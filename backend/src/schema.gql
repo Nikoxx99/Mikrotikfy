@@ -1,0 +1,133 @@
+type Query {
+  Client(_id: ID): Client
+  Clients(limit: Int): [Client]
+  City(id: Int): City
+  Cities(limit: Int): [City]
+  Neighborhood(id: Int): Neighborhood
+  Neighborhoods(limit: Int): [Neighborhood]
+  Plan(id: Int): Plan
+  Plans(limit: Int): [Plan]
+  Technology(id: Int): Technology
+  Technologies(limit: Int): [Technology]
+}
+type Client {
+  _id: ID
+  code: Int
+  name: String
+  dni: String
+  address: String
+  neighborhood: String
+  city: Int
+  phone: String
+  plan: Int
+  wifi_ssid: String
+  wifi_password: String
+  technology: Int
+  mac_address: String
+  comment: String
+  operator: Int
+}
+type City {
+  _id: ID
+  id: Int
+  name: String
+  clients: [Client]
+  neighborhoods: [Neighborhood]
+}
+type Neighborhood {
+  _id: ID
+  id: Int
+  name: String
+  clients: [Client]
+  cities: [City]
+}
+type Plan {
+  _id: ID
+  id: Int
+  name: String
+  mikrotik_name: String
+  clients: [Client]
+}
+type Technology {
+  _id: ID
+  id: Int
+  name: String
+  clients: [Client]
+}
+type Error {
+  path: String!
+  message: String!
+}
+type SimpleResponse {
+  success: Boolean!
+  errors: [Error]
+}
+type Response {
+  success: Boolean!
+  token: String
+  role: Int
+  username: String
+  errors: [Error]
+}
+
+scalar Date
+
+type Mutation {
+  createClient(input: ClientInput): SimpleResponse
+  editClient(input: EditClientInput): SimpleResponse
+  deleteClient(id: ID): SimpleResponse
+  createCity(input: CityInput): SimpleResponse
+  createNeighborhood(input: NeighborhoodInput): SimpleResponse
+  createPlan(input: PlanInput): SimpleResponse
+  createTechnology(input: TechnologyInput): SimpleResponse
+}
+input ClientInput {
+  code: Int
+  name: String
+  dni: String
+  address: String
+  neighborhood: Int
+  city: Int
+  phone: String
+  plan: Int
+  wifi_ssid: String
+  wifi_password: String
+  technology: Int
+  mac_address: String
+  comment: String
+  operator: Int
+}
+input EditClientInput {
+  _id: String
+  code: Int
+  name: String
+  dni: String
+  address: String
+  neighborhood: Int
+  city: Int
+  phone: String
+  plan: Int
+  wifi_ssid: String
+  wifi_password: String
+  technology: Int
+  mac_address: String
+  comment: String
+  operator: Int
+}
+input CityInput {
+  id: Int
+  name: String
+}
+input NeighborhoodInput {
+  id: Int
+  name: String
+}
+input PlanInput {
+  id: Int
+  name: String
+  mikrotik_name: String
+}
+input TechnologyInput {
+  id: Int
+  name: String
+}
