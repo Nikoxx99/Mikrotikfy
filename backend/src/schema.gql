@@ -16,13 +16,13 @@ type Client {
   name: String
   dni: String
   address: String
-  neighborhood: String
-  city: Int
+  neighborhood: Neighborhood
+  city: City
   phone: String
-  plan: Int
+  plan: Plan
   wifi_ssid: String
   wifi_password: String
-  technology: Int
+  technology: Technology
   mac_address: String
   comment: String
   operator: Int

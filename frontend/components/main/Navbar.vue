@@ -6,6 +6,7 @@
           <v-btn
             class="mr-4"
             color="primary"
+            :to="`/crear?city=${$route.query.city}`"
           >
             <v-icon>mdi-plus</v-icon>
             Crear Cliente
@@ -28,12 +29,14 @@
           <v-btn
             class="mr-4"
             color="primary"
+            href="/lista?city=1"
           >
             Mariquita
           </v-btn>
           <v-btn
             class="mr-4"
             color="success"
+            href="/lista?city=2"
           >
             Fresno
           </v-btn>

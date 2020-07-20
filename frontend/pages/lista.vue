@@ -10,10 +10,12 @@
         cols="12"
       >
         <v-card>
-          <v-card-title>
-            Clientes Mariquita
+          <v-card-title
+            :class="cityColor"
+          >
+            Clientes {{ city }}
             <v-chip
-              color="success"
+              color="blue darken-3 white--text"
               small
               class="mx-4"
             >
@@ -40,11 +42,12 @@
               label="Buscar Cliente"
               single-line
               hide-details
+              class="white--text"
             />
           </v-card-title>
           <v-data-table
             :headers="headers"
-            :items="desserts"
+            :items="City.clients"
             :search="search"
             hide-default-footer
             :page.sync="page"
@@ -61,10 +64,48 @@
 </template>
 
 <script>
+import gql from 'graphql-tag'
 import Navbar from '../components/main/Navbar'
 export default {
   components: {
     Navbar
+  },
+  middleware: 'defaultCity',
+  apollo: {
+    City () {
+      return {
+        query: gql`
+        query($city: Int) {
+          City(id: $city){
+            name
+            clients{
+              code
+              name
+              dni
+              address
+              neighborhood{
+                name
+              }
+              city{
+                name
+              }
+              phone
+              plan{
+                name
+              }
+              technology{
+                name
+              }
+              operator
+            }
+          }
+        }
+      `,
+        variables: {
+          city: parseInt(this.$route.query.city, 10)
+        }
+      }
+    }
   },
   data () {
     return {
@@ -72,101 +113,31 @@ export default {
       pageCount: 0,
       itemsPerPage: 50,
       search: '',
+      city: 'Mariquita',
+      cityColor: 'blue darken-3 white--text',
       headers: [
         {
-          text: 'Dessert (100g serving)',
+          text: 'Codigo',
           align: 'start',
-          sortable: false,
-          value: 'name'
+          sortable: true,
+          value: 'code'
         },
-        { text: 'Calories', value: 'calories' },
-        { text: 'Fat (g)', value: 'fat' },
-        { text: 'Carbs (g)', value: 'carbs' },
-        { text: 'Protein (g)', value: 'protein' },
-        { text: 'Iron (%)', value: 'iron' }
-      ],
-      desserts: [
-        {
-          name: 'Frozen Yogurt',
-          calories: 159,
-          fat: 6.0,
-          carbs: 24,
-          protein: 4.0,
-          iron: '1%'
-        },
-        {
-          name: 'Ice cream sandwich',
-          calories: 237,
-          fat: 9.0,
-          carbs: 37,
-          protein: 4.3,
-          iron: '1%'
-        },
-        {
-          name: 'Eclair',
-          calories: 262,
-          fat: 16.0,
-          carbs: 23,
-          protein: 6.0,
-          iron: '7%'
-        },
-        {
-          name: 'Cupcake',
-          calories: 305,
-          fat: 3.7,
-          carbs: 67,
-          protein: 4.3,
-          iron: '8%'
-        },
-        {
-          name: 'Gingerbread',
-          calories: 356,
-          fat: 16.0,
-          carbs: 49,
-          protein: 3.9,
-          iron: '16%'
-        },
-        {
-          name: 'Jelly bean',
-          calories: 375,
-          fat: 0.0,
-          carbs: 94,
-          protein: 0.0,
-          iron: '0%'
-        },
-        {
-          name: 'Lollipop',
-          calories: 392,
-          fat: 0.2,
-          carbs: 98,
-          protein: 0,
-          iron: '2%'
-        },
-        {
-          name: 'Honeycomb',
-          calories: 408,
-          fat: 3.2,
-          carbs: 87,
-          protein: 6.5,
-          iron: '45%'
-        },
-        {
-          name: 'Donut',
-          calories: 452,
-          fat: 25.0,
-          carbs: 51,
-          protein: 4.9,
-          iron: '22%'
-        },
-        {
-          name: 'KitKat',
-          calories: 518,
-          fat: 26.0,
-          carbs: 65,
-          protein: 7,
-          iron: '6%'
-        }
+        { text: 'Nombre', sortable: true, value: 'name' },
+        { text: 'Cedula', sortable: true, value: 'dni' },
+        { text: 'Direccion', sortable: true, value: 'address' },
+        { text: 'Barrio', sortable: true, value: 'neighborhood.name' },
+        { text: 'Ciudad', sortable: true, value: 'city.name' },
+        { text: 'Telefono', sortable: true, value: 'phone' },
+        { text: 'Plan', sortable: true, value: 'plan.name' },
+        { text: 'Tecnologia', sortable: true, value: 'technology.name' },
+        { text: 'Op.', sortable: true, value: 'operator' }
       ]
+    }
+  },
+  created () {
+    if (this.$route.query.city === '2') {
+      this.cityColor = 'green darken-3 white--text'
+      this.city = 'Fresno'
     }
   }
 }

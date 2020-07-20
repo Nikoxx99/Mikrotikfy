@@ -1,5 +1,5 @@
 import colors from 'vuetify/es5/util/colors'
-
+require('dotenv').config()
 export default {
   /*
   ** Nuxt rendering mode
@@ -49,8 +49,18 @@ export default {
   buildModules: [
     // Doc: https://github.com/nuxt-community/eslint-module
     '@nuxtjs/eslint-module',
+    '@nuxtjs/apollo',
     '@nuxtjs/vuetify'
   ],
+
+  apollo: {
+    clientConfigs: {
+      default: {
+        httpEndpoint: process.env.API_ENDPOINT
+      }
+    }
+  },
+
   /*
   ** Nuxt.js modules
   */

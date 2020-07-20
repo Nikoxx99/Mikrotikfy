@@ -1,0 +1,284 @@
+<template>
+  <div>
+    <v-alert
+      v-if="alertBox"
+      type="info"
+      :class="alertBoxColor"
+      tile
+      dismissible
+    >
+      {{ createdMessage }}
+    </v-alert>
+    <v-form v-model="valid">
+      <v-text-field
+        v-model.number="Client.code"
+        type="number"
+        label="Codigo"
+        required
+      />
+      <v-text-field
+        v-model="Client.name"
+        label="Nombre Completo"
+        required
+      />
+      <v-text-field
+        v-model="Client.dni"
+        type="number"
+        label="Cedula"
+        required
+      />
+      <v-row>
+        <v-col>
+          <v-select
+            v-model="dir1"
+            :items="dirFragment1"
+            label="Dirección"
+            @blur="genAddress"
+          />
+        </v-col>
+        <v-col>
+          <v-text-field
+            v-model="dir2"
+            label="#"
+            @blur="genAddress"
+          />
+        </v-col>
+        <v-col>
+          <v-select
+            v-model="dir3"
+            :items="dirFragment2"
+            label="#"
+            @blur="genAddress"
+          />
+        </v-col>
+        <v-col>
+          <v-text-field
+            v-model="dir4"
+            label="#"
+            @blur="genAddress"
+          />
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <v-select
+            v-model="Client.neighborhood"
+            item-text="name"
+            item-value="id"
+            :items="Neighborhoods"
+            label="Barrio"
+          />
+        </v-col>
+        <v-col>
+          <v-select
+            v-model="Client.city"
+            item-text="name"
+            item-value="id"
+            :items="Cities"
+            label="Ciudad"
+            disabled
+          />
+        </v-col>
+      </v-row>
+      <v-text-field
+        v-model="Client.phone"
+        label="Telefono"
+        required
+      />
+      <v-select
+        v-model="Client.plan"
+        item-text="name"
+        item-value="id"
+        :items="Plans"
+        label="Plan"
+      />
+      <v-row>
+        <v-col>
+          <v-text-field
+            v-model="Client.wifi_ssid"
+            label="Nombre de Red"
+            required
+          />
+        </v-col>
+        <v-col>
+          <v-text-field
+            v-model="Client.wifi_password"
+            label="Clave de Red"
+            required
+          />
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <v-select
+            v-model="Client.technology"
+            item-text="name"
+            item-value="id"
+            :items="Technologies"
+            label="Tecnología"
+          />
+        </v-col>
+        <v-col>
+          <v-text-field
+            v-model="Client.mac_address"
+            label="Mac Equipo"
+            required
+          />
+        </v-col>
+      </v-row>
+      <v-textarea
+        v-model="Client.comment"
+        outlined
+        label="Comentario"
+      />
+      <v-btn
+        class="mr-4"
+        color="primary"
+        :loading="isSubmitting"
+        :disabled="isSubmitting"
+        @click="createClient"
+      >
+        Crear Cliente
+      </v-btn>
+    </v-form>
+  </div>
+</template>
+
+<script>
+import gql from 'graphql-tag'
+export default {
+  apollo: {
+    Cities () {
+      return {
+        query: gql`
+        query{
+          Cities{
+            id
+            name
+          }
+        }
+      `
+      }
+    },
+    Neighborhoods () {
+      return {
+        query: gql`
+        query{
+          Neighborhoods{
+            id
+            name
+          }
+        }
+      `
+      }
+    },
+    Plans () {
+      return {
+        query: gql`
+        query{
+          Plans{
+            id
+            name
+          }
+        }
+      `
+      }
+    },
+    Technologies () {
+      return {
+        query: gql`
+        query{
+          Technologies{
+            id
+            name
+          }
+        }
+      `
+      }
+    }
+  },
+  data: () => {
+    return {
+      valid: false,
+      Client: {
+        code: '',
+        name: '',
+        dni: '',
+        address: '',
+        neighborhood: '',
+        city: 1,
+        phone: '',
+        plan: '',
+        wifi_ssid: '',
+        wifi_password: '',
+        technology: '',
+        mac_address: '',
+        comment: ''
+      },
+      dir1: '',
+      dir2: '',
+      dir3: '',
+      dir4: '',
+      dirFragment1: [
+        '(SIN INICIAL)',
+        'CARRERA',
+        'CALLE',
+        'MANZANA',
+        'DIAGONAL'
+      ],
+      dirFragment2: [
+        '#',
+        'CASA',
+        'DIAGONAL'
+      ],
+      alertBox: false,
+      alertBoxColor: '',
+      createdMessage: '',
+      isSubmitting: false
+    }
+  },
+  mounted () {
+    if (this.$route.query.city) {
+      this.Client.city = parseInt(this.$route.query.city)
+    }
+  },
+  methods: {
+    createClient () {
+      // this.isSubmitting = !this.isSubmitting
+      this.$apollo.mutate({
+        mutation: gql`mutation ($input: ClientInput){
+          createClient(input: $input){
+            success
+            errors{
+              path
+              message
+            }
+          }
+        }`,
+        variables: {
+          input: this.Client
+        }
+      }).then((input) => {
+        if (input.data.createClient.success) {
+          // this.$router.push({ path: '/lista/', query: { created: true } }, () => { window.location.reload(true) }, () => { window.location.reload(true) })
+        } else {
+          this.alertBox = true
+          this.alertBoxColor = 'red darken-4'
+          this.createdMessage = input.data.createClient.errors[0].message
+          this.isSubmitting = false
+        }
+      }).catch((error) => {
+        // eslint-disable-next-line no-console
+        console.error(error)
+      })
+    },
+    genAddress () {
+      this.Client.address = `${this.dir1} ${this.dir2} ${this.dir3} ${this.dir4}`
+    }
+  }
+}
+</script>
+
+<style>
+
+</style>

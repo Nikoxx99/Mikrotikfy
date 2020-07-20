@@ -3,6 +3,7 @@ import City from './models/City'
 import Neighborhood from './models/Neighborhood'
 import Plan from './models/Plan'
 import Technology from './models/Technology'
+import { mkCreateClient } from './mikrotik/createClient'
 const simpleResponse = async (success, path, message) => {
   return { success: success, errors: [{ path: path, message: message }] }
 }
@@ -12,10 +13,10 @@ export const resolvers = {
       return await Client.findById(_id)
     },
     Clients: async (_, { limit }) => {
-      return await Client.find().limit(limit)
+      return await Client.find().limit(limit).sort({ 'code': 'desc' })
     },
-    City: async (_, { _id }) => {
-      return await City.findById(_id)
+    City: async (_, { id }) => {
+      return await City.findOne({id: id})
     },
     Cities: async (_, { limit }) => {
       return await City.find().limit(limit)
@@ -40,10 +41,15 @@ export const resolvers = {
     },
   },
   Mutation: {
-    createClient: async (_, { input }) => {
-      const newClient = new Client(input)
+    createClient: async (_, { input: {city, neighborhood, plan, technology, ...data} }) => {
+      const newClient = new Client({city,plan,technology,...data})
+      const newCity = await City.find({id: city},{name: 1, _id:0})
+      const newNeighborhood = await Neighborhood.find({id: neighborhood},{name: 1, _id:0})
+      const newPlan = await Plan.find({id: plan},{name: 1, mikrotik_name: 1, _id:0})
+      const newTechnology = await Technology.find({id: technology},{name: 1, _id:0})
       const res = await newClient.save()
       if (res) {
+        await mkCreateClient({newCity,newNeighborhood,newPlan,newTechnology,...data})
         return simpleResponse(true, 'Create Client', 'Client Created Successfullly.')
       } else {
         return simpleResponse(false, 'Create Client', 'Error Creating Client.')
@@ -102,6 +108,20 @@ export const resolvers = {
         return simpleResponse(false, 'Create Technology', 'Error Creating Technology.')
       }
     },
+  },
+  Client: {
+    city({ city }) {
+      return City.findOne({ id: city})
+    },
+    neighborhood({ neighborhood }){
+      return Neighborhood.findOne({ id: neighborhood})
+    },
+    plan({ plan }) {
+      return Plan.findOne({ id: plan})
+    },
+    technology({ technology }) {
+      return Technology.findOne({ id: technology})
+    }
   },
   City: {
     clients({ id }) {

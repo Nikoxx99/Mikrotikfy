@@ -11,7 +11,7 @@
         <v-list-item
           v-for="(item, i) in items"
           :key="i"
-          :to="item.to"
+          :href="item.to"
           router
           exact
         >
@@ -63,7 +63,7 @@ export default {
         {
           icon: 'mdi-apps',
           title: 'Base de Datos',
-          to: '/'
+          to: '/lista'
         }
       ],
       miniVariant: false,
