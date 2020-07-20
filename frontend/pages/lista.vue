@@ -2,6 +2,19 @@
   <div>
     <v-row>
       <v-col>
+        <v-alert
+          v-if="alertBox"
+          type="info"
+          :class="alertBoxColor"
+          tile
+          dismissible
+        >
+          {{ createdMessage }}
+        </v-alert>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
         <Navbar />
       </v-col>
     </v-row>
@@ -138,6 +151,21 @@ export default {
     if (this.$route.query.city === '2') {
       this.cityColor = 'green darken-3 white--text'
       this.city = 'Fresno'
+    }
+    if (this.$route.query.created) {
+      this.alertBox = true
+      this.alertBoxColor = 'blue darken-4'
+      this.createdMessage = 'Cliente Creado Satisfactoriamente'
+    }
+    if (this.$route.query.edited) {
+      this.alertBox = true
+      this.alertBoxColor = 'yellow darken-4'
+      this.createdMessage = 'Cliente Editado Satisfactoriamente.'
+    }
+    if (this.$route.query.deleted) {
+      this.alertBox = true
+      this.alertBoxColor = 'red darken-4'
+      this.createdMessage = 'Cliente Eliminado Satisfactoriamente.'
     }
   }
 }

@@ -244,7 +244,7 @@ export default {
   },
   methods: {
     createClient () {
-      // this.isSubmitting = !this.isSubmitting
+      this.isSubmitting = !this.isSubmitting
       this.$apollo.mutate({
         mutation: gql`mutation ($input: ClientInput){
           createClient(input: $input){
@@ -260,7 +260,7 @@ export default {
         }
       }).then((input) => {
         if (input.data.createClient.success) {
-          // this.$router.push({ path: '/lista/', query: { created: true } }, () => { window.location.reload(true) }, () => { window.location.reload(true) })
+          this.$router.push({ path: '/lista?city=' + parseInt(this.$route.query.city), query: { created: true } }, () => { window.location.reload(true) }, () => { window.location.reload(true) })
         } else {
           this.alertBox = true
           this.alertBoxColor = 'red darken-4'
@@ -268,8 +268,10 @@ export default {
           this.isSubmitting = false
         }
       }).catch((error) => {
-        // eslint-disable-next-line no-console
-        console.error(error)
+        this.alertBox = true
+        this.alertBoxColor = 'red darken-4'
+        this.createdMessage = error
+        this.isSubmitting = false
       })
     },
     genAddress () {

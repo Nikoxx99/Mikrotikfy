@@ -42,8 +42,8 @@ export const resolvers = {
   },
   Mutation: {
     createClient: async (_, { input: {city, neighborhood, plan, technology, ...data} }) => {
-      const newClient = new Client({city,plan,technology,...data})
-      const newCity = await City.find({id: city},{name: 1, _id:0})
+      const newClient = new Client({city,plan,neighborhood,technology,...data})
+      const newCity = await City.find({id: city},{name: 1, ip:1, _id:0})
       const newNeighborhood = await Neighborhood.find({id: neighborhood},{name: 1, _id:0})
       const newPlan = await Plan.find({id: plan},{name: 1, mikrotik_name: 1, _id:0})
       const newTechnology = await Technology.find({id: technology},{name: 1, _id:0})
