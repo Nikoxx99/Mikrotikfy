@@ -1,5 +1,7 @@
 <template>
-  <v-app>
+  <v-app
+    dark
+  >
     <v-navigation-drawer
       v-model="drawer"
       :mini-variant="miniVariant"
@@ -32,11 +34,20 @@
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-toolbar-title v-text="title" />
       <v-spacer />
-      <v-btn
-        icon
-      >
-        <v-icon>mdi-power</v-icon>
-      </v-btn>
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            icon
+            large
+            v-bind="attrs"
+            v-on="on"
+            @click="logout"
+          >
+            <v-icon>mdi-exit-to-app</v-icon>
+          </v-btn>
+        </template>
+        <span>Cerrar sesión</span>
+      </v-tooltip>
     </v-app-bar>
     <v-main>
       <v-container fluid>
@@ -53,6 +64,7 @@
 </template>
 
 <script>
+import Cookie from 'js-cookie'
 export default {
   data () {
     return {
@@ -70,6 +82,13 @@ export default {
       right: true,
       rightDrawer: false,
       title: 'ARNOProducciones Database'
+    }
+  },
+  methods: {
+    logout () {
+      Cookie.remove('auth')
+      this.$store.commit('setAuth', null)
+      this.$router.replace('/login')
     }
   }
 }

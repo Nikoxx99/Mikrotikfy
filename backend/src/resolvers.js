@@ -1,3 +1,5 @@
+import { auth } from './auth'
+import User from './models/User'
 import Client from './models/Client'
 import City from './models/City'
 import Neighborhood from './models/Neighborhood'
@@ -56,6 +58,7 @@ export const resolvers = {
       }
     },
     editClient: async (_,{input}) => {
+      console.log(input)
       const id = input._id
       const res = await Client.updateOne({_id: id}, input, {multi: false})
       if(res){
@@ -108,6 +111,26 @@ export const resolvers = {
         return simpleResponse(false, 'Create Technology', 'Error Creating Technology.')
       }
     },
+    createUser: async function (_,{input: {...data}}){
+      const emailUser = await User.findOne({email: data.email})
+      const userUser = await User.findOne({username: data.username})
+      const role = 1
+      if(emailUser){
+        return simpleResponse(false,'Create User','Email already exists.')
+      }else if (userUser){
+        return simpleResponse(false,'Create User','Username already exists.')
+      }else{
+        const newUser = new User({role,...data})
+        newUser.password = await newUser.encryptPassword(data.password)
+        const res = await newUser.save()
+        if(res){
+          return simpleResponse(true,'Create User','User created successfully.')
+        }else{
+          return simpleResponse(false,'Create User','User creating error.')
+        }
+      }
+    },
+    login: async (_, {input}, SECRET) => auth.login(input, User, SECRET)
   },
   Client: {
     city({ city }) {

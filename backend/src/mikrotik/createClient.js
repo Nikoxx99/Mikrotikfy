@@ -7,10 +7,9 @@ module.exports.mkCreateClient = async function (input) {
     password: 'weare991010rootnortetv',
     port: 8087
   })
-  const comment = `CODIGO: ${input.code} NOMBRE: ${input.name} CEDULA: ${input.dni} DIRECCION: ${input.address} BARRIO: ${input.newNeighborhood[0].name} CIUDAD: ${input.newCity[0].name} TELEFONO: ${input.phone} PLAN: ${input.newPlan[0].name} SSID: ${input.wifi_ssid} CLAVE: ${input.wifi_password} TECNOLOGIA: ${input.newTechnology[0].name} MAC: ${input.mac_address} COMENTARIO: ${input.comment} OPERADOR: ${input.operator}
-  `
+  const comment = `${input.code} ${input.name} ${input.dni} ${input.address} ${input.newNeighborhood[0].name} ${input.newCity[0].name} ${input.phone} ${input.newPlan[0].name} ${input.wifi_ssid} ${input.wifi_password} ${input.newTechnology[0].name} ${input.mac_address} ${input.comment} ${input.operator}`
   await conn.connect().then(() => {
-    console.log('Connected Successfully >>>')
+    console.log('Connected to Mikrotik Successfully >>>')
   }).then(() => {
     conn.write('/ppp/secret/add', [
       '=name='+input.code,
@@ -20,9 +19,10 @@ module.exports.mkCreateClient = async function (input) {
       '=comment='+comment,
     ]).then(() => {
       conn.close()
+      console.log('Connection Closed <<<')
     })
   }).catch((err) => {
-    console.log(err)
     conn.close()
+    console.log(err)
   })
 }

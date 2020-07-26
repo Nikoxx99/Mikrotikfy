@@ -80,6 +80,8 @@ type Mutation {
   createNeighborhood(input: NeighborhoodInput): SimpleResponse
   createPlan(input: PlanInput): SimpleResponse
   createTechnology(input: TechnologyInput): SimpleResponse
+  createUser(input: UserInput): Response
+  login(input: LoginInput): Response
 }
 input ClientInput {
   code: Int
@@ -130,4 +132,15 @@ input PlanInput {
 input TechnologyInput {
   id: Int
   name: String
+}
+input UserInput {
+  username: String!
+  email: String
+  password: String!
+  date: String
+  role: Int
+}
+input LoginInput {
+  username: String!
+  password: String!
 }

@@ -5,14 +5,6 @@
         <v-card-title>
           <v-btn
             class="mr-4"
-            color="primary"
-            :to="`/crear?city=${$route.query.city}`"
-          >
-            <v-icon>mdi-plus</v-icon>
-            Crear Cliente
-          </v-btn>
-          <v-btn
-            class="mr-4"
             color="red darken-3 white--text"
           >
             <v-icon>mdi-trash</v-icon>

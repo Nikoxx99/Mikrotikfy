@@ -27,27 +27,6 @@
             :class="cityColor"
           >
             Clientes {{ city }}
-            <v-chip
-              color="blue darken-3 white--text"
-              small
-              class="mx-4"
-            >
-              Activos: 900
-            </v-chip>
-            <v-chip
-              color="red darken-4 white--text"
-              small
-              class="mr-4"
-            >
-              En Mora: 100
-            </v-chip>
-            <v-chip
-              color="primary"
-              small
-              class="mr-4"
-            >
-              Totales: 1000
-            </v-chip>
             <v-spacer />
             <v-text-field
               v-model="search"
@@ -59,14 +38,107 @@
             />
           </v-card-title>
           <v-data-table
+            fixed-header
             :headers="headers"
-            :items="City.clients"
+            :items.sync="City.clients"
             :search="search"
             hide-default-footer
             :page.sync="page"
             :items-per-page="itemsPerPage"
             @page-count="pageCount = $event"
-          />
+          >
+            <!-- ########################### -->
+            <template v-slot:top>
+              <v-toolbar flat>
+                <v-dialog v-model="dialog" max-width="500px" :retain-focus="false">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                      color="primary"
+                      dark
+                      class="mb-2 mr-4"
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      <v-icon>mdi-plus</v-icon>
+                      Nuevo Cliente
+                    </v-btn>
+                    <v-chip
+                      color="blue darken-3 white--text"
+                      small
+                      class="mr-4"
+                    >
+                      Activos: {{ active_users }}
+                    </v-chip>
+                    <v-chip
+                      color="red darken-4 white--text"
+                      small
+                      class="mr-4"
+                    >
+                      En Mora: {{ inactive_users }}
+                    </v-chip>
+                    <v-chip
+                      color="primary"
+                      small
+                      class="mr-4"
+                    >
+                      Totales: {{ Object.keys(City.clients).length }}
+                    </v-chip>
+                  </template>
+                  <v-card>
+                    <v-card-title>
+                      <span class="headline">Crear Cliente</span>
+                    </v-card-title>
+                    <v-card-text>
+                      <v-container>
+                        <CreateForm />
+                      </v-container>
+                    </v-card-text>
+                  </v-card>
+                </v-dialog>
+                <v-dialog v-model="dialogEdit" max-width="500px" :retain-focus="false">
+                  <v-card>
+                    <v-card-title>
+                      <span class="headline">Editar Cliente</span>
+                    </v-card-title>
+                    <v-card-text>
+                      <v-container>
+                        <EditForm
+                          v-bind="client"
+                          @updateClient="updateClient($event)"
+                        />
+                      </v-container>
+                    </v-card-text>
+                  </v-card>
+                </v-dialog>
+              </v-toolbar>
+            </template>
+            <!-- ########################### -->
+            <template v-slot:item.actions="{ item }">
+              <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    v-bind="attrs"
+                    class="yellow darken-4"
+                    small
+                    v-on="on"
+                    @click="editItem(item)"
+                  >
+                    <v-icon>
+                      mdi-pencil
+                    </v-icon>
+                  </v-btn>
+                </template>
+                <span>Editar Cliente</span>
+              </v-tooltip>
+              <DeleteClient :name="item.name" :clientid="item._id" />
+            </template>
+            <!-- ########################### -->
+            <template v-slot:item.plan.name="{ item }">
+              <v-chip :color="getColor(item.plan.id)" class="white--text">
+                {{ item.plan.name }}
+              </v-chip>
+            </template>
+          </v-data-table>
           <div class="text-center pt-2">
             <v-pagination v-model="page" :length="pageCount" />
           </div>
@@ -79,11 +151,17 @@
 <script>
 import gql from 'graphql-tag'
 import Navbar from '../components/main/Navbar'
+import CreateForm from '../components/create/CreateForm'
+import EditForm from '../components/edit/EditForm'
+import DeleteClient from '../components/delete/DeleteClient'
 export default {
   components: {
-    Navbar
+    Navbar,
+    CreateForm,
+    EditForm,
+    DeleteClient
   },
-  middleware: 'defaultCity',
+  middleware: ['defaultCity', 'authenticated'],
   apollo: {
     City () {
       return {
@@ -92,23 +170,32 @@ export default {
           City(id: $city){
             name
             clients{
+              _id
               code
               name
               dni
               address
               neighborhood{
+                id
                 name
               }
               city{
+                id
                 name
               }
               phone
               plan{
+                id
                 name
               }
               technology{
+                id
                 name
               }
+              wifi_ssid
+              wifi_password
+              mac_address
+              comment
               operator
             }
           }
@@ -128,6 +215,9 @@ export default {
       search: '',
       city: 'Mariquita',
       cityColor: 'blue darken-3 white--text',
+      alertBox: false,
+      dialog: false,
+      dialogEdit: false,
       headers: [
         {
           text: 'Codigo',
@@ -137,14 +227,38 @@ export default {
         },
         { text: 'Nombre', sortable: true, value: 'name' },
         { text: 'Cedula', sortable: true, value: 'dni' },
-        { text: 'Direccion', sortable: true, value: 'address' },
+        { text: 'Direccion', sortable: false, value: 'address' },
         { text: 'Barrio', sortable: true, value: 'neighborhood.name' },
-        { text: 'Ciudad', sortable: true, value: 'city.name' },
-        { text: 'Telefono', sortable: true, value: 'phone' },
+        { text: 'Ciudad', sortable: false, value: 'city.name' },
+        { text: 'Telefono', sortable: false, value: 'phone' },
         { text: 'Plan', sortable: true, value: 'plan.name' },
         { text: 'Tecnologia', sortable: true, value: 'technology.name' },
-        { text: 'Op.', sortable: true, value: 'operator' }
-      ]
+        { text: 'Op.', sortable: true, value: 'operator' },
+        { text: 'Aciones', value: 'actions', sortable: false }
+      ],
+      editedIndex: -1,
+      client: {
+        Client: {
+          code: 1,
+          name: '',
+          dni: '',
+          address: '',
+          neighborhood: 0,
+          city: 0,
+          phone: '',
+          plan: 0,
+          wifi_ssid: '',
+          wifi_password: '',
+          technology: '',
+          mac_address: '',
+          comment: ''
+        }
+      },
+      snack: false,
+      snackColor: '',
+      snackText: '',
+      active_users: 0,
+      inactive_users: 0
     }
   },
   created () {
@@ -167,6 +281,47 @@ export default {
       this.alertBoxColor = 'red darken-4'
       this.createdMessage = 'Cliente Eliminado Satisfactoriamente.'
     }
+  },
+  mounted () {
+    const clients = this.City.clients.filter((c) => {
+      return c.plan.id < 7
+    })
+    this.active_users = clients.length
+    const inactiveClients = this.City.clients.filter((c) => {
+      return c.plan.id >= 7
+    })
+    this.inactive_users = inactiveClients.length
+  },
+  methods: {
+    editItem (item) {
+      this.editedIndex = this.City.clients.indexOf(item)
+      this.client.Client = Object.assign({}, item)
+      this.dialogEdit = true
+    },
+    getColor (plan) {
+      if (plan === 1) {
+        return 'blue'
+      } else if (plan === 2) {
+        return 'green'
+      } else if (plan === 7) {
+        return 'red'
+      } else if (plan === 8) {
+        return 'black'
+      }
+    },
+    updateClient (input) {
+      if (this.editedIndex > -1) {
+        Object.assign(this.City.clients[this.editedIndex], input)
+      } else {
+        this.City.clients.push(input)
+      }
+      this.dialogEdit = false
+    }
   }
 }
 </script>
+<style>
+  .diez {
+    color: red;
+  }
+</style>

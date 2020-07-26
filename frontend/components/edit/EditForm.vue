@@ -30,42 +30,11 @@
         required
         dense
       />
-      <v-row>
-        <v-col>
-          <v-select
-            v-model="dir1"
-            :items="dirFragment1"
-            label="Dirección"
-            dense
-            @blur="genAddress"
-          />
-        </v-col>
-        <v-col>
-          <v-text-field
-            v-model="dir2"
-            label="#"
-            dense
-            @blur="genAddress"
-          />
-        </v-col>
-        <v-col>
-          <v-select
-            v-model="dir3"
-            :items="dirFragment2"
-            label="#"
-            dense
-            @blur="genAddress"
-          />
-        </v-col>
-        <v-col>
-          <v-text-field
-            v-model="dir4"
-            label="#"
-            dense
-            @blur="genAddress"
-          />
-        </v-col>
-      </v-row>
+      <v-text-field
+        v-model="Client.address"
+        label="Direccion"
+        dense
+      />
       <v-row>
         <v-col>
           <v-select
@@ -73,6 +42,7 @@
             item-text="name"
             item-value="id"
             :items="Neighborhoods"
+            return-object
             label="Barrio"
             dense
           />
@@ -83,6 +53,7 @@
             item-text="name"
             item-value="id"
             :items="Cities"
+            return-object
             label="Ciudad"
             disabled
             dense
@@ -100,6 +71,7 @@
         item-text="name"
         item-value="id"
         :items="Plans"
+        return-object
         label="Plan"
         dense
       />
@@ -128,6 +100,7 @@
             item-text="name"
             item-value="id"
             :items="Technologies"
+            return-object
             label="Tecnología"
             dense
           />
@@ -149,21 +122,22 @@
       />
       <v-btn
         class="mr-4"
-        color="primary"
+        color="success"
         :loading="isSubmitting"
         :disabled="isSubmitting"
-        @click="createClient"
+        @click="editClient"
       >
-        Crear Cliente
+        Editar Cliente
       </v-btn>
     </v-form>
   </div>
 </template>
 
 <script>
+/* eslint-disable vue/prop-name-casing */
 import gql from 'graphql-tag'
 export default {
-  name: 'CreateForm',
+  name: 'EditForm',
   apollo: {
     Cities () {
       return {
@@ -214,24 +188,103 @@ export default {
       }
     }
   },
+  props: {
+    Client: {
+      type: Object,
+      default: () => {},
+      _id: {
+        type: String,
+        default: ''
+      },
+      code: {
+        type: Number,
+        default: 1
+      },
+      name: {
+        type: String,
+        default: ''
+      },
+      dni: {
+        type: String,
+        default: ''
+      },
+      address: {
+        type: String,
+        default: ''
+      },
+      neighborhood: {
+        type: Object,
+        default: () => { this.neighborhood = 1 },
+        id: {
+          type: Number,
+          default: 1
+        },
+        name: {
+          type: String,
+          default: ''
+        }
+      },
+      city: {
+        type: Object,
+        default: () => {},
+        id: {
+          type: Number,
+          default: 0
+        },
+        name: {
+          type: String,
+          default: ''
+        }
+      },
+      phone: {
+        type: String,
+        default: ''
+      },
+      plan: {
+        type: Object,
+        default: () => {},
+        id: {
+          type: Number,
+          default: 0
+        },
+        name: {
+          type: String,
+          default: ''
+        }
+      },
+      wifi_ssid: {
+        type: String,
+        default: ''
+      },
+      wifi_password: {
+        type: String,
+        default: ''
+      },
+      technology: {
+        type: Object,
+        default: () => {},
+        id: {
+          type: Number,
+          default: 0
+        },
+        name: {
+          type: String,
+          default: ''
+        }
+      },
+      mac_address: {
+        type: String,
+        default: ''
+      },
+      comment: {
+        type: String,
+        default: ''
+      }
+    }
+  },
   data: () => {
     return {
       valid: false,
-      Client: {
-        code: '',
-        name: '',
-        dni: '',
-        address: '',
-        neighborhood: '',
-        city: 1,
-        phone: '',
-        plan: '',
-        wifi_ssid: '',
-        wifi_password: '',
-        technology: '',
-        mac_address: '',
-        comment: ''
-      },
       dir1: '',
       dir2: '',
       dir3: '',
@@ -254,17 +307,11 @@ export default {
       isSubmitting: false
     }
   },
-  mounted () {
-    if (this.$route.query.city) {
-      this.Client.city = parseInt(this.$route.query.city)
-    }
-  },
   methods: {
-    createClient () {
-      this.isSubmitting = !this.isSubmitting
+    editClient () {
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: ClientInput){
-          createClient(input: $input){
+        mutation: gql`mutation ($input: EditClientInput){
+          editClient(input: $input){
             success
             errors{
               path
@@ -273,15 +320,32 @@ export default {
           }
         }`,
         variables: {
-          input: this.Client
+          input: {
+            _id: this.Client._id,
+            code: this.Client.code,
+            name: this.Client.name,
+            dni: this.Client.dni,
+            address: this.Client.address,
+            neighborhood: this.Client.neighborhood.id,
+            city: this.Client.city.id,
+            phone: this.Client.phone,
+            plan: this.Client.plan.id,
+            technology: this.Client.technology.id,
+            wifi_ssid: this.Client.wifi_ssid,
+            wifi_password: this.Client.wifi_password,
+            mac_address: this.Client.mac_address,
+            comment: this.Client.comment,
+            operator: this.Client.operator
+          }
         }
       }).then((input) => {
-        if (input.data.createClient.success) {
-          this.$router.push({ path: '/lista?city=' + parseInt(this.$route.query.city), query: { created: true } }, () => { window.location.reload(true) }, () => { window.location.reload(true) })
+        if (input.data.editClient.success) {
+          this.$emit('updateClient', this.Client)
+          // window.location.reload(true)
         } else {
           this.alertBox = true
           this.alertBoxColor = 'red darken-4'
-          this.createdMessage = input.data.createClient.errors[0].message
+          this.createdMessage = input.data.editClient.errors[0].message
           this.isSubmitting = false
         }
       }).catch((error) => {
