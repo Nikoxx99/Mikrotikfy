@@ -75,6 +75,7 @@ scalar Date
 type Mutation {
   createClient(input: ClientInput): SimpleResponse
   editClient(input: EditClientInput): SimpleResponse
+  editClientPlan(input: EditClientPlanInput): SimpleResponse
   deleteClient(id: ID): SimpleResponse
   createCity(input: CityInput): SimpleResponse
   createNeighborhood(input: NeighborhoodInput): SimpleResponse
@@ -115,6 +116,10 @@ input EditClientInput {
   mac_address: String
   comment: String
   operator: Int
+}
+input EditClientPlanInput {
+  id: String
+  plan: Int
 }
 input CityInput {
   id: Int

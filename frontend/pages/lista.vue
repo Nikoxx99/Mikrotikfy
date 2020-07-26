@@ -47,6 +47,35 @@
             :items-per-page="itemsPerPage"
             @page-count="pageCount = $event"
           >
+            <template v-slot:item.plan.name="props">
+              <v-edit-dialog
+                :return-value.sync="props.item.plan"
+                persistent
+                large
+                cancel-text="Cancelar"
+                save-text="Guardar"
+                @save="save(props.item._id, props.item.plan.id)"
+                @cancel="cancel"
+                @open="open"
+                @close="close"
+              >
+                <v-chip :color="getColor(props.item.plan.id)" class="white--text">
+                  {{ props.item.plan.name }}
+                </v-chip>
+                <template v-slot:input>
+                  <v-select
+                    v-model="props.item.plan"
+                    item-text="name"
+                    item-value="id"
+                    :items="Plans"
+                    return-object
+                    single-line
+                    label="Plan"
+                    dense
+                  />
+                </template>
+              </v-edit-dialog>
+            </template>
             <!-- ########################### -->
             <template v-slot:top>
               <v-toolbar flat>
@@ -133,11 +162,6 @@
               <DeleteClient :name="item.name" :clientid="item._id" />
             </template>
             <!-- ########################### -->
-            <template v-slot:item.plan.name="{ item }">
-              <v-chip :color="getColor(item.plan.id)" class="white--text">
-                {{ item.plan.name }}
-              </v-chip>
-            </template>
           </v-data-table>
           <div class="text-center pt-2">
             <v-pagination v-model="page" :length="pageCount" />
@@ -145,6 +169,15 @@
         </v-card>
       </v-col>
     </v-row>
+    <v-snackbar v-model="snack" :timeout="3000" :color="snackColor">
+      {{ snackText }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn v-bind="attrs" text @click="snack = false">
+          Cerrar
+        </v-btn>
+      </template>
+    </v-snackbar>
   </div>
 </template>
 
@@ -204,6 +237,18 @@ export default {
         variables: {
           city: parseInt(this.$route.query.city, 10)
         }
+      }
+    },
+    Plans () {
+      return {
+        query: gql`
+        query{
+          Plans{
+            id
+            name
+          }
+        }
+      `
       }
     }
   },
@@ -316,6 +361,46 @@ export default {
         this.City.clients.push(input)
       }
       this.dialogEdit = false
+    },
+    save (clientId, newPlan) {
+      this.$apollo.mutate({
+        mutation: gql`mutation ($input: EditClientPlanInput){
+          editClientPlan(input: $input){
+            success
+            errors{
+              path
+              message
+            }
+          }
+        }`,
+        variables: {
+          input: {
+            id: clientId,
+            plan: newPlan
+          }
+        }
+      }).then((input) => {
+        this.snack = true
+        this.snackColor = 'success'
+        this.snackText = 'Cambio de plan exitoso'
+      }).catch((error) => {
+        this.snack = true
+        this.snackColor = 'red'
+        this.snackText = error
+      })
+    },
+    cancel () {
+      this.snack = true
+      this.snackColor = 'error'
+      this.snackText = 'Operacion cancelada'
+    },
+    open () {
+      this.snack = true
+      this.snackColor = 'info'
+      this.snackText = 'Editar plan'
+    },
+    close () {
+      console.log('Info closed')
     }
   }
 }

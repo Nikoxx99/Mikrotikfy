@@ -43,7 +43,7 @@
           <v-btn
             color="red darken-1"
             text
-            @click.once="deleteClient(clientid)"
+            @click="deleteClient(clientid)"
           >
             Borrar
           </v-btn>

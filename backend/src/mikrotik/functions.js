@@ -26,3 +26,31 @@ module.exports.mkCreateClient = async function (input) {
     console.log(err)
   })
 }
+
+module.exports.mkDeleteClient = async function (input) {
+  const conn = new RouterOSAPI({
+    host: input.newCity,
+    user: 'API_ARNOP',
+    password: 'weare991010rootnortetv',
+    port: 8087
+  })
+  await conn.connect().then(() => {
+    console.log('Connected to Mikrotik Successfully >>>')
+  }).then(() => {
+    conn.write('/ppp/secret/getall', [
+      '=.proplist=.id',
+      '?=name='+input.client,
+    ]).then((data) => {
+      conn.write('/ppp/secret/remove', [
+        '=.id='+data[0]['.id']
+      ]).then(() => {
+        conn.close()
+        console.log('Connection Closed <<<')
+        return true
+      })
+    })
+  }).catch((err) => {
+    conn.close()
+    console.log(err)
+  })
+}

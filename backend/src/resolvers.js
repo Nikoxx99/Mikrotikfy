@@ -5,7 +5,7 @@ import City from './models/City'
 import Neighborhood from './models/Neighborhood'
 import Plan from './models/Plan'
 import Technology from './models/Technology'
-import { mkCreateClient } from './mikrotik/createClient'
+import { mkCreateClient, mkDeleteClient } from './mikrotik/functions'
 const simpleResponse = async (success, path, message) => {
   return { success: success, errors: [{ path: path, message: message }] }
 }
@@ -58,7 +58,6 @@ export const resolvers = {
       }
     },
     editClient: async (_,{input}) => {
-      console.log(input)
       const id = input._id
       const res = await Client.updateOne({_id: id}, input, {multi: false})
       if(res){
@@ -67,9 +66,26 @@ export const resolvers = {
         return simpleResponse(false,'Edit Client','Error Editing Client')
       }
     },
+    editClientPlan: async (_,{input}) => {
+      console.log(input)
+      const id = input.id
+      const plan = input.plan
+      const res = await Client.updateOne({_id: id}, {plan}, {multi: false})
+      if(res){
+        return simpleResponse(true,'Edit Client Plan','Client Plan Edited Successfuly')
+      }else{
+        return simpleResponse(false,'Edit Client Plan','Error Editing Client Plan')
+      }
+    },
     deleteClient: async (_,{id}) => {
+      const search = await Client.find({_id: id})
+      const searchCity = search[0].city
+      const city = await City.find({id: searchCity})
+      const newCity = city[0].ip
+      const client = search[0].code
       const deleteEpisode = await Client.findByIdAndDelete(id)
-      if(deleteEpisode){
+      const delMikrotik = await mkDeleteClient({client,newCity})
+      if(deleteEpisode && delMikrotik){
         return simpleResponse(true,'Delete Client','Client deleted successfully.')
       }else{
         return simpleResponse(false,'Delete Client','Error deleting Client.')
