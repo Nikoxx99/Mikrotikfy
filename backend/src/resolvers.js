@@ -5,7 +5,7 @@ import City from './models/City'
 import Neighborhood from './models/Neighborhood'
 import Plan from './models/Plan'
 import Technology from './models/Technology'
-import { mkCreateClient, mkDeleteClient } from './mikrotik/functions'
+import { mkCreateClient, mkDeleteClient, mkClientStatus } from './mikrotik/functions'
 const simpleResponse = async (success, path, message) => {
   return { success: success, errors: [{ path: path, message: message }] }
 }
@@ -90,6 +90,15 @@ export const resolvers = {
       }else{
         return simpleResponse(false,'Delete Client','Error deleting Client.')
       }
+    },
+    getClientStatus: async (_,{id}) => {
+      const search = await Client.find({_id: id})
+      const searchCity = search[0].city
+      const city = await City.find({id: searchCity})
+      const newCity = city[0].ip
+      const client = search[0].code
+      const status = await mkClientStatus({client, newCity})
+      return status
     },
     createCity: async (_, { input }) => {
       const newCity = new City(input)

@@ -54,3 +54,54 @@ module.exports.mkDeleteClient = async function (input) {
     console.log(err)
   })
 }
+
+module.exports.mkClientStatus = async function (input) {
+  const conn = new RouterOSAPI({
+    host: input.newCity,
+    user: 'API_ARNOP',
+    password: 'weare991010rootnortetv',
+    port: 8087
+  })
+  await conn.connect()
+  try {
+    const com1 = await conn.write('/interface/getall', [
+      '=.proplist=tx-byte,rx-byte,last-link-up-time',
+      '?=name=<pppoe-' + input.client + '>',
+    ])
+    const com2 = await conn.write('/ppp/active/getall', [
+      '=.proplist=caller-id,uptime,address',
+      '?=name='+input.client,
+    ])
+    const com3 = await conn.write('/ppp/secret/getall', [
+      '=.proplist=last-logged-out',
+      '?=name='+input.client,
+    ])
+    if (com1.length > 0 && com2.length > 0) {
+      let client = {}
+      client.status = true
+      client.download = com1[0]['tx-byte']
+      client.upload = com1[0]['rx-byte']
+      client.offlineTime = com1[0]['last-link-up-time']
+      client.address = com2[0]['address']
+      client.mac_address = com2[0]['caller-id']
+      client.uptime = com2[0].uptime
+      conn.close()
+      return client
+    } else {
+      if (com3.length > 0) {
+        let client = {}
+        client.status = true
+        client.offlineTime = com3[0]['last-logged-out']
+        conn.close()
+        return client
+      }
+      let client = {}
+      client.status = false
+      conn.close()
+      return client
+    }
+  } catch (error) {
+    console.log(error)
+    conn.close()
+  }
+}

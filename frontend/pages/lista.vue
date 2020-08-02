@@ -56,7 +56,6 @@
                 save-text="Guardar"
                 @save="save(props.item._id, props.item.plan.id)"
                 @cancel="cancel"
-                @open="open"
                 @close="close"
               >
                 <v-chip :color="getColor(props.item.plan.id)" class="white--text">
@@ -143,6 +142,7 @@
             </template>
             <!-- ########################### -->
             <template v-slot:item.actions="{ item }">
+              <ClientStatus :name="item.name" :clientid="item._id" />
               <v-tooltip top>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
@@ -169,11 +169,32 @@
         </v-card>
       </v-col>
     </v-row>
-    <v-snackbar v-model="snack" :timeout="3000" :color="snackColor">
+    <v-snackbar
+      v-model="snack"
+      :timeout="3000"
+      :color="snackColor"
+      top
+      vertical
+    >
       {{ snackText }}
 
       <template v-slot:action="{ attrs }">
         <v-btn v-bind="attrs" text @click="snack = false">
+          Cerrar
+        </v-btn>
+      </template>
+    </v-snackbar>
+    <v-snackbar
+      v-model="editSnack"
+      :timeout="3000"
+      color="yellow darken-4"
+      top
+      vertical
+    >
+      {{ editSnackText }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn v-bind="attrs" text @click="editSnack = false">
           Cerrar
         </v-btn>
       </template>
@@ -187,12 +208,14 @@ import Navbar from '../components/main/Navbar'
 import CreateForm from '../components/create/CreateForm'
 import EditForm from '../components/edit/EditForm'
 import DeleteClient from '../components/delete/DeleteClient'
+import ClientStatus from '../components/main/ClientStatus'
 export default {
   components: {
     Navbar,
     CreateForm,
     EditForm,
-    DeleteClient
+    DeleteClient,
+    ClientStatus
   },
   middleware: ['defaultCity', 'authenticated'],
   apollo: {
@@ -302,6 +325,8 @@ export default {
       snack: false,
       snackColor: '',
       snackText: '',
+      editSnack: false,
+      editSnackText: '',
       active_users: 0,
       inactive_users: 0
     }
@@ -361,6 +386,8 @@ export default {
         this.City.clients.push(input)
       }
       this.dialogEdit = false
+      this.editSnack = true
+      this.editSnackText = 'Cliente editado exitosamente'
     },
     save (clientId, newPlan) {
       this.$apollo.mutate({
@@ -394,12 +421,8 @@ export default {
       this.snackColor = 'error'
       this.snackText = 'Operacion cancelada'
     },
-    open () {
-      this.snack = true
-      this.snackColor = 'info'
-      this.snackText = 'Editar plan'
-    },
     close () {
+      // eslint-disable-next-line no-console
       console.log('Info closed')
     }
   }

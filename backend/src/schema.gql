@@ -69,6 +69,15 @@ type Response {
   username: String
   errors: [Error]
 }
+type ClientStatus {
+  status: Boolean
+  address: String
+  mac_address: String
+  offlineTime: String
+  uptime: String
+  download: String
+  upload: String
+}
 
 scalar Date
 
@@ -77,6 +86,7 @@ type Mutation {
   editClient(input: EditClientInput): SimpleResponse
   editClientPlan(input: EditClientPlanInput): SimpleResponse
   deleteClient(id: ID): SimpleResponse
+  getClientStatus(id: ID): ClientStatus
   createCity(input: CityInput): SimpleResponse
   createNeighborhood(input: NeighborhoodInput): SimpleResponse
   createPlan(input: PlanInput): SimpleResponse
