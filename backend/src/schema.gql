@@ -1,6 +1,7 @@
 type Query {
   Client(_id: ID): Client
   Clients(limit: Int): [Client]
+  getActiveClients(city: Int): [ActiveClients]
   City(id: Int): City
   Cities(limit: Int): [City]
   Neighborhood(id: Int): Neighborhood
@@ -77,6 +78,9 @@ type ClientStatus {
   uptime: String
   download: String
   upload: String
+}
+type ActiveClients {
+  name: String
 }
 
 scalar Date

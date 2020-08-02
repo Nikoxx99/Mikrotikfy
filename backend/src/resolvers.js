@@ -5,7 +5,7 @@ import City from './models/City'
 import Neighborhood from './models/Neighborhood'
 import Plan from './models/Plan'
 import Technology from './models/Technology'
-import { mkCreateClient, mkDeleteClient, mkClientStatus } from './mikrotik/functions'
+import { mkCreateClient, mkDeleteClient, mkClientStatus, mkGetActiveClients, mkSetClientPlanInformation } from './mikrotik/functions'
 const simpleResponse = async (success, path, message) => {
   return { success: success, errors: [{ path: path, message: message }] }
 }
@@ -16,6 +16,12 @@ export const resolvers = {
     },
     Clients: async (_, { limit }) => {
       return await Client.find().limit(limit).sort({ 'code': 'desc' })
+    },
+    getActiveClients: async (_, {city}) =>{
+      const search = await City.find({id: city})
+      const newCity = search[0].ip
+      const activeClients = await mkGetActiveClients({newCity})
+      return activeClients
     },
     City: async (_, { id }) => {
       return await City.findOne({id: id})
@@ -59,19 +65,42 @@ export const resolvers = {
     },
     editClient: async (_,{input}) => {
       const id = input._id
+      const search = await Client.find({_id: id})
+      const code = search[0].code
+
+      const searchCity = search[0].city
+      const city = await City.find({id: searchCity})
+      const newCity = city[0].ip
+
+      const searchPlan = input.plan
+      const plan = await Plan.find({id: searchPlan})
+      const newPlan = plan[0].mikrotik_name
+
       const res = await Client.updateOne({_id: id}, input, {multi: false})
-      if(res){
+      const mkRes = await mkSetClientPlanInformation({newPlan, newCity, code})
+      if(res && mkRes){
         return simpleResponse(true,'Edit Client','Client Edited Successfuly')
       }else{
         return simpleResponse(false,'Edit Client','Error Editing Client')
       }
     },
     editClientPlan: async (_,{input}) => {
-      console.log(input)
       const id = input.id
-      const plan = input.plan
-      const res = await Client.updateOne({_id: id}, {plan}, {multi: false})
-      if(res){
+      const search = await Client.find({_id: id})
+      const code = search[0].code
+
+      const searchCity = search[0].city
+      const city = await City.find({id: searchCity})
+      const newCity = city[0].ip
+
+      const searchPlan = input.plan
+      const plan = await Plan.find({id: searchPlan})
+      const savePlan = plan[0].id
+      const newPlan = plan[0].mikrotik_name
+
+      const res = await Client.updateOne({_id: id}, {savePlan}, {multi: false})
+      const mkRes = await mkSetClientPlanInformation({newPlan, newCity, code})
+      if(res && mkRes){
         return simpleResponse(true,'Edit Client Plan','Client Plan Edited Successfuly')
       }else{
         return simpleResponse(false,'Edit Client Plan','Error Editing Client Plan')

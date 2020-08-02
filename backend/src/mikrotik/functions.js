@@ -105,3 +105,47 @@ module.exports.mkClientStatus = async function (input) {
     conn.close()
   }
 }
+
+module.exports.mkGetActiveClients = async function (input) {
+  const conn = new RouterOSAPI({
+    host: input.newCity,
+    user: 'API_ARNOP',
+    password: 'weare991010rootnortetv',
+    port: 8087
+  })
+  await conn.connect()
+  const com1 = await conn.write('/ppp/active/print', [
+    '=.proplist=name',
+  ])
+  conn.close()
+  return com1
+}
+
+module.exports.mkSetClientPlanInformation = async function (input) {
+  const conn = new RouterOSAPI({
+    host: input.newCity,
+    user: 'API_ARNOP',
+    password: 'weare991010rootnortetv',
+    port: 8087
+  })
+  try {
+    await conn.connect()
+    const com1 = await conn.write('/ppp/secret/getall', [
+      '=.proplist=.id',
+      '?=name='+input.code,
+    ])
+    await conn.write('/ppp/secret/set', [
+      '=.id=' + com1[0]['.id'],
+      '=profile='+input.newPlan,
+    ])
+    if (com1.length > 0) {
+      conn.close()
+      return true
+    } else {
+      conn.close()
+      return false
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}

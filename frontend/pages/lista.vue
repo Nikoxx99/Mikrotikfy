@@ -45,6 +45,7 @@
             hide-default-footer
             :page.sync="page"
             :items-per-page="itemsPerPage"
+            dense
             @page-count="pageCount = $event"
           >
             <template v-slot:item.plan.name="props">
@@ -58,7 +59,7 @@
                 @cancel="cancel"
                 @close="close"
               >
-                <v-chip :color="getColor(props.item.plan.id)" class="white--text">
+                <v-chip small :color="getColor(props.item.plan.id)" class="white--text">
                   {{ props.item.plan.name }}
                 </v-chip>
                 <template v-slot:input>
@@ -74,6 +75,12 @@
                   />
                 </template>
               </v-edit-dialog>
+            </template>
+            <!-- ########################### -->
+            <template v-slot:item.status="{ item }">
+              <svg height="20" width="20">
+                <circle cx="10" cy="10" r="5" :fill="getStatus(item.code)" />
+              </svg>
             </template>
             <!-- ########################### -->
             <template v-slot:top>
@@ -273,6 +280,20 @@ export default {
         }
       `
       }
+    },
+    getActiveClients () {
+      return {
+        query: gql`
+        query($city: Int){
+          getActiveClients(city: $city){
+            name
+          }
+        }
+      `,
+        variables: {
+          city: parseInt(this.$route.query.city, 10)
+        }
+      }
     }
   },
   data () {
@@ -293,6 +314,7 @@ export default {
           sortable: true,
           value: 'code'
         },
+        { text: 'Estado', sortable: false, value: 'status', class: 'statusClass', width: '1%' },
         { text: 'Nombre', sortable: true, value: 'name' },
         { text: 'Cedula', sortable: true, value: 'dni' },
         { text: 'Direccion', sortable: false, value: 'address' },
@@ -377,6 +399,15 @@ export default {
         return 'red'
       } else if (plan === 8) {
         return 'black'
+      }
+    },
+    getStatus (client) {
+      // eslint-disable-next-line eqeqeq
+      const search = this.getActiveClients.find(c => c.name == client)
+      if (search) {
+        return 'green'
+      } else {
+        return 'red'
       }
     },
     updateClient (input) {
