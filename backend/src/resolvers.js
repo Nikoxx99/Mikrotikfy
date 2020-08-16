@@ -125,8 +125,10 @@ export const resolvers = {
       const searchCity = search[0].city
       const city = await City.find({id: searchCity})
       const newCity = city[0].ip
-      const client = search[0].code
-      const status = await mkClientStatus({client, newCity})
+      const code = search[0].code
+      const dni = search[0].dni
+      const model = search[0].newModel
+      const status = await mkClientStatus({dni, code, newCity, model})
       return status
     },
     createCity: async (_, { input }) => {
@@ -201,8 +203,8 @@ export const resolvers = {
     }
   },
   City: {
-    clients({ id }) {
-      return Client.find({ city: id }).sort({ 'code': 'desc' })
+    clients({ id }, {limit}) {
+      return Client.find({ city: id }).sort({ 'code': 'desc' }).limit(limit)
     },
     neighborhoods({ id }) {
       return Neighborhood.find({ city: id }).sort({ 'code': 'desc' })

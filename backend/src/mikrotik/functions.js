@@ -64,18 +64,29 @@ module.exports.mkClientStatus = async function (input) {
   })
   await conn.connect()
   try {
-    const com1 = await conn.write('/interface/getall', [
-      '=.proplist=tx-byte,rx-byte,last-link-up-time',
-      '?=name=<pppoe-' + input.client + '>',
-    ])
-    const com2 = await conn.write('/ppp/active/getall', [
-      '=.proplist=caller-id,uptime,address',
-      '?=name='+input.client,
-    ])
-    const com3 = await conn.write('/ppp/secret/getall', [
-      '=.proplist=last-logged-out',
-      '?=name='+input.client,
-    ])
+    if (input.model === 1) {
+      var com1 = await conn.write('/interface/print', [
+        '=.proplist=tx-byte,rx-byte,last-link-up-time',
+        '?=name=<pppoe-' + input.code + '>',
+      ])
+      console.log(1)
+      var com2 = await conn.write('/ppp/active/print', [
+        '=.proplist=caller-id,uptime,address',
+        '?=name='+input.code,
+      ])
+      console.log(2)
+    } else {
+      var com1 = await conn.write('/interface/print', [
+        '=.proplist=tx-byte,rx-byte,last-link-up-time',
+        '?=name=<pppoe-' + input.dni + '>',
+      ])
+      console.log(4)
+      var com2 = await conn.write('/ppp/active/print', [
+        '=.proplist=caller-id,uptime,address',
+        '?=name='+input.dni,
+      ])
+      console.log(5)
+    } 
     if (com1.length > 0 && com2.length > 0) {
       let client = {}
       client.status = true
@@ -88,6 +99,10 @@ module.exports.mkClientStatus = async function (input) {
       conn.close()
       return client
     } else {
+      var com3 = await conn.write('/ppp/secret/print', [
+        '=.proplist=last-logged-out',
+        '?=name='+input.code,
+      ])
       if (com3.length > 0) {
         let client = {}
         client.status = true

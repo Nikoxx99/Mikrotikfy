@@ -40,7 +40,7 @@
           <v-data-table
             fixed-header
             :headers="headers"
-            :items.sync="City.clients"
+            :items="City.clients"
             :search="search"
             hide-default-footer
             :page.sync="page"
@@ -48,6 +48,7 @@
             dense
             @page-count="pageCount = $event"
           >
+            <!-- ########################### -->
             <template v-slot:item.plan.name="props">
               <v-edit-dialog
                 :return-value.sync="props.item.plan"
@@ -77,9 +78,15 @@
               </v-edit-dialog>
             </template>
             <!-- ########################### -->
+            <template v-slot:item.technology.name="{ item }">
+              <span :class="getTechnology(item.technology.id) + '--text'">
+                {{ item.technology.name }}
+              </span>
+            </template>
+            <!-- ########################### -->
             <template v-slot:item.status="{ item }">
-              <svg height="20" width="20">
-                <circle cx="10" cy="10" r="5" :fill="getStatus(item.code)" />
+              <svg height="13" width="20">
+                <circle cx="10" cy="8" r="5" :fill="getStatus(item.code, item.dni)" />
               </svg>
             </template>
             <!-- ########################### -->
@@ -401,13 +408,27 @@ export default {
         return 'black'
       }
     },
-    getStatus (client) {
+    getTechnology (technology) {
+      console.log(technology)
+      if (technology === 0) {
+        return 'cyan'
+      } else if (technology === 1) {
+        return 'green'
+      }
+    },
+    getStatus (code, dni) {
       // eslint-disable-next-line eqeqeq
-      const search = this.getActiveClients.find(c => c.name == client)
+      const search = this.getActiveClients.find(c => c.name == code)
       if (search) {
         return 'green'
       } else {
-        return 'red'
+        // eslint-disable-next-line eqeqeq
+        const search2 = this.getActiveClients.find(c => c.name == dni)
+        if (search2) {
+          return 'green'
+        } else {
+          return 'red'
+        }
       }
     },
     updateClient (input) {

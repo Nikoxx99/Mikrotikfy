@@ -34,7 +34,8 @@ const clientSchema = new Schema({
   updated_at: {
     type: Date
   },
-  operator: Number
+  operator: Number,
+  newModel: Number
 })
 
 export default model('Client', clientSchema)

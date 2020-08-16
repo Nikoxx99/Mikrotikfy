@@ -32,7 +32,7 @@ type City {
   _id: ID
   id: Int
   name: String
-  clients: [Client]
+  clients(limit: Int): [Client]
   neighborhoods: [Neighborhood]
 }
 type Neighborhood {

@@ -1,6 +1,7 @@
 <template>
   <v-card
     flat
+    :loading="isLoading"
   >
     <v-alert
       v-if="firstTime"
@@ -41,7 +42,15 @@
       </form>
     </v-card-text>
     <v-card-text>
-      <v-btn tile text block class="my-2 blue darken-4 white--text" @click.enter="login">
+      <v-btn
+        tile
+        text
+        block
+        class="my-2 blue darken-4 white--text"
+        :loading="isLoading"
+        :disabled="isLoading"
+        @click.enter="login"
+      >
         Ingresar
       </v-btn>
     </v-card-text>
@@ -66,7 +75,8 @@ export default {
     ],
     showPassword: false,
     firstTime: false,
-    loginFailed: false
+    loginFailed: false,
+    isLoading: false
   }),
   mounted () {
     if (this.$route.query.firstTime) {
@@ -82,6 +92,8 @@ export default {
       this.password = ''
     },
     login () {
+      this.isLoading = true
+      this.loginFailed = false
       this.$apollo.mutate({
         mutation: gql`mutation ($input: LoginInput!){
           login(input: $input){
@@ -117,6 +129,7 @@ export default {
           }
         } else {
           this.loginFailed = true
+          this.isLoading = false
         }
       }).catch((error) => {
         // eslint-disable-next-line no-console
