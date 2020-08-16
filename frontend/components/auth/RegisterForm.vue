@@ -2,6 +2,15 @@
   <v-card
     flat
   >
+    <v-alert
+      v-if="alertBox"
+      type="info"
+      :class="alertBoxColor"
+      tile
+      dismissible
+    >
+      {{ createdMessage }}
+    </v-alert>
     <v-card-title class="justify-center">
       Registrar usuario
     </v-card-title>
@@ -74,7 +83,10 @@ export default {
       v => !!v || 'Las contraseñas no coinciden'
     ],
     showPassword: false,
-    valid: false
+    valid: false,
+    createdMessage: '',
+    alertBox: false,
+    alertBoxColor: ''
   }),
 
   methods: {
@@ -113,7 +125,14 @@ export default {
           }
         }
       }).then((input) => {
-        this.$router.push({ path: '/login?firstTime=true' })
+        if (input.data.createUser.success) {
+          this.$router.push({ path: '/login?firstTime=true' })
+        } else {
+          this.alertBox = true
+          this.alertBoxColor = 'red darken-4'
+          this.createdMessage = input.data.createUser.errors[0].message
+          this.isSubmitting = false
+        }
       }).catch((error) => {
         // eslint-disable-next-line no-console
         console.error(error)

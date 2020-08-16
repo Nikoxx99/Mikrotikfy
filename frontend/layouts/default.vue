@@ -76,6 +76,11 @@ export default {
           icon: 'mdi-apps',
           title: 'Base de Datos',
           to: '/lista'
+        },
+        {
+          icon: 'mdi-cog',
+          title: 'Ajustes',
+          to: '/config'
         }
       ],
       miniVariant: false,

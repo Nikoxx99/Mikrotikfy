@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="City">
     <v-row>
       <v-col>
         <v-alert
@@ -26,7 +26,7 @@
           <v-card-title
             :class="cityColor"
           >
-            Clientes {{ city }}
+            Clientes {{ currentCity }}
             <v-spacer />
             <v-text-field
               v-model="search"
@@ -214,6 +214,14 @@
       </template>
     </v-snackbar>
   </div>
+  <div
+    v-else
+    style="display:grid;place-items:center"
+  >
+    <h1>
+      No hay informacion agregada aun
+    </h1>
+  </div>
 </template>
 
 <script>
@@ -309,7 +317,8 @@ export default {
       pageCount: 0,
       itemsPerPage: 50,
       search: '',
-      city: 'Mariquita',
+      currentCity: 'Mariquita',
+      City: '',
       cityColor: 'blue darken-3 white--text',
       alertBox: false,
       dialog: false,
@@ -317,7 +326,6 @@ export default {
       headers: [
         {
           text: 'Codigo',
-          align: 'start',
           sortable: true,
           value: 'code'
         },
@@ -382,14 +390,16 @@ export default {
     }
   },
   mounted () {
-    const clients = this.City.clients.filter((c) => {
-      return c.plan.id < 7
-    })
-    this.active_users = clients.length
-    const inactiveClients = this.City.clients.filter((c) => {
-      return c.plan.id >= 7
-    })
-    this.inactive_users = inactiveClients.length
+    if (this.City) {
+      const clients = this.City.clients.filter((c) => {
+        return c.plan.id < 7
+      })
+      this.active_users = clients.length
+      const inactiveClients = this.City.clients.filter((c) => {
+        return c.plan.id >= 7
+      })
+      this.inactive_users = inactiveClients.length
+    }
   },
   methods: {
     editItem (item) {
@@ -409,7 +419,6 @@ export default {
       }
     },
     getTechnology (technology) {
-      console.log(technology)
       if (technology === 0) {
         return 'cyan'
       } else if (technology === 1) {
@@ -481,7 +490,5 @@ export default {
 }
 </script>
 <style>
-  .diez {
-    color: red;
-  }
+
 </style>

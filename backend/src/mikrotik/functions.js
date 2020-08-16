@@ -76,11 +76,13 @@ module.exports.mkClientStatus = async function (input) {
       ])
       console.log(2)
     } else {
+      // eslint-disable-next-line no-redeclare
       var com1 = await conn.write('/interface/print', [
         '=.proplist=tx-byte,rx-byte,last-link-up-time',
         '?=name=<pppoe-' + input.dni + '>',
       ])
       console.log(4)
+      // eslint-disable-next-line no-redeclare
       var com2 = await conn.write('/ppp/active/print', [
         '=.proplist=caller-id,uptime,address',
         '?=name='+input.dni,

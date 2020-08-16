@@ -34,6 +34,7 @@ type City {
   name: String
   clients(limit: Int): [Client]
   neighborhoods: [Neighborhood]
+  ip: String
 }
 type Neighborhood {
   _id: ID
@@ -138,6 +139,7 @@ input EditClientPlanInput {
 input CityInput {
   id: Int
   name: String
+  ip: String
 }
 input NeighborhoodInput {
   id: Int
