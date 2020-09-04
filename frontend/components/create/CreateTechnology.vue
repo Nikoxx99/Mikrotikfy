@@ -42,19 +42,46 @@
               <v-card-title class="blue darken-3">
                 Tecnologias
               </v-card-title>
-              <v-list
-                rounded
-                shaped
+              <v-data-table
+                :headers="headers"
+                :items="technologies"
+                class="elevation-1"
               >
-                <v-list-item
-                  v-for="technology in technologies"
-                  :key="technology.id"
-                >
-                  <v-list-item-content>
-                    <v-list-item-title>{{ technology.name }}</v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </v-list>
+                <template v-slot:item.actions="{ item }">
+                  <v-dialog v-model="dialogEdit" max-width="500px" :retain-focus="false">
+                    <v-card>
+                      <v-card-title>
+                        <span class="headline">Editar Tecnologias</span>
+                      </v-card-title>
+                      <v-card-text>
+                        <v-container>
+                          <EditTechnology
+                            v-bind="edit"
+                            @updateTechnology="updateTechnology($event)"
+                          />
+                        </v-container>
+                      </v-card-text>
+                    </v-card>
+                  </v-dialog>
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn
+                        v-bind="attrs"
+                        class="yellow darken-4"
+                        small
+                        v-on="on"
+                        @click="editItem(item)"
+                      >
+                        <v-icon>
+                          mdi-pencil
+                        </v-icon>
+                      </v-btn>
+                    </template>
+                    <span>Editar Tecnologia</span>
+                  </v-tooltip>
+                  <ModalDeleteTechnology :name="item.name" :technologyid="item.id" />
+                </template>
+              </v-data-table>
             </v-card>
           </v-container>
         </v-row>
@@ -65,8 +92,14 @@
 
 <script>
 import gql from 'graphql-tag'
+import EditTechnology from '../edit/EditTechnology'
+import ModalDeleteTechnology from '../delete/ModalDeleteTechnology'
 export default {
   name: 'CreateTechnology',
+  components: {
+    EditTechnology,
+    ModalDeleteTechnology
+  },
   data: () => ({
     id: 0,
     name: '',
@@ -74,7 +107,21 @@ export default {
     createdMessage: '',
     alertBox: false,
     alertBoxColor: '',
-    isSubmitting: false
+    isSubmitting: false,
+    headers: [
+      { text: 'ID', value: 'id' },
+      { text: 'Nombre', value: 'name' },
+      { text: 'A.', value: 'actions' }
+    ],
+    editedIndex: -1,
+    edit: {
+      technologies: {
+        id: 0,
+        name: '',
+        ip: ''
+      }
+    },
+    dialogEdit: false
   }),
   created () {
     if (this.$route.query.created) {
@@ -100,6 +147,19 @@ export default {
     })
   },
   methods: {
+    editItem (item) {
+      this.editedIndex = this.technologies.indexOf(item)
+      this.edit.technologies = Object.assign({}, item)
+      this.dialogEdit = true
+    },
+    updateTechnology (input) {
+      if (this.editedIndex > -1) {
+        Object.assign(this.technologies[this.editedIndex], input)
+      } else {
+        this.technologies.push(input)
+      }
+      this.dialogEdit = false
+    },
     createTechnology () {
       this.isSubmitting = !this.isSubmitting
       this.$apollo.mutate({

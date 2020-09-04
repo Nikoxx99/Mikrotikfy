@@ -93,9 +93,17 @@ type Mutation {
   deleteClient(id: ID): SimpleResponse
   getClientStatus(id: ID): ClientStatus
   createCity(input: CityInput): SimpleResponse
+  updateCity(input: CityInput): SimpleResponse
+  deleteCity(id: Int): SimpleResponse
   createNeighborhood(input: NeighborhoodInput): SimpleResponse
+  updateNeighborhood(input: NeighborhoodInput): SimpleResponse
+  deleteNeighborhood(id: Int): SimpleResponse
   createPlan(input: PlanInput): SimpleResponse
+  updatePlan(input: PlanInput): SimpleResponse
+  deletePlan(id: Int): SimpleResponse
   createTechnology(input: TechnologyInput): SimpleResponse
+  updateTechnology(input: TechnologyInput): SimpleResponse
+  deleteTechnology(id: Int): SimpleResponse
   createUser(input: UserInput): Response
   login(input: LoginInput): Response
 }

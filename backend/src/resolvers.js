@@ -140,6 +140,22 @@ export const resolvers = {
         return simpleResponse(false, 'Create City', 'Error Creating City.')
       }
     },
+    updateCity: async (_,{input}) => {
+      const updateCity = await City.updateOne({id: input.id}, input, {multi: false})
+      if(updateCity){
+        return simpleResponse(true,'Update City','City updated successfully.')
+      }else{
+        return simpleResponse(false,'Update City','Error updating City.')
+      }
+    },
+    deleteCity: async (_,{id}) => {
+      const deleteCity = await City.findOneAndRemove(id)
+      if(deleteCity){
+        return simpleResponse(true,'Delete City','City deleted successfully.')
+      }else{
+        return simpleResponse(false,'Delete City','Error deleting City.')
+      }
+    },
     createNeighborhood: async (_, { input }) => {
       const newNeighborhood = new Neighborhood(input)
       const res = await newNeighborhood.save()
@@ -147,6 +163,22 @@ export const resolvers = {
         return simpleResponse(true, 'Create Neighborhood', 'Neighborhood Created Successfullly.')
       } else {
         return simpleResponse(false, 'Create Neighborhood', 'Error Creating Neighborhood.')
+      }
+    },
+    updateNeighborhood: async (_,{input}) => {
+      const updateNeighborhood = await Neighborhood.updateOne({id: input.id}, input, {multi: false})
+      if(updateNeighborhood){
+        return simpleResponse(true,'Update Neighborhood','Neighborhood updated successfully.')
+      }else{
+        return simpleResponse(false,'Update Neighborhood','Error updating Neighborhood.')
+      }
+    },
+    deleteNeighborhood: async (_,{id}) => {
+      const deleteNeighborhood = await Neighborhood.findOneAndRemove(id)
+      if(deleteNeighborhood){
+        return simpleResponse(true,'Delete Neighborhood','Neighborhood deleted successfully.')
+      }else{
+        return simpleResponse(false,'Delete Neighborhood','Error deleting Neighborhood.')
       }
     },
     createPlan: async (_, { input }) => {
@@ -158,6 +190,22 @@ export const resolvers = {
         return simpleResponse(false, 'Create Plan', 'Error Creating Plan.')
       }
     },
+    updatePlan: async (_,{input}) => {
+      const updatePlan = await Plan.updateOne({id: input.id}, input, {multi: false})
+      if(updatePlan){
+        return simpleResponse(true,'Update Plan','Plan updated successfully.')
+      }else{
+        return simpleResponse(false,'Update Plan','Error updating Plan.')
+      }
+    },
+    deletePlan: async (_,{id}) => {
+      const deletePlan = await Plan.findOneAndRemove(id)
+      if(deletePlan){
+        return simpleResponse(true,'Delete Plan','Plan deleted successfully.')
+      }else{
+        return simpleResponse(false,'Delete Plan','Error deleting Plan.')
+      }
+    },
     createTechnology: async (_, { input }) => {
       const newTechnology = new Technology(input)
       const res = await newTechnology.save()
@@ -165,6 +213,22 @@ export const resolvers = {
         return simpleResponse(true, 'Create Technology', 'Technology Created Successfullly.')
       } else {
         return simpleResponse(false, 'Create Technology', 'Error Creating Technology.')
+      }
+    },
+    updateTechnology: async (_,{input}) => {
+      const updateTechnology = await Technology.updateOne({id: input.id}, input, {multi: false})
+      if(updateTechnology){
+        return simpleResponse(true,'Update Technology','Technology updated successfully.')
+      }else{
+        return simpleResponse(false,'Update Technology','Error updating Technology.')
+      }
+    },
+    deleteTechnology: async (_,{id}) => {
+      const deleteTechnology = await Technology.findOneAndRemove(id)
+      if(deleteTechnology){
+        return simpleResponse(true,'Delete Technology','Technology deleted successfully.')
+      }else{
+        return simpleResponse(false,'Delete Technology','Error deleting Technology.')
       }
     },
     createUser: async function (_,{input: {...data}}){

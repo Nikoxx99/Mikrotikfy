@@ -42,19 +42,47 @@
               <v-card-title class="blue darken-3">
                 Barrios
               </v-card-title>
-              <v-list
-                rounded
-                shaped
+              <v-data-table
+                :headers="headers"
+                :items="neighborhoods"
+                sort-by="calories"
+                class="elevation-1"
               >
-                <v-list-item
-                  v-for="neighborhood in neighborhoods"
-                  :key="neighborhood.id"
-                >
-                  <v-list-item-content>
-                    <v-list-item-title>{{ neighborhood.name }}</v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </v-list>
+                <template v-slot:item.actions="{ item }">
+                  <v-dialog v-model="dialogEdit" max-width="500px" :retain-focus="false">
+                    <v-card>
+                      <v-card-title>
+                        <span class="headline">Editar Barrio</span>
+                      </v-card-title>
+                      <v-card-text>
+                        <v-container>
+                          <EditNeighborhood
+                            v-bind="edit"
+                            @updateNeighborhood="updateNeighborhood($event)"
+                          />
+                        </v-container>
+                      </v-card-text>
+                    </v-card>
+                  </v-dialog>
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn
+                        v-bind="attrs"
+                        class="yellow darken-4"
+                        small
+                        v-on="on"
+                        @click="editItem(item)"
+                      >
+                        <v-icon>
+                          mdi-pencil
+                        </v-icon>
+                      </v-btn>
+                    </template>
+                    <span>Editar Barrio</span>
+                  </v-tooltip>
+                  <ModalDeleteNeighborhood :name="item.name" :neighborhoodid="item.id" />
+                </template>
+              </v-data-table>
             </v-card>
           </v-container>
         </v-row>
@@ -65,8 +93,14 @@
 
 <script>
 import gql from 'graphql-tag'
+import EditNeighborhood from '../edit/EditNeighborhood'
+import ModalDeleteNeighborhood from '../delete/ModalDeleteNeighborhood'
 export default {
   name: 'CreateNeighborhood',
+  components: {
+    EditNeighborhood,
+    ModalDeleteNeighborhood
+  },
   data: () => ({
     id: 0,
     name: '',
@@ -74,7 +108,20 @@ export default {
     createdMessage: '',
     alertBox: false,
     alertBoxColor: '',
-    isSubmitting: false
+    isSubmitting: false,
+    headers: [
+      { text: 'ID', value: 'id' },
+      { text: 'Nombre', value: 'name' },
+      { text: 'A.', value: 'actions' }
+    ],
+    editedIndex: -1,
+    edit: {
+      neighborhoods: {
+        id: 0,
+        name: ''
+      }
+    },
+    dialogEdit: false
   }),
   created () {
     if (this.$route.query.created) {
@@ -100,6 +147,19 @@ export default {
     })
   },
   methods: {
+    editItem (item) {
+      this.editedIndex = this.neighborhoods.indexOf(item)
+      this.edit.neighborhoods = Object.assign({}, item)
+      this.dialogEdit = true
+    },
+    updateNeighborhood (input) {
+      if (this.editedIndex > -1) {
+        Object.assign(this.neighborhoods[this.editedIndex], input)
+      } else {
+        this.neighborhoods.push(input)
+      }
+      this.dialogEdit = false
+    },
     createNeighborhood () {
       this.isSubmitting = !this.isSubmitting
       this.$apollo.mutate({

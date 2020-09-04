@@ -49,20 +49,46 @@
               <v-card-title class="blue darken-3">
                 Planes
               </v-card-title>
-              <v-list
-                rounded
-                shaped
+              <v-data-table
+                :headers="headers"
+                :items="plans"
+                class="elevation-1"
               >
-                <v-list-item
-                  v-for="plan in plans"
-                  :key="plan.id"
-                >
-                  <v-list-item-content>
-                    <v-list-item-title>{{ plan.name }}</v-list-item-title>
-                    <v-list-item-title>{{ plan.mikrotik_name }}</v-list-item-title>
-                  </v-list-item-content>
-                </v-list-item>
-              </v-list>
+                <template v-slot:item.actions="{ item }">
+                  <v-dialog v-model="dialogEdit" max-width="500px" :retain-focus="false">
+                    <v-card>
+                      <v-card-title>
+                        <span class="headline">Editar Planes</span>
+                      </v-card-title>
+                      <v-card-text>
+                        <v-container>
+                          <EditPlan
+                            v-bind="edit"
+                            @updatePlan="updatePlan($event)"
+                          />
+                        </v-container>
+                      </v-card-text>
+                    </v-card>
+                  </v-dialog>
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn
+                        v-bind="attrs"
+                        class="yellow darken-4"
+                        small
+                        v-on="on"
+                        @click="editItem(item)"
+                      >
+                        <v-icon>
+                          mdi-pencil
+                        </v-icon>
+                      </v-btn>
+                    </template>
+                    <span>Editar Ciudad</span>
+                  </v-tooltip>
+                  <ModalDeletePlan :name="item.name" :planid="item.id" />
+                </template>
+              </v-data-table>
             </v-card>
           </v-container>
         </v-row>
@@ -73,8 +99,14 @@
 
 <script>
 import gql from 'graphql-tag'
+import EditPlan from '../edit/EditPlan'
+import ModalDeletePlan from '../delete/ModalDeletePlan'
 export default {
   name: 'CreatePlan',
+  components: {
+    EditPlan,
+    ModalDeletePlan
+  },
   data: () => ({
     id: 0,
     name: '',
@@ -84,7 +116,22 @@ export default {
     createdMessage: '',
     alertBox: false,
     alertBoxColor: '',
-    isSubmitting: false
+    isSubmitting: false,
+    headers: [
+      { text: 'ID', value: 'id' },
+      { text: 'Nombre', value: 'name' },
+      { text: 'Nombre Mikrotik', value: 'mikrotik_name' },
+      { text: 'A.', value: 'actions' }
+    ],
+    editedIndex: -1,
+    edit: {
+      plan: {
+        id: 0,
+        name: '',
+        ip: ''
+      }
+    },
+    dialogEdit: false
   }),
   created () {
     if (this.$route.query.created) {
@@ -111,6 +158,19 @@ export default {
     })
   },
   methods: {
+    editItem (item) {
+      this.editedIndex = this.plans.indexOf(item)
+      this.edit.plan = Object.assign({}, item)
+      this.dialogEdit = true
+    },
+    updatePlan (input) {
+      if (this.editedIndex > -1) {
+        Object.assign(this.plans[this.editedIndex], input)
+      } else {
+        this.plans.push(input)
+      }
+      this.dialogEdit = false
+    },
     createPlan () {
       this.isSubmitting = !this.isSubmitting
       this.$apollo.mutate({
