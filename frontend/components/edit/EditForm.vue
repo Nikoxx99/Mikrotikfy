@@ -338,6 +338,8 @@ export default {
     Client: {
       immediate: true,
       handler (val, oldVal) {
+        this.success = false
+        this.error = true
         this.$apollo.mutate({
           mutation: gql`mutation ($id: ID){
             getClientComment(id: $id){
