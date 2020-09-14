@@ -38,6 +38,7 @@
             :items="City.clients"
             :search="search"
             hide-default-footer
+            mobile-breakpoint="100"
             :page.sync="page"
             :items-per-page="itemsPerPage"
             dense
