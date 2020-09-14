@@ -32,6 +32,7 @@
       />
       <v-color-picker
         v-model="cities.color"
+        mode="hexa"
         hide-canvas
         flat
       />

@@ -33,6 +33,7 @@
             />
             <v-color-picker
               v-model="color"
+              mode="hexa"
               hide-canvas
               flat
             />

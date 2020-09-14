@@ -334,6 +334,34 @@ export default {
       errorMessage: ''
     }
   },
+  watch: {
+    Client: {
+      immediate: true,
+      handler (val, oldVal) {
+        this.$apollo.mutate({
+          mutation: gql`mutation ($id: ID){
+            getClientComment(id: $id){
+              comment
+            }
+          }`,
+          variables: {
+            id: this.Client._id
+          }
+        }).then((input) => {
+          this.Client.comment = input.data.getClientComment.comment
+          this.$emit('updateComment', this.Client.comment)
+          this.success = true
+          this.successMessage = 'Comentario sincronizado con la Mikrotik'
+          this.error = false
+        }).catch((error) => {
+          this.success = false
+          this.error = true
+          this.errorMessage = 'Comentario no sincronizado'
+          console.log(error)
+        })
+      }
+    }
+  },
   mounted () {
     this.$apollo.mutate({
       mutation: gql`mutation ($id: ID){
