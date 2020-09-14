@@ -58,8 +58,8 @@ import gql from 'graphql-tag'
 export default {
   props: {
     planid: {
-      type: String,
-      default: ''
+      type: Number,
+      default: 0
     },
     name: {
       type: String,

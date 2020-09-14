@@ -114,8 +114,23 @@
           />
         </v-col>
       </v-row>
+      <v-select
+        v-model="Client.newModel"
+        :items="idwith"
+        item-text="name"
+        item-value="id"
+        mandatory
+        label="Identificar con:"
+        dense
+      />
       <v-textarea
         v-model="Client.comment"
+        auto-grow
+        :success="success"
+        :success-messages="successMessage"
+        :error="error"
+        :error-messages="errorMessage"
+        persistent-hint
         outlined
         label="Comentario"
         dense
@@ -279,6 +294,10 @@ export default {
       comment: {
         type: String,
         default: ''
+      },
+      newModel: {
+        type: Number,
+        default: 1
       }
     }
   },
@@ -304,8 +323,39 @@ export default {
       alertBox: false,
       alertBoxColor: '',
       createdMessage: '',
-      isSubmitting: false
+      isSubmitting: false,
+      idwith: [
+        { id: 0, name: 'Cedula' },
+        { id: 1, name: 'Codigo' }
+      ],
+      success: false,
+      error: true,
+      successMessage: '',
+      errorMessage: ''
     }
+  },
+  mounted () {
+    this.$apollo.mutate({
+      mutation: gql`mutation ($id: ID){
+        getClientComment(id: $id){
+          comment
+        }
+      }`,
+      variables: {
+        id: this.Client._id
+      }
+    }).then((input) => {
+      this.Client.comment = input.data.getClientComment.comment
+      this.$emit('updateComment', this.Client.comment)
+      this.success = true
+      this.successMessage = 'Comentario sincronizado con la Mikrotik'
+      this.error = false
+    }).catch((error) => {
+      this.success = false
+      this.error = true
+      this.errorMessage = 'Comentario no sincronizado'
+      console.log(error)
+    })
   },
   methods: {
     editClient () {
@@ -335,7 +385,8 @@ export default {
             wifi_password: this.Client.wifi_password,
             mac_address: this.Client.mac_address,
             comment: this.Client.comment,
-            operator: this.Client.operator
+            operator: this.Client.operator,
+            newModel: this.Client.newModel
           }
         }
       }).then((input) => {

@@ -14,17 +14,12 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col>
-        <Navbar />
-      </v-col>
-    </v-row>
-    <v-row>
       <v-col
         cols="12"
       >
         <v-card>
           <v-card-title
-            :class="cityColor"
+            :style="`background-color:${City.color};`"
           >
             Clientes {{ currentCity }}
             <v-spacer />
@@ -56,7 +51,7 @@
                 large
                 cancel-text="Cancelar"
                 save-text="Guardar"
-                @save="save(props.item._id, props.item.plan.id)"
+                @save="save(props.item._id, props.item.plan.id, props.item.newModel)"
                 @cancel="cancel"
                 @close="close"
               >
@@ -82,6 +77,12 @@
               <span :class="getTechnology(item.technology.id) + '--text'">
                 {{ item.technology.name }}
               </span>
+            </template>
+            <!-- ########################### -->
+            <template v-slot:item.newModel="{ item }">
+              <svg height="13" width="20">
+                <circle cx="10" cy="8" r="5" :fill="getModel(item.newModel)" />
+              </svg>
             </template>
             <!-- ########################### -->
             <template v-slot:item.status="{ item }">
@@ -147,6 +148,7 @@
                         <EditForm
                           v-bind="client"
                           @updateClient="updateClient($event)"
+                          @updateComment="updateComment($event)"
                         />
                       </v-container>
                     </v-card-text>
@@ -226,14 +228,12 @@
 
 <script>
 import gql from 'graphql-tag'
-import Navbar from '../components/main/Navbar'
 import CreateForm from '../components/create/CreateForm'
 import EditForm from '../components/edit/EditForm'
 import DeleteClient from '../components/delete/DeleteClient'
 import ClientStatus from '../components/main/ClientStatus'
 export default {
   components: {
-    Navbar,
     CreateForm,
     EditForm,
     DeleteClient,
@@ -247,6 +247,7 @@ export default {
         query($city: Int) {
           City(id: $city){
             name
+            color
             clients{
               _id
               code
@@ -275,6 +276,7 @@ export default {
               mac_address
               comment
               operator
+              newModel
             }
           }
         }
@@ -334,11 +336,10 @@ export default {
         { text: 'Cedula', sortable: true, value: 'dni' },
         { text: 'Direccion', sortable: false, value: 'address' },
         { text: 'Barrio', sortable: true, value: 'neighborhood.name' },
-        { text: 'Ciudad', sortable: false, value: 'city.name' },
         { text: 'Telefono', sortable: false, value: 'phone' },
         { text: 'Plan', sortable: true, value: 'plan.name' },
         { text: 'Tecnologia', sortable: true, value: 'technology.name' },
-        { text: 'Op.', sortable: true, value: 'operator' },
+        { text: 'Tipo', sortable: true, value: 'newModel' },
         { text: 'Aciones', value: 'actions', sortable: false }
       ],
       editedIndex: -1,
@@ -356,7 +357,8 @@ export default {
           wifi_password: '',
           technology: '',
           mac_address: '',
-          comment: ''
+          comment: '',
+          newModel: 0
         }
       },
       snack: false,
@@ -365,7 +367,8 @@ export default {
       editSnack: false,
       editSnackText: '',
       active_users: 0,
-      inactive_users: 0
+      inactive_users: 0,
+      title: 'Base de datos '
     }
   },
   created () {
@@ -440,6 +443,13 @@ export default {
         }
       }
     },
+    getModel (model) {
+      if (model === 0) {
+        return 'grey'
+      } else if (model === 1) {
+        return 'cyan'
+      }
+    },
     updateClient (input) {
       if (this.editedIndex > -1) {
         Object.assign(this.City.clients[this.editedIndex], input)
@@ -450,7 +460,12 @@ export default {
       this.editSnack = true
       this.editSnackText = 'Cliente editado exitosamente'
     },
-    save (clientId, newPlan) {
+    updateComment (input) {
+      if (this.editedIndex > -1) {
+        this.City.clients[this.editedIndex].comment = input
+      }
+    },
+    save (clientId, newPlan, newModel) {
       this.$apollo.mutate({
         mutation: gql`mutation ($input: EditClientPlanInput){
           editClientPlan(input: $input){
@@ -464,7 +479,8 @@ export default {
         variables: {
           input: {
             id: clientId,
-            plan: newPlan
+            plan: newPlan,
+            model: newModel
           }
         }
       }).then((input) => {
@@ -486,9 +502,37 @@ export default {
       // eslint-disable-next-line no-console
       console.log('Info closed')
     }
+  },
+  head () {
+    return {
+      title: this.title + this.currentCity,
+      meta: [
+        { hid: 'language', name: 'language', content: 'es' },
+        { hid: 'audience', name: 'audience', content: 'all' },
+        { hid: 'rating', name: 'rating', content: 'general' },
+        { hid: 'distribution', name: 'distribution', content: 'global' },
+        { hid: 'document-type', name: 'document-type', content: 'Public' },
+        { hid: 'MSSmartTagsPreventParsing', name: 'MSSmartTagsPreventParsing', content: 'true' },
+        { hid: 'robots', name: 'robots', content: 'all' },
+        { hid: 'robots', name: 'robots', content: 'all, index, follow' },
+        { hid: 'googlebot', name: 'googlebot', content: 'all, index, follow' },
+        { hid: 'yahoo-slurp', name: 'yahoo-slurp', content: 'all, index, follow' },
+        { hid: 'msnbot', name: 'msnbot', content: 'index, follow' },
+        { hid: 'googlebot-image', name: 'googlebot-image', content: 'all' },
+        { hid: 'title', name: 'title', content: this.title },
+        { hid: 'og:title', property: 'og:title', content: this.title },
+        { hid: 'og:description', property: 'og:description', content: 'ARNOProducciones - Base de datos interactiva' },
+        { hid: 'author', name: 'author', content: 'Nicolas Echeverry' }
+      ]
+    }
   }
 }
 </script>
 <style>
-
+.new-model {
+  background-color: #1f2c38 !important;
+}
+.old-model {
+  background-color: #222 !important;
+}
 </style>

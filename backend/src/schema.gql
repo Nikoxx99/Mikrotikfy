@@ -27,6 +27,7 @@ type Client {
   mac_address: String
   comment: String
   operator: Int
+  newModel: Int
 }
 type City {
   _id: ID
@@ -35,6 +36,7 @@ type City {
   clients(limit: Int): [Client]
   neighborhoods: [Neighborhood]
   ip: String
+  color: String
 }
 type Neighborhood {
   _id: ID
@@ -80,6 +82,9 @@ type ClientStatus {
   download: String
   upload: String
 }
+type ClientComment {
+  comment: String
+}
 type ActiveClients {
   name: String
 }
@@ -92,6 +97,7 @@ type Mutation {
   editClientPlan(input: EditClientPlanInput): SimpleResponse
   deleteClient(id: ID): SimpleResponse
   getClientStatus(id: ID): ClientStatus
+  getClientComment(id: ID): ClientComment
   createCity(input: CityInput): SimpleResponse
   updateCity(input: CityInput): SimpleResponse
   deleteCity(id: Int): SimpleResponse
@@ -122,6 +128,8 @@ input ClientInput {
   mac_address: String
   comment: String
   operator: Int
+  newModel: Int
+  sendToMikrotik: Boolean
 }
 input EditClientInput {
   _id: String
@@ -139,15 +147,18 @@ input EditClientInput {
   mac_address: String
   comment: String
   operator: Int
+  newModel: Int
 }
 input EditClientPlanInput {
   id: String
   plan: Int
+  model: Int
 }
 input CityInput {
   id: Int
   name: String
   ip: String
+  color: String
 }
 input NeighborhoodInput {
   id: Int

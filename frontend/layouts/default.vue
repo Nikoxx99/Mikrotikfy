@@ -34,6 +34,15 @@
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-toolbar-title v-text="title" />
       <v-spacer />
+      <v-btn
+        v-for="city in Cities"
+        :key="city.id"
+        class="mr-4"
+        :color="city.color"
+        :href="`/lista?city=${city.id}`"
+      >
+        {{ city.name }}
+      </v-btn>
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
           <v-btn
@@ -64,8 +73,24 @@
 </template>
 
 <script>
+import gql from 'graphql-tag'
 import Cookie from 'js-cookie'
 export default {
+  apollo: {
+    Cities () {
+      return {
+        query: gql`
+        query{
+          Cities{
+            id
+            name
+            color
+          }
+        }
+      `
+      }
+    }
+  },
   data () {
     return {
       clipped: false,
@@ -80,6 +105,16 @@ export default {
         {
           icon: 'mdi-cog',
           title: 'Ajustes',
+          to: '/config'
+        },
+        {
+          icon: 'mdi-key',
+          title: 'Cambios de Clave',
+          to: '/config'
+        },
+        {
+          icon: 'mdi-trash',
+          title: 'Suspencion por Mora',
           to: '/config'
         }
       ],

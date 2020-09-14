@@ -147,6 +147,16 @@
         label="Comentario"
         dense
       />
+      <v-select
+        v-model="Client.newModel"
+        :items="idwith"
+        item-text="name"
+        item-value="id"
+        mandatory
+        label="Identificar con:"
+        dense
+      />
+      <v-checkbox v-model="Client.sendToMikrotik" input-value="true" label="Crear en Mikrotik?" />
       <v-btn
         class="mr-4"
         color="primary"
@@ -230,7 +240,9 @@ export default {
         wifi_password: '',
         technology: '',
         mac_address: '',
-        comment: ''
+        comment: '',
+        newModel: 1,
+        sendToMikrotik: true
       },
       dir1: '',
       dir2: '',
@@ -251,7 +263,11 @@ export default {
       alertBox: false,
       alertBoxColor: '',
       createdMessage: '',
-      isSubmitting: false
+      isSubmitting: false,
+      idwith: [
+        { id: 0, name: 'Cedula' },
+        { id: 1, name: 'Codigo' }
+      ]
     }
   },
   mounted () {

@@ -5,7 +5,7 @@ import City from './models/City'
 import Neighborhood from './models/Neighborhood'
 import Plan from './models/Plan'
 import Technology from './models/Technology'
-import { mkCreateClient, mkDeleteClient, mkClientStatus, mkGetActiveClients, mkSetClientPlanInformation } from './mikrotik/functions'
+import { mkCreateClient, mkDeleteClient, mkClientStatus, mkGetActiveClients, mkSetClientPlanInformation, mkGetComment, mkSetComment } from './mikrotik/functions'
 const simpleResponse = async (success, path, message) => {
   return { success: success, errors: [{ path: path, message: message }] }
 }
@@ -49,7 +49,7 @@ export const resolvers = {
     },
   },
   Mutation: {
-    createClient: async (_, { input: {city, neighborhood, plan, technology, ...data} }) => {
+    createClient: async (_, { input: {city, neighborhood, plan, technology, sendToMikrotik, ...data} }) => {
       const newClient = new Client({city,plan,neighborhood,technology,...data})
       const newCity = await City.find({id: city},{name: 1, ip:1, _id:0})
       const newNeighborhood = await Neighborhood.find({id: neighborhood},{name: 1, _id:0})
@@ -57,7 +57,9 @@ export const resolvers = {
       const newTechnology = await Technology.find({id: technology},{name: 1, _id:0})
       const res = await newClient.save()
       if (res) {
-        await mkCreateClient({newCity,newNeighborhood,newPlan,newTechnology,...data})
+        if (sendToMikrotik) {
+          await mkCreateClient({newCity,newNeighborhood,newPlan,newTechnology,...data})
+        }
         return simpleResponse(true, 'Create Client', 'Client Created Successfullly.')
       } else {
         return simpleResponse(false, 'Create Client', 'Error Creating Client.')
@@ -76,8 +78,14 @@ export const resolvers = {
       const plan = await Plan.find({id: searchPlan})
       const newPlan = plan[0].mikrotik_name
 
+      const dni = input.dni
+      const model = input.newModel
+
+      const comment = input.comment
+
       const res = await Client.updateOne({_id: id}, input, {multi: false})
-      const mkRes = await mkSetClientPlanInformation({newPlan, newCity, code})
+      const mkRes = await mkSetClientPlanInformation({newPlan, newCity, dni, code, model, comment})
+      await mkSetComment({newPlan, newCity, dni, code, model, comment})
       if(res && mkRes){
         return simpleResponse(true,'Edit Client','Client Edited Successfuly')
       }else{
@@ -98,8 +106,11 @@ export const resolvers = {
       const savePlan = plan[0].id
       const newPlan = plan[0].mikrotik_name
 
+      const dni = search[0].dni
+      const model = search[0].newModel
+
       const res = await Client.updateOne({_id: id}, {savePlan}, {multi: false})
-      const mkRes = await mkSetClientPlanInformation({newPlan, newCity, code})
+      const mkRes = await mkSetClientPlanInformation({newPlan, newCity, dni, code, model})
       if(res && mkRes){
         return simpleResponse(true,'Edit Client Plan','Client Plan Edited Successfuly')
       }else{
@@ -130,6 +141,17 @@ export const resolvers = {
       const model = search[0].newModel
       const status = await mkClientStatus({dni, code, newCity, model})
       return status
+    },
+    getClientComment: async (_,{id}) => {
+      const search = await Client.find({_id: id})
+      const searchCity = search[0].city
+      const city = await City.find({id: searchCity})
+      const newCity = city[0].ip
+      const code = search[0].code
+      const dni = search[0].dni
+      const model = search[0].newModel
+      const comment = await mkGetComment({dni, code, newCity, model})
+      return comment
     },
     createCity: async (_, { input }) => {
       const newCity = new City(input)

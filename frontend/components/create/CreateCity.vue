@@ -31,6 +31,11 @@
               persistent-hint
               required
             />
+            <v-color-picker
+              v-model="color"
+              hide-canvas
+              flat
+            />
             <v-btn
               class="mr-4 blue darken-4"
               :loading="isSubmitting"
@@ -54,6 +59,11 @@
                 :items="cities"
                 class="elevation-1"
               >
+                <template v-slot:item.color="{ item }">
+                  <svg height="13" width="20">
+                    <circle cx="10" cy="8" r="5" :fill="item.color" />
+                  </svg>
+                </template>
                 <template v-slot:item.actions="{ item }">
                   <v-dialog v-model="dialogEdit" max-width="500px" :retain-focus="false">
                     <v-card>
@@ -111,6 +121,7 @@ export default {
     id: 0,
     name: '',
     ip: '',
+    color: '',
     hint: 'Es la ip de la mikrotik a la que apunta',
     cities: [],
     createdMessage: '',
@@ -121,6 +132,7 @@ export default {
       { text: 'ID', value: 'id' },
       { text: 'Nombre', value: 'name' },
       { text: 'IP Mikrotik', value: 'ip' },
+      { text: 'Color', value: 'color' },
       { text: 'A.', value: 'actions' }
     ],
     editedIndex: -1,
@@ -128,7 +140,8 @@ export default {
       cities: {
         id: 0,
         name: '',
-        ip: ''
+        ip: '',
+        color: ''
       }
     },
     dialogEdit: false
@@ -145,6 +158,7 @@ export default {
           id
           name
           ip
+          color
         }
       }`,
       variables: {
@@ -187,7 +201,8 @@ export default {
           input: {
             id: this.id,
             name: this.name,
-            ip: this.ip
+            ip: this.ip,
+            color: this.color
           }
         }
       }).then((input) => {

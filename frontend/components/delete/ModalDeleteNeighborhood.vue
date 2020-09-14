@@ -58,8 +58,8 @@ import gql from 'graphql-tag'
 export default {
   props: {
     neighborhoodid: {
-      type: String,
-      default: ''
+      type: Number,
+      default: 0
     },
     name: {
       type: String,

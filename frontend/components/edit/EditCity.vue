@@ -30,6 +30,11 @@
         required
         dense
       />
+      <v-color-picker
+        v-model="cities.color"
+        hide-canvas
+        flat
+      />
       <v-btn
         class="mr-4"
         color="success"
@@ -63,6 +68,10 @@ export default {
       ip: {
         type: Number,
         default: 1
+      },
+      color: {
+        type: String,
+        default: ''
       }
     }
   },
@@ -91,7 +100,8 @@ export default {
           input: {
             id: this.cities.id,
             name: this.cities.name,
-            ip: this.cities.ip
+            ip: this.cities.ip,
+            color: this.cities.color
           }
         }
       }).then((input) => {
