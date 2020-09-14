@@ -536,4 +536,7 @@ export default {
 .old-model {
   background-color: #222 !important;
 }
+table {
+  overflow: hidden;
+}
 </style>
