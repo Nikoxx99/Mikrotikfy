@@ -126,10 +126,12 @@
       <v-textarea
         v-model="Client.comment"
         auto-grow
-        :success="success"
+        :success.sync="success"
         :success-messages="successMessage"
         :error="error"
         :error-messages="errorMessage"
+        :loading="commentLoading"
+        :disabled="commentDisabled"
         persistent-hint
         outlined
         label="Comentario"
@@ -329,17 +331,21 @@ export default {
         { id: 1, name: 'Codigo' }
       ],
       success: false,
-      error: true,
+      error: false,
+      commentDisabled: false,
       successMessage: '',
-      errorMessage: ''
+      errorMessage: '',
+      commentLoading: false
     }
   },
   watch: {
     Client: {
       immediate: true,
-      handler (val, oldVal) {
+      handler () {
         this.success = false
-        this.error = true
+        this.error = false
+        this.commentLoading = true
+        this.commentDisabled = true
         this.$apollo.mutate({
           mutation: gql`mutation ($id: ID){
             getClientComment(id: $id){
@@ -352,6 +358,8 @@ export default {
         }).then((input) => {
           this.Client.comment = input.data.getClientComment.comment
           this.$emit('updateComment', this.Client.comment)
+          this.commentLoading = false
+          this.commentDisabled = false
           this.success = true
           this.successMessage = 'Comentario sincronizado con la Mikrotik'
           this.error = false
@@ -365,6 +373,10 @@ export default {
     }
   },
   mounted () {
+    this.success = false
+    this.error = false
+    this.commentLoading = true
+    this.commentDisabled = true
     this.$apollo.mutate({
       mutation: gql`mutation ($id: ID){
         getClientComment(id: $id){
@@ -375,6 +387,8 @@ export default {
         id: this.Client._id
       }
     }).then((input) => {
+      this.commentLoading = false
+      this.commentDisabled = false
       this.Client.comment = input.data.getClientComment.comment
       this.$emit('updateComment', this.Client.comment)
       this.success = true
