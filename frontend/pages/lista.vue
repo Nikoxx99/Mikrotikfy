@@ -40,7 +40,7 @@
               :page.sync="page"
               :loading="initialLoading"
               no-data-text="No hay informacion para mostrar aun..."
-              loading-text="Carganfo información de clientes..."
+              loading-text="Cargando información de clientes..."
               dense
               hide-default-footer
               mobile-breakpoint="100"
