@@ -37,7 +37,7 @@
       />
       <v-row>
         <v-col>
-          <v-select
+          <v-autocomplete
             v-model="Client.neighborhood"
             item-text="name"
             item-value="id"

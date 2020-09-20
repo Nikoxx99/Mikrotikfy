@@ -39,6 +39,8 @@
               :items-per-page="itemsPerPage"
               :page.sync="page"
               :loading="initialLoading"
+              sort-by="created_at"
+              sort-desc
               no-data-text="No hay informacion para mostrar aun..."
               loading-text="Cargando información de clientes..."
               dense
@@ -380,6 +382,7 @@ export default {
               mac_address
               comment
               operator
+              created_at
               newModel
             }
           }
@@ -408,6 +411,7 @@ export default {
         dataTable.mac_address = input.data.City.clients[i].mac_address
         dataTable.comment = input.data.City.clients[i].comment
         dataTable.operator = input.data.City.clients[i].operator
+        dataTable.created_at = input.data.City.clients[i].created_at
         dataTable.newModel = input.data.City.clients[i].newModel
         this.dataTable.push(dataTable)
       }

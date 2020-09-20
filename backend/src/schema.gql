@@ -27,6 +27,7 @@ type Client {
   mac_address: String
   comment: String
   operator: Int
+  created_at: String
   newModel: Int
 }
 type City {
