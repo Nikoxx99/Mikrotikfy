@@ -39,7 +39,8 @@
               :items-per-page="itemsPerPage"
               :page.sync="page"
               :loading="initialLoading"
-              no-data-text="Cargando información de clientes..."
+              no-data-text="No hay informacion para mostrar aun..."
+              loading-text="Carganfo información de clientes..."
               dense
               hide-default-footer
               mobile-breakpoint="100"
