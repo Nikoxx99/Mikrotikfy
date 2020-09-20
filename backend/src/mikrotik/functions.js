@@ -157,9 +157,18 @@ module.exports.mkSetClientPlanInformation = async function (input) {
         '=.proplist=.id',
         '?=name='+input.code,
       ])
+      var removeActive = await conn.write('/ppp/active/getall', [
+        '=.proplist=.id',
+        '?=name='+input.code,
+      ])
     } else {
       // eslint-disable-next-line no-redeclare
       var com1 = await conn.write('/ppp/secret/getall', [
+        '=.proplist=.id',
+        '?=name='+input.dni,
+      ])
+      // eslint-disable-next-line no-redeclare
+      var removeActive = await conn.write('/ppp/active/getall', [
         '=.proplist=.id',
         '?=name='+input.dni,
       ])
@@ -169,6 +178,15 @@ module.exports.mkSetClientPlanInformation = async function (input) {
         '=.id=' + com1[0]['.id'],
         '=profile='+input.newPlan,
       ])
+      if (input.removeActive) {
+        if (removeActive.length > 0) { 
+          // eslint-disable-next-line no-redeclare
+          var removeActive = await conn.write('/ppp/active/remove', [
+            '=.proplist=.id',
+            '=.id='+removeActive[0]['.id'],
+          ])
+        }
+      }
       conn.close()
       return true
     } else {

@@ -34,15 +34,17 @@
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-toolbar-title v-text="title" />
       <v-spacer />
-      <v-btn
-        v-for="city in Cities"
-        :key="city.id"
-        class="mr-4"
-        :color="city.color"
-        :href="`/lista?city=${city.id}`"
-      >
-        {{ city.name }}
-      </v-btn>
+      <div v-if="$store.state.auth">
+        <v-btn
+          v-for="city in Cities"
+          :key="city.id"
+          class="mr-4"
+          :color="city.color"
+          :href="`/lista?city=${city.id}`"
+        >
+          {{ city.name }}
+        </v-btn>
+      </div>
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
           <v-btn
@@ -121,7 +123,7 @@ export default {
       miniVariant: false,
       right: true,
       rightDrawer: false,
-      title: 'ARNOProducciones Database'
+      title: 'ARNOProducciones SAS'
     }
   },
   methods: {

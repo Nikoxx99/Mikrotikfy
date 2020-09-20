@@ -2,17 +2,14 @@
   <span>
     <v-tooltip top>
       <template v-slot:activator="{ on, attrs }">
-        <v-btn
+        <v-icon
           v-bind="attrs"
-          class="blue darken-4"
-          small
+          color="blue darken-4"
           v-on="on"
           @click="initComponent"
         >
-          <v-icon>
-            mdi-server
-          </v-icon>
-        </v-btn>
+          mdi-server
+        </v-icon>
       </template>
       <span>Estatus</span>
     </v-tooltip>

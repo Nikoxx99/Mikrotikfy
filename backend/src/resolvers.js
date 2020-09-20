@@ -83,8 +83,19 @@ export const resolvers = {
 
       const comment = input.comment
 
+      const currentPlan = input.plan
+      const dbPlan = search[0].plan
+      var removeActive = false
+      if (currentPlan == dbPlan) {
+        // eslint-disable-next-line no-redeclare
+        var removeActive = false
+      } else {
+        // eslint-disable-next-line no-redeclare
+        var removeActive = true
+      }
+
       const res = await Client.updateOne({_id: id}, input, {multi: false})
-      const mkRes = await mkSetClientPlanInformation({newPlan, newCity, dni, code, model, comment})
+      const mkRes = await mkSetClientPlanInformation({newPlan, newCity, dni, code, model, comment, removeActive})
       await mkSetComment({newPlan, newCity, dni, code, model, comment})
       if(res && mkRes){
         return simpleResponse(true,'Edit Client','Client Edited Successfuly')
@@ -109,8 +120,10 @@ export const resolvers = {
       const dni = search[0].dni
       const model = search[0].newModel
 
+      const removeActive = true
+
       const res = await Client.updateOne({_id: id}, {savePlan}, {multi: false})
-      const mkRes = await mkSetClientPlanInformation({newPlan, newCity, dni, code, model})
+      const mkRes = await mkSetClientPlanInformation({newPlan, newCity, dni, code, model, removeActive})
       if(res && mkRes){
         return simpleResponse(true,'Edit Client Plan','Client Plan Edited Successfuly')
       }else{

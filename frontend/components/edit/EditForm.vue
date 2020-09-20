@@ -346,6 +346,7 @@ export default {
         this.error = false
         this.commentLoading = true
         this.commentDisabled = true
+        this.isSubmitting = false
         this.$apollo.mutate({
           mutation: gql`mutation ($id: ID){
             getClientComment(id: $id){
@@ -403,6 +404,7 @@ export default {
   },
   methods: {
     editClient () {
+      this.isSubmitting = true
       this.$apollo.mutate({
         mutation: gql`mutation ($input: EditClientInput){
           editClient(input: $input){

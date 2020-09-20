@@ -2,17 +2,14 @@
   <span>
     <v-tooltip top>
       <template v-slot:activator="{ on, attrs }">
-        <v-btn
+        <v-icon
           v-bind="attrs"
-          class="red darken-4"
-          small
+          color="red darken-4"
           v-on="on"
           @click.stop="modal = true"
         >
-          <v-icon>
-            mdi-delete-outline
-          </v-icon>
-        </v-btn>
+          mdi-delete-outline
+        </v-icon>
       </template>
       <span>Borrar Cliente</span>
     </v-tooltip>
