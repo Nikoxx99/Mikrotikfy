@@ -38,6 +38,8 @@
               :search="search"
               :items-per-page="itemsPerPage"
               :page.sync="page"
+              :loading="initialLoading"
+              no-data-text="Cargando información de clientes..."
               dense
               hide-default-footer
               mobile-breakpoint="100"
@@ -278,6 +280,7 @@ export default {
       alertBox: false,
       dialog: false,
       dialogEdit: false,
+      initialLoading: false,
       headers: [
         { text: 'Codigo', sortable: true, value: 'code' },
         { text: 'Estado', sortable: false, value: 'status' },
@@ -341,6 +344,7 @@ export default {
       this.alertBoxColor = 'red darken-4'
       this.createdMessage = 'Cliente Eliminado Satisfactoriamente.'
     }
+    this.initialLoading = true
     this.$apollo.query({
       query: gql`
         query($city: Int) {
@@ -406,9 +410,11 @@ export default {
         dataTable.newModel = input.data.City.clients[i].newModel
         this.dataTable.push(dataTable)
       }
+      this.initialLoading = false
     }).catch((error) => {
       // eslint-disable-next-line no-console
       console.error(error)
+      this.initialLoading = false
     })
   },
   mounted () {
