@@ -6,6 +6,7 @@
       v-model="drawer"
       :mini-variant="miniVariant"
       :clipped="clipped"
+      src="nav-bg.jpg"
       fixed
       app
     >
