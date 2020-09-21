@@ -10,25 +10,37 @@
       {{ createdMessage }}
     </v-alert>
     <v-form v-model="valid">
-      <v-text-field
-        v-model.number="Client.code"
-        type="number"
-        label="Codigo"
-        required
-        dense
-      />
+      <v-row>
+        <v-col>
+          <v-text-field
+            v-model.number="Client.code"
+            type="number"
+            label="Codigo"
+            required
+            outlined
+            dense
+            hide-details
+          />
+        </v-col>
+        <v-col>
+          <v-text-field
+            v-model="Client.dni"
+            type="number"
+            label="Cedula"
+            required
+            outlined
+            dense
+            hide-details
+          />
+        </v-col>
+      </v-row>
       <v-text-field
         v-model="Client.name"
         label="Nombre Completo"
         required
+        outlined
         dense
-      />
-      <v-text-field
-        v-model="Client.dni"
-        type="number"
-        label="Cedula"
-        required
-        dense
+        hide-details
       />
       <v-row>
         <v-col>
@@ -36,7 +48,9 @@
             v-model="dir1"
             :items="dirFragment1"
             label="Dirección"
+            outlined
             dense
+            hide-details
             @blur="genAddress"
           />
         </v-col>
@@ -44,7 +58,9 @@
           <v-text-field
             v-model="dir2"
             label="#"
+            outlined
             dense
+            hide-details
             @blur="genAddress"
           />
         </v-col>
@@ -53,7 +69,9 @@
             v-model="dir3"
             :items="dirFragment2"
             label="#"
+            outlined
             dense
+            hide-details
             @blur="genAddress"
           />
         </v-col>
@@ -61,7 +79,9 @@
           <v-text-field
             v-model="dir4"
             label="#"
+            outlined
             dense
+            hide-details
             @blur="genAddress"
           />
         </v-col>
@@ -74,7 +94,9 @@
             item-value="id"
             :items="Neighborhoods"
             label="Barrio"
+            outlined
             dense
+            hide-details
           />
         </v-col>
         <v-col>
@@ -85,31 +107,45 @@
             :items="Cities"
             label="Ciudad"
             disabled
+            outlined
             dense
+            hide-details
           />
         </v-col>
       </v-row>
-      <v-text-field
-        v-model="Client.phone"
-        label="Telefono"
-        required
-        dense
-      />
-      <v-select
-        v-model="Client.plan"
-        item-text="name"
-        item-value="id"
-        :items="Plans"
-        label="Plan"
-        dense
-      />
+      <v-row>
+        <v-col>
+          <v-text-field
+            v-model="Client.phone"
+            label="Telefono"
+            required
+            outlined
+            dense
+            hide-details
+          />
+        </v-col>
+        <v-col>
+          <v-select
+            v-model="Client.plan"
+            item-text="name"
+            item-value="id"
+            :items="Plans"
+            label="Plan"
+            outlined
+            dense
+            hide-details
+          />
+        </v-col>
+      </v-row>
       <v-row>
         <v-col>
           <v-text-field
             v-model="Client.wifi_ssid"
             label="Nombre de Red"
             required
+            outlined
             dense
+            hide-details
           />
         </v-col>
         <v-col>
@@ -117,7 +153,9 @@
             v-model="Client.wifi_password"
             label="Clave de Red"
             required
+            outlined
             dense
+            hide-details
           />
         </v-col>
       </v-row>
@@ -129,7 +167,9 @@
             item-value="id"
             :items="Technologies"
             label="Tecnología"
+            outlined
             dense
+            hide-details
           />
         </v-col>
         <v-col>
@@ -137,7 +177,9 @@
             v-model="Client.mac_address"
             label="Mac Equipo"
             required
+            outlined
             dense
+            hide-details
           />
         </v-col>
       </v-row>
@@ -154,7 +196,9 @@
         item-value="id"
         mandatory
         label="Identificar con:"
+        outlined
         dense
+        hide-details
       />
       <v-checkbox v-model="Client.sendToMikrotik" input-value="true" label="Crear en Mikrotik?" />
       <v-btn
@@ -258,7 +302,8 @@ export default {
       dirFragment2: [
         '#',
         'CASA',
-        'DIAGONAL'
+        'DIAGONAL',
+        'LOTE'
       ],
       alertBox: false,
       alertBoxColor: '',

@@ -40,6 +40,7 @@
               :page.sync="page"
               :loading="initialLoading"
               sort-by="created_at"
+              calculate-widths
               sort-desc
               no-data-text="No hay informacion para mostrar aun..."
               loading-text="Cargando información de clientes..."
@@ -313,6 +314,7 @@ export default {
           technology: '',
           mac_address: '',
           comment: '',
+          created_at: '',
           newModel: 0
         }
       },

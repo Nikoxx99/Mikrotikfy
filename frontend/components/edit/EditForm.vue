@@ -10,30 +10,45 @@
       {{ createdMessage }}
     </v-alert>
     <v-form v-model="valid">
-      <v-text-field
-        v-model.number="Client.code"
-        type="number"
-        label="Codigo"
-        required
-        dense
-      />
+      <v-row>
+        <v-col>
+          <v-text-field
+            v-model.number="Client.code"
+            type="number"
+            label="Codigo"
+            required
+            outlined
+            dense
+            hide-details
+          />
+        </v-col>
+        <v-col>
+          <v-text-field
+            v-model="Client.dni"
+            type="number"
+            label="Cedula"
+            required
+            outlined
+            dense
+            hide-details
+          />
+        </v-col>
+      </v-row>
       <v-text-field
         v-model="Client.name"
         label="Nombre Completo"
         required
+        outlined
         dense
-      />
-      <v-text-field
-        v-model="Client.dni"
-        type="number"
-        label="Cedula"
-        required
-        dense
+        hide-details
+        class="pb-3"
       />
       <v-text-field
         v-model="Client.address"
         label="Direccion"
+        outlined
         dense
+        hide-details
       />
       <v-row>
         <v-col>
@@ -44,7 +59,9 @@
             :items="Neighborhoods"
             return-object
             label="Barrio"
+            outlined
             dense
+            hide-details
           />
         </v-col>
         <v-col>
@@ -56,32 +73,46 @@
             return-object
             label="Ciudad"
             disabled
+            outlined
             dense
+            hide-details
           />
         </v-col>
       </v-row>
-      <v-text-field
-        v-model="Client.phone"
-        label="Telefono"
-        required
-        dense
-      />
-      <v-select
-        v-model="Client.plan"
-        item-text="name"
-        item-value="id"
-        :items="Plans"
-        return-object
-        label="Plan"
-        dense
-      />
+      <v-row>
+        <v-col>
+          <v-text-field
+            v-model="Client.phone"
+            label="Telefono"
+            required
+            outlined
+            dense
+            hide-details
+          />
+        </v-col>
+        <v-col>
+          <v-select
+            v-model="Client.plan"
+            item-text="name"
+            item-value="id"
+            :items="Plans"
+            return-object
+            label="Plan"
+            outlined
+            dense
+            hide-details
+          />
+        </v-col>
+      </v-row>
       <v-row>
         <v-col>
           <v-text-field
             v-model="Client.wifi_ssid"
             label="Nombre de Red"
             required
+            outlined
             dense
+            hide-details
           />
         </v-col>
         <v-col>
@@ -89,7 +120,9 @@
             v-model="Client.wifi_password"
             label="Clave de Red"
             required
+            outlined
             dense
+            hide-details
           />
         </v-col>
       </v-row>
@@ -102,7 +135,9 @@
             :items="Technologies"
             return-object
             label="Tecnología"
+            outlined
             dense
+            hide-details
           />
         </v-col>
         <v-col>
@@ -110,7 +145,9 @@
             v-model="Client.mac_address"
             label="Mac Equipo"
             required
+            outlined
             dense
+            hide-details
           />
         </v-col>
       </v-row>
@@ -121,6 +158,7 @@
         item-value="id"
         mandatory
         label="Identificar con:"
+        outlined
         dense
       />
       <v-textarea
@@ -136,6 +174,17 @@
         outlined
         label="Comentario"
         dense
+      />
+      <v-text-field
+        v-model="Client.created_at"
+        label="Fecha de Creación"
+        required
+        outlined
+        dense
+        readonly
+        disabled
+        hide-details
+        class="py-3"
       />
       <v-btn
         class="mr-4"
@@ -294,6 +343,10 @@ export default {
         default: ''
       },
       comment: {
+        type: String,
+        default: ''
+      },
+      created_at: {
         type: String,
         default: ''
       },
