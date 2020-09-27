@@ -188,7 +188,7 @@
       />
       <v-btn
         class="mr-4"
-        color="success"
+        :color="Client.citycolor"
         :loading="isSubmitting"
         :disabled="isSubmitting"
         @click="editClient"
@@ -353,6 +353,10 @@ export default {
       newModel: {
         type: Number,
         default: 1
+      },
+      citycolor: {
+        type: String,
+        default: ''
       }
     }
   },

@@ -203,7 +203,7 @@
       <v-checkbox v-model="Client.sendToMikrotik" input-value="true" label="Crear en Mikrotik?" />
       <v-btn
         class="mr-4"
-        color="primary"
+        :color="citycolor"
         :loading="isSubmitting"
         :disabled="isSubmitting"
         @click="createClient"
@@ -218,6 +218,12 @@
 import gql from 'graphql-tag'
 export default {
   name: 'CreateForm',
+  props: {
+    citycolor: {
+      type: String,
+      default: ''
+    }
+  },
   apollo: {
     Cities () {
       return {

@@ -18,16 +18,18 @@
       >
         <v-card>
           <v-card-title
-            :style="`background-color:${cityColor};`"
+            :style="`color:${cityColor};border: solid 1px ${cityColor}`"
           >
             Clientes {{ cityName }}
             <v-spacer />
             <v-text-field
               v-model="search"
-              append-icon="mdi-magnify"
+              prepend-icon="mdi-magnify"
               label="Buscar Cliente"
               single-line
               hide-details
+              outlined
+              dense
               class="white--text"
             />
           </v-card-title>
@@ -102,7 +104,7 @@
                   <v-dialog v-model="dialog" max-width="500px" :retain-focus="false">
                     <template v-slot:activator="{ on, attrs }">
                       <v-btn
-                        color="primary"
+                        :color="cityColor"
                         dark
                         class="mb-2 mr-4"
                         v-bind="attrs"
@@ -129,17 +131,18 @@
                         color="primary"
                         small
                         class="mr-4"
+                        @click="getInitialData()"
                       >
                         Totales: {{ Object.keys(dataTable).length }}
                       </v-chip>
                     </template>
                     <v-card>
                       <v-card-title>
-                        <span class="headline">Crear Cliente</span>
+                        <span class="headline" :style="`color:${cityColor}`">Crear Cliente en {{ cityName }}</span>
                       </v-card-title>
                       <v-card-text>
                         <v-container>
-                          <CreateForm />
+                          <CreateForm :citycolor="cityColor" />
                         </v-container>
                       </v-card-text>
                     </v-card>
@@ -315,7 +318,8 @@ export default {
           mac_address: '',
           comment: '',
           created_at: '',
-          newModel: 0
+          newModel: 0,
+          citycolor: '1'
         }
       },
       snack: false,
@@ -330,10 +334,6 @@ export default {
     }
   },
   created () {
-    if (this.$route.query.city === '2') {
-      this.cityColor = 'green darken-3 white--text'
-      this.city = 'Fresno'
-    }
     if (this.$route.query.created) {
       this.alertBox = true
       this.alertBoxColor = 'blue darken-4'
@@ -350,8 +350,26 @@ export default {
       this.createdMessage = 'Cliente Eliminado Satisfactoriamente.'
     }
     this.initialLoading = true
-    this.$apollo.query({
-      query: gql`
+    this.getInitialData()
+  },
+  mounted () {
+    if (this.dataTable) {
+      const clients = this.dataTable.filter((c) => {
+        return c.plan.id < 7
+      })
+      this.active_users = clients.length
+      const inactiveClients = this.dataTable.filter((c) => {
+        return c.plan.id >= 7
+      })
+      this.inactive_users = inactiveClients.length
+    }
+  },
+  methods: {
+    getInitialData () {
+      this.initialLoading = true
+      this.dataTable = []
+      this.$apollo.query({
+        query: gql`
         query($city: Int) {
           City(id: $city){
             name
@@ -390,53 +408,42 @@ export default {
           }
         }
       `,
-      variables: {
-        city: parseInt(this.$route.query.city, 10)
-      }
-    }).then((input) => {
-      this.cityName = input.data.City.name
-      this.cityColor = input.data.City.color
-      for (let i = 0; i < input.data.City.clients.length; i++) {
-        const dataTable = {}
-        dataTable._id = input.data.City.clients[i]._id
-        dataTable.code = input.data.City.clients[i].code
-        dataTable.name = input.data.City.clients[i].name
-        dataTable.dni = input.data.City.clients[i].dni
-        dataTable.address = input.data.City.clients[i].address
-        dataTable.neighborhood = input.data.City.clients[i].neighborhood
-        dataTable.city = input.data.City.clients[i].city
-        dataTable.phone = input.data.City.clients[i].phone
-        dataTable.plan = input.data.City.clients[i].plan
-        dataTable.technology = input.data.City.clients[i].technology
-        dataTable.wifi_ssid = input.data.City.clients[i].wifi_ssid
-        dataTable.wifi_password = input.data.City.clients[i].wifi_password
-        dataTable.mac_address = input.data.City.clients[i].mac_address
-        dataTable.comment = input.data.City.clients[i].comment
-        dataTable.operator = input.data.City.clients[i].operator
-        dataTable.created_at = input.data.City.clients[i].created_at
-        dataTable.newModel = input.data.City.clients[i].newModel
-        this.dataTable.push(dataTable)
-      }
-      this.initialLoading = false
-    }).catch((error) => {
-      // eslint-disable-next-line no-console
-      console.error(error)
-      this.initialLoading = false
-    })
-  },
-  mounted () {
-    if (this.dataTable) {
-      const clients = this.dataTable.filter((c) => {
-        return c.plan.id < 7
+        variables: {
+          city: parseInt(this.$route.query.city, 10)
+        }
+      }).then((input) => {
+        this.cityName = input.data.City.name
+        this.cityColor = input.data.City.color
+        for (let i = 0; i < input.data.City.clients.length; i++) {
+          const dataTable = {}
+          dataTable._id = input.data.City.clients[i]._id
+          dataTable.status = 0
+          dataTable.code = input.data.City.clients[i].code
+          dataTable.name = input.data.City.clients[i].name
+          dataTable.dni = input.data.City.clients[i].dni
+          dataTable.address = input.data.City.clients[i].address
+          dataTable.neighborhood = input.data.City.clients[i].neighborhood
+          dataTable.city = input.data.City.clients[i].city
+          dataTable.phone = input.data.City.clients[i].phone
+          dataTable.plan = input.data.City.clients[i].plan
+          dataTable.technology = input.data.City.clients[i].technology
+          dataTable.wifi_ssid = input.data.City.clients[i].wifi_ssid
+          dataTable.wifi_password = input.data.City.clients[i].wifi_password
+          dataTable.mac_address = input.data.City.clients[i].mac_address
+          dataTable.comment = input.data.City.clients[i].comment
+          dataTable.operator = input.data.City.clients[i].operator
+          dataTable.created_at = input.data.City.clients[i].created_at
+          dataTable.newModel = input.data.City.clients[i].newModel
+          dataTable.citycolor = input.data.City.color
+          this.dataTable.push(dataTable)
+        }
+        this.initialLoading = false
+      }).catch((error) => {
+        // eslint-disable-next-line no-console
+        console.error(error)
+        this.initialLoading = false
       })
-      this.active_users = clients.length
-      const inactiveClients = this.dataTable.filter((c) => {
-        return c.plan.id >= 7
-      })
-      this.inactive_users = inactiveClients.length
-    }
-  },
-  methods: {
+    },
     editItem (item) {
       this.editedIndex = this.dataTable.indexOf(item)
       this.client.Client = Object.assign({}, item)
