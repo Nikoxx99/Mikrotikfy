@@ -425,6 +425,7 @@ export default {
           this.success = false
           this.error = true
           this.errorMessage = 'Comentario no sincronizado'
+          // eslint-disable-next-line no-console
           console.log(error)
         })
       }
@@ -456,6 +457,7 @@ export default {
       this.success = false
       this.error = true
       this.errorMessage = 'Comentario no sincronizado'
+      // eslint-disable-next-line no-console
       console.log(error)
     })
   },

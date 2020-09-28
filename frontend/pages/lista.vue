@@ -18,7 +18,7 @@
       >
         <v-card>
           <v-card-title
-            :style="`color:${cityColor};border: solid 1px ${cityColor}`"
+            :style="`color:${cityColor};`"
           >
             Clientes {{ cityName }}
             <v-spacer />
@@ -33,8 +33,9 @@
               class="white--text"
             />
           </v-card-title>
-          <no-ssr>
+          <client-only>
             <v-data-table
+              :key="key"
               :headers="headers"
               :items="dataTable"
               :search="search"
@@ -95,7 +96,7 @@
               <!-- ########################### -->
               <template v-slot:item.status="{ item }">
                 <svg height="13" width="20">
-                  <circle cx="10" cy="8" r="5" :fill="getStatus(item.code, item.dni)" />
+                  <circle :id="item._id" cx="10" cy="8" r="5" :fill="item.status" />
                 </svg>
               </template>
               <!-- ########################### -->
@@ -131,10 +132,24 @@
                         color="primary"
                         small
                         class="mr-4"
-                        @click="getInitialData()"
                       >
                         Totales: {{ Object.keys(dataTable).length }}
                       </v-chip>
+                      <v-tooltip bottom>
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-btn
+                            v-bind="attrs"
+                            color="cyan"
+                            dark
+                            class="mb-2 mr-4"
+                            v-on="on"
+                            @click="activeClients(true)"
+                          >
+                            <v-icon>mdi-reload</v-icon>
+                          </v-btn>
+                        </template>
+                        <span>Refrescar Estado</span>
+                      </v-tooltip>
                     </template>
                     <v-card>
                       <v-card-title>
@@ -185,7 +200,7 @@
               </template>
               <!-- ########################### -->
             </v-data-table>
-          </no-ssr>
+          </client-only>
           <div class="text-center pt-2">
             <v-pagination v-model="page" :length="pageCount" />
           </div>
@@ -277,6 +292,7 @@ export default {
   },
   data () {
     return {
+      key: 0,
       page: 1,
       pageCount: 0,
       itemsPerPage: 50,
@@ -417,7 +433,7 @@ export default {
         for (let i = 0; i < input.data.City.clients.length; i++) {
           const dataTable = {}
           dataTable._id = input.data.City.clients[i]._id
-          dataTable.status = 0
+          dataTable.status = '#777'
           dataTable.code = input.data.City.clients[i].code
           dataTable.name = input.data.City.clients[i].name
           dataTable.dni = input.data.City.clients[i].dni
@@ -438,11 +454,32 @@ export default {
           this.dataTable.push(dataTable)
         }
         this.initialLoading = false
+        this.activeClients(false)
       }).catch((error) => {
         // eslint-disable-next-line no-console
         console.error(error)
         this.initialLoading = false
       })
+    },
+    async activeClients (refetch) {
+      if (refetch) {
+        await this.$apollo.queries.getActiveClients.refetch()
+      }
+      for (let i = 0; i < this.dataTable.length; i++) {
+        // eslint-disable-next-line eqeqeq
+        const search = this.getActiveClients.find(c => c.name == this.dataTable[i].code)
+        if (search) {
+          this.dataTable[i].status = 'green'
+        } else {
+          // eslint-disable-next-line eqeqeq
+          const search2 = this.getActiveClients.find(c => c.name == this.dataTable[i].dni)
+          if (search2) {
+            this.dataTable[i].status = 'green'
+          } else {
+            this.dataTable[i].status = 'red'
+          }
+        }
+      }
     },
     editItem (item) {
       this.editedIndex = this.dataTable.indexOf(item)
@@ -467,20 +504,8 @@ export default {
         return 'green'
       }
     },
-    getStatus (code, dni) {
-      // eslint-disable-next-line eqeqeq
-      const search = this.getActiveClients.find(c => c.name == code)
-      if (search) {
-        return 'green'
-      } else {
-        // eslint-disable-next-line eqeqeq
-        const search2 = this.getActiveClients.find(c => c.name == dni)
-        if (search2) {
-          return 'green'
-        } else {
-          return 'red'
-        }
-      }
+    updateKey () {
+      this.key++
     },
     getModel (model) {
       if (model === 0) {
