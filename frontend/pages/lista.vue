@@ -142,6 +142,8 @@
                             color="cyan"
                             dark
                             class="mb-2 mr-4"
+                            :disabled="initialLoading"
+                            :loading="initialLoading"
                             v-on="on"
                             @click="activeClients(true)"
                           >
@@ -462,6 +464,7 @@ export default {
       })
     },
     async activeClients (refetch) {
+      this.initialLoading = true
       if (refetch) {
         await this.$apollo.queries.getActiveClients.refetch()
       }
@@ -480,6 +483,7 @@ export default {
           }
         }
       }
+      this.initialLoading = false
     },
     editItem (item) {
       this.editedIndex = this.dataTable.indexOf(item)
