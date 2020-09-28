@@ -29,6 +29,7 @@
               single-line
               hide-details
               outlined
+              autofocus
               dense
               class="white--text"
             />
