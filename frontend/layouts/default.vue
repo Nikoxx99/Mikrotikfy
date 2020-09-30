@@ -33,7 +33,7 @@
       app
     >
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-      <v-toolbar-title v-text="title" />
+      <v-toolbar-title class="d-none d-md-flex d-lg-flex d-xl-flex" v-text="title" />
       <v-spacer />
       <div v-if="$store.state.auth">
         <v-btn

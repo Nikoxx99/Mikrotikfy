@@ -119,28 +119,28 @@
                         color="white white--text"
                         small
                         outlined
-                        class="mr-4"
+                        class="mr-4 d-none d-sm-flex d-md-flex d-lg-flex d-xl-flex"
                       >
                         En Linea: {{ online_users }}
                       </v-chip>
                       <v-chip
                         color="green darken-3 white--text"
                         small
-                        class="mr-4"
+                        class="mr-4 d-none d-md-flex d-lg-flex d-xl-flex"
                       >
                         Activos: {{ active_users }}
                       </v-chip>
                       <v-chip
                         color="red lighten-1 white--text"
                         small
-                        class="mr-4"
+                        class="mr-4 d-none d-md-flex d-lg-flex d-xl-flex"
                       >
                         En Mora: {{ inactive_users }}
                       </v-chip>
                       <v-chip
                         color="primary"
                         small
-                        class="mr-4"
+                        class="mr-4 d-none d-sm-flex d-md-flex d-lg-flex d-xl-flex"
                       >
                         Totales: {{ Object.keys(dataTable).length }}
                       </v-chip>
@@ -489,7 +489,6 @@ export default {
     },
     calculateState () {
       if (this.dataTable) {
-        console.log(this.dataTable)
         const clients = this.dataTable.filter(c => c.plan.id < 7)
         this.active_users = clients.length
         const inactiveClients = this.dataTable.filter(c => c.plan.id >= 7)
