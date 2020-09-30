@@ -108,7 +108,7 @@
                       <v-btn
                         :color="cityColor"
                         dark
-                        class="mb-2 mr-4"
+                        class="mr-4"
                         v-bind="attrs"
                         v-on="on"
                       >
@@ -116,14 +116,22 @@
                         Nuevo Cliente
                       </v-btn>
                       <v-chip
-                        color="blue darken-3 white--text"
+                        color="white white--text"
+                        small
+                        outlined
+                        class="mr-4"
+                      >
+                        En Linea: {{ online_users }}
+                      </v-chip>
+                      <v-chip
+                        color="green darken-3 white--text"
                         small
                         class="mr-4"
                       >
                         Activos: {{ active_users }}
                       </v-chip>
                       <v-chip
-                        color="red darken-4 white--text"
+                        color="red lighten-1 white--text"
                         small
                         class="mr-4"
                       >
@@ -140,9 +148,9 @@
                         <template v-slot:activator="{ on, attrs }">
                           <v-btn
                             v-bind="attrs"
-                            color="cyan"
+                            :color="cityColor"
                             dark
-                            class="mb-2 mr-4"
+                            class="mr-4"
                             :disabled="initialLoading"
                             :loading="initialLoading"
                             v-on="on"
@@ -348,6 +356,7 @@ export default {
       editSnackText: '',
       active_users: 0,
       inactive_users: 0,
+      online_users: 0,
       title: ' Base de datos',
       dataTable: []
     }
@@ -372,16 +381,6 @@ export default {
     this.getInitialData()
   },
   mounted () {
-    if (this.dataTable) {
-      const clients = this.dataTable.filter((c) => {
-        return c.plan.id < 7
-      })
-      this.active_users = clients.length
-      const inactiveClients = this.dataTable.filter((c) => {
-        return c.plan.id >= 7
-      })
-      this.inactive_users = inactiveClients.length
-    }
   },
   methods: {
     getInitialData () {
@@ -458,6 +457,7 @@ export default {
         }
         this.initialLoading = false
         this.activeClients(false)
+        this.calculateState()
       }).catch((error) => {
         // eslint-disable-next-line no-console
         console.error(error)
@@ -466,6 +466,7 @@ export default {
     },
     async activeClients (refetch) {
       this.initialLoading = true
+      this.online_users = this.getActiveClients.length
       if (refetch) {
         await this.$apollo.queries.getActiveClients.refetch()
       }
@@ -485,6 +486,15 @@ export default {
         }
       }
       this.initialLoading = false
+    },
+    calculateState () {
+      if (this.dataTable) {
+        console.log(this.dataTable)
+        const clients = this.dataTable.filter(c => c.plan.id < 7)
+        this.active_users = clients.length
+        const inactiveClients = this.dataTable.filter(c => c.plan.id >= 7)
+        this.inactive_users = inactiveClients.length
+      }
     },
     editItem (item) {
       this.editedIndex = this.dataTable.indexOf(item)
