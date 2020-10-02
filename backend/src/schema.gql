@@ -10,6 +10,10 @@ type Query {
   Plans(limit: Int): [Plan]
   Technology(id: Int): Technology
   Technologies(limit: Int): [Technology]
+  Ticket(id: ID): Ticket
+  Tickets(limit: Int): [Ticket]
+  PasswordChange(dni: String): PasswordChange
+  PasswordChanges(limit: Int): [PasswordChange]
 }
 type Client {
   _id: ID
@@ -29,6 +33,7 @@ type Client {
   operator: Int
   created_at: String
   newModel: Int
+  tickets(limit: Int): Ticket
 }
 type City {
   _id: ID
@@ -89,6 +94,37 @@ type ClientComment {
 type ActiveClients {
   name: String
 }
+type Attachments {
+  id: String
+  url: String
+}
+type Geolocation {
+  latitud: String
+  longitude: String
+}
+type Ticket {
+  id: Int
+  client: String
+  type: Int
+  comment: String
+  attachments: Attachments
+  geolocation: Geolocation
+  created_at: String
+  updated_at: String
+  closed_at: String
+  created_by: Int
+  updated_by: Int
+  closed_by: Int
+}
+type PasswordChange {
+  id: Int
+  client_id: String
+  dni: String
+  old_pass: String
+  new_pass: String
+  closed: Boolean
+  created_at: String
+}
 
 scalar Date
 
@@ -113,6 +149,7 @@ type Mutation {
   deleteTechnology(id: Int): SimpleResponse
   createUser(input: UserInput): Response
   login(input: LoginInput): Response
+  createPasswordChangeRequest(input: PasswordChangeInput): SimpleResponse
 }
 input ClientInput {
   code: Int
@@ -184,4 +221,9 @@ input UserInput {
 input LoginInput {
   username: String!
   password: String!
+}
+input PasswordChangeInput {
+  dni: String
+  old_password: String
+  new_password: String
 }

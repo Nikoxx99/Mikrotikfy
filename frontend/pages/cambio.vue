@@ -1,12 +1,12 @@
 <template>
-  <div>
+  <div v-if="!done">
     <Logo />
     <v-row justify="center">
       <v-col lg="6" md="6" sm="12" xs="12">
         <v-card>
           <v-card-title> Solicitar Cambio de Clave </v-card-title>
           <v-card-text>
-            El plazo para que el cambio se haga efectivo son de 12 a 24 horas
+            El plazo para que el cambio se haga efectivo es de 12 a 72 horas
             luego de solicitar el cambio mediante este formulario. Recuerda
             verificar tu contraseña nueva antes de enviar la solicitud.
           </v-card-text>
@@ -45,6 +45,8 @@
                     >
                       <v-text-field
                         v-model="user_dni"
+                        autofocus
+                        type="number"
                         required
                         :rules="valid_dni"
                         label="Ingresa tu Cedula o NIT del titular de la red"
@@ -89,13 +91,11 @@
                           :hide-details="hideHint"
                           outlined
                           @keyup="hideHint = false"
-                          @blur="hideHint = true"
-                          @focus="hideHint = false"
                         />
                       </v-form>
                     </v-col>
                   </v-card>
-                  <v-btn class="mt-4" color="green darken-4" @click="sendRequest()">
+                  <v-btn class="mt-4" color="green darken-4" @click="openConfirm()">
                     Confirmar y Enviar
                   </v-btn>
                   <v-btn class="mt-4" color="grey" @click="e1 = 1">
@@ -113,32 +113,77 @@
       width="500"
     >
       <v-card>
-        <v-card-title class="headline grey lighten-2">
-          Privacy Policy
+        <v-card-title>
+          ¿Estas seguro de continuar?
         </v-card-title>
 
         <v-card-text>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+          Antes de continuar, verifica cuidadosamente la nueva contraseña que quieres.
+          <p class="mt-4">
+            <strong style="font-size:2rem;color:green;">{{ user_new_password }}</strong>
+          </p>
         </v-card-text>
 
-        <v-divider></v-divider>
+        <v-divider />
 
         <v-card-actions>
-          <v-spacer></v-spacer>
           <v-btn
             color="primary"
             text
+            @click="sendRequest()"
+          >
+            Confirmar y Enviar
+          </v-btn>
+          <v-btn
+            color="grey"
+            text
             @click="dialog = false"
           >
-            I accept
+            Volver y Corregir
           </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
   </div>
+  <div v-else>
+    <v-row
+      justify="center"
+    >
+      <v-col
+        lg="6"
+        md="6"
+        sm="12"
+        xs="12"
+      >
+        <v-card>
+          <v-card-title>ARNOProducciones</v-card-title>
+          <v-card-text>
+            <v-alert
+              border="left"
+              colored-border
+              type="success"
+              elevation="2"
+            >
+              Petición enviada con exito. Pronto el cambio se hará efectivo.
+            </v-alert>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn
+              color="success"
+              text
+              href="https://arnoproducciones.com"
+            >
+              Terminar y Volver
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+    </v-row>
+  </div>
 </template>
 
 <script>
+import gql from 'graphql-tag'
 import Logo from '../components/main/Logo'
 export default {
   layout: 'outuser',
@@ -147,6 +192,8 @@ export default {
   },
   data () {
     return {
+      title: 'Solicitar cambio de clave Wi-Fi',
+      done: false,
       e1: 1,
       confirmation: false,
       user_dni: '',
@@ -172,17 +219,103 @@ export default {
   methods: {
     testDni () {
       if (this.user_dni.length > 0) {
-        this.error = false
-        this.e1 = 2
+        this.$apollo.query({
+          query: gql`
+          query($dni: String) {
+            PasswordChange(dni: $dni){
+              closed
+            }
+          }
+        `,
+          variables: {
+            dni: this.user_dni
+          }
+        }).then((input) => {
+          console.log(this.$apollo)
+          if (input.data.PasswordChange !== null) {
+            const res = input.data.PasswordChange.closed
+            if (res === true) {
+              this.error = false
+              this.e1 = 2
+            } else {
+              this.error = true
+              this.errorMessage = 'Ya existe un proceso activo para el cambio de tu clave.'
+            }
+          } else {
+            this.error = false
+            this.e1 = 2
+          }
+        }).catch((error) => {
+          // eslint-disable-next-line no-console
+          console.error(error)
+          this.initialLoading = false
+        })
       } else {
         this.error = true
         this.errorMessage = 'No puedes dejar este campo en blanco.'
       }
     },
-    sendRequest () {
+    openConfirm () {
       if (this.valid) {
         this.confirmation = true
       }
+    },
+    sendRequest () {
+      if (this.valid) {
+        this.$apollo.mutate({
+          mutation: gql`mutation ($input: PasswordChangeInput){
+          createPasswordChangeRequest(input: $input){
+            success
+            errors{
+              path
+              message
+            }
+          }
+        }`,
+          variables: {
+            input: {
+              dni: this.user_dni,
+              old_password: this.user_old_password,
+              new_password: this.user_new_password
+            }
+          }
+        }).then((input) => {
+          if (input.data.createPasswordChangeRequest.success) {
+            this.done = true
+          } else {
+            this.error = true
+            this.errorMessage = 'Se ha producido un error, intentalo mas tarde o contecta nuevamente con la empresa.'
+            this.isSubmitting = false
+          }
+        }).catch((error) => {
+          this.error = true
+          this.errorMessage = error
+          this.isSubmitting = false
+        })
+      }
+    }
+  },
+  head () {
+    return {
+      title: this.title,
+      meta: [
+        { hid: 'language', name: 'language', content: 'es' },
+        { hid: 'audience', name: 'audience', content: 'all' },
+        { hid: 'rating', name: 'rating', content: 'general' },
+        { hid: 'distribution', name: 'distribution', content: 'global' },
+        { hid: 'document-type', name: 'document-type', content: 'Public' },
+        { hid: 'MSSmartTagsPreventParsing', name: 'MSSmartTagsPreventParsing', content: 'true' },
+        { hid: 'robots', name: 'robots', content: 'all' },
+        { hid: 'robots', name: 'robots', content: 'all, index, follow' },
+        { hid: 'googlebot', name: 'googlebot', content: 'all, index, follow' },
+        { hid: 'yahoo-slurp', name: 'yahoo-slurp', content: 'all, index, follow' },
+        { hid: 'msnbot', name: 'msnbot', content: 'index, follow' },
+        { hid: 'googlebot-image', name: 'googlebot-image', content: 'all' },
+        { hid: 'title', name: 'title', content: this.title },
+        { hid: 'og:title', property: 'og:title', content: this.title },
+        { hid: 'og:description', property: 'og:description', content: 'ARNOProducciones - Base de datos interactiva' },
+        { hid: 'author', name: 'author', content: 'Nicolas Echeverry' }
+      ]
     }
   }
 }
