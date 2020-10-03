@@ -120,8 +120,8 @@ type PasswordChange {
   id: Int
   client_id: String
   dni: String
-  old_pass: String
-  new_pass: String
+  old_password: String
+  new_password: String
   closed: Boolean
   created_at: String
 }

@@ -113,10 +113,10 @@ export default {
         {
           icon: 'mdi-key',
           title: 'Cambios de Clave',
-          to: '/config'
+          to: '/password'
         },
         {
-          icon: 'mdi-trash',
+          icon: 'mdi-close-network',
           title: 'Suspencion por Mora',
           to: '/config'
         }
