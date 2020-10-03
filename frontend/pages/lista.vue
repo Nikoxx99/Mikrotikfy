@@ -103,7 +103,7 @@
               <!-- ########################### -->
               <template v-slot:top>
                 <v-toolbar flat>
-                  <v-dialog v-model="dialog" max-width="500px" :retain-focus="false">
+                  <v-dialog v-model="dialog" max-width="650px" :retain-focus="false">
                     <template v-slot:activator="{ on, attrs }">
                       <v-btn
                         :color="cityColor"
@@ -379,8 +379,6 @@ export default {
     }
     this.initialLoading = true
     this.getInitialData()
-  },
-  mounted () {
   },
   methods: {
     getInitialData () {

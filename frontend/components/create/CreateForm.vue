@@ -31,6 +31,7 @@
             outlined
             dense
             hide-details
+            @keyup="calculateSsid"
           />
         </v-col>
       </v-row>
@@ -41,6 +42,7 @@
         outlined
         dense
         hide-details
+        @keyup="calculateSsid"
       />
       <v-row>
         <v-col>
@@ -360,6 +362,18 @@ export default {
     },
     genAddress () {
       this.Client.address = `${this.dir1} ${this.dir2} ${this.dir3} ${this.dir4}`
+    },
+    calculateSsid () {
+      const name = this.Client.name.split(' ')
+      if (name[2] && this.Client.dni) {
+        const lastNameLowerCase = name[2].toLowerCase()
+        const nombreLowerCase = name[0].toLowerCase()
+        const processedName = nombreLowerCase.charAt(0).toUpperCase() + nombreLowerCase.slice(1)
+        this.Client.wifi_password = processedName + this.Client.dni
+        this.Client.wifi_ssid = `ARNOP${lastNameLowerCase.charAt(0).toUpperCase() + lastNameLowerCase.slice(1)}`
+      } else {
+        return false
+      }
     }
   }
 }
