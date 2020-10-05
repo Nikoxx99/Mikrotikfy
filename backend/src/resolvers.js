@@ -302,6 +302,16 @@ export const resolvers = {
         return simpleResponse(false, 'Create Password Change Request', 'Error Creating Password Change Request.')
       }
     },
+    updatePasswordChangeRequest: async function (_, { input }) {
+      console.log(input)
+      const closed = input.closed
+      const updatePasswordChangeRequest = await PasswordChange.updateOne({ _id: input._id }, { closed }, { multi: false })
+      if (updatePasswordChangeRequest) {
+        return simpleResponse(true, 'Update Password Change Request', 'Password Change Request updated successfully.')
+      } else {
+        return simpleResponse(false, 'Update Password Change Request', 'Error updating Password Change Request.')
+      }
+    },
     login: async (_, { input }, SECRET) => auth.login(input, User, SECRET)
   },
   Client: {

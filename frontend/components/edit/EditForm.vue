@@ -176,7 +176,7 @@
         dense
       />
       <v-text-field
-        v-model="Client.created_at"
+        :value="getDate(Client.created_at)"
         label="Fecha de Creación"
         required
         outlined
@@ -513,6 +513,11 @@ export default {
     },
     genAddress () {
       this.Client.address = `${this.dir1} ${this.dir2} ${this.dir3} ${this.dir4}`
+    },
+    getDate (date) {
+      const dateObject = new Date(parseInt(date))
+      const humanDateFormat = dateObject.toLocaleString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric' })
+      return humanDateFormat
     }
   }
 }

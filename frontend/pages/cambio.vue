@@ -223,7 +223,10 @@ export default {
           query: gql`
           query($dni: String) {
             PasswordChange(dni: $dni){
-              closed
+              closed {
+                name
+                value
+              }
             }
           }
         `,
@@ -231,9 +234,8 @@ export default {
             dni: this.user_dni
           }
         }).then((input) => {
-          console.log(this.$apollo)
           if (input.data.PasswordChange !== null) {
-            const res = input.data.PasswordChange.closed
+            const res = input.data.PasswordChange.closed.value
             if (res === true) {
               this.error = false
               this.e1 = 2

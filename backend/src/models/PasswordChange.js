@@ -7,8 +7,11 @@ const passwordChangeSchema = new Schema({
   old_password: String,
   new_password: String,
   closed: {
-    type: Boolean,
-    default: false
+    type: Object,
+    default: {
+      name: 'Cerrado',
+      value: false
+    }
   },
   created_at: {
     type: Date,

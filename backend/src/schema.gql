@@ -116,13 +116,18 @@ type Ticket {
   updated_by: Int
   closed_by: Int
 }
+type ClosedObject {
+  name: String
+  value: Boolean
+}
 type PasswordChange {
+  _id: ID
   id: Int
   client_id: String
   dni: String
   old_password: String
   new_password: String
-  closed: Boolean
+  closed: ClosedObject
   created_at: String
 }
 
@@ -150,6 +155,7 @@ type Mutation {
   createUser(input: UserInput): Response
   login(input: LoginInput): Response
   createPasswordChangeRequest(input: PasswordChangeInput): SimpleResponse
+  updatePasswordChangeRequest(input: UpdatePasswordChangeInput): SimpleResponse
 }
 input ClientInput {
   code: Int
@@ -226,4 +232,12 @@ input PasswordChangeInput {
   dni: String
   old_password: String
   new_password: String
+}
+input UpdatePasswordChangeInput {
+  _id: ID
+  closed: ClosedObjectInput
+}
+input ClosedObjectInput {
+  name: String
+  value: Boolean
 }
