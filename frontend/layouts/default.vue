@@ -24,6 +24,11 @@
           <v-list-item-content>
             <v-list-item-title v-text="item.title" />
           </v-list-item-content>
+          <v-list-item-action>
+            <span>
+              {{ item.info }}
+            </span>
+          </v-list-item-action>
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
@@ -32,6 +37,10 @@
       fixed
       app
     >
+      <svg height="13" width="20" style="position:absolute;top:12px;left:43px;">
+        <span>1</span>
+        <circle cx="10" cy="8" r="5" fill="red" />
+      </svg>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-toolbar-title class="d-none d-md-flex d-lg-flex d-xl-flex" v-text="title" />
       <v-spacer />
@@ -92,6 +101,20 @@ export default {
         }
       `
       }
+    },
+    PasswordChanges () {
+      return {
+        query: gql`
+        query{
+          PasswordChanges(limit: 100){
+            closed {
+              name
+              value
+            }
+          }
+        }
+      `
+      }
     }
   },
   data () {
@@ -113,7 +136,8 @@ export default {
         {
           icon: 'mdi-key',
           title: 'Cambios de Clave',
-          to: '/password'
+          to: '/password',
+          info: 1
         },
         {
           icon: 'mdi-close-network',
@@ -125,6 +149,13 @@ export default {
       right: true,
       rightDrawer: false,
       title: 'ARNOProducciones SAS'
+    }
+  },
+  mounted () {
+    for (let i = 0; i < this.PasswordChanges.length; i++) {
+      if (this.PasswordChanges[i].closed.value === true) {
+        this.items[2].info++
+      }
     }
   },
   methods: {

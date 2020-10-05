@@ -208,7 +208,6 @@ module.exports.mkGetComment = async function (input) {
   })
   await conn.connect()
   if (input.model === 1) {
-    console.log(input.code)
     // eslint-disable-next-line no-unused-vars
     var com1 = await conn.write('/ppp/secret/print', [
       '=.proplist=comment',
