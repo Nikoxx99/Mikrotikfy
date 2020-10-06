@@ -24,10 +24,10 @@
           <v-list-item-content>
             <v-list-item-title v-text="item.title" />
           </v-list-item-content>
-          <v-list-item-action>
-            <span>
+          <v-list-item-action v-if="item.info">
+            <v-chip color="red">
               {{ item.info }}
-            </span>
+            </v-chip>
           </v-list-item-action>
         </v-list-item>
       </v-list>
@@ -37,10 +37,11 @@
       fixed
       app
     >
-      <svg height="13" width="20" style="position:absolute;top:12px;left:43px;">
-        <span>1</span>
-        <circle cx="10" cy="8" r="5" fill="red" />
-      </svg>
+      <div v-if="hasPendingChanges">
+        <svg height="13" width="20" style="position:absolute;top:12px;left:43px;">
+          <circle cx="10" cy="8" r="5" fill="red" />
+        </svg>
+      </div>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-toolbar-title class="d-none d-md-flex d-lg-flex d-xl-flex" v-text="title" />
       <v-spacer />
@@ -101,24 +102,11 @@ export default {
         }
       `
       }
-    },
-    PasswordChanges () {
-      return {
-        query: gql`
-        query{
-          PasswordChanges(limit: 100){
-            closed {
-              name
-              value
-            }
-          }
-        }
-      `
-      }
     }
   },
   data () {
     return {
+      hasPendingChanges: false,
       clipped: false,
       drawer: false,
       fixed: false,
@@ -137,7 +125,7 @@ export default {
           icon: 'mdi-key',
           title: 'Cambios de Clave',
           to: '/password',
-          info: 1
+          info: 0
         },
         {
           icon: 'mdi-close-network',
@@ -152,11 +140,34 @@ export default {
     }
   },
   mounted () {
-    for (let i = 0; i < this.PasswordChanges.length; i++) {
-      if (this.PasswordChanges[i].closed.value === true) {
-        this.items[2].info++
+    this.$apollo.query({
+      query: gql`
+      query($limit: Int) {
+        PasswordChanges(limit: $limit){
+          closed {
+            name
+            value
+          }
+        }
       }
-    }
+      `,
+      variables: {
+        limit: 1000
+      }
+    }).then((input) => {
+      for (let i = 0; i < input.data.PasswordChanges.length; i++) {
+        if (input.data.PasswordChanges[i].closed.value === false) {
+          this.items[2].info++
+        }
+      }
+      if (this.items[2].info >= 0) {
+        this.hasPendingChanges = true
+        console.log()
+      }
+    }).catch((error) => {
+      // eslint-disable-next-line no-console
+      console.error(error)
+    })
   },
   methods: {
     logout () {
