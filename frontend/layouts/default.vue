@@ -160,9 +160,8 @@ export default {
           this.items[2].info++
         }
       }
-      if (this.items[2].info >= 0) {
+      if (this.items[2].info > 0) {
         this.hasPendingChanges = true
-        console.log()
       }
     }).catch((error) => {
       // eslint-disable-next-line no-console
