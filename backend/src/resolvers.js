@@ -303,7 +303,6 @@ export const resolvers = {
       }
     },
     updatePasswordChangeRequest: async function (_, { input }) {
-      console.log(input)
       const closed = input.closed
       const updatePasswordChangeRequest = await PasswordChange.updateOne({ _id: input._id }, { closed }, { multi: false })
       if (updatePasswordChangeRequest) {
@@ -356,5 +355,10 @@ export const resolvers = {
     clients({ id }) {
       return Client.find({ technology: id }).sort({ 'code': 'desc' })
     },
+  },
+  PasswordChange: {
+    client({ dni }) {
+      return Client.findOne({ dni: dni })
+    }
   }
 }

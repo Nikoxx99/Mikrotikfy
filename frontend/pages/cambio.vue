@@ -263,6 +263,7 @@ export default {
       }
     },
     sendRequest () {
+      const date = Date.now()
       if (this.valid) {
         this.$apollo.mutate({
           mutation: gql`mutation ($input: PasswordChangeInput){
@@ -278,7 +279,8 @@ export default {
             input: {
               dni: this.user_dni,
               old_password: this.user_old_password,
-              new_password: this.user_new_password
+              new_password: this.user_new_password,
+              created_at: String(date)
             }
           }
         }).then((input) => {

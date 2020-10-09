@@ -14,8 +14,8 @@ const passwordChangeSchema = new Schema({
     }
   },
   created_at: {
-    type: Date,
-    default: Date.now()
+    type: Number,
+    default: 0
   }
 })
 

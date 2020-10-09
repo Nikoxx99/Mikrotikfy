@@ -114,6 +114,12 @@ export default {
           PasswordChanges(limit: 100){
             _id
             dni
+            client {
+              name
+              city {
+                name
+              }
+            }
             old_password
             new_password
             closed {
@@ -142,9 +148,11 @@ export default {
       dialogEdit: false,
       initialLoading: false,
       headers: [
+        { text: 'NOMBRE', sortable: true, value: 'client.name' },
         { text: 'Cedula', sortable: true, value: 'dni' },
         { text: 'Clave Anterior', sortable: false, value: 'old_password' },
         { text: 'Clave Nueva', sortable: true, value: 'new_password' },
+        { text: 'Ciudad', sortable: true, value: 'client.city.name' },
         { text: 'Estado', sortable: true, value: 'closed' },
         { text: 'Fecha', sortable: false, value: 'created_at' }
       ],

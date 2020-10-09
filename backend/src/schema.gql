@@ -123,7 +123,7 @@ type ClosedObject {
 type PasswordChange {
   _id: ID
   id: Int
-  client_id: String
+  client: Client
   dni: String
   old_password: String
   new_password: String
@@ -232,6 +232,7 @@ input PasswordChangeInput {
   dni: String
   old_password: String
   new_password: String
+  created_at: String
 }
 input UpdatePasswordChangeInput {
   _id: ID
