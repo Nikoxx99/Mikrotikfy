@@ -14,8 +14,8 @@
       "type": "string"
     },
     "clients": {
-      "collection": "client",
-      "via": "technology"
+      "via": "technology",
+      "collection": "client"
     }
   }
 }

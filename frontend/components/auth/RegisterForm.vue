@@ -51,7 +51,7 @@
       </form>
     </v-card-text>
     <v-card-text>
-      <v-btn block text class="my-2 yellow darken-4 white--text" @click="createUser">
+      <v-btn block text class="my-2 yellow darken-4 white--text" @click="register">
         Registrar
       </v-btn>
     </v-card-text>
@@ -104,16 +104,17 @@ export default {
       this.select = null
       this.checkbox = false
     },
-    createUser () {
+    register () {
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: UserInput!){
-          createUser(input: $input){
-            success
-            token
-            username
-            errors{
-              path
-              message
+        mutation: gql`mutation ($input: UsersPermissionsRegisterInput!){
+          register(input: $input){
+            jwt
+            user{
+              username
+              confirmed
+              role{
+                name
+              }
             }
           }
         }`,
@@ -125,7 +126,7 @@ export default {
           }
         }
       }).then((input) => {
-        if (input.data.createUser.success) {
+        if (!input.errors) {
           this.$router.push({ path: '/login?firstTime=true' })
         } else {
           this.alertBox = true

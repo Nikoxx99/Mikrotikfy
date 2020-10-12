@@ -1,0 +1,13 @@
+module.exports = {
+  definition: ``,
+  query: ``,
+  type: {},
+  resolver: {
+    Query: {
+      getActiveClients: {
+        description: 'Return the active clients',
+        resolver: 'application::get-active-clients.get-active-clients.getActiveClients'
+      }
+    },
+  },
+};

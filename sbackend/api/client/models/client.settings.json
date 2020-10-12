@@ -24,12 +24,12 @@
       "type": "string"
     },
     "phone": {
-      "type": "integer"
+      "type": "biginteger"
     },
-    "ssid": {
+    "wifi_ssid": {
       "type": "string"
     },
-    "password": {
+    "wifi_password": {
       "type": "string"
     },
     "mac_address": {
@@ -42,20 +42,25 @@
       "type": "integer"
     },
     "neighborhood": {
-      "via": "clients",
-      "model": "neighborhood"
+      "model": "neighborhood",
+      "via": "clients"
     },
     "city": {
-      "via": "clients",
-      "model": "city"
+      "model": "city",
+      "via": "clients"
     },
     "plan": {
-      "via": "clients",
-      "model": "plan"
+      "model": "plan",
+      "via": "clients"
     },
     "technology": {
-      "via": "clients",
-      "model": "technology"
+      "model": "technology",
+      "via": "clients"
+    },
+    "operator": {
+      "plugin": "users-permissions",
+      "model": "user",
+      "via": "clients"
     }
   }
 }

@@ -1,8 +1,9 @@
 {
   "kind": "collectionType",
-  "collectionName": "plans",
+  "collectionName": "get_active_clients",
   "info": {
-    "name": "Plan"
+    "name": "getActiveClients",
+    "description": ""
   },
   "options": {
     "increments": true,
@@ -10,15 +11,8 @@
     "draftAndPublish": true
   },
   "attributes": {
-    "name": {
+    "active": {
       "type": "string"
-    },
-    "mikrotik_name": {
-      "type": "string"
-    },
-    "clients": {
-      "via": "plan",
-      "collection": "client"
     }
   }
 }

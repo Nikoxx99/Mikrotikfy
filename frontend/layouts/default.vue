@@ -47,7 +47,7 @@
       <v-spacer />
       <div v-if="$store.state.auth">
         <v-btn
-          v-for="city in Cities"
+          v-for="city in cities"
           :key="city.id"
           class="mr-4"
           :color="city.color"
@@ -90,11 +90,11 @@ import gql from 'graphql-tag'
 import Cookie from 'js-cookie'
 export default {
   apollo: {
-    Cities () {
+    cities () {
       return {
         query: gql`
         query{
-          Cities{
+          cities{
             id
             name
             color
@@ -171,6 +171,7 @@ export default {
   methods: {
     logout () {
       Cookie.remove('auth')
+      Cookie.remove('authToken')
       this.$store.commit('setAuth', null)
       this.$router.replace('/login')
     }
