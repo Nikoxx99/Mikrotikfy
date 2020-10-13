@@ -107,11 +107,11 @@ export default {
   },
   middleware: 'authenticated',
   apollo: {
-    PasswordChanges () {
+    passwordchanges () {
       return {
         query: gql`
         query{
-          PasswordChanges(limit: 100){
+          passwordchanges(limit: 100){
             _id
             dni
             client {

@@ -143,20 +143,17 @@ export default {
     this.$apollo.query({
       query: gql`
       query($limit: Int) {
-        PasswordChanges(limit: $limit){
-          closed {
-            name
-            value
-          }
+        passwordchanges(limit: $limit){
+          closed
         }
       }
       `,
       variables: {
-        limit: 1000
+        limit: 100
       }
     }).then((input) => {
-      for (let i = 0; i < input.data.PasswordChanges.length; i++) {
-        if (input.data.PasswordChanges[i].closed.value === false) {
+      for (let i = 0; i < input.data.passwordchanges.length; i++) {
+        if (input.data.passwordchanges[i].closed.value === false) {
           this.items[2].info++
         }
       }

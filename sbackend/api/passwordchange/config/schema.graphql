@@ -1,0 +1,36 @@
+module.exports = {
+  definition: `
+    type ClosedObject {
+      name: String
+      value: Boolean
+    }
+    type PasswordChangeType {
+      dni: String
+      client: Client
+      old_password: String
+      new_password: String
+      closed: ClosedObject
+    }
+  `,
+  query: `
+    TestPasswordChange(dni: String): PasswordChangeType
+    passwordchangesq(dni: String): [PasswordChangeType]
+  `,
+  type: {
+    TestPasswordChange: {
+      name: 'returns old password changes querys'
+    }
+  },
+  resolver: {
+    Query: {
+      TestPasswordChange: {
+        description: 'Return old password changes queries for test',
+        resolver: 'application::passwordchange.passwordchange.getTestPasswordChange'
+      },
+      passwordchangesq: {
+        description: 'Return password change request',
+        resolver: 'application::passwordchange.passwordchange.PasswordChangeCtrl'
+      }
+    },
+  },
+};

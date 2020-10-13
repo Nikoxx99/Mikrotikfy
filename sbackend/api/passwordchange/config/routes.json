@@ -1,0 +1,52 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/passwordchanges",
+      "handler": "passwordchange.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/passwordchanges/count",
+      "handler": "passwordchange.count",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/passwordchanges/:id",
+      "handler": "passwordchange.findOne",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/passwordchanges",
+      "handler": "passwordchange.create",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/passwordchanges/:id",
+      "handler": "passwordchange.update",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/passwordchanges/:id",
+      "handler": "passwordchange.delete",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}
