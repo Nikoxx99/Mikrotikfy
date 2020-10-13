@@ -127,9 +127,9 @@ export default {
   methods: {
     initComponent () {
       this.modal = true
-      this.$apollo.mutate({
-        mutation: gql`mutation ($id: ID){
-          getClientStatus(id: $id){
+      this.$apollo.query({
+        query: gql`query ($id: ID){
+          ClientStatus(id: $id){
             status
             address
             mac_address
@@ -143,16 +143,16 @@ export default {
           id: this.clientid
         }
       }).then((input) => {
-        const status = input.data.getClientStatus.status
+        const status = input.data.ClientStatus.status
         if (status) {
           this.loading = false
-          this.address = input.data.getClientStatus.address
-          this.mac_address = input.data.getClientStatus.mac_address
-          this.uptime = input.data.getClientStatus.uptime
-          this.offlineTime = input.data.getClientStatus.offlineTime
-          this.download = input.data.getClientStatus.download
-          this.upload = input.data.getClientStatus.upload
-          if (input.data.getClientStatus.address) {
+          this.address = input.data.ClientStatus.address
+          this.mac_address = input.data.ClientStatus.mac_address
+          this.uptime = input.data.ClientStatus.uptime
+          this.offlineTime = input.data.ClientStatus.offlineTime
+          this.download = input.data.ClientStatus.download
+          this.upload = input.data.ClientStatus.upload
+          if (input.data.ClientStatus.address) {
             this.clientExists = true
             this.online = true
             this.showCard = true

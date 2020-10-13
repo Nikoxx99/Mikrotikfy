@@ -73,7 +73,7 @@
                       v-model="props.item.plan"
                       item-text="name"
                       item-value="id"
-                      :items="Plans"
+                      :items="plans"
                       return-object
                       single-line
                       label="Plan"
@@ -286,17 +286,17 @@ export default {
       `
       }
     },
-    getActiveClients () {
+    ActiveClients () {
       return {
         query: gql`
-        query($city: Int){
-          getActiveClients(city: $city){
+        query($city: String){
+          ActiveClients(city: $city){
             name
           }
         }
       `,
         variables: {
-          city: parseInt(this.$route.query.city, 10)
+          city: this.$route.query.city
         }
       }
     }
@@ -468,18 +468,18 @@ export default {
     },
     async activeClients (refetch) {
       this.initialLoading = true
-      this.online_users = this.getActiveClients.length
+      this.online_users = this.ActiveClients.length
       if (refetch) {
-        await this.$apollo.queries.getActiveClients.refetch()
+        await this.$apollo.queries.ActiveClients.refetch()
       }
       for (let i = 0; i < this.dataTable.length; i++) {
         // eslint-disable-next-line eqeqeq
-        const search = this.getActiveClients.find(c => c.name == this.dataTable[i].code)
+        const search = this.ActiveClients.find(c => c.name == this.dataTable[i].code)
         if (search) {
           this.dataTable[i].status = 'green'
         } else {
           // eslint-disable-next-line eqeqeq
-          const search2 = this.getActiveClients.find(c => c.name == this.dataTable[i].dni)
+          const search2 = this.ActiveClients.find(c => c.name == this.dataTable[i].dni)
           if (search2) {
             this.dataTable[i].status = 'green'
           } else {

@@ -1,0 +1,29 @@
+module.exports = {
+  definition: `
+    type ClientStatus {
+      status: Boolean
+      address: String
+      mac_address: String
+      offlineTime: String
+      uptime: String
+      download: String
+      upload: String
+    }
+  `,
+  query: `
+    ClientStatus(id: ID): ClientStatus
+  `,
+  type: {
+    ActiveClientList: {
+      name: 'returns the list of all active clients'
+    }
+  },
+  resolver: {
+    Query: {
+      ClientStatus: {
+        description: 'Return the active client status info',
+        resolver: 'application::client.client.getClientStatus'
+      }
+    },
+  },
+};
