@@ -22,8 +22,16 @@ export const resolvers = {
     getActiveClients: async (_, { city }) => {
       const search = await City.find({ id: city })
       const newCity = search[0].ip
-      const activeClients = await mkGetActiveClients({ newCity })
-      return activeClients
+      if (newCity === '191.102.86.52') {
+        const activeClients = await mkGetActiveClients(newCity)
+        return activeClients
+      } else {
+        const mk2 = '191.102.86.54'
+        const activeClients1 = await mkGetActiveClients(newCity)
+        const activeClients2 = await mkGetActiveClients(mk2)
+        const activeClients = activeClients1.concat(activeClients2)
+        return activeClients
+      }
     },
     City: async (_, { id }) => {
       return await City.findOne({ id: id })
@@ -60,13 +68,15 @@ export const resolvers = {
     createClient: async (_, { input: { city, neighborhood, plan, technology, sendToMikrotik, ...data } }) => {
       const newClient = new Client({ city, plan, neighborhood, technology, ...data })
       const newCity = await City.find({ id: city }, { name: 1, ip: 1, _id: 0 })
+      const newCity2 = [{ name: 'MARIQUITA 2', ip: '191.102.86.54' }]
       const newNeighborhood = await Neighborhood.find({ id: neighborhood }, { name: 1, _id: 0 })
       const newPlan = await Plan.find({ id: plan }, { name: 1, mikrotik_name: 1, _id: 0 })
       const newTechnology = await Technology.find({ id: technology }, { name: 1, _id: 0 })
       const res = await newClient.save()
       if (res) {
         if (sendToMikrotik) {
-          await mkCreateClient({ newCity, newNeighborhood, newPlan, newTechnology, ...data })
+          await mkCreateClient(newCity, { newNeighborhood, newPlan, newTechnology, ...data })
+          await mkCreateClient(newCity2, { newNeighborhood, newPlan, newTechnology, ...data })
         }
         return simpleResponse(true, 'Create Client', 'Client Created Successfullly.')
       } else {
@@ -101,11 +111,13 @@ export const resolvers = {
         // eslint-disable-next-line no-redeclare
         var removeActive = true
       }
-
+      const newCity2 = '191.102.86.54'
       const res = await Client.updateOne({ _id: id }, input, { multi: false })
-      const mkRes = await mkSetClientPlanInformation({ newPlan, newCity, dni, code, model, comment, removeActive })
-      await mkSetComment({ newPlan, newCity, dni, code, model, comment })
-      if (res && mkRes) {
+      const mkRes = await mkSetClientPlanInformation(newCity, { newPlan, dni, code, model, comment, removeActive })
+      const mkRes2 = await mkSetClientPlanInformation(newCity2, { newPlan, dni, code, model, comment, removeActive })
+      await mkSetComment(newCity, { newPlan, dni, code, model, comment })
+      await mkSetComment(newCity2, { newPlan, dni, code, model, comment })
+      if (res && mkRes && mkRes2) {
         return simpleResponse(true, 'Edit Client', 'Client Edited Successfuly')
       } else {
         return simpleResponse(false, 'Edit Client', 'Error Editing Client')
@@ -129,10 +141,11 @@ export const resolvers = {
       const model = search[0].newModel
 
       const removeActive = true
-
+      const newCity2 = '191.102.86.54'
       const res = await Client.updateOne({ _id: id }, { savePlan }, { multi: false })
-      const mkRes = await mkSetClientPlanInformation({ newPlan, newCity, dni, code, model, removeActive })
-      if (res && mkRes) {
+      const mkRes = await mkSetClientPlanInformation(newCity, { newPlan, dni, code, model, removeActive })
+      const mkRes2 = await mkSetClientPlanInformation(newCity2, { newPlan, dni, code, model, removeActive })
+      if (res && mkRes && mkRes2) {
         return simpleResponse(true, 'Edit Client Plan', 'Client Plan Edited Successfuly')
       } else {
         return simpleResponse(false, 'Edit Client Plan', 'Error Editing Client Plan')
@@ -145,8 +158,10 @@ export const resolvers = {
       const newCity = city[0].ip
       const client = search[0].code
       const deleteEpisode = await Client.findByIdAndDelete(id)
-      const delMikrotik = await mkDeleteClient({ client, newCity })
-      if (deleteEpisode && delMikrotik) {
+      const newCity2 = '191.102.86.54'
+      const delMikrotik = await mkDeleteClient(newCity, { client })
+      const delMikrotik2 = await mkDeleteClient(newCity2, { client })
+      if (deleteEpisode && delMikrotik && delMikrotik2) {
         return simpleResponse(true, 'Delete Client', 'Client deleted successfully.')
       } else {
         return simpleResponse(false, 'Delete Client', 'Error deleting Client.')

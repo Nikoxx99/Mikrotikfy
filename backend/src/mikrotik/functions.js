@@ -1,22 +1,23 @@
 /* eslint-disable no-undef */
 const RouterOSAPI = require('node-routeros').RouterOSAPI
-module.exports.mkCreateClient = async function (input) {
+module.exports.mkCreateClient = async function (city, input) {
+  console.log(city)
   const conn = new RouterOSAPI({
-    host: input.newCity[0].ip,
+    host: city[0].ip,
     user: 'API_ARNOP',
     password: 'weare991010rootnortetv',
     port: 8087
   })
-  const comment = `${input.code} ${input.name} ${input.dni} ${input.address} ${input.newNeighborhood[0].name} ${input.newCity[0].name} ${input.phone} ${input.newPlan[0].name} ${input.wifi_ssid} ${input.wifi_password} ${input.newTechnology[0].name} ${input.mac_address} ${input.comment}`
+  const comment = `${input.code} ${input.name} ${input.dni} ${input.address} ${input.newNeighborhood[0].name} ${city[0].name} ${input.phone} ${input.newPlan[0].name} ${input.wifi_ssid} ${input.wifi_password} ${input.newTechnology[0].name} ${input.mac_address} ${input.comment}`
   await conn.connect().then(() => {
     console.log('Connected to Mikrotik Successfully >>>')
   }).then(() => {
     conn.write('/ppp/secret/add', [
-      '=name='+input.code,
-      '=password=MAR'+input.code,
-      '=profile='+input.newPlan[0].mikrotik_name,
+      '=name=' + input.code,
+      '=password=MAR' + input.code,
+      '=profile=' + input.newPlan[0].mikrotik_name,
       '=service=pppoe',
-      '=comment='+comment,
+      '=comment=' + comment,
     ]).then(() => {
       conn.close()
       console.log('Connection Closed <<<')
@@ -27,9 +28,9 @@ module.exports.mkCreateClient = async function (input) {
   })
 }
 
-module.exports.mkDeleteClient = async function (input) {
+module.exports.mkDeleteClient = async function (city, input) {
   const conn = new RouterOSAPI({
-    host: input.newCity,
+    host: city,
     user: 'API_ARNOP',
     password: 'weare991010rootnortetv',
     port: 8087
@@ -39,10 +40,10 @@ module.exports.mkDeleteClient = async function (input) {
   }).then(() => {
     conn.write('/ppp/secret/getall', [
       '=.proplist=.id',
-      '?=name='+input.client,
+      '?=name=' + input.client,
     ]).then((data) => {
       conn.write('/ppp/secret/remove', [
-        '=.id='+data[0]['.id']
+        '=.id=' + data[0]['.id']
       ]).then(() => {
         conn.close()
         console.log('Connection Closed <<<')
@@ -71,7 +72,7 @@ module.exports.mkClientStatus = async function (input) {
       ])
       var com2 = await conn.write('/ppp/active/print', [
         '=.proplist=caller-id,uptime,address',
-        '?=name='+input.code,
+        '?=name=' + input.code,
       ])
     } else {
       // eslint-disable-next-line no-redeclare
@@ -82,9 +83,9 @@ module.exports.mkClientStatus = async function (input) {
       // eslint-disable-next-line no-redeclare
       var com2 = await conn.write('/ppp/active/print', [
         '=.proplist=caller-id,uptime,address',
-        '?=name='+input.dni,
+        '?=name=' + input.dni,
       ])
-    } 
+    }
     if (com1.length > 0 && com2.length > 0) {
       let client = {}
       client.status = true
@@ -100,21 +101,99 @@ module.exports.mkClientStatus = async function (input) {
       if (input.model === 1) {
         var com3 = await conn.write('/ppp/secret/print', [
           '=.proplist=last-logged-out',
-          '?=name='+input.code,
+          '?=name=' + input.code,
         ])
       } else {
         // eslint-disable-next-line no-redeclare
         var com3 = await conn.write('/ppp/secret/print', [
           '=.proplist=last-logged-out',
-          '?=name='+input.dni,
+          '?=name=' + input.dni,
         ])
       }
       if (com3.length > 0) {
-        let client = {}
-        client.status = true
-        client.offlineTime = com3[0]['last-logged-out']
+        var client_old_mk = {}
+        client_old_mk.status = true
+        client_old_mk.offlineTime = com3[0]['last-logged-out']
         conn.close()
-        return client
+        if (input.newCity === '191.102.86.50') {
+          const conn = new RouterOSAPI({
+            host: '191.102.86.54',
+            user: 'API_ARNOP',
+            password: 'weare991010rootnortetv',
+            port: 8087
+          })
+          await conn.connect()
+          try {
+            if (input.model === 1) {
+              // eslint-disable-next-line no-redeclare
+              var com1 = await conn.write('/interface/print', [
+                '=.proplist=tx-byte,rx-byte,last-link-up-time',
+                '?=name=<pppoe-' + input.code + '>',
+              ])
+              // eslint-disable-next-line no-redeclare
+              var com2 = await conn.write('/ppp/active/print', [
+                '=.proplist=caller-id,uptime,address',
+                '?=name=' + input.code,
+              ])
+            } else {
+              // eslint-disable-next-line no-redeclare
+              var com1 = await conn.write('/interface/print', [
+                '=.proplist=tx-byte,rx-byte,last-link-up-time',
+                '?=name=<pppoe-' + input.dni + '>',
+              ])
+              // eslint-disable-next-line no-redeclare
+              var com2 = await conn.write('/ppp/active/print', [
+                '=.proplist=caller-id,uptime,address',
+                '?=name=' + input.dni,
+              ])
+            }
+            if (com1.length > 0 && com2.length > 0) {
+              let client = {}
+              client.status = true
+              client.download = com1[0]['tx-byte']
+              client.upload = com1[0]['rx-byte']
+              client.offlineTime = com1[0]['last-link-up-time']
+              client.address = com2[0]['address']
+              client.mac_address = com2[0]['caller-id']
+              client.uptime = com2[0].uptime
+              conn.close()
+              return client
+            } else {
+              if (input.model === 1) {
+                // eslint-disable-next-line no-redeclare
+                var com3 = await conn.write('/ppp/secret/print', [
+                  '=.proplist=last-logged-out',
+                  '?=name=' + input.code,
+                ])
+              } else {
+                // eslint-disable-next-line no-redeclare
+                var com3 = await conn.write('/ppp/secret/print', [
+                  '=.proplist=last-logged-out',
+                  '?=name=' + input.dni,
+                ])
+              }
+              if (com3[0]['last-logged-out'] !== 'jan/01/1970 00:00:00') {
+                console.log('this', client_old_mk)
+                let client = {}
+                client.status = true
+                client.offlineTime = com3[0]['last-logged-out']
+                conn.close()
+                return client
+              }
+              if (client_old_mk['offlineTime:'] !== 'jan/01/1970 00:00:00') {
+                conn.close()
+                return client_old_mk
+              }
+              let client = {}
+              client.status = false
+              conn.close()
+              return client
+            }
+          } catch (error) {
+            console.log(error)
+            conn.close()
+          }
+        }
       }
       let client = {}
       client.status = false
@@ -129,7 +208,7 @@ module.exports.mkClientStatus = async function (input) {
 
 module.exports.mkGetActiveClients = async function (input) {
   const conn = new RouterOSAPI({
-    host: input.newCity,
+    host: input,
     user: 'API_ARNOP',
     password: 'weare991010rootnortetv',
     port: 8087
@@ -142,9 +221,9 @@ module.exports.mkGetActiveClients = async function (input) {
   return com1
 }
 
-module.exports.mkSetClientPlanInformation = async function (input) {
+module.exports.mkSetClientPlanInformation = async function (city, input) {
   const conn = new RouterOSAPI({
-    host: input.newCity,
+    host: city,
     user: 'API_ARNOP',
     password: 'weare991010rootnortetv',
     port: 8087
@@ -155,35 +234,35 @@ module.exports.mkSetClientPlanInformation = async function (input) {
       // eslint-disable-next-line no-unused-vars
       var com1 = await conn.write('/ppp/secret/getall', [
         '=.proplist=.id',
-        '?=name='+input.code,
+        '?=name=' + input.code,
       ])
       var removeActive = await conn.write('/ppp/active/getall', [
         '=.proplist=.id',
-        '?=name='+input.code,
+        '?=name=' + input.code,
       ])
     } else {
       // eslint-disable-next-line no-redeclare
       var com1 = await conn.write('/ppp/secret/getall', [
         '=.proplist=.id',
-        '?=name='+input.dni,
+        '?=name=' + input.dni,
       ])
       // eslint-disable-next-line no-redeclare
       var removeActive = await conn.write('/ppp/active/getall', [
         '=.proplist=.id',
-        '?=name='+input.dni,
+        '?=name=' + input.dni,
       ])
     }
     if (com1.length > 0) {
       await conn.write('/ppp/secret/set', [
         '=.id=' + com1[0]['.id'],
-        '=profile='+input.newPlan,
+        '=profile=' + input.newPlan,
       ])
       if (input.removeActive) {
-        if (removeActive.length > 0) { 
+        if (removeActive.length > 0) {
           // eslint-disable-next-line no-redeclare
           var removeActive = await conn.write('/ppp/active/remove', [
             '=.proplist=.id',
-            '=.id='+removeActive[0]['.id'],
+            '=.id=' + removeActive[0]['.id'],
           ])
         }
       }
@@ -223,9 +302,9 @@ module.exports.mkGetComment = async function (input) {
   conn.close()
   return com1[0]
 }
-module.exports.mkSetComment = async function (input) {
+module.exports.mkSetComment = async function (city, input) {
   const conn = new RouterOSAPI({
-    host: input.newCity,
+    host: city,
     user: 'API_ARNOP',
     password: 'weare991010rootnortetv',
     port: 8087
