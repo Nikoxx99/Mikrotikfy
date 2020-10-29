@@ -43,7 +43,7 @@
               type="error"
               class="my-4"
             >
-              Fuera de Linea hace <strong>{{ offlineTime }}</strong>
+              Fuera de Linea desde <strong>{{ offlineTime }}</strong>
             </v-alert>
             <v-alert
               v-else
@@ -56,28 +56,20 @@
             </v-alert>
             <v-divider class="my-4" />
             <div v-if="online">
-              <h3>Acceso: <a :href="`http://${address}`" target="_blank">{{ address }}</a></h3>
-              <v-spacer />
-              <h3>Mac: {{ mac_address }}</h3>
-              <v-spacer />
-              <h3>Uptime: {{ uptime }}</h3>
-              <v-divider class="my-4" />
-              <v-simple-table class="teal darken-4">
-                <template v-slot:default>
-                  <thead>
-                    <tr>
-                      <th class="text-left">Descarga</th>
-                      <th class="text-left">Carga</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><h2>{{ formatBytes(download) }}</h2></td>
-                      <td><h2>{{ formatBytes(upload) }}</h2></td>
-                    </tr>
-                  </tbody>
-                </template>
-              </v-simple-table>
+              <v-row>
+                <v-col>
+                  <h3>Acceso: <strong><a :href="`http://${address}`" target="_blank">{{ address }}</a></strong></h3>
+                  <v-spacer />
+                  <h3>Mac: {{ mac_address }}</h3>
+                  <v-spacer />
+                  <h3>Uptime: {{ uptime }}</h3>
+                </v-col>
+                <v-col>
+                  <h3>Descarga: <strong>{{ formatBytes(download) }}</strong></h3>
+                  <h3>Subida: <strong>{{ formatBytes(upload) }}</strong></h3>
+                  <h3>Mikrotik: {{ mikrotik ? 'AHx4' : 'CCR' }}</h3>
+                </v-col>
+              </v-row>
             </div>
           </v-card-text>
         </div>
@@ -118,6 +110,7 @@ export default {
     showInfo: false,
     online: false,
     address: 0,
+    mirkotik: 0,
     mac_address: 0,
     uptime: 0,
     offlineTime: 0,
@@ -132,6 +125,7 @@ export default {
           getClientStatus(id: $id){
             status
             address
+            mikrotik
             mac_address
             offlineTime
             uptime
@@ -147,6 +141,7 @@ export default {
         if (status) {
           this.loading = false
           this.address = input.data.getClientStatus.address
+          this.mikrotik = input.data.getClientStatus.mikrotik
           this.mac_address = input.data.getClientStatus.mac_address
           this.uptime = input.data.getClientStatus.uptime
           this.offlineTime = input.data.getClientStatus.offlineTime

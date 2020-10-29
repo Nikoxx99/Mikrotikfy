@@ -89,6 +89,7 @@ module.exports.mkClientStatus = async function (input) {
     if (com1.length > 0 && com2.length > 0) {
       let client = {}
       client.status = true
+      client.mikrotik = false
       client.download = com1[0]['tx-byte']
       client.upload = com1[0]['rx-byte']
       client.offlineTime = com1[0]['last-link-up-time']
@@ -150,6 +151,7 @@ module.exports.mkClientStatus = async function (input) {
             if (com1.length > 0 && com2.length > 0) {
               let client = {}
               client.status = true
+              client.mikrotik = true
               client.download = com1[0]['tx-byte']
               client.upload = com1[0]['rx-byte']
               client.offlineTime = com1[0]['last-link-up-time']

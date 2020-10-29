@@ -82,6 +82,7 @@ type Response {
 type ClientStatus {
   status: Boolean
   address: String
+  mikrotik: Int
   mac_address: String
   offlineTime: String
   uptime: String
