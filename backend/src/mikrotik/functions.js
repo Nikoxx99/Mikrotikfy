@@ -193,6 +193,8 @@ module.exports.mkClientStatus = async function (input) {
             console.log(error)
             conn.close()
           }
+        } else {
+          return client_old_mk
         }
       }
       let client = {}
