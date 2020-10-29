@@ -43,15 +43,17 @@
         hide-details
         class="pb-3"
       />
-      <v-text-field
-        v-model="Client.address"
-        label="Direccion"
-        outlined
-        dense
-        hide-details
-      />
       <v-row>
-        <v-col>
+        <v-col cols="6" lg="3" md="3">
+          <v-text-field
+            v-model="Client.address"
+            label="Direccion"
+            outlined
+            dense
+            hide-details
+          />
+        </v-col>
+        <v-col cols="6" lg="3" md="3">
           <v-autocomplete
             v-model="Client.neighborhood"
             item-text="name"
@@ -64,7 +66,7 @@
             hide-details
           />
         </v-col>
-        <v-col>
+        <v-col cols="6" lg="3" md="3">
           <v-select
             v-model="Client.city"
             item-text="name"
@@ -78,9 +80,7 @@
             hide-details
           />
         </v-col>
-      </v-row>
-      <v-row>
-        <v-col>
+        <v-col cols="6" lg="3" md="3">
           <v-text-field
             v-model="Client.phone"
             label="Telefono"
@@ -90,7 +90,9 @@
             hide-details
           />
         </v-col>
-        <v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="12" lg="4" md="4">
           <v-select
             v-model="Client.plan"
             item-text="name"
@@ -103,9 +105,7 @@
             hide-details
           />
         </v-col>
-      </v-row>
-      <v-row>
-        <v-col>
+        <v-col cols="6" lg="4" md="4">
           <v-text-field
             v-model="Client.wifi_ssid"
             label="Nombre de Red"
@@ -115,7 +115,7 @@
             hide-details
           />
         </v-col>
-        <v-col>
+        <v-col cols="6" lg="4" md="4">
           <v-text-field
             v-model="Client.wifi_password"
             label="Clave de Red"
@@ -151,16 +151,32 @@
           />
         </v-col>
       </v-row>
-      <v-select
-        v-model="Client.newModel"
-        :items="idwith"
-        item-text="name"
-        item-value="id"
-        mandatory
-        label="Identificar con:"
-        outlined
-        dense
-      />
+      <v-row>
+        <v-col>
+          <v-select
+            v-model="Client.newModel"
+            :items="idwith"
+            item-text="name"
+            item-value="id"
+            mandatory
+            label="Identificar con:"
+            outlined
+            dense
+          />
+        </v-col>
+        <v-col>
+          <v-text-field
+            :value="getDate(Client.created_at)"
+            label="Fecha de Creación"
+            required
+            outlined
+            dense
+            readonly
+            disabled
+            hide-details
+          />
+        </v-col>
+      </v-row>
       <v-textarea
         v-model="Client.comment"
         auto-grow
@@ -174,17 +190,6 @@
         outlined
         label="Comentario"
         dense
-      />
-      <v-text-field
-        :value="getDate(Client.created_at)"
-        label="Fecha de Creación"
-        required
-        outlined
-        dense
-        readonly
-        disabled
-        hide-details
-        class="py-3"
       />
       <v-btn
         class="mr-4"

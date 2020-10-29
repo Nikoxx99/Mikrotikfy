@@ -17,9 +17,7 @@
         cols="12"
       >
         <v-card>
-          <v-card-title
-            :style="`color:${cityColor};`"
-          >
+          <v-card-title>
             Clientes {{ cityName }}
             <v-spacer />
             <v-text-field
@@ -103,7 +101,7 @@
               <!-- ########################### -->
               <template v-slot:top>
                 <v-toolbar flat>
-                  <v-dialog v-model="dialog" max-width="650px" :retain-focus="false">
+                  <v-dialog v-model="dialog" max-width="650px" :retain-focus="false" fullscreen>
                     <template v-slot:activator="{ on, attrs }">
                       <v-btn
                         :color="cityColor"
@@ -164,7 +162,18 @@
                     </template>
                     <v-card>
                       <v-card-title>
-                        <span class="headline" :style="`color:${cityColor}`">Crear Cliente en {{ cityName }}</span>
+                        <v-toolbar
+                          dark
+                        >
+                          <v-btn
+                            icon
+                            dark
+                            @click="dialog = false"
+                          >
+                            <v-icon>mdi-close</v-icon>
+                          </v-btn>
+                          <v-toolbar-title><span class="headline">Crear Cliente en {{ cityName }}</span></v-toolbar-title>
+                        </v-toolbar>
                       </v-card-title>
                       <v-card-text>
                         <v-container>
@@ -173,10 +182,21 @@
                       </v-card-text>
                     </v-card>
                   </v-dialog>
-                  <v-dialog v-model="dialogEdit" max-width="500px" :retain-focus="false">
+                  <v-dialog v-model="dialogEdit" max-width="500px" :retain-focus="false" fullscreen>
                     <v-card>
                       <v-card-title>
-                        <span class="headline">Editar Cliente</span>
+                        <v-toolbar
+                          dark
+                        >
+                          <v-btn
+                            icon
+                            dark
+                            @click="dialogEdit = false"
+                          >
+                            <v-icon>mdi-close</v-icon>
+                          </v-btn>
+                          <v-toolbar-title>Editar Cliente</v-toolbar-title>
+                        </v-toolbar>
                       </v-card-title>
                       <v-card-text>
                         <v-container>

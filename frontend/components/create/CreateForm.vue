@@ -45,7 +45,7 @@
         @keyup="calculateSsid"
       />
       <v-row>
-        <v-col>
+        <v-col cols="6" lg="3" md="3">
           <v-select
             v-model="dir1"
             :items="dirFragment1"
@@ -56,7 +56,7 @@
             @blur="genAddress"
           />
         </v-col>
-        <v-col>
+        <v-col cols="6" lg="3" md="3">
           <v-text-field
             v-model="dir2"
             label="#"
@@ -66,18 +66,19 @@
             @blur="genAddress"
           />
         </v-col>
-        <v-col>
+        <v-col cols="6" lg="3" md="3">
           <v-select
             v-model="dir3"
             :items="dirFragment2"
             label="#"
+            value="#"
             outlined
             dense
             hide-details
             @blur="genAddress"
           />
         </v-col>
-        <v-col>
+        <v-col cols="6" lg="3" md="3">
           <v-text-field
             v-model="dir4"
             label="#"
@@ -298,7 +299,7 @@ export default {
       },
       dir1: '',
       dir2: '',
-      dir3: '',
+      dir3: '#',
       dir4: '',
       dirFragment1: [
         '(SIN INICIAL)',

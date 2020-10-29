@@ -4,10 +4,9 @@
   >
     <v-navigation-drawer
       v-model="drawer"
-      :mini-variant="miniVariant"
-      :clipped="clipped"
       src="nav-bg.jpg"
-      fixed
+      absolute
+      temporary
       app
     >
       <v-list>
@@ -107,9 +106,7 @@ export default {
   data () {
     return {
       hasPendingChanges: false,
-      clipped: false,
       drawer: false,
-      fixed: false,
       items: [
         {
           icon: 'mdi-apps',
