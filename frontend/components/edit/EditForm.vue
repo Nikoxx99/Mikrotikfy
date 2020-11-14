@@ -400,55 +400,20 @@ export default {
       commentLoading: false
     }
   },
-  watch: {
-    Client: {
-      immediate: true,
-      handler () {
-        this.success = false
-        this.error = false
-        this.commentLoading = true
-        this.commentDisabled = true
-        this.isSubmitting = false
-        this.$apollo.mutate({
-          mutation: gql`mutation ($id: ID){
-            getClientComment(id: $id){
-              comment
-            }
-          }`,
-          variables: {
-            id: this.Client._id
-          }
-        }).then((input) => {
-          this.Client.comment = input.data.getClientComment.comment
-          this.$emit('updateComment', this.Client.comment)
-          this.commentLoading = false
-          this.commentDisabled = false
-          this.success = true
-          this.successMessage = 'Comentario sincronizado con la Mikrotik'
-          this.error = false
-        }).catch((error) => {
-          this.success = false
-          this.error = true
-          this.errorMessage = 'Comentario no sincronizado'
-          // eslint-disable-next-line no-console
-          console.log(error)
-        })
-      }
-    }
-  },
   mounted () {
     this.success = false
     this.error = false
     this.commentLoading = true
     this.commentDisabled = true
     this.$apollo.mutate({
-      mutation: gql`mutation ($id: ID){
-        getClientComment(id: $id){
+      mutation: gql`mutation ($id: ID, $code: Int){
+        getClientComment(id: $id, code: $code){
           comment
         }
       }`,
       variables: {
-        id: this.Client._id
+        id: this.Client._id,
+        code: this.Client.code
       }
     }).then((input) => {
       this.commentLoading = false

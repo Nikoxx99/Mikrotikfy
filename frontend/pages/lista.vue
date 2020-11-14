@@ -177,7 +177,13 @@
                       </v-card-title>
                       <v-card-text>
                         <v-container>
-                          <CreateForm :citycolor="cityColor" />
+                          <CreateForm
+                            v-if="dialog"
+                            :citycolor="cityColor"
+                            @createClient="createClient($event)"
+                            @createClientDialog="createClientDialog($event)"
+                            @createClientSnack="createClientSnack($event)"
+                          />
                         </v-container>
                       </v-card-text>
                     </v-card>
@@ -201,6 +207,7 @@
                       <v-card-text>
                         <v-container>
                           <EditForm
+                            v-if="dialogEdit"
                             v-bind="client"
                             @updateClient="updateClient($event)"
                             @updateComment="updateComment($event)"
@@ -213,7 +220,7 @@
               </template>
               <!-- ########################### -->
               <template v-slot:item.actions="{ item }">
-                <ClientStatus :name="item.name" :clientid="item._id" />
+                <ClientStatus :name="item.name" :clientid="item._id" :code="item.code" />
                 <v-tooltip top>
                   <template v-slot:activator="{ on, attrs }">
                     <v-icon
@@ -339,13 +346,13 @@ export default {
         { text: 'Codigo', sortable: true, value: 'code' },
         { text: 'Estado', sortable: false, value: 'status' },
         { text: 'Nombre', sortable: true, value: 'name' },
-        { text: 'Cedula', sortable: true, value: 'dni' },
-        { text: 'Direccion', sortable: false, value: 'address' },
-        { text: 'Barrio', sortable: true, value: 'neighborhood.name' },
-        { text: 'Telefono', sortable: false, value: 'phone' },
-        { text: 'Plan', sortable: true, value: 'plan.name' },
-        { text: 'Tecnologia', sortable: true, value: 'technology.name' },
-        { text: 'Tipo', sortable: true, value: 'newModel' },
+        { text: 'Cedula', sortable: true, value: 'dni', align: ' d-none d-lg-table-cell' },
+        { text: 'Direccion', sortable: false, value: 'address', align: ' d-none d-lg-table-cell' },
+        { text: 'Barrio', sortable: true, value: 'neighborhood.name', align: ' d-none d-lg-table-cell' },
+        { text: 'Telefono', sortable: false, value: 'phone', align: ' d-none d-lg-table-cell' },
+        { text: 'Plan', sortable: true, value: 'plan.name', align: ' d-none d-lg-table-cell' },
+        { text: 'Tecnologia', sortable: true, value: 'technology.name', align: ' d-none d-lg-table-cell' },
+        { text: 'Tipo', sortable: true, value: 'newModel', align: ' d-none d-lg-table-cell' },
         { text: 'Aciones', value: 'actions', sortable: false }
       ],
       editedIndex: -1,
@@ -560,6 +567,17 @@ export default {
       if (this.editedIndex > -1) {
         this.dataTable[this.editedIndex].comment = input
       }
+    },
+    createClient (client) {
+      this.dataTable.push(client)
+    },
+    createClientDialog (value) {
+      this.dialog = false
+    },
+    createClientSnack (value) {
+      this.snack = value
+      this.snackText = 'Cliente creado con éxito!'
+      this.snackColor = 'info'
     },
     save (clientId, newPlan, newModel) {
       this.$apollo.mutate({

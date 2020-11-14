@@ -18,6 +18,7 @@
       max-width="590"
     >
       <v-card
+        v-if="modal"
         :loading="loading"
         :class="online ? 'teal darken-4' : ''"
       >
@@ -100,6 +101,10 @@ export default {
     name: {
       type: String,
       default: ''
+    },
+    code: {
+      type: Number,
+      default: 0
     }
   },
   data: () => ({
@@ -121,8 +126,8 @@ export default {
     initComponent () {
       this.modal = true
       this.$apollo.mutate({
-        mutation: gql`mutation ($id: ID){
-          getClientStatus(id: $id){
+        mutation: gql`mutation ($id: ID, $code: Int){
+          getClientStatus(id: $id, code: $code){
             status
             address
             mikrotik
@@ -134,7 +139,8 @@ export default {
           }
         }`,
         variables: {
-          id: this.clientid
+          id: this.clientid,
+          code: this.code
         }
       }).then((input) => {
         const status = input.data.getClientStatus.status

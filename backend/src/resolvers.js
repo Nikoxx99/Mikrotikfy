@@ -66,6 +66,12 @@ export const resolvers = {
   },
   Mutation: {
     createClient: async (_, { input: { city, neighborhood, plan, technology, sendToMikrotik, ...data } }) => {
+      // eslint-disable-next-line no-redeclare
+      var plan = plan.id
+      // eslint-disable-next-line no-redeclare
+      var neighborhood = neighborhood.id
+      // eslint-disable-next-line no-redeclare
+      var technology = technology.id
       const newClient = new Client({ city, plan, neighborhood, technology, ...data })
       const newCity = await City.find({ id: city }, { name: 1, ip: 1, _id: 0 })
       const newCity2 = [{ name: 'MARIQUITA 2', ip: '191.102.86.54' }]
@@ -167,27 +173,47 @@ export const resolvers = {
         return simpleResponse(false, 'Delete Client', 'Error deleting Client.')
       }
     },
-    getClientStatus: async (_, { id }) => {
-      const search = await Client.find({ _id: id })
-      const searchCity = search[0].city
-      const city = await City.find({ id: searchCity })
-      const newCity = city[0].ip
-      const code = search[0].code
-      const dni = search[0].dni
-      const model = search[0].newModel
-      const status = await mkClientStatus({ dni, code, newCity, model })
-      return status
+    getClientStatus: async (_, { id, code }) => {
+      if (id) {
+        const search = await Client.find({ _id: id })
+        const searchCity = search[0].city
+        const city = await City.find({ id: searchCity })
+        const newCity = city[0].ip
+        const dni = search[0].dni
+        const model = search[0].newModel
+        const status = await mkClientStatus({ dni, code, newCity, model })
+        return status
+      } else {
+        const search = await Client.find({ code: code })
+        const searchCity = search[0].city
+        const city = await City.find({ id: searchCity })
+        const newCity = city[0].ip
+        const dni = search[0].dni
+        const model = search[0].newModel
+        const status = await mkClientStatus({ dni, code, newCity, model })
+        return status
+      }
     },
-    getClientComment: async (_, { id }) => {
-      const search = await Client.find({ _id: id })
-      const searchCity = search[0].city
-      const city = await City.find({ id: searchCity })
-      const newCity = city[0].ip
-      const code = search[0].code
-      const dni = search[0].dni
-      const model = search[0].newModel
-      const comment = await mkGetComment({ dni, code, newCity, model })
-      return comment
+    getClientComment: async (_, { id, code }) => {
+      if (id) {
+        const search = await Client.find({ _id: id })
+        const searchCity = search[0].city
+        const city = await City.find({ id: searchCity })
+        const newCity = city[0].ip
+        const dni = search[0].dni
+        const model = search[0].newModel
+        const comment = await mkGetComment({ dni, code, newCity, model })
+        return comment
+      } else {
+        const search = await Client.find({ code: code })
+        const searchCity = search[0].city
+        const city = await City.find({ id: searchCity })
+        const newCity = city[0].ip
+        const dni = search[0].dni
+        const model = search[0].newModel
+        const comment = await mkGetComment({ dni, code, newCity, model })
+        return comment
+      }
     },
     createCity: async (_, { input }) => {
       const newCity = new City(input)

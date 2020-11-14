@@ -55,7 +55,9 @@
                       />
                     </v-col>
                   </v-card>
-                  <v-btn class="mt-4" color="primary" @click="testDni()"> Continuar </v-btn>
+                  <v-btn class="mt-4" color="primary" @click="testDni()">
+                    Continuar
+                  </v-btn>
                 </v-stepper-content>
                 <v-stepper-content step="2">
                   <v-card>
