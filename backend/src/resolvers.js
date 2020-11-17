@@ -5,7 +5,7 @@ import City from './models/City'
 import Neighborhood from './models/Neighborhood'
 import Plan from './models/Plan'
 import Technology from './models/Technology'
-import { mkCreateClient, mkDeleteClient, mkClientStatus, mkGetActiveClients, mkSetClientPlanInformation, mkGetComment, mkSetComment } from './mikrotik/functions'
+import { mkCreateClient, mkDeleteClient, mkClientStatus, mkGetActiveClients, mkSetClientPlanInformation, mkGetComment, mkSetComment, mkDxClient } from './mikrotik/functions'
 import Ticket from './models/Ticket'
 import PasswordChange from './models/PasswordChange'
 const simpleResponse = async (success, path, message) => {
@@ -213,6 +213,29 @@ export const resolvers = {
         const model = search[0].newModel
         const comment = await mkGetComment({ dni, code, newCity, model })
         return comment
+      }
+    },
+    dxClient: async (_, { input }) => {
+      for (let i = 0; i < input.length; i++) {
+        const search = await Client.find({ code: input[i].code })
+        const id = search[0]._id
+        const searchCity = search[0].city
+        const city = await City.find({ id: searchCity })
+        const newCity = city[0].ip
+        const dni = search[0].dni
+        const code = input[i].code
+        const model = search[0].newModel
+
+        const newPlanSet = input.dxPlan.id
+
+        const res = await Client.updateOne({ _id: id }, { newPlanSet }, { multi: false })
+
+        const resMk = await mkDxClient({ dni, code, newCity, model, newPlanSet })
+        if (res && resMk) {
+          return simpleResponse(true, 'Dx Client', 'Client Dx successfully.')
+        } else {
+          return simpleResponse(false, 'Dx Client', 'Error Dx Client.')
+        }
       }
     },
     createCity: async (_, { input }) => {

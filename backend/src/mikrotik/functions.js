@@ -330,3 +330,6 @@ module.exports.mkSetComment = async function (city, input) {
   conn.close()
   return com1[0]
 }
+module.exports.mkDxClient = async function (input) {
+
+}

@@ -124,7 +124,7 @@ export default {
         {
           icon: 'mdi-close-network',
           title: 'Suspencion por Mora',
-          to: '/config'
+          to: '/cortes'
         }
       ],
       miniVariant: false,
