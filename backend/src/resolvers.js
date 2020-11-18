@@ -148,7 +148,7 @@ export const resolvers = {
 
       const removeActive = true
       const newCity2 = '191.102.86.54'
-      const res = await Client.updateOne({ _id: id }, { savePlan }, { multi: false })
+      const res = await Client.updateOne({ _id: id }, { plan: savePlan }, { multi: false })
       const mkRes = await mkSetClientPlanInformation(newCity, { newPlan, dni, code, model, removeActive })
       const mkRes2 = await mkSetClientPlanInformation(newCity2, { newPlan, dni, code, model, removeActive })
       if (res && mkRes && mkRes2) {
@@ -220,7 +220,7 @@ export const resolvers = {
       console.log(input)
       const search = await Client.find({ code: input.dx.code, city: input.dxCity })
       if (search.length < 1) {
-        process.push({code: input.dx.code, name: 'NO ENCONTRADO', success: false})
+        process.push({ code: input.dx.code, name: 'NO ENCONTRADO', success: false })
         return process
       }
       const id = search[0]._id
@@ -230,20 +230,20 @@ export const resolvers = {
       const dni = search[0].dni
       const code = input.dx.code
       const model = search[0].newModel
-      
+
       const planSearch = input.dxPlan.id
       const plan = await Plan.find({ id: planSearch })
       const newPlanSet = plan[0].mikrotik_name
-      
+
       const kick = input.dxKick
-      
+
       const res = await Client.updateOne({ _id: id }, { plan: planSearch }, { multi: false })
-      
+
       const resMk = await mkDxClient({ dni, code, newCity, model, newPlanSet, kick })
       if (res && resMk) {
-        process.push({code: input.dx.code, name: search[0].name, success: true})
+        process.push({ code: input.dx.code, name: search[0].name, success: true })
       } else {
-        process.push({code: input.dx.code, name: search[0].name, success: false})
+        process.push({ code: input.dx.code, name: search[0].name, success: false })
       }
       return process
     },
