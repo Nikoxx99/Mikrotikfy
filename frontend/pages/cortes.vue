@@ -304,6 +304,7 @@ export default {
     },
     async exec () {
       this.loading = true
+      const city = parseInt(this.$route.query.city, 10)
       const pendingDx = this.pendingCuts
       if (this.setPlan.id === 0 || this.pendingCuts.length < 1) {
         this.snack = true
@@ -330,7 +331,8 @@ export default {
                   id: this.setPlan.id,
                   name: this.setPlan.name
                 },
-                dxKick: this.kickStat.id
+                dxKick: this.kickStat.id,
+                dxCity: city
               }
             }
           }).then((input) => {
@@ -341,7 +343,7 @@ export default {
             this.snackText = error
             this.loading = false
           })
-          await this.sleep(3000)
+          await this.sleep(1000)
           console.log(1)
         }
         this.loading = false

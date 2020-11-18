@@ -217,9 +217,10 @@ export const resolvers = {
     },
     dxClient: async (_, { input }) => {
       const process = []
-      const search = await Client.find({ code: input.dx.code })
+      console.log(input)
+      const search = await Client.find({ code: input.dx.code, city: input.dxCity })
       if (search.length < 1) {
-        process.push({code: 0, name: 'NO ENCONTRADO', success: false})
+        process.push({code: input.dx.code, name: 'NO ENCONTRADO', success: false})
         return process
       }
       const id = search[0]._id

@@ -210,6 +210,7 @@ input DxInfoInput {
   dx: DxClientInput
   dxPlan: PlanInput
   dxKick: Int
+  dxCity: Int
 }
 input EditClientPlanInput {
   id: String
