@@ -49,6 +49,8 @@
               <v-btn
                 color="red darken-4"
                 class="mr-4"
+                :loading="loading"
+                :disabled="loading"
                 @click="exec()"
               >
                 Ejecutar Cortes
@@ -60,6 +62,7 @@
                 item-value="id"
                 item-text="name"
                 dense
+                return-object
                 outlined
                 width="150px"
                 class="mr-4"
@@ -78,9 +81,10 @@
             </v-row>
             <client-only>
               <v-data-table
-                no-data-text="Aun no hay clietes por desconectar"
+                no-data-text="Aun no hay clientes por desconectar"
                 :items="pendingCuts"
                 :headers="headers"
+                :loading="loading"
               />
             </client-only>
             <div class="text-center pt-2">
@@ -90,6 +94,31 @@
         </v-row>
       </v-container>
     </v-card-text>
+    <v-card-text>
+      <v-card-title>Clientes desconectados</v-card-title>
+      <client-only>
+        <v-data-table
+          no-data-text="Aun no hay clientes desconectados en proceso"
+          :items="successfulCuts"
+          :headers="successfulCutsHeaders"
+        />
+      </client-only>
+    </v-card-text>
+    <v-snackbar
+      v-model="snack"
+      :timeout="3000"
+      :color="snackColor"
+      top
+      vertical
+    >
+      {{ snackText }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn v-bind="attrs" text @click="snack = false">
+          Cerrar
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-card>
 </template>
 
@@ -126,18 +155,28 @@ export default {
       errorCount: 0,
       clientCount: 0,
       dataTable: [],
+      successfulCuts: [],
       input: '',
       headers: [
         { text: 'Codigo', sortable: true, value: 'code' },
         { text: 'Nombre', sortable: true, value: 'name' },
-        { text: 'Plan', sortable: true, value: 'plan.name', align: ' d-none d-lg-table-cell' },
+        { text: 'Plan', sortable: true, value: 'plan.name' },
         { text: 'Aciones', value: 'actions', sortable: false }
+      ],
+      successfulCutsHeaders: [
+        { text: 'Codigo', sortable: true, value: 'code' },
+        { text: 'Nombre', sortable: true, value: 'name' },
+        { text: 'Exitoso', sortable: true, value: 'success' }
       ],
       kickStat: { id: 1, name: 'No patear' },
       kick: [
         { id: 1, name: 'No patear' },
         { id: 2, name: 'Patear' }
-      ]
+      ],
+      snack: false,
+      snackColor: '',
+      snackText: '',
+      loading: false
     }
   },
   created () {
@@ -246,36 +285,70 @@ export default {
           if (clientExist.length < 1) {
             this.pendingCuts.push(inputObject)
           }
+        } else {
+          const inputObject = {
+            code: 0,
+            name: '',
+            plan: {
+              id: 0,
+              name: ''
+            }
+          }
+          inputObject.code = 0
+          inputObject.name = 'NO ENCONTRADO EN LA DB'
+          inputObject.plan.id = 0
+          inputObject.plan.name = 'NO ENCONTRADO'
+          this.pendingCuts.push(inputObject)
         }
       }
     },
-    exec () {
+    async exec () {
+      this.loading = true
       const pendingDx = this.pendingCuts
-      this.$apollo.mutate({
-        mutation: gql`mutation ($input: DxInfoInput){
-          dxClient(input: $input){
-            success
-            errors{
-              path
-              message
+      if (this.setPlan.id === 0 || this.pendingCuts.length < 1) {
+        this.snack = true
+        this.snackColor = 'red darken-4'
+        this.snackText = 'Debes ingresar datos antes de proceder.'
+        this.loading = false
+      } else {
+        this.snack = true
+        this.snackColor = 'info'
+        this.snackText = 'El proceso ha comenzado...'
+        for (let i = 0; i < pendingDx.length; i++) {
+          this.$apollo.mutate({
+            mutation: gql`mutation ($input: DxInfoInput){
+              dxClient(input: $input){
+                code
+                name
+                success
+              }
+            }`,
+            variables: {
+              input: {
+                dx: pendingDx[i],
+                dxPlan: {
+                  id: this.setPlan.id,
+                  name: this.setPlan.name
+                },
+                dxKick: this.kickStat.id
+              }
             }
-          }
-        }`,
-        variables: {
-          input: {
-            dx: pendingDx,
-            dxPlan: this.setPlan
-          }
+          }).then((input) => {
+            this.successfulCuts.push(input.data.dxClient[0])
+          }).catch((error) => {
+            this.snack = true
+            this.snackColor = 'red'
+            this.snackText = error
+            this.loading = false
+          })
+          await this.sleep(3000)
+          console.log(1)
         }
-      }).then((input) => {
-        this.snack = true
-        this.snackColor = 'success'
-        this.snackText = 'Cambio de plan exitoso'
-      }).catch((error) => {
-        this.snack = true
-        this.snackColor = 'red'
-        this.snackText = error
-      })
+        this.loading = false
+      }
+    },
+    sleep (ms) {
+      return new Promise(resolve => setTimeout(resolve, ms))
     }
   },
   head () {

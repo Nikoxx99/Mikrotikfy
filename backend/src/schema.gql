@@ -72,6 +72,11 @@ type SimpleResponse {
   success: Boolean!
   errors: [Error]
 }
+type dxResponse {
+  code: Int
+  name: String
+  success: Boolean
+}
 type Response {
   success: Boolean!
   token: String
@@ -141,7 +146,7 @@ type Mutation {
   deleteClient(id: ID): SimpleResponse
   getClientStatus(id: ID, code: Int): ClientStatus
   getClientComment(id: ID, code: Int): ClientComment
-  dxClient(input: DxInfoInput): SimpleResponse
+  dxClient(input: DxInfoInput): [dxResponse]
   createCity(input: CityInput): SimpleResponse
   updateCity(input: CityInput): SimpleResponse
   deleteCity(id: Int): SimpleResponse
@@ -202,8 +207,9 @@ input DxClientInput {
   plan: PlanInput
 }
 input DxInfoInput {
-  dx: [DxClientInput]
+  dx: DxClientInput
   dxPlan: PlanInput
+  dxKick: Int
 }
 input EditClientPlanInput {
   id: String

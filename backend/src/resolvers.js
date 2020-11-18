@@ -216,27 +216,35 @@ export const resolvers = {
       }
     },
     dxClient: async (_, { input }) => {
-      for (let i = 0; i < input.length; i++) {
-        const search = await Client.find({ code: input[i].code })
-        const id = search[0]._id
-        const searchCity = search[0].city
-        const city = await City.find({ id: searchCity })
-        const newCity = city[0].ip
-        const dni = search[0].dni
-        const code = input[i].code
-        const model = search[0].newModel
-
-        const newPlanSet = input.dxPlan.id
-
-        const res = await Client.updateOne({ _id: id }, { newPlanSet }, { multi: false })
-
-        const resMk = await mkDxClient({ dni, code, newCity, model, newPlanSet })
-        if (res && resMk) {
-          return simpleResponse(true, 'Dx Client', 'Client Dx successfully.')
-        } else {
-          return simpleResponse(false, 'Dx Client', 'Error Dx Client.')
-        }
+      const process = []
+      const search = await Client.find({ code: input.dx.code })
+      if (search.length < 1) {
+        process.push({code: 0, name: 'NO ENCONTRADO', success: false})
+        return process
       }
+      const id = search[0]._id
+      const searchCity = search[0].city
+      const city = await City.find({ id: searchCity })
+      const newCity = city[0].ip
+      const dni = search[0].dni
+      const code = input.dx.code
+      const model = search[0].newModel
+      
+      const planSearch = input.dxPlan.id
+      const plan = await Plan.find({ id: planSearch })
+      const newPlanSet = plan[0].mikrotik_name
+      
+      const kick = input.dxKick
+      
+      const res = await Client.updateOne({ _id: id }, { plan: planSearch }, { multi: false })
+      
+      const resMk = await mkDxClient({ dni, code, newCity, model, newPlanSet, kick })
+      if (res && resMk) {
+        process.push({code: input.dx.code, name: search[0].name, success: true})
+      } else {
+        process.push({code: input.dx.code, name: search[0].name, success: false})
+      }
+      return process
     },
     createCity: async (_, { input }) => {
       const newCity = new City(input)
