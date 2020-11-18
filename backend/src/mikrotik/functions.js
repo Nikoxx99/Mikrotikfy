@@ -345,7 +345,7 @@ module.exports.mkDxClient = async function (input) {
         '=.proplist=.id',
         '?=name=' + input.code,
       ])
-      if (input.kick) {
+      if (input.kick === 2) {
         var removeActive = await conn.write('/ppp/active/getall', [
           '=.proplist=.id',
           '?=name=' + input.code,
@@ -357,7 +357,7 @@ module.exports.mkDxClient = async function (input) {
         '=.proplist=.id',
         '?=name=' + input.dni,
       ])
-      if (input.kick) {
+      if (input.kick === 2) {
         // eslint-disable-next-line no-redeclare
         var removeActive = await conn.write('/ppp/active/getall', [
           '=.proplist=.id',
@@ -370,7 +370,7 @@ module.exports.mkDxClient = async function (input) {
         '=.id=' + com1[0]['.id'],
         '=profile=' + input.newPlanSet,
       ])
-      if (input.kick) {
+      if (input.kick === 2) {
         if (removeActive.length > 0) {
           // eslint-disable-next-line no-redeclare
           var removeActive = await conn.write('/ppp/active/remove', [
@@ -380,6 +380,67 @@ module.exports.mkDxClient = async function (input) {
         }
       }
       conn.close()
+      if (input.newCity === '191.102.86.50') {
+        const conn = new RouterOSAPI({
+          host: '191.102.86.54',
+          user: 'API_ARNOP',
+          password: 'weare991010rootnortetv',
+          port: 8087
+        })
+        try {
+          await conn.connect()
+          if (input.model === 1) {
+            // eslint-disable-next-line no-redeclare
+            var com1 = await conn.write('/ppp/secret/getall', [
+              '=.proplist=.id',
+              '?=name=' + input.code,
+            ])
+            if (input.kick === 2) {
+              // eslint-disable-next-line no-redeclare
+              var removeActive = await conn.write('/ppp/active/getall', [
+                '=.proplist=.id',
+                '?=name=' + input.code,
+              ])
+            }
+          } else {
+            // eslint-disable-next-line no-redeclare
+            var com1 = await conn.write('/ppp/secret/getall', [
+              '=.proplist=.id',
+              '?=name=' + input.dni,
+            ])
+            if (input.kick === 2) {
+              // eslint-disable-next-line no-redeclare
+              var removeActive = await conn.write('/ppp/active/getall', [
+                '=.proplist=.id',
+                '?=name=' + input.dni,
+              ])
+            }
+          }
+          if (com1.length > 0) {
+            await conn.write('/ppp/secret/set', [
+              '=.id=' + com1[0]['.id'],
+              '=profile=' + input.newPlanSet,
+            ])
+            if (input.kick === 2) {
+              if (removeActive.length > 0) {
+                // eslint-disable-next-line no-redeclare
+                var removeActive = await conn.write('/ppp/active/remove', [
+                  '=.proplist=.id',
+                  '=.id=' + removeActive[0]['.id'],
+                ])
+              }
+            }
+            conn.close()
+            return true
+          } else {
+            console.log('Failed setting client information')
+            conn.close()
+            return false
+          }
+        } catch (error) {
+          console.log(error)
+        }
+      }
       return true
     } else {
       console.log('Failed setting client information')
