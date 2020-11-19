@@ -111,7 +111,7 @@ export default {
       return {
         query: gql`
         query{
-          PasswordChanges(limit: 100){
+          PasswordChanges(limit: 100000){
             _id
             dni
             client {
