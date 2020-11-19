@@ -66,8 +66,8 @@
                     >
                       <v-text-field
                         v-model="user_old_password"
-                        label="Ingresa clave anterior o nombre del titular"
-                        hint="Puedes dejar esto en blanco si no recuerdas la contraseña anterior, pero entonces el proceso estar+a sujeto a verificación."
+                        label="Ingresa nombre del titular"
+                        hint="Puedes dejar esto en blanco, pero entonces el proceso estará sujeto a verificación."
                         persistent-hint
                         outlined
                       />
