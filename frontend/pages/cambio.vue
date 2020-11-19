@@ -28,7 +28,7 @@
                 <v-divider />
 
                 <v-stepper-step :complete="e1 > 2" step="2">
-                  Clave Anterior
+                  Nombre del ttular
                 </v-stepper-step>
 
                 <v-divider />
