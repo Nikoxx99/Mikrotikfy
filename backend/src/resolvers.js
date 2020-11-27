@@ -404,8 +404,8 @@ export const resolvers = {
     }
   },
   City: {
-    clients({ id }, { limit }) {
-      return Client.find({ city: id }).sort({ 'code': 'desc' }).limit(limit)
+    clients({ id }, { startIndex, limit }) {
+      return Client.find({ city: id }).skip(startIndex).sort({ 'code': 'desc' }).limit(limit)
     },
     neighborhoods({ id }) {
       return Neighborhood.find({ city: id }).sort({ 'code': 'desc' })

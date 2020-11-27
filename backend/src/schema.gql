@@ -39,7 +39,7 @@ type City {
   _id: ID
   id: Int
   name: String
-  clients(limit: Int): [Client]
+  clients(limit: Int, , startIndex: Int, limit: Int): [Client]
   neighborhoods: [Neighborhood]
   ip: String
   color: String
