@@ -407,6 +407,9 @@ export const resolvers = {
     clients({ id }, { startIndex, limit }) {
       return Client.find({ city: id }).skip(startIndex).sort({ 'code': 'desc' }).limit(limit)
     },
+    clientCount ({ id }){
+      return Client.find({ city: id }).count()
+    },
     neighborhoods({ id }) {
       return Neighborhood.find({ city: id }).sort({ 'code': 'desc' })
     }

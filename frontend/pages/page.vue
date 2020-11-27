@@ -1,12 +1,22 @@
 <template>
   <div>
-    <v-data-table
-      :headers="headers"
-      :items="desserts"
-      :options.sync="options"
-      :server-items-length="totalDesserts"
-      :loading="loading"
-      class="elevation-1"
+    <client-only>
+      <v-data-table
+        :headers="headers"
+        :items="dataTable"
+        :page.sync="page"
+        :options.sync="options"
+        :server-items-length="totalDesserts"
+        :items-per-page="itemsPerPage"
+        :loading="loading"
+        class="elevation-1"
+        hide-default-footer
+        @page-count="pageCount = $event"
+      />
+    </client-only>
+    <v-pagination
+      v-model="page"
+      :length="pageCount"
     />
   </div>
 </template>
@@ -14,12 +24,16 @@
 <script>
 import gql from 'graphql-tag'
 export default {
+  name: 'Page',
   data () {
     return {
+      itemsPerPage: 5,
       totalDesserts: 0,
       desserts: [],
       loading: true,
       options: {},
+      page: 1,
+      pageCount: 0,
       headers: [
         { text: 'Codigo', sortable: true, value: 'code' },
         { text: 'Estado', sortable: false, value: 'status' },
@@ -44,14 +58,13 @@ export default {
       deep: true
     }
   },
-  mounted () {
+  created () {
     this.getDataFromApi()
   },
   methods: {
     getDataFromApi () {
       this.loading = true
       this.fakeApiCall().then((data) => {
-        this.desserts = data.items
         this.totalDesserts = data.total
         this.loading = false
       })
@@ -63,7 +76,7 @@ export default {
       const { sortBy, sortDesc, page, itemsPerPage } = this.options
 
       let items = await this.getInitialData((page - 1) * itemsPerPage, itemsPerPage)
-      const total = items.length
+      const total = this.dataTable.length
 
       if (sortBy.length === 1 && sortDesc.length === 1) {
         items = items.sort((a, b) => {
@@ -81,11 +94,6 @@ export default {
           }
         })
       }
-
-      if (itemsPerPage > 0) {
-        items = items.slice((page - 1) * itemsPerPage, page * itemsPerPage)
-      }
-
       return { items, total }
     },
     getInitialData (sindex, ilimit) {
@@ -97,6 +105,7 @@ export default {
           City(id: $city){
             name
             color
+            clientCount
             clients(startIndex: $startIndex, limit: $limit){
               _id
               code
@@ -160,6 +169,8 @@ export default {
           dataTable.citycolor = input.data.City.color
           this.dataTable.push(dataTable)
         }
+        this.totalDesserts = input.data.City.clientCount
+        console.log(input)
       }).catch((error) => {
         // eslint-disable-next-line no-console
         console.error(error)
