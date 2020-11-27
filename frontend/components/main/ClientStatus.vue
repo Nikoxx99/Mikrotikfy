@@ -14,18 +14,18 @@
       <span>Estatus</span>
     </v-tooltip>
     <v-dialog
+      v-if="modal"
       v-model="modal"
       max-width="590"
     >
       <v-card
-        v-if="modal"
         :loading="loading"
         :class="online ? 'teal darken-4' : ''"
       >
         <v-card-title class="headline">
           Estatus en Mikrotik
         </v-card-title>
-        <div v-if="showCard">
+        <div v-if="!loading">
           <v-card-text>
             <h2> {{ name }} </h2>
             <v-alert
@@ -125,6 +125,8 @@ export default {
   methods: {
     initComponent () {
       this.modal = true
+      this.online = false
+      this.loading = true
       this.$apollo.mutate({
         mutation: gql`mutation ($id: ID, $code: Int){
           getClientStatus(id: $id, code: $code){
@@ -154,10 +156,12 @@ export default {
           this.download = input.data.getClientStatus.download
           this.upload = input.data.getClientStatus.upload
           if (input.data.getClientStatus.address) {
+            this.loading = false
             this.clientExists = true
             this.online = true
             this.showCard = true
           } else {
+            this.loading = false
             this.clientExists = true
             this.online = false
             this.showCard = true
@@ -171,6 +175,7 @@ export default {
       }).catch((error) => {
         // eslint-disable-next-line no-console
         console.error(error)
+        this.loading = false
       })
     },
     formatBytes (bytes, decimals = 2) {
