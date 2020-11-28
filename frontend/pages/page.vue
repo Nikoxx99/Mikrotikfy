@@ -1,5 +1,7 @@
 <template>
   <div>
+    <v-text-field v-model="search" label="search" />
+    <p> {{ answer }} </p>
     <client-only>
       <v-data-table
         :headers="headers"
@@ -23,17 +25,20 @@
 
 <script>
 import gql from 'graphql-tag'
+
 export default {
   name: 'Page',
   data () {
     return {
-      itemsPerPage: 5,
+      search: '',
+      answer: '',
       totalDesserts: 0,
-      desserts: [],
+      dataTable: [],
       loading: true,
-      options: {},
       page: 1,
+      itemsPerPage: 5,
       pageCount: 0,
+      options: {},
       headers: [
         { text: 'Codigo', sortable: true, value: 'code' },
         { text: 'Estado', sortable: false, value: 'status' },
@@ -46,67 +51,19 @@ export default {
         { text: 'Tecnologia', sortable: true, value: 'technology.name', align: ' d-none d-lg-table-cell' },
         { text: 'Tipo', sortable: true, value: 'newModel', align: ' d-none d-lg-table-cell' },
         { text: 'Aciones', value: 'actions', sortable: false }
-      ],
-      dataTable: []
+      ]
     }
   },
-  watch: {
-    options: {
-      handler () {
-        this.getDataFromApi()
-      },
-      deep: true
-    }
-  },
-  created () {
-    this.getDataFromApi()
-  },
-  methods: {
-    getDataFromApi () {
-      this.loading = true
-      this.fakeApiCall().then((data) => {
-        this.totalDesserts = data.total
-        this.loading = false
-      })
-    },
-    /**
-     * In a real application this would be a call to fetch() or axios.get()
-     */
-    async fakeApiCall () {
-      const { sortBy, sortDesc, page, itemsPerPage } = this.options
-
-      let items = await this.getInitialData((page - 1) * itemsPerPage, itemsPerPage)
-      const total = this.dataTable.length
-
-      if (sortBy.length === 1 && sortDesc.length === 1) {
-        items = items.sort((a, b) => {
-          const sortA = a[sortBy[0]]
-          const sortB = b[sortBy[0]]
-
-          if (sortDesc[0]) {
-            if (sortA < sortB) { return 1 }
-            if (sortA > sortB) { return -1 }
-            return 0
-          } else {
-            if (sortA < sortB) { return -1 }
-            if (sortA > sortB) { return 1 }
-            return 0
-          }
-        })
-      }
-      return { items, total }
-    },
-    getInitialData (sindex, ilimit) {
-      this.initialLoading = true
-      this.dataTable = []
-      this.$apollo.query({
+  apollo: {
+    City () {
+      return {
         query: gql`
         query($city: Int, $startIndex: Int, $limit: Int) {
           City(id: $city){
             name
             color
             clientCount
-            clients(startIndex: $startIndex, limit: $limit){
+            clients (startIndex: $startIndex, limit: $limit){
               _id
               code
               name
@@ -142,40 +99,136 @@ export default {
       `,
         variables: {
           city: 1,
-          startIndex: sindex,
-          limit: ilimit
+          startIndex: 0,
+          limit: 5
         }
-      }).then((input) => {
-        for (let i = 0; i < input.data.City.clients.length; i++) {
-          const dataTable = {}
-          dataTable._id = input.data.City.clients[i]._id
-          dataTable.status = '#777'
-          dataTable.code = input.data.City.clients[i].code
-          dataTable.name = input.data.City.clients[i].name
-          dataTable.dni = input.data.City.clients[i].dni
-          dataTable.address = input.data.City.clients[i].address
-          dataTable.neighborhood = input.data.City.clients[i].neighborhood
-          dataTable.city = input.data.City.clients[i].city
-          dataTable.phone = input.data.City.clients[i].phone
-          dataTable.plan = input.data.City.clients[i].plan
-          dataTable.technology = input.data.City.clients[i].technology
-          dataTable.wifi_ssid = input.data.City.clients[i].wifi_ssid
-          dataTable.wifi_password = input.data.City.clients[i].wifi_password
-          dataTable.mac_address = input.data.City.clients[i].mac_address
-          dataTable.comment = input.data.City.clients[i].comment
-          dataTable.operator = input.data.City.clients[i].operator
-          dataTable.created_at = input.data.City.clients[i].created_at
-          dataTable.newModel = input.data.City.clients[i].newModel
-          dataTable.citycolor = input.data.City.color
-          this.dataTable.push(dataTable)
-        }
-        this.totalDesserts = input.data.City.clientCount
-        console.log(input)
-      }).catch((error) => {
-        // eslint-disable-next-line no-console
-        console.error(error)
-      })
+      }
     }
+  },
+  computed: {
+    params (nv) {
+      return {
+        ...this.options,
+        query: this.search
+      }
+    }
+  },
+  watch: {
+    // eslint-disable-next-line object-shorthand
+    search: function (newQuestion, oldQuestion) {
+      this.answer = 'Waiting for you to stop typing...'
+      this.debouncedGetAnswer()
+    },
+    params: {
+      handler () {
+        this.getDataFromApi().then((data) => {
+          console.log('new input data 3', data)
+          this.dataTable = data.items
+          this.totalDesserts = this.City.clientCount
+          this.debouncedGetResult()
+        })
+      },
+      deep: true
+    }
+  },
+  mounted () {
+    // eslint-disable-next-line no-undef
+    this.debouncedGetAnswer = _.debounce(this.getAnswer, 500)
+    // eslint-disable-next-line no-undef
+    this.debouncedGetResult = _.debounce(this.getDataFromApi, 1500)
+    this.getDataFromApi().then((data) => {
+      console.log('initial input data 3', data)
+      this.dataTable = data.items
+      this.totalDesserts = this.City.clientCount
+    })
+  },
+  methods: {
+    getAnswer (search) {
+
+    },
+    async getDataFromApi () {
+      this.loading = true
+      const { sortBy, sortDesc, page, itemsPerPage } = this.options
+      const search = this.search.trim().toLowerCase()
+
+      let items = await this.getClients((page - 1) * itemsPerPage, itemsPerPage)
+      console.log('Items return 2', items)
+
+      if (search) {
+        items = items.filter((item) => {
+          return Object.values(item)
+            .join(',')
+            .toLowerCase()
+            .includes(search)
+        })
+      }
+
+      if (this.options.sortBy) {
+        items = items.sort((a, b) => {
+          const sortA = a[sortBy]
+          const sortB = b[sortBy]
+
+          if (sortDesc) {
+            if (sortA < sortB) { return 1 }
+            if (sortA > sortB) { return -1 }
+            return 0
+          } else {
+            if (sortA < sortB) { return -1 }
+            if (sortA > sortB) { return 1 }
+            return 0
+          }
+        })
+      }
+
+      if (itemsPerPage > 0) {
+        items = items.slice(
+          (page - 1) * itemsPerPage,
+          page * itemsPerPage
+        )
+      }
+      const total = items.length
+      this.loading = false
+      return {
+        items,
+        total
+      }
+    },
+    async getClients (limit, startIndex) {
+      if (this.City.clients < 1) {
+        return {}
+      }
+      if (this.page < 2) {
+        return await this.City.clients
+      } else {
+        await this.$apollo.queries.City.fetchMore({
+          // New variables
+          variables: {
+            startIndex,
+            limit
+          },
+          // Transform the previous result with new data
+          updateQuery: (previousResult, { fetchMoreResult }) => {
+            const newClients = fetchMoreResult.City.clients
+            console.log('newCLients 1', newClients)
+            return {
+              City: {
+                __typename: previousResult.City.__typename,
+                // Merging the tag list
+                clients: newClients
+              }
+            }
+          }
+        })
+      }
+      return this.dataTable
+    }
+  },
+  head: {
+    script: [
+      {
+        src: 'https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js'
+      }
+    ]
   }
 }
 </script>

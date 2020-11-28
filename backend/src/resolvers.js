@@ -62,6 +62,10 @@ export const resolvers = {
     },
     PasswordChanges: async (_, { limit }) => {
       return await PasswordChange.find().limit(limit)
+    },
+    SearchClient: async (_, { search }) => {
+      console.log(search)
+      return await Client.find({ $or: [{ code: search }, { name: search }, { dni: search }, { neighborhood: search }, { phone: search },] })
     }
   },
   Mutation: {
@@ -405,10 +409,10 @@ export const resolvers = {
   },
   City: {
     clients({ id }, { startIndex, limit }) {
-      return Client.find({ city: id }).skip(startIndex).sort({ 'code': 'desc' }).limit(limit)
+      return Client.find({ city: id }).skip(startIndex).limit(limit).sort({ 'code': 'desc' })
     },
-    clientCount ({ id }){
-      return Client.find({ city: id }).count()
+    clientCount({ id }) {
+      return Client.find({ city: id }).countDocuments()
     },
     neighborhoods({ id }) {
       return Neighborhood.find({ city: id }).sort({ 'code': 'desc' })
