@@ -408,8 +408,8 @@ export const resolvers = {
     }
   },
   City: {
-    clients({ id }, { startIndex, limit }) {
-      return Client.find({ city: id }).skip(startIndex).limit(limit).sort({ 'code': 'desc' })
+    async clients({ id }, { startIndex, limit }) {
+      return await Client.find({ city: id }).skip(startIndex).limit(limit).sort({ 'code': 'desc' })
     },
     clientCount({ id }) {
       return Client.find({ city: id }).countDocuments()

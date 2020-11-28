@@ -14,6 +14,8 @@
         class="elevation-1"
         hide-default-footer
         @page-count="pageCount = $event"
+        @update:page="updatePage($event)"
+        @update:options="updateOptions($event)"
       />
     </client-only>
     <v-pagination
@@ -30,6 +32,7 @@ export default {
   name: 'Page',
   data () {
     return {
+      initialLoad: true,
       search: '',
       answer: '',
       totalDesserts: 0,
@@ -121,12 +124,7 @@ export default {
     },
     params: {
       handler () {
-        this.getDataFromApi().then((data) => {
-          console.log('new input data 3', data)
-          this.dataTable = data.items
-          this.totalDesserts = this.City.clientCount
-          this.debouncedGetResult()
-        })
+        this.clientApiCall()
       },
       deep: true
     }
@@ -135,23 +133,29 @@ export default {
     // eslint-disable-next-line no-undef
     this.debouncedGetAnswer = _.debounce(this.getAnswer, 500)
     // eslint-disable-next-line no-undef
-    this.debouncedGetResult = _.debounce(this.getDataFromApi, 1500)
-    this.getDataFromApi().then((data) => {
-      console.log('initial input data 3', data)
-      this.dataTable = data.items
-      this.totalDesserts = this.City.clientCount
-    })
+    this.debouncedGetResult = _.debounce(this.getDataFromApi, 4000)
+    this.clientApiCall()
   },
   methods: {
     getAnswer (search) {
 
     },
-    async getDataFromApi () {
+    clientApiCall () {
       this.loading = true
+      this.getDataFromApi().then((data) => {
+      // eslint-disable-next-line no-console
+        console.log('Final step input data 3', data)
+        this.dataTable = data.items
+        this.totalDesserts = this.City.clientCount
+        this.loading = false
+      })
+    },
+    async getDataFromApi () {
       const { sortBy, sortDesc, page, itemsPerPage } = this.options
       const search = this.search.trim().toLowerCase()
 
       let items = await this.getClients((page - 1) * itemsPerPage, itemsPerPage)
+      // eslint-disable-next-line no-console
       console.log('Items return 2', items)
 
       if (search) {
@@ -180,26 +184,20 @@ export default {
         })
       }
 
-      if (itemsPerPage > 0) {
-        items = items.slice(
-          (page - 1) * itemsPerPage,
-          page * itemsPerPage
-        )
-      }
       const total = items.length
-      this.loading = false
       return {
         items,
         total
       }
     },
-    async getClients (limit, startIndex) {
+    async getClients (startIndex, limit) {
       if (this.City.clients < 1) {
         return {}
       }
-      if (this.page < 2) {
+      if (this.initialLoad) {
         return await this.City.clients
       } else {
+        console.log('new variables', limit, startIndex)
         await this.$apollo.queries.City.fetchMore({
           // New variables
           variables: {
@@ -220,7 +218,14 @@ export default {
           }
         })
       }
-      return this.dataTable
+      return this.City.clients
+    },
+    updatePage (event) {
+      this.initialLoad = false
+      console.log('Event update page: ', event)
+    },
+    updateOptions (event) {
+      console.log('Event update options: ', event)
     }
   },
   head: {

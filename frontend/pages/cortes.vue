@@ -344,7 +344,6 @@ export default {
             this.loading = false
           })
           await this.sleep(1000)
-          console.log(1)
         }
         this.loading = false
       }
