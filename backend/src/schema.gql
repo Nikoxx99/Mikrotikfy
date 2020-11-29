@@ -14,11 +14,11 @@ type Query {
   Tickets(limit: Int): [Ticket]
   PasswordChange(dni: String): PasswordChange
   PasswordChanges(limit: Int): [PasswordChange]
-  SearchClient(search: String): [Client]
+  SearchClient(search: String, limit: Int): [Client]
 }
 type Client {
   _id: ID
-  code: Int
+  code: String
   name: String
   dni: String
   address: String
@@ -41,6 +41,8 @@ type City {
   id: Int
   name: String
   clientCount: Int
+  clientActiveCount: Int
+  clientDisabledCount: Int
   clients(limit: Int, , startIndex: Int, limit: Int): [Client]
   neighborhoods: [Neighborhood]
   ip: String
@@ -75,7 +77,7 @@ type SimpleResponse {
   errors: [Error]
 }
 type dxResponse {
-  code: Int
+  code: String
   name: String
   success: Boolean
 }
@@ -146,8 +148,8 @@ type Mutation {
   editClient(input: EditClientInput): SimpleResponse
   editClientPlan(input: EditClientPlanInput): SimpleResponse
   deleteClient(id: ID): SimpleResponse
-  getClientStatus(id: ID, code: Int): ClientStatus
-  getClientComment(id: ID, code: Int): ClientComment
+  getClientStatus(id: ID, code: String): ClientStatus
+  getClientComment(id: ID, code: String): ClientComment
   dxClient(input: DxInfoInput): [dxResponse]
   createCity(input: CityInput): SimpleResponse
   updateCity(input: CityInput): SimpleResponse
@@ -167,7 +169,7 @@ type Mutation {
   updatePasswordChangeRequest(input: UpdatePasswordChangeInput): SimpleResponse
 }
 input ClientInput {
-  code: Int
+  code: String
   name: String
   dni: String
   address: String
@@ -187,7 +189,7 @@ input ClientInput {
 }
 input EditClientInput {
   _id: String
-  code: Int
+  code: String
   name: String
   dni: String
   address: String
@@ -204,7 +206,7 @@ input EditClientInput {
   newModel: Int
 }
 input DxClientInput {
-  code: Int
+  code: String
   name: String
   plan: PlanInput
 }

@@ -1,7 +1,6 @@
 <template>
   <div>
-    <v-text-field v-model="search" label="search" />
-    <p> {{ answer }} </p>
+    <v-text-field v-model="searchClient" label="search" />
     <client-only>
       <v-data-table
         :headers="headers"
@@ -9,16 +8,14 @@
         :page.sync="page"
         :options.sync="options"
         :server-items-length="totalDesserts"
-        :items-per-page="itemsPerPage"
+        :items-per-page.sync="itemsPerPage"
         :loading="loading"
-        class="elevation-1"
         hide-default-footer
         @page-count="pageCount = $event"
-        @update:page="updatePage($event)"
-        @update:options="updateOptions($event)"
       />
     </client-only>
     <v-pagination
+      v-if="isPaginationActive"
       v-model="page"
       :length="pageCount"
     />
@@ -32,8 +29,9 @@ export default {
   name: 'Page',
   data () {
     return {
+      isPaginationActive: true,
       initialLoad: true,
-      search: '',
+      searchClient: '',
       answer: '',
       totalDesserts: 0,
       dataTable: [],
@@ -106,6 +104,48 @@ export default {
           limit: 5
         }
       }
+    },
+    SearchClient () {
+      return {
+        query: gql`
+        query($search: String, $limit: Int){
+          SearchClient(search: $search, limit: $limit) {
+            _id
+            code
+            name
+            dni
+            address
+            neighborhood{
+              id
+              name
+            }
+            city{
+              id
+              name
+            }
+            phone
+            plan{
+              id
+              name
+            }
+            technology{
+              id
+              name
+            }
+            wifi_ssid
+            wifi_password
+            mac_address
+            comment
+            operator
+            created_at
+            newModel
+          }
+        }
+        `,
+        variables: {
+          limit: 1
+        }
+      }
     }
   },
   computed: {
@@ -118,9 +158,11 @@ export default {
   },
   watch: {
     // eslint-disable-next-line object-shorthand
-    search: function (newQuestion, oldQuestion) {
-      this.answer = 'Waiting for you to stop typing...'
+    searchClient: function () {
       this.debouncedGetAnswer()
+      if (!this.searchClient) {
+        this.clientApiCall()
+      }
     },
     params: {
       handler () {
@@ -131,41 +173,48 @@ export default {
   },
   mounted () {
     // eslint-disable-next-line no-undef
-    this.debouncedGetAnswer = _.debounce(this.getAnswer, 500)
+    this.debouncedGetAnswer = _.debounce(this.getClientBySearch, 700)
     // eslint-disable-next-line no-undef
-    this.debouncedGetResult = _.debounce(this.getDataFromApi, 4000)
+    this.debouncedGetResult = _.debounce(this.getDataFromApi, 100)
     this.clientApiCall()
+    this.initialLoad = false
   },
   methods: {
-    getAnswer (search) {
-
+    getClientBySearch () {
+      const search = this.searchClient
+      if (this.searchClient) {
+        this.$apollo.queries.SearchClient.fetchMore({
+        // New variables
+          variables: {
+            search,
+            limit: 1000
+          },
+          // Transform the previous result with new data
+          updateQuery: (previousResult, { fetchMoreResult }) => {
+            const newClients = fetchMoreResult.SearchClient
+            this.itemsPerPage = newClients.length
+            this.totalDesserts = newClients.length
+            this.dataTable = newClients
+            this.isPaginationActive = false
+          }
+        })
+      }
     },
     clientApiCall () {
       this.loading = true
-      this.getDataFromApi().then((data) => {
-      // eslint-disable-next-line no-console
-        console.log('Final step input data 3', data)
-        this.dataTable = data.items
-        this.totalDesserts = this.City.clientCount
-        this.loading = false
-      })
+      if (!this.searchClient) {
+        this.getDataFromApi().then((data) => {
+          this.dataTable = data.items
+          this.totalDesserts = this.City.clientCount
+          this.loading = false
+          this.isPaginationActive = true
+        })
+      }
     },
     async getDataFromApi () {
       const { sortBy, sortDesc, page, itemsPerPage } = this.options
-      const search = this.search.trim().toLowerCase()
 
       let items = await this.getClients((page - 1) * itemsPerPage, itemsPerPage)
-      // eslint-disable-next-line no-console
-      console.log('Items return 2', items)
-
-      if (search) {
-        items = items.filter((item) => {
-          return Object.values(item)
-            .join(',')
-            .toLowerCase()
-            .includes(search)
-        })
-      }
 
       if (this.options.sortBy) {
         items = items.sort((a, b) => {
@@ -197,7 +246,6 @@ export default {
       if (this.initialLoad) {
         return await this.City.clients
       } else {
-        console.log('new variables', limit, startIndex)
         await this.$apollo.queries.City.fetchMore({
           // New variables
           variables: {
@@ -207,25 +255,11 @@ export default {
           // Transform the previous result with new data
           updateQuery: (previousResult, { fetchMoreResult }) => {
             const newClients = fetchMoreResult.City.clients
-            console.log('newCLients 1', newClients)
-            return {
-              City: {
-                __typename: previousResult.City.__typename,
-                // Merging the tag list
-                clients: newClients
-              }
-            }
+            this.dataTable = newClients
           }
         })
       }
-      return this.City.clients
-    },
-    updatePage (event) {
-      this.initialLoad = false
-      console.log('Event update page: ', event)
-    },
-    updateOptions (event) {
-      console.log('Event update options: ', event)
+      return this.dataTable
     }
   },
   head: {

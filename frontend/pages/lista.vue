@@ -18,10 +18,10 @@
       >
         <v-card>
           <v-card-title>
-            Clientes {{ cityName }}
+            Clientes {{ City.name }}
             <v-spacer />
             <v-text-field
-              v-model="search"
+              v-model="searchClient"
               prepend-icon="mdi-magnify"
               label="Buscar Cliente"
               single-line
@@ -37,13 +37,11 @@
               :key="key"
               :headers="headers"
               :items="dataTable"
-              :search="search"
-              :items-per-page="itemsPerPage"
+              :server-items-length="totalDesserts"
+              :items-per-page.sync="itemsPerPage"
               :page.sync="page"
-              :loading="initialLoading"
-              sort-by="created_at"
-              calculate-widths
-              sort-desc
+              :options.sync="options"
+              :loading="loadingDataTable"
               no-data-text="No hay informacion para mostrar aun..."
               loading-text="Cargando información de clientes..."
               dense
@@ -104,7 +102,7 @@
                   <v-dialog v-model="dialog" max-width="650px" :retain-focus="false" fullscreen>
                     <template v-slot:activator="{ on, attrs }">
                       <v-btn
-                        :color="cityColor"
+                        :color="City.color"
                         dark
                         class="mr-4"
                         v-bind="attrs"
@@ -126,31 +124,31 @@
                         small
                         class="mr-4 d-none d-md-flex d-lg-flex d-xl-flex"
                       >
-                        Activos: {{ active_users }}
+                        Activos: {{ City.clientActiveCount }}
                       </v-chip>
                       <v-chip
                         color="red lighten-1 white--text"
                         small
                         class="mr-4 d-none d-md-flex d-lg-flex d-xl-flex"
                       >
-                        En Mora: {{ inactive_users }}
+                        En Mora: {{ City.clientDisabledCount }}
                       </v-chip>
                       <v-chip
                         color="primary"
                         small
                         class="mr-4 d-none d-sm-flex d-md-flex d-lg-flex d-xl-flex"
                       >
-                        Totales: {{ Object.keys(dataTable).length }}
+                        Totales: {{ City.clientCount }}
                       </v-chip>
                       <v-tooltip bottom>
                         <template v-slot:activator="{ on, attrs }">
                           <v-btn
                             v-bind="attrs"
-                            :color="cityColor"
+                            :color="City.color"
                             dark
                             class="mr-4"
-                            :disabled="initialLoading"
-                            :loading="initialLoading"
+                            :disabled="refreshLoading"
+                            :loading="refreshLoading"
                             v-on="on"
                             @click="activeClients(true)"
                           >
@@ -172,14 +170,14 @@
                           >
                             <v-icon>mdi-close</v-icon>
                           </v-btn>
-                          <v-toolbar-title><span class="headline">Crear Cliente en {{ cityName }}</span></v-toolbar-title>
+                          <v-toolbar-title><span class="headline">Crear Cliente en {{ City.name }}</span></v-toolbar-title>
                         </v-toolbar>
                       </v-card-title>
                       <v-card-text>
                         <v-container>
                           <CreateForm
                             v-if="dialog"
-                            :citycolor="cityColor"
+                            :citycolor="City.color"
                             @createClient="createClient($event)"
                             @createClientDialog="createClientDialog($event)"
                             @createClientSnack="createClientSnack($event)"
@@ -240,7 +238,11 @@
             </v-data-table>
           </client-only>
           <div class="text-center pt-2">
-            <v-pagination v-model="page" :length="pageCount" />
+            <v-pagination
+              v-if="isPaginationActive"
+              v-model="page"
+              :length="pageCount"
+            />
           </div>
         </v-card>
       </v-col>
@@ -293,6 +295,7 @@ import EditForm from '../components/edit/EditForm'
 import DeleteClient from '../components/delete/DeleteClient'
 import ClientStatus from '../components/main/ClientStatus'
 export default {
+  name: 'Lista',
   components: {
     CreateForm,
     EditForm,
@@ -326,22 +329,120 @@ export default {
           city: parseInt(this.$route.query.city, 10)
         }
       }
+    },
+    City () {
+      return {
+        query: gql`
+        query($city: Int, $startIndex: Int, $limit: Int) {
+          City(id: $city){
+            name
+            color
+            clientCount
+            clientActiveCount
+            clientDisabledCount
+            clients (startIndex: $startIndex, limit: $limit){
+              _id
+              code
+              name
+              dni
+              address
+              neighborhood{
+                id
+                name
+              }
+              city{
+                id
+                name
+              }
+              phone
+              plan{
+                id
+                name
+              }
+              technology{
+                id
+                name
+              }
+              wifi_ssid
+              wifi_password
+              mac_address
+              comment
+              operator
+              created_at
+              newModel
+            }
+          }
+        }
+      `,
+        variables: {
+          city: 1,
+          startIndex: 0,
+          limit: 50
+        }
+      }
+    },
+    SearchClient () {
+      return {
+        query: gql`
+        query($search: String, $limit: Int){
+          SearchClient(search: $search, limit: $limit) {
+            _id
+            code
+            name
+            dni
+            address
+            neighborhood{
+              id
+              name
+            }
+            city{
+              id
+              name
+            }
+            phone
+            plan{
+              id
+              name
+            }
+            technology{
+              id
+              name
+            }
+            wifi_ssid
+            wifi_password
+            mac_address
+            comment
+            operator
+            created_at
+            newModel
+          }
+        }
+        `,
+        variables: {
+          limit: 1
+        }
+      }
     }
   },
   data () {
     return {
+      isPaginationActive: true,
+      initialLoad: true,
+      refreshLoading: false,
+      loadingDataTable: true,
       key: 0,
       page: 1,
       pageCount: 0,
       itemsPerPage: 50,
-      search: '',
+      searchClient: '',
+      totalDesserts: 0,
       currentCity: 'Mariquita',
       cityName: '',
       cityColor: '',
       alertBox: false,
       dialog: false,
       dialogEdit: false,
-      initialLoading: false,
+      options: {},
       headers: [
         { text: 'Codigo', sortable: true, value: 'code' },
         { text: 'Estado', sortable: false, value: 'status' },
@@ -388,6 +489,31 @@ export default {
       dataTable: []
     }
   },
+  computed: {
+    params (nv) {
+      return {
+        ...this.options,
+        query: this.search
+      }
+    }
+  },
+  watch: {
+    // eslint-disable-next-line object-shorthand
+    searchClient: function () {
+      this.debouncedGetAnswer()
+      if (!this.searchClient) {
+        this.clientApiCall()
+      }
+    },
+    params: {
+      handler () {
+        if (!this.initialLoad) {
+          this.clientApiCall()
+        }
+      },
+      deep: true
+    }
+  },
   created () {
     if (this.$route.query.created) {
       this.alertBox = true
@@ -404,96 +530,112 @@ export default {
       this.alertBoxColor = 'red darken-4'
       this.createdMessage = 'Cliente Eliminado Satisfactoriamente.'
     }
-    this.initialLoading = true
-    this.getInitialData()
+  },
+  mounted () {
+    // eslint-disable-next-line no-undef
+    this.debouncedGetAnswer = _.debounce(this.getClientBySearch, 700)
+    // eslint-disable-next-line no-undef
+    this.debouncedGetResult = _.debounce(this.getDataFromApi, 100)
+    this.clientApiCall()
   },
   methods: {
-    getInitialData () {
-      this.initialLoading = true
-      this.dataTable = []
-      this.$apollo.query({
-        query: gql`
-        query($city: Int) {
-          City(id: $city){
-            name
-            color
-            clients{
-              _id
-              code
-              name
-              dni
-              address
-              neighborhood{
-                id
-                name
-              }
-              city{
-                id
-                name
-              }
-              phone
-              plan{
-                id
-                name
-              }
-              technology{
-                id
-                name
-              }
-              wifi_ssid
-              wifi_password
-              mac_address
-              comment
-              operator
-              created_at
-              newModel
-            }
+    getClientBySearch () {
+      const search = this.searchClient
+      if (this.searchClient) {
+        this.$apollo.queries.SearchClient.fetchMore({
+        // New variables
+          variables: {
+            search,
+            limit: 1000
+          },
+          // Transform the previous result with new data
+          updateQuery: (previousResult, { fetchMoreResult }) => {
+            const newClients = fetchMoreResult.SearchClient
+            this.itemsPerPage = newClients.length
+            this.totalDesserts = newClients.length
+            this.dataTable = newClients
+            this.isPaginationActive = false
           }
-        }
-      `,
-        variables: {
-          city: parseInt(this.$route.query.city, 10)
-        }
-      }).then((input) => {
-        this.cityName = input.data.City.name
-        this.cityColor = input.data.City.color
-        for (let i = 0; i < input.data.City.clients.length; i++) {
-          const dataTable = {}
-          dataTable._id = input.data.City.clients[i]._id
-          dataTable.status = '#777'
-          dataTable.code = input.data.City.clients[i].code
-          dataTable.name = input.data.City.clients[i].name
-          dataTable.dni = input.data.City.clients[i].dni
-          dataTable.address = input.data.City.clients[i].address
-          dataTable.neighborhood = input.data.City.clients[i].neighborhood
-          dataTable.city = input.data.City.clients[i].city
-          dataTable.phone = input.data.City.clients[i].phone
-          dataTable.plan = input.data.City.clients[i].plan
-          dataTable.technology = input.data.City.clients[i].technology
-          dataTable.wifi_ssid = input.data.City.clients[i].wifi_ssid
-          dataTable.wifi_password = input.data.City.clients[i].wifi_password
-          dataTable.mac_address = input.data.City.clients[i].mac_address
-          dataTable.comment = input.data.City.clients[i].comment
-          dataTable.operator = input.data.City.clients[i].operator
-          dataTable.created_at = input.data.City.clients[i].created_at
-          dataTable.newModel = input.data.City.clients[i].newModel
-          dataTable.citycolor = input.data.City.color
-          this.dataTable.push(dataTable)
-        }
-        this.initialLoading = false
-        this.activeClients(false)
-        this.calculateState()
-      }).catch((error) => {
-        // eslint-disable-next-line no-console
-        console.error(error)
-        this.initialLoading = false
-      })
+        })
+        this.activeClients()
+        this.refreshLoading = false
+      }
+    },
+    clientApiCall () {
+      this.loadingDataTable = true
+      if (!this.searchClient) {
+        this.getDataFromApi().then((data) => {
+          this.dataTable = data.items
+          this.totalDesserts = this.City.clientCount
+          this.loadingDataTable = false
+          this.isPaginationActive = true
+          this.activeClients(false)
+          this.initialLoad = false
+          this.refreshLoading = false
+          console.log('Api Call')
+        })
+      }
+    },
+    async getDataFromApi () {
+      const { sortBy, sortDesc, page, itemsPerPage } = this.options
+
+      let items = await this.getClients((page - 1) * itemsPerPage, itemsPerPage)
+
+      if (this.options.sortBy) {
+        items = items.sort((a, b) => {
+          const sortA = a[sortBy]
+          const sortB = b[sortBy]
+
+          if (sortDesc) {
+            if (sortA < sortB) { return 1 }
+            if (sortA > sortB) { return -1 }
+            return 0
+          } else {
+            if (sortA < sortB) { return -1 }
+            if (sortA > sortB) { return 1 }
+            return 0
+          }
+        })
+      }
+
+      const total = items.length
+      return {
+        items,
+        total
+      }
+    },
+    async getClients (startIndex, limit) {
+      if (this.City.clients < 1) {
+        return {}
+      }
+      if (this.initialLoad) {
+        return await this.City.clients
+      } else {
+        await this.$apollo.queries.City.fetchMore({
+          // New variables
+          variables: {
+            startIndex,
+            limit
+          },
+          // Transform the previous result with new data
+          updateQuery: (previousResult, { fetchMoreResult }) => {
+            const newClients = fetchMoreResult.City.clients
+            const newClientsMod = newClients.map(function (c) {
+              c.status = 'white'
+              return c
+            })
+            this.dataTable = newClientsMod
+          }
+        })
+      }
+      return this.dataTable
     },
     async activeClients (refetch) {
-      this.initialLoading = true
+      this.refreshLoading = true
       this.online_users = this.getActiveClients.length
       if (refetch) {
         await this.$apollo.queries.getActiveClients.refetch()
+        this.refreshLoading = false
       }
       for (let i = 0; i < this.dataTable.length; i++) {
         // eslint-disable-next-line eqeqeq
@@ -509,15 +651,6 @@ export default {
             this.dataTable[i].status = 'red'
           }
         }
-      }
-      this.initialLoading = false
-    },
-    calculateState () {
-      if (this.dataTable) {
-        const clients = this.dataTable.filter(c => c.plan.id < 7)
-        this.active_users = clients.length
-        const inactiveClients = this.dataTable.filter(c => c.plan.id >= 7)
-        this.inactive_users = inactiveClients.length
       }
     },
     editItem (item) {
@@ -637,6 +770,11 @@ export default {
         { hid: 'og:title', property: 'og:title', content: this.title },
         { hid: 'og:description', property: 'og:description', content: 'ARNOProducciones - Base de datos interactiva' },
         { hid: 'author', name: 'author', content: 'Nicolas Echeverry' }
+      ],
+      script: [
+        {
+          src: 'https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js'
+        }
       ]
     }
   }

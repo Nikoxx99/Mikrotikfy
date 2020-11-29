@@ -268,7 +268,7 @@ export default {
         default: ''
       },
       code: {
-        type: Number,
+        type: String,
         default: 1
       },
       name: {
@@ -406,7 +406,7 @@ export default {
     this.commentLoading = true
     this.commentDisabled = true
     this.$apollo.mutate({
-      mutation: gql`mutation ($id: ID, $code: Int){
+      mutation: gql`mutation ($id: ID, $code: String){
         getClientComment(id: $id, code: $code){
           comment
         }

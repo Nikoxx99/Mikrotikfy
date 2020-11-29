@@ -103,8 +103,8 @@ export default {
       default: ''
     },
     code: {
-      type: Number,
-      default: 0
+      type: String,
+      default: ''
     }
   },
   data: () => ({
@@ -128,7 +128,7 @@ export default {
       this.online = false
       this.loading = true
       this.$apollo.mutate({
-        mutation: gql`mutation ($id: ID, $code: Int){
+        mutation: gql`mutation ($id: ID, $code: String){
           getClientStatus(id: $id, code: $code){
             status
             address

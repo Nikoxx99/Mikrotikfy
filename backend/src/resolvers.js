@@ -63,9 +63,17 @@ export const resolvers = {
     PasswordChanges: async (_, { limit }) => {
       return await PasswordChange.find().limit(limit)
     },
-    SearchClient: async (_, { search }) => {
-      console.log(search)
-      return await Client.find({ $or: [{ code: search }, { name: search }, { dni: search }, { neighborhood: search }, { phone: search },] })
+    SearchClient: async (_, { search, limit }) => {
+      return await Client.find({
+        $or:[
+          {'code':{ $regex: new RegExp(search, 'i') }},
+          {'name':{ $regex: new RegExp(search, 'i') }},
+          {'address':{ $regex: new RegExp(search, 'i') }},
+          {'dni':{ $regex: new RegExp(search, 'i') }},
+          {'phone':{ $regex: new RegExp(search, 'i') }}
+        ]
+      }).limit(limit)
+
     }
   },
   Mutation: {
@@ -409,10 +417,30 @@ export const resolvers = {
   },
   City: {
     async clients({ id }, { startIndex, limit }) {
-      return await Client.find({ city: id }).skip(startIndex).limit(limit).sort({ 'code': 'desc' })
+      return await Client.find({ city: id }).skip(startIndex).limit(limit).sort({ 'created_at': 'desc' })
     },
     clientCount({ id }) {
       return Client.find({ city: id }).countDocuments()
+    },
+    clientActiveCount({ id }) {
+      return Client.find({ 
+        $or: [ 
+          {city: id, plan: 1 },
+          {city: id, plan: 2 },
+          {city: id, plan: 3 },
+          {city: id, plan: 4 },
+          {city: id, plan: 5 },
+          {city: id, plan: 6 },
+        ] 
+      }).countDocuments()
+    },
+    clientDisabledCount({ id }) {
+      return Client.find({ 
+        $or: [ 
+          {city: id, plan: 7 },
+          {city: id, plan: 8 },
+        ] 
+      }).countDocuments()
     },
     neighborhoods({ id }) {
       return Neighborhood.find({ city: id }).sort({ 'code': 'desc' })
