@@ -1,2 +1,8 @@
 
 backend/.env
+
+sbackend/node_modules/
+
+sbackend/.cache/
+
+frontend/page.vue

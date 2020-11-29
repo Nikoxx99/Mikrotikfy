@@ -63,14 +63,15 @@ export const resolvers = {
     PasswordChanges: async (_, { limit }) => {
       return await PasswordChange.find().limit(limit)
     },
-    SearchClient: async (_, { search, limit }) => {
+    SearchClient: async (_, { search, limit, city }) => {
+      console.log(city)
       return await Client.find({
         $or:[
-          {'code':{ $regex: new RegExp(search, 'i') }},
-          {'name':{ $regex: new RegExp(search, 'i') }},
-          {'address':{ $regex: new RegExp(search, 'i') }},
-          {'dni':{ $regex: new RegExp(search, 'i') }},
-          {'phone':{ $regex: new RegExp(search, 'i') }}
+          {city: city, 'code':{ $regex: new RegExp(search, 'i') }},
+          {city: city, 'name':{ $regex: new RegExp(search, 'i') }},
+          {city: city, 'address':{ $regex: new RegExp(search, 'i') }},
+          {city: city, 'dni':{ $regex: new RegExp(search, 'i') }},
+          {city: city, 'phone':{ $regex: new RegExp(search, 'i') }}
         ]
       }).limit(limit)
 

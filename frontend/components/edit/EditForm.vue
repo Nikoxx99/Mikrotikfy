@@ -13,7 +13,7 @@
       <v-row>
         <v-col>
           <v-text-field
-            v-model.number="Client.code"
+            v-model="Client.code"
             type="number"
             label="Codigo"
             required

@@ -13,7 +13,7 @@
       <v-row>
         <v-col>
           <v-text-field
-            v-model.number="Client.code"
+            v-model="Client.code"
             type="number"
             label="Codigo"
             required
@@ -341,8 +341,6 @@ export default {
     if (this.$route.query.city) {
       this.Client.city = parseInt(this.$route.query.city)
     }
-    const date = Date.now()
-    this.Client.created_at = date
   },
   methods: {
     createClient () {
@@ -381,7 +379,7 @@ export default {
             },
             mac_address: this.Client.mac_address,
             comment: this.Client.comment,
-            created_at: '1605374828000',
+            created_at: String(Date.now()),
             newModel: this.Client.newModel,
             sendToMikrotik: this.Client.sendToMikrotik
           }

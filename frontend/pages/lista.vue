@@ -36,8 +36,8 @@
             <v-data-table
               :key="key"
               :headers="headers"
-              :items="dataTable"
-              :server-items-length="totalDesserts"
+              :items.sync="dataTable"
+              :server-items-length="totalClients"
               :items-per-page.sync="itemsPerPage"
               :page.sync="page"
               :options.sync="options"
@@ -50,6 +50,7 @@
               @page-count="pageCount = $event"
             >
               <!-- ########################### -->
+              <!-- eslint-disable -->
               <template v-slot:item.plan.name="props">
                 <v-edit-dialog
                   :return-value.sync="props.item.plan"
@@ -79,18 +80,21 @@
                 </v-edit-dialog>
               </template>
               <!-- ########################### -->
+              <!-- eslint-disable -->
               <template v-slot:item.technology.name="{ item }">
                 <span :class="getTechnology(item.technology.id) + '--text'">
                   {{ item.technology.name }}
                 </span>
               </template>
               <!-- ########################### -->
+              <!-- eslint-disable -->
               <template v-slot:item.newModel="{ item }">
                 <svg height="13" width="20">
                   <circle cx="10" cy="8" r="5" :fill="getModel(item.newModel)" />
                 </svg>
               </template>
               <!-- ########################### -->
+              <!-- eslint-disable -->
               <template v-slot:item.status="{ item }">
                 <svg height="13" width="20">
                   <circle :id="item._id" cx="10" cy="8" r="5" :fill="item.status" />
@@ -141,6 +145,7 @@
                         Totales: {{ City.clientCount }}
                       </v-chip>
                       <v-tooltip bottom>
+                        <!-- eslint-disable -->
                         <template v-slot:activator="{ on, attrs }">
                           <v-btn
                             v-bind="attrs"
@@ -217,6 +222,7 @@
                 </v-toolbar>
               </template>
               <!-- ########################### -->
+              <!-- eslint-disable -->
               <template v-slot:item.actions="{ item }">
                 <ClientStatus :name="item.name" :clientid="item._id" :code="item.code" />
                 <v-tooltip top>
@@ -289,6 +295,7 @@
 </template>
 
 <script>
+/* eslint-disable */
 import gql from 'graphql-tag'
 import CreateForm from '../components/create/CreateForm'
 import EditForm from '../components/edit/EditForm'
@@ -384,8 +391,8 @@ export default {
     SearchClient () {
       return {
         query: gql`
-        query($search: String, $limit: Int){
-          SearchClient(search: $search, limit: $limit) {
+        query($search: String, $limit: Int, $city: Int){
+          SearchClient(search: $search, limit: $limit, city: $city) {
             _id
             code
             name
@@ -435,7 +442,7 @@ export default {
       pageCount: 0,
       itemsPerPage: 50,
       searchClient: '',
-      totalDesserts: 0,
+      totalClients: 0,
       currentCity: 'Mariquita',
       cityName: '',
       cityColor: '',
@@ -444,14 +451,14 @@ export default {
       dialogEdit: false,
       options: {},
       headers: [
-        { text: 'Codigo', sortable: true, value: 'code' },
+        { text: 'Codigo', sortable: true, value: 'code', align: ' d-none d-lg-table-cell'},
         { text: 'Estado', sortable: false, value: 'status' },
         { text: 'Nombre', sortable: true, value: 'name' },
         { text: 'Cedula', sortable: true, value: 'dni', align: ' d-none d-lg-table-cell' },
-        { text: 'Direccion', sortable: false, value: 'address', align: ' d-none d-lg-table-cell' },
+        { text: 'Direccion', sortable: false, value: 'address'},
         { text: 'Barrio', sortable: true, value: 'neighborhood.name', align: ' d-none d-lg-table-cell' },
         { text: 'Telefono', sortable: false, value: 'phone', align: ' d-none d-lg-table-cell' },
-        { text: 'Plan', sortable: true, value: 'plan.name', align: ' d-none d-lg-table-cell' },
+        { text: 'Plan', sortable: true, value: 'plan.name' },
         { text: 'Tecnologia', sortable: true, value: 'technology.name', align: ' d-none d-lg-table-cell' },
         { text: 'Tipo', sortable: true, value: 'newModel', align: ' d-none d-lg-table-cell' },
         { text: 'Aciones', value: 'actions', sortable: false }
@@ -539,26 +546,27 @@ export default {
     this.clientApiCall()
   },
   methods: {
-    getClientBySearch () {
+    async getClientBySearch () {
       const search = this.searchClient
       if (this.searchClient) {
-        this.$apollo.queries.SearchClient.fetchMore({
+        await this.$apollo.queries.SearchClient.fetchMore({
         // New variables
           variables: {
             search,
-            limit: 1000
+            limit: 1000,
+            city: parseInt(this.$route.query.city, 10)
           },
           // Transform the previous result with new data
           updateQuery: (previousResult, { fetchMoreResult }) => {
             const newClients = fetchMoreResult.SearchClient
             this.itemsPerPage = newClients.length
-            this.totalDesserts = newClients.length
+            this.totalClients = newClients.length
             this.dataTable = newClients
             this.isPaginationActive = false
+            this.activeClients()
+            this.refreshLoading = false
           }
         })
-        this.activeClients()
-        this.refreshLoading = false
       }
     },
     clientApiCall () {
@@ -566,13 +574,12 @@ export default {
       if (!this.searchClient) {
         this.getDataFromApi().then((data) => {
           this.dataTable = data.items
-          this.totalDesserts = this.City.clientCount
+          this.totalClients = this.City.clientCount
           this.loadingDataTable = false
           this.isPaginationActive = true
           this.activeClients(false)
           this.initialLoad = false
           this.refreshLoading = false
-          console.log('Api Call')
         })
       }
     },
@@ -752,7 +759,7 @@ export default {
   },
   head () {
     return {
-      title: this.cityName + this.title,
+      title: this.City.name + this.title,
       meta: [
         { hid: 'language', name: 'language', content: 'es' },
         { hid: 'audience', name: 'audience', content: 'all' },
@@ -780,14 +787,3 @@ export default {
   }
 }
 </script>
-<style>
-.new-model {
-  background-color: #1f2c38 !important;
-}
-.old-model {
-  background-color: #222 !important;
-}
-table {
-  overflow: hidden;
-}
-</style>

@@ -14,7 +14,7 @@ type Query {
   Tickets(limit: Int): [Ticket]
   PasswordChange(dni: String): PasswordChange
   PasswordChanges(limit: Int): [PasswordChange]
-  SearchClient(search: String, limit: Int): [Client]
+  SearchClient(search: String, limit: Int, city: Int): [Client]
 }
 type Client {
   _id: ID
