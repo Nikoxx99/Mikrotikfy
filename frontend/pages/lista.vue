@@ -375,7 +375,7 @@ export default {
         }
       `,
         variables: {
-          city: 1,
+          city: parseInt(this.$route.query.city, 10),
           startIndex: 0,
           limit: 50
         }
