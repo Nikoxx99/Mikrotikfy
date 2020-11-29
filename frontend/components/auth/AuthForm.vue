@@ -95,33 +95,34 @@ export default {
       this.isLoading = true
       this.loginFailed = false
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: LoginInput!){
+        mutation: gql`mutation ($input: UsersPermissionsLoginInput!){
           login(input: $input){
-            success
-            token
-            username
-            role
-            errors{
-              path
-              message
+            jwt
+            user{
+              username
+              role{
+                name
+              }
             }
           }
         }`,
         variables: {
           input: {
-            username: this.username,
-            password: this.password
+            identifier: this.username,
+            password: this.password,
+            provider: 'local'
           }
         }
       }).then((input) => {
-        if (input.data.login.success) {
+        if (!input.errors) {
           const auth = {
-            accessToken: input.data.login.token,
-            username: input.data.login.username,
-            role: input.data.login.role
+            accessToken: input.data.login.jwt,
+            username: input.data.login.user.username,
+            role: input.data.login.user.role.name
           }
           this.$store.commit('setAuth', auth)
           Cookie.set('auth', auth)
+          Cookie.set('authToken', auth.accessToken)
           if (this.username === 'nohora') {
             window.location.href = '/lista?city=2'
           } else {

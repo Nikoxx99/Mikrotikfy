@@ -51,7 +51,9 @@ export default {
   apollo: {
     clientConfigs: {
       default: {
-        httpEndpoint: process.env.API_ENDPOINT
+        httpEndpoint: 'http://localhost:1337/graphql',
+        authenticationType: 'Bearer',
+        tokenName: 'authToken'
       }
     }
   },

@@ -44,7 +44,7 @@
       <v-spacer />
       <div v-if="$store.state.auth">
         <v-btn
-          v-for="city in Cities"
+          v-for="city in cities"
           :key="city.id"
           class="mr-4"
           :color="city.color"
@@ -70,7 +70,7 @@
     </v-app-bar>
     <v-main>
       <v-container fluid>
-        <nuxt />
+        <!-- <nuxt /> -->
       </v-container>
     </v-main>
     <v-footer
@@ -86,11 +86,11 @@ import gql from 'graphql-tag'
 import Cookie from 'js-cookie'
 export default {
   apollo: {
-    Cities () {
+    cities () {
       return {
         query: gql`
         query{
-          Cities{
+          cities{
             id
             name
             color
@@ -137,11 +137,8 @@ export default {
     this.$apollo.query({
       query: gql`
       query($limit: Int) {
-        PasswordChanges(limit: $limit){
-          closed {
-            name
-            value
-          }
+        passwordchanges(limit: $limit){
+          closed
         }
       }
       `,
@@ -149,8 +146,8 @@ export default {
         limit: 1000
       }
     }).then((input) => {
-      for (let i = 0; i < input.data.PasswordChanges.length; i++) {
-        if (input.data.PasswordChanges[i].closed.value === false) {
+      for (let i = 0; i < input.data.passwordchanges.length; i++) {
+        if (input.data.passwordchanges[i].closed.value === false) {
           this.items[2].info++
         }
       }

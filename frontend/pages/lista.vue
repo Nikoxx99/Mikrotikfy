@@ -18,10 +18,10 @@
       >
         <v-card>
           <v-card-title>
-            Clientes {{ City.name }}
+            Clientes {{ city.name }}
             <v-spacer />
             <v-text-field
-              v-model="searchClient"
+              v-model="searchClientInput"
               prepend-icon="mdi-magnify"
               label="Buscar Cliente"
               single-line
@@ -106,7 +106,7 @@
                   <v-dialog v-model="dialog" max-width="650px" :retain-focus="false" fullscreen>
                     <template v-slot:activator="{ on, attrs }">
                       <v-btn
-                        :color="City.color"
+                        :color="city.color"
                         dark
                         class="mr-4"
                         v-bind="attrs"
@@ -128,28 +128,28 @@
                         small
                         class="mr-4 d-none d-md-flex d-lg-flex d-xl-flex"
                       >
-                        Activos: {{ City.clientActiveCount }}
+                        Activos: {{ clientCountActive }}
                       </v-chip>
                       <v-chip
                         color="red lighten-1 white--text"
                         small
                         class="mr-4 d-none d-md-flex d-lg-flex d-xl-flex"
                       >
-                        En Mora: {{ City.clientDisabledCount }}
+                        En Mora: {{ clientCountDisable }}
                       </v-chip>
                       <v-chip
                         color="primary"
                         small
                         class="mr-4 d-none d-sm-flex d-md-flex d-lg-flex d-xl-flex"
                       >
-                        Totales: {{ City.clientCount }}
+                        Totales: {{ clientCount }}
                       </v-chip>
                       <v-tooltip bottom>
                         <!-- eslint-disable -->
                         <template v-slot:activator="{ on, attrs }">
                           <v-btn
                             v-bind="attrs"
-                            :color="City.color"
+                            :color="city.color"
                             dark
                             class="mr-4"
                             :disabled="refreshLoading"
@@ -175,14 +175,14 @@
                           >
                             <v-icon>mdi-close</v-icon>
                           </v-btn>
-                          <v-toolbar-title><span class="headline">Crear Cliente en {{ City.name }}</span></v-toolbar-title>
+                          <v-toolbar-title><span class="headline">Crear Cliente en {{ city.name }}</span></v-toolbar-title>
                         </v-toolbar>
                       </v-card-title>
                       <v-card-text>
                         <v-container>
                           <CreateForm
                             v-if="dialog"
-                            :citycolor="City.color"
+                            :citycolor="city.color"
                             @createClient="createClient($event)"
                             @createClientDialog="createClientDialog($event)"
                             @createClientSnack="createClientSnack($event)"
@@ -311,11 +311,11 @@ export default {
   },
   middleware: ['defaultCity', 'authenticated'],
   apollo: {
-    Plans () {
+    plans () {
       return {
         query: gql`
         query{
-          Plans{
+          plans{
             id
             name
           }
@@ -323,76 +323,78 @@ export default {
       `
       }
     },
-    getActiveClients () {
+    ActiveClients () {
       return {
         query: gql`
-        query($city: Int){
-          getActiveClients(city: $city){
+        query($city: String){
+          ActiveClients(city: $city){
             name
           }
         }
       `,
         variables: {
-          city: parseInt(this.$route.query.city, 10)
+          city: this.$route.query.city
         }
       }
     },
-    City () {
+    city () {
       return {
         query: gql`
-        query($city: Int, $startIndex: Int, $limit: Int) {
-          City(id: $city){
+        query($city: String, $start: Int, $limit: Int) {
+          city(id: $city){
             name
             color
-            clientCount
-            clientActiveCount
-            clientDisabledCount
-            clients (startIndex: $startIndex, limit: $limit){
-              _id
-              code
-              name
-              dni
-              address
-              neighborhood{
-                id
-                name
-              }
-              city{
-                id
-                name
-              }
-              phone
-              plan{
-                id
-                name
-              }
-              technology{
-                id
-                name
-              }
-              wifi_ssid
-              wifi_password
-              mac_address
-              comment
-              operator
-              created_at
-              newModel
-            }
           }
         }
       `,
         variables: {
-          city: parseInt(this.$route.query.city, 10),
-          startIndex: 0,
+          city: this.$route.query.city,
+          start: 0,
           limit: 50
         }
       }
     },
-    SearchClient () {
+    clientCount () {
       return {
         query: gql`
-        query($search: String, $limit: Int, $city: Int){
-          SearchClient(search: $search, limit: $limit, city: $city) {
+          query($city: String) {
+            clientCount(city: $city)
+          }
+        `,
+        variables: {
+          city: this.$route.query.city
+        }
+      }
+    },
+    clientCountActive () {
+      return {
+        query: gql`
+          query($city: String) {
+            clientCountActive(city: $city)
+          }
+        `,
+        variables: {
+          city: this.$route.query.city
+        }
+      }
+    },
+    clientCountDisable () {
+      return {
+        query: gql`
+          query($city: String) {
+            clientCountDisable(city: $city)
+          }
+        `,
+        variables: {
+          city: this.$route.query.city
+        }
+      }
+    },
+    searchClient () {
+      return {
+        query: gql`
+        query($search: String, $limit: Int, $city: String){
+          searchClient(search: $search, limit: $limit, city: $city) {
             _id
             code
             name
@@ -441,7 +443,7 @@ export default {
       page: 1,
       pageCount: 0,
       itemsPerPage: 50,
-      searchClient: '',
+      searchClientInput: '',
       totalClients: 0,
       currentCity: 'Mariquita',
       cityName: '',
@@ -506,9 +508,9 @@ export default {
   },
   watch: {
     // eslint-disable-next-line object-shorthand
-    searchClient: function () {
+    searchClientInput: function () {
       this.debouncedGetAnswer()
-      if (!this.searchClient) {
+      if (!this.searchClientInput) {
         this.clientApiCall()
       }
     },
@@ -521,23 +523,6 @@ export default {
       deep: true
     }
   },
-  created () {
-    if (this.$route.query.created) {
-      this.alertBox = true
-      this.alertBoxColor = 'blue darken-4'
-      this.createdMessage = 'Cliente Creado Satisfactoriamente'
-    }
-    if (this.$route.query.edited) {
-      this.alertBox = true
-      this.alertBoxColor = 'yellow darken-4'
-      this.createdMessage = 'Cliente Editado Satisfactoriamente.'
-    }
-    if (this.$route.query.deleted) {
-      this.alertBox = true
-      this.alertBoxColor = 'red darken-4'
-      this.createdMessage = 'Cliente Eliminado Satisfactoriamente.'
-    }
-  },
   mounted () {
     // eslint-disable-next-line no-undef
     this.debouncedGetAnswer = _.debounce(this.getClientBySearch, 700)
@@ -547,18 +532,18 @@ export default {
   },
   methods: {
     async getClientBySearch () {
-      const search = this.searchClient
-      if (this.searchClient) {
-        await this.$apollo.queries.SearchClient.fetchMore({
+      const search = this.searchClientInput
+      if (this.searchClientInput) {
+        await this.$apollo.queries.searchClient.fetchMore({
         // New variables
           variables: {
             search,
             limit: 1000,
-            city: parseInt(this.$route.query.city, 10)
+            city: this.$route.query.city
           },
           // Transform the previous result with new data
           updateQuery: (previousResult, { fetchMoreResult }) => {
-            const newClients = fetchMoreResult.SearchClient
+            const newClients = fetchMoreResult.searchClient
             this.itemsPerPage = newClients.length
             this.totalClients = newClients.length
             this.dataTable = newClients
@@ -571,10 +556,10 @@ export default {
     },
     clientApiCall () {
       this.loadingDataTable = true
-      if (!this.searchClient) {
+      if (!this.searchClientInput) {
         this.getDataFromApi().then((data) => {
           this.dataTable = data.items
-          this.totalClients = this.City.clientCount
+          this.totalClients = this.city.clientCount
           this.loadingDataTable = false
           this.isPaginationActive = true
           this.activeClients(false)
@@ -612,21 +597,21 @@ export default {
       }
     },
     async getClients (startIndex, limit) {
-      if (this.City.clients < 1) {
+      if (this.city.clients < 1) {
         return {}
       }
       if (this.initialLoad) {
-        return await this.City.clients
+        return await this.city.clients
       } else {
-        await this.$apollo.queries.City.fetchMore({
+        await this.$apollo.queries.city.fetchMore({
           // New variables
           variables: {
-            startIndex,
+            start,
             limit
           },
           // Transform the previous result with new data
           updateQuery: (previousResult, { fetchMoreResult }) => {
-            const newClients = fetchMoreResult.City.clients
+            const newClients = fetchMoreResult.city.clients
             const newClientsMod = newClients.map(function (c) {
               c.status = 'white'
               return c
@@ -639,19 +624,19 @@ export default {
     },
     async activeClients (refetch) {
       this.refreshLoading = true
-      this.online_users = this.getActiveClients.length
+      this.online_users = this.ActiveClients.length
       if (refetch) {
-        await this.$apollo.queries.getActiveClients.refetch()
+        await this.$apollo.queries.ActiveClients.refetch()
         this.refreshLoading = false
       }
       for (let i = 0; i < this.dataTable.length; i++) {
         // eslint-disable-next-line eqeqeq
-        const search = this.getActiveClients.find(c => c.name == this.dataTable[i].code)
+        const search = this.ActiveClients.find(c => c.name == this.dataTable[i].code)
         if (search) {
           this.dataTable[i].status = 'green'
         } else {
           // eslint-disable-next-line eqeqeq
-          const search2 = this.getActiveClients.find(c => c.name == this.dataTable[i].dni)
+          const search2 = this.ActiveClients.find(c => c.name == this.dataTable[i].dni)
           if (search2) {
             this.dataTable[i].status = 'green'
           } else {
@@ -759,7 +744,7 @@ export default {
   },
   head () {
     return {
-      title: this.City.name + this.title,
+      title: this.city.name + this.title,
       meta: [
         { hid: 'language', name: 'language', content: 'es' },
         { hid: 'audience', name: 'audience', content: 'all' },

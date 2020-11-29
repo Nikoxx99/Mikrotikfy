@@ -24,6 +24,7 @@
 <script>
 import AuthForm from '../components/auth/AuthForm.vue'
 export default {
+  layout: 'outuser',
   components: {
     AuthForm
   },
