@@ -64,17 +64,21 @@ export const resolvers = {
       return await PasswordChange.find().limit(limit)
     },
     SearchClient: async (_, { search, limit, city }) => {
-      console.log(city)
-      return await Client.find({
-        $or:[
-          {city: city, 'code':{ $regex: new RegExp(search, 'i') }},
-          {city: city, 'name':{ $regex: new RegExp(search, 'i') }},
-          {city: city, 'address':{ $regex: new RegExp(search, 'i') }},
-          {city: city, 'dni':{ $regex: new RegExp(search, 'i') }},
-          {city: city, 'phone':{ $regex: new RegExp(search, 'i') }}
-        ]
-      }).limit(limit)
-
+      if (search) {
+        const neighborhood = await Neighborhood.find({'name': { $regex: new RegExp(search, 'i') }})
+        return await Client.find({
+          $or:[
+            {city: city, 'code':{ $regex: new RegExp(search, 'i') }},
+            {city: city, 'name':{ $regex: new RegExp(search, 'i') }},
+            {city: city, 'address':{ $regex: new RegExp(search, 'i') }},
+            {city: city, 'neighborhood': neighborhood[0].id},
+            {city: city, 'dni':{ $regex: new RegExp(search, 'i') }},
+            {city: city, 'phone':{ $regex: new RegExp(search, 'i') }}
+          ]
+        }).limit(limit)
+      } else {
+        return [{init: 'initial request'}]
+      }
     }
   },
   Mutation: {
