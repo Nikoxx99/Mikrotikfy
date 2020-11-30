@@ -127,9 +127,9 @@ export default {
       this.modal = true
       this.online = false
       this.loading = true
-      this.$apollo.mutate({
-        mutation: gql`mutation ($id: ID, $code: String){
-          getClientStatus(id: $id, code: $code){
+      this.$apollo.query({
+        query: gql`query ($id: ID){
+          ClientStatus(id: $id){
             status
             address
             mikrotik
@@ -141,21 +141,20 @@ export default {
           }
         }`,
         variables: {
-          id: this.clientid,
-          code: this.code
+          id: this.clientid
         }
       }).then((input) => {
-        const status = input.data.getClientStatus.status
+        const status = input.data.ClientStatus.status
         if (status) {
           this.loading = false
-          this.address = input.data.getClientStatus.address
-          this.mikrotik = input.data.getClientStatus.mikrotik
-          this.mac_address = input.data.getClientStatus.mac_address
-          this.uptime = input.data.getClientStatus.uptime
-          this.offlineTime = input.data.getClientStatus.offlineTime
-          this.download = input.data.getClientStatus.download
-          this.upload = input.data.getClientStatus.upload
-          if (input.data.getClientStatus.address) {
+          this.address = input.data.ClientStatus.address
+          this.mikrotik = input.data.ClientStatus.mikrotik
+          this.mac_address = input.data.ClientStatus.mac_address
+          this.uptime = input.data.ClientStatus.uptime
+          this.offlineTime = input.data.ClientStatus.offlineTime
+          this.download = input.data.ClientStatus.download
+          this.upload = input.data.ClientStatus.upload
+          if (input.data.ClientStatus.address) {
             this.loading = false
             this.clientExists = true
             this.online = true

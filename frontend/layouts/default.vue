@@ -70,7 +70,7 @@
     </v-app-bar>
     <v-main>
       <v-container fluid>
-        <!-- <nuxt /> -->
+        <nuxt />
       </v-container>
     </v-main>
     <v-footer

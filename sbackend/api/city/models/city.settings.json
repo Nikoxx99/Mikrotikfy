@@ -15,8 +15,8 @@
       "type": "string"
     },
     "clients": {
-      "via": "city",
-      "collection": "client"
+      "collection": "client",
+      "via": "city"
     },
     "color": {
       "type": "string"
@@ -27,15 +27,6 @@
     },
     "ip": {
       "type": "json"
-    },
-    "clientCount": {
-      "type": "integer"
-    },
-    "clientActiveCount": {
-      "type": "integer"
-    },
-    "clientDisabledCount": {
-      "type": "integer"
     }
   }
 }

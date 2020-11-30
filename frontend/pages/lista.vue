@@ -70,7 +70,7 @@
                       v-model="props.item.plan"
                       item-text="name"
                       item-value="id"
-                      :items="Plans"
+                      :items="plans"
                       return-object
                       single-line
                       label="Plan"
@@ -311,6 +311,51 @@ export default {
   },
   middleware: ['defaultCity', 'authenticated'],
   apollo: {
+    city () {
+      return {
+        query: gql`
+        query($city: ID!) {
+          city(id: $city){
+            name
+            color
+            clients (start: 0, limit: 50){
+              _id
+              code
+              name
+              dni
+              address
+              neighborhood{
+                id
+                name
+              }
+              city{
+                id
+                name
+              }
+              phone
+              plan{
+                id
+                name
+              }
+              technology{
+                id
+                name
+              }
+              wifi_ssid
+              wifi_password
+              mac_address
+              comment
+              createdAt
+              newModel
+            }
+          }
+        }
+      `,
+        variables: {
+          city: this.$route.query.city
+        }
+      }
+    },
     plans () {
       return {
         query: gql`
@@ -334,23 +379,6 @@ export default {
       `,
         variables: {
           city: this.$route.query.city
-        }
-      }
-    },
-    city () {
-      return {
-        query: gql`
-        query($city: String, $start: Int, $limit: Int) {
-          city(id: $city){
-            name
-            color
-          }
-        }
-      `,
-        variables: {
-          city: this.$route.query.city,
-          start: 0,
-          limit: 50
         }
       }
     },

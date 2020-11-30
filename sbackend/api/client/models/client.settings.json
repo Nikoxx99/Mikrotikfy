@@ -40,8 +40,8 @@
       "via": "clients"
     },
     "city": {
-      "model": "city",
-      "via": "clients"
+      "via": "clients",
+      "model": "city"
     },
     "plan": {
       "model": "plan",

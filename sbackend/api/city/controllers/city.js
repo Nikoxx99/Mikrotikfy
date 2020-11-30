@@ -19,13 +19,13 @@ module.exports = {
           port: 8087
         })
         await conn.connect()
-        const result1 = await conn.write('/ppp/active/print', [
+        const result = await conn.write('/ppp/active/print', [
           '=.proplist=name',
         ])
         conn.close()
-        cityActiveClients.push(result1)
+        cityActiveClients.push(result)
       }
-      return cityActiveClients[0]
+      return cityActiveClients[0].concat(cityActiveClients[1])
     } else {
       const conn = new RouterOSAPI({
         host: cityIpArray[0],
