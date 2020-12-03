@@ -565,7 +565,7 @@ export default {
             this.totalClients = newClients.length
             this.dataTable = newClients
             this.isPaginationActive = false
-            this.activeClients(true)
+            this.activeClients(false)
             this.refreshLoading = false
           }
         })
