@@ -384,7 +384,7 @@ export default {
         variables: {
           city: parseInt(this.$route.query.city, 10),
           startIndex: 0,
-          limit: 50
+          limit: 25
         }
       }
     },
@@ -440,7 +440,7 @@ export default {
       key: 0,
       page: 1,
       pageCount: 0,
-      itemsPerPage: 50,
+      itemsPerPage: 25,
       searchClient: '',
       totalClients: 0,
       currentCity: 'Mariquita',
@@ -507,9 +507,11 @@ export default {
   watch: {
     // eslint-disable-next-line object-shorthand
     searchClient: function () {
-      this.debouncedGetAnswer()
-      if (!this.searchClient) {
-        this.clientApiCall()
+      if (this.searchClient.length > 3 || !this.searchClient) {
+        this.debouncedGetAnswer()
+        if (!this.searchClient) {
+          this.clientApiCall()
+        }
       }
     },
     params: {
@@ -548,12 +550,12 @@ export default {
   methods: {
     async getClientBySearch () {
       const search = this.searchClient
-      if (this.searchClient) {
+      if (search || search.length > 4) {
         await this.$apollo.queries.SearchClient.fetchMore({
         // New variables
           variables: {
             search,
-            limit: 1000,
+            limit: 100,
             city: parseInt(this.$route.query.city, 10)
           },
           // Transform the previous result with new data
