@@ -4,7 +4,7 @@
 
 <script>
 export default {
-  middleware: 'defaultCity'
+  middleware: ['defaultCity', 'authenticated']
 }
 </script>
 
