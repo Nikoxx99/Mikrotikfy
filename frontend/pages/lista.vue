@@ -42,7 +42,7 @@
               :page.sync="page"
               :options.sync="options"
               :loading="loadingDataTable"
-              no-data-text="No hay informacion para mostrar aun..."
+              no-data-text="No hay resultados a la busqueda..."
               loading-text="Cargando información de clientes..."
               dense
               hide-default-footer
@@ -257,7 +257,7 @@
       v-model="snack"
       :timeout="3000"
       :color="snackColor"
-      top
+      bottom
       vertical
     >
       {{ snackText }}
@@ -272,7 +272,7 @@
       v-model="editSnack"
       :timeout="3000"
       color="yellow darken-4"
-      top
+      bottom
       vertical
     >
       {{ editSnackText }}
