@@ -741,8 +741,8 @@ export default {
         }
       }).then((input) => {
         this.snack = true
-        this.snackColor = 'success'
-        this.snackText = 'Cambio de plan exitoso'
+        this.snackColor = 'info'
+        this.snackText = 'Cambio de plan exitoso!'
       }).catch((error) => {
         this.snack = true
         this.snackColor = 'red'
