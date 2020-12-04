@@ -65,31 +65,31 @@ export const resolvers = {
     },
     SearchClient: async (_, { search, limit, city }) => {
       if (search) {
-        const neighborhood = await Neighborhood.find({'name': { $regex: new RegExp(search, 'i') }})
+        const neighborhood = await Neighborhood.find({ 'name': { $regex: new RegExp(search, 'i') } })
         if (neighborhood.length > 0) {
           return await Client.find({
-            $or:[
-              {city: city, 'code':{ $regex: new RegExp(search, 'i') }},
-              {city: city, 'name':{ $regex: new RegExp(search, 'i') }},
-              {city: city, 'address':{ $regex: new RegExp(search, 'i') }},
-              {city: city, 'neighborhood': neighborhood[0].id},
-              {city: city, 'dni':{ $regex: new RegExp(search, 'i') }},
-              {city: city, 'phone':{ $regex: new RegExp(search, 'i') }}
+            $or: [
+              { city: city, 'code': { $regex: new RegExp(search, 'i') } },
+              { city: city, 'name': { $regex: new RegExp(search, 'i') } },
+              { city: city, 'address': { $regex: new RegExp(search, 'i') } },
+              { city: city, 'neighborhood': neighborhood[0].id },
+              { city: city, 'dni': { $regex: new RegExp(search, 'i') } },
+              { city: city, 'phone': { $regex: new RegExp(search, 'i') } }
             ]
           }).limit(limit)
         } else {
           return await Client.find({
-            $or:[
-              {city: city, 'code':{ $regex: new RegExp(search, 'i') }},
-              {city: city, 'name':{ $regex: new RegExp(search, 'i') }},
-              {city: city, 'address':{ $regex: new RegExp(search, 'i') }},
-              {city: city, 'dni':{ $regex: new RegExp(search, 'i') }},
-              {city: city, 'phone':{ $regex: new RegExp(search, 'i') }}
+            $or: [
+              { city: city, 'code': { $regex: new RegExp(search, 'i') } },
+              { city: city, 'name': { $regex: new RegExp(search, 'i') } },
+              { city: city, 'address': { $regex: new RegExp(search, 'i') } },
+              { city: city, 'dni': { $regex: new RegExp(search, 'i') } },
+              { city: city, 'phone': { $regex: new RegExp(search, 'i') } }
             ]
           }).limit(limit)
         }
       } else {
-        return [{init: 'initial request'}]
+        return [{ init: 'initial request' }]
       }
     }
   },
@@ -147,15 +147,26 @@ export const resolvers = {
         var removeActive = true
       }
       const newCity2 = '191.102.86.54'
-      const res = await Client.updateOne({ _id: id }, input, { multi: false })
-      const mkRes = await mkSetClientPlanInformation(newCity, { newPlan, dni, code, model, comment, removeActive })
-      const mkRes2 = await mkSetClientPlanInformation(newCity2, { newPlan, dni, code, model, comment, removeActive })
-      await mkSetComment(newCity, { newPlan, dni, code, model, comment })
-      await mkSetComment(newCity2, { newPlan, dni, code, model, comment })
-      if (res && mkRes && mkRes2) {
-        return simpleResponse(true, 'Edit Client', 'Client Edited Successfuly')
+      if (newCity === '191.102.86.50') {
+        const res = await Client.updateOne({ _id: id }, input, { multi: false })
+        const mkRes = await mkSetClientPlanInformation(newCity, { newPlan, dni, code, model, comment, removeActive })
+        const mkRes2 = await mkSetClientPlanInformation(newCity2, { newPlan, dni, code, model, comment, removeActive })
+        await mkSetComment(newCity, { newPlan, dni, code, model, comment })
+        await mkSetComment(newCity2, { newPlan, dni, code, model, comment })
+        if (res && mkRes && mkRes2) {
+          return simpleResponse(true, 'Edit Client', 'Client Edited Successfuly')
+        } else {
+          return simpleResponse(false, 'Edit Client', 'Error Editing Client')
+        }
       } else {
-        return simpleResponse(false, 'Edit Client', 'Error Editing Client')
+        const res = await Client.updateOne({ _id: id }, input, { multi: false })
+        const mkRes = await mkSetClientPlanInformation(newCity, { newPlan, dni, code, model, comment, removeActive })
+        await mkSetComment(newCity, { newPlan, dni, code, model, comment })
+        if (res && mkRes) {
+          return simpleResponse(true, 'Edit Client', 'Client Edited Successfuly')
+        } else {
+          return simpleResponse(false, 'Edit Client', 'Error Editing Client')
+        }
       }
     },
     editClientPlan: async (_, { input }) => {
@@ -177,13 +188,23 @@ export const resolvers = {
 
       const removeActive = true
       const newCity2 = '191.102.86.54'
-      const res = await Client.updateOne({ _id: id }, { plan: savePlan }, { multi: false })
-      const mkRes = await mkSetClientPlanInformation(newCity, { newPlan, dni, code, model, removeActive })
-      const mkRes2 = await mkSetClientPlanInformation(newCity2, { newPlan, dni, code, model, removeActive })
-      if (res && mkRes && mkRes2) {
-        return simpleResponse(true, 'Edit Client Plan', 'Client Plan Edited Successfuly')
+      if (newCity === '191.102.86.50') {
+        const res = await Client.updateOne({ _id: id }, { plan: savePlan }, { multi: false })
+        const mkRes = await mkSetClientPlanInformation(newCity, { newPlan, dni, code, model, removeActive })
+        const mkRes2 = await mkSetClientPlanInformation(newCity2, { newPlan, dni, code, model, removeActive })
+        if (res && mkRes && mkRes2) {
+          return simpleResponse(true, 'Edit Client Plan', 'Client Plan Edited Successfuly')
+        } else {
+          return simpleResponse(false, 'Edit Client Plan', 'Error Editing Client Plan')
+        }
       } else {
-        return simpleResponse(false, 'Edit Client Plan', 'Error Editing Client Plan')
+        const res = await Client.updateOne({ _id: id }, { plan: savePlan }, { multi: false })
+        const mkRes = await mkSetClientPlanInformation(newCity, { newPlan, dni, code, model, removeActive })
+        if (res && mkRes) {
+          return simpleResponse(true, 'Edit Client Plan', 'Client Plan Edited Successfuly')
+        } else {
+          return simpleResponse(false, 'Edit Client Plan', 'Error Editing Client Plan')
+        }
       }
     },
     deleteClient: async (_, { id }) => {
@@ -194,12 +215,21 @@ export const resolvers = {
       const client = search[0].code
       const deleteEpisode = await Client.findByIdAndDelete(id)
       const newCity2 = '191.102.86.54'
-      const delMikrotik = await mkDeleteClient(newCity, { client })
-      const delMikrotik2 = await mkDeleteClient(newCity2, { client })
-      if (deleteEpisode && delMikrotik && delMikrotik2) {
-        return simpleResponse(true, 'Delete Client', 'Client deleted successfully.')
+      if (newCity === '191.102.86.50') {
+        const delMikrotik = await mkDeleteClient(newCity, { client })
+        const delMikrotik2 = await mkDeleteClient(newCity2, { client })
+        if (deleteEpisode && delMikrotik && delMikrotik2) {
+          return simpleResponse(true, 'Delete Client', 'Client deleted successfully.')
+        } else {
+          return simpleResponse(false, 'Delete Client', 'Error deleting Client.')
+        }
       } else {
-        return simpleResponse(false, 'Delete Client', 'Error deleting Client.')
+        const delMikrotik = await mkDeleteClient(newCity, { client })
+        if (deleteEpisode && delMikrotik) {
+          return simpleResponse(true, 'Delete Client', 'Client deleted successfully.')
+        } else {
+          return simpleResponse(false, 'Delete Client', 'Error deleting Client.')
+        }
       }
     },
     getClientStatus: async (_, { id, code }) => {
@@ -440,23 +470,23 @@ export const resolvers = {
       return Client.find({ city: id }).countDocuments()
     },
     clientActiveCount({ id }) {
-      return Client.find({ 
-        $or: [ 
-          {city: id, plan: 1 },
-          {city: id, plan: 2 },
-          {city: id, plan: 3 },
-          {city: id, plan: 4 },
-          {city: id, plan: 5 },
-          {city: id, plan: 6 },
-        ] 
+      return Client.find({
+        $or: [
+          { city: id, plan: 1 },
+          { city: id, plan: 2 },
+          { city: id, plan: 3 },
+          { city: id, plan: 4 },
+          { city: id, plan: 5 },
+          { city: id, plan: 6 },
+        ]
       }).countDocuments()
     },
     clientDisabledCount({ id }) {
-      return Client.find({ 
-        $or: [ 
-          {city: id, plan: 7 },
-          {city: id, plan: 8 },
-        ] 
+      return Client.find({
+        $or: [
+          { city: id, plan: 7 },
+          { city: id, plan: 8 },
+        ]
       }).countDocuments()
     },
     neighborhoods({ id }) {
