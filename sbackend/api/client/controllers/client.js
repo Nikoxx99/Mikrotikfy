@@ -1,10 +1,10 @@
 'use strict';
-
 /**
  * Read the documentation (https://strapi.io/documentation/v3.x/concepts/controllers.html#core-controllers)
  * to customize this controller
  */
 const RouterOSAPI = require('node-routeros').RouterOSAPI
+const { mkSetClientPlanInformation } = require('../../../mikrotik/functions')
 module.exports = {
   async count(ctx) {
     return await strapi.services.client.count({city: ctx.query._city});
@@ -17,7 +17,6 @@ module.exports = {
   },
   async searchClient (ctx) {
     const search = ctx.query._search
-    const city = ctx.query._city
     if (search) {
       const neighborhood = await strapi.services.neighborhood.find({'name': { $regex: new RegExp(search, 'i') }})
       return await strapi.services.client.findClient({
@@ -33,6 +32,57 @@ module.exports = {
     } else {
       return [{init: 'initial request'}]
     }
+  },
+  async editClientPlan(ctx) {
+    const id = ctx.request.body.id
+    const newClientPlanSearch = ctx.request.body.plan
+    const searchPlan = await strapi.services.plan.find({id: newClientPlanSearch})
+    const newClientPlan = searchPlan[0].mikrotik_name
+
+    const search = await strapi.services.client.find({id: id})
+    const clientObj = search[0]
+    const dni = clientObj.dni
+    const code = clientObj.code
+    const model = clientObj.newModel
+    const removeActive = true
+    const reqCityIpArray = clientObj.city.ip
+    const successfulMikrotikResponses = []
+
+    if (reqCityIpArray.length > 1) {
+      //for loop
+      for (let i = 0; i < reqCityIpArray.length; i++) {
+        const mikrotikHost = reqCityIpArray[i]
+        const res = await mkSetClientPlanInformation(mikrotikHost, { newClientPlan, dni, code, model, removeActive })
+        successfulMikrotikResponses.push(res)
+      }
+      //INPROVE: detect if the array elements are true or false
+      if (successfulMikrotikResponses.length === reqCityIpArray.length) {
+        return true
+      } else {
+        return false
+      }
+    } else {
+      //normal req
+      const mikrotikHost = reqCityIpArray[0]
+      const res = await mkSetClientPlanInformation(mikrotikHost, { newClientPlan, dni, code, model, removeActive })
+      if (res){
+        return true
+      } else {
+        return false
+      }
+    }
+
+    const searchCity = search[0].city
+    const city = await strapi.services.city.find({})
+    const newCity = city[0].ip
+
+    // const plan = await Plan.find({ id: searchPlan })
+    // const savePlan = plan[0].id
+    // const newPlan = plan[0].mikrotik_name
+
+    // const dni = search[0].dni
+    // const model = search[0].newModel
+    
   },
   async getClientStatus(ctx) {
     const search = await strapi.services.client.findOne({ id: ctx.query.id })

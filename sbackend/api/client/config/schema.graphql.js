@@ -37,6 +37,9 @@ module.exports = {
     clientCountDisable(city: String): Int
     searchClient(search: String, limit: Int, city: String): [SearchClient]
   `,
+  mutation: `
+    editClientPlan(id: String, plan: String): Boolean
+  `,
   type: {
     ActiveClientList: {
       name: 'returns the list of all active clients'
@@ -65,5 +68,11 @@ module.exports = {
         resolver: 'application::client.client.searchClient'
       }
     },
+    Mutation: {
+      editClientPlan: {
+        description: 'Edit client plan',
+        resolver: 'application::client.client.editClientPlan',
+      }
+    }
   },
 };

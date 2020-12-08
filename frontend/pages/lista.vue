@@ -58,7 +58,7 @@
                   large
                   cancel-text="Cancelar"
                   save-text="Guardar"
-                  @save="save(props.item._id, props.item.plan.id, props.item.newModel)"
+                  @save="save(props.item._id, props.item.plan.id)"
                   @cancel="cancel"
                   @close="close"
                 >
@@ -537,9 +537,11 @@ export default {
   watch: {
     // eslint-disable-next-line object-shorthand
     searchClientInput: function () {
-      this.debouncedGetAnswer()
-      if (!this.searchClientInput) {
-        this.clientApiCall()
+      if (this.searchClientInput.length > 3 || !this.searchClientInput) {
+        this.debouncedGetAnswer()
+        if (!this.searchClientInput) {
+          this.clientApiCall()
+        }
       }
     },
     params: {
@@ -561,12 +563,11 @@ export default {
   methods: {
     async getClientBySearch () {
       const search = this.searchClientInput
-      if (this.searchClientInput) {
+      if (search || search.length > 3) {
         await this.$apollo.queries.searchClient.fetchMore({
         // New variables
           variables: {
             search,
-            limit: 1000,
             city: this.$route.query.city
           },
           // Transform the previous result with new data
@@ -624,7 +625,7 @@ export default {
         total
       }
     },
-    async getClients (startIndex, limit) {
+    async getClients (start, limit) {
       if (this.city.clients < 1) {
         return {}
       }
@@ -732,25 +733,17 @@ export default {
       this.snackText = 'Cliente creado con éxito!'
       this.snackColor = 'info'
     },
-    save (clientId, newPlan, newModel) {
+    save (clientId, newPlan) {
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: EditClientPlanInput){
-          editClientPlan(input: $input){
-            success
-            errors{
-              path
-              message
-            }
-          }
+        mutation: gql`mutation ($id: String, $plan: String){
+          editClientPlan(id: $id, plan: $plan)
         }`,
         variables: {
-          input: {
-            id: clientId,
-            plan: newPlan,
-            model: newModel
-          }
+          id: clientId,
+          plan: newPlan,
         }
       }).then((input) => {
+        console.log(input)
         this.snack = true
         this.snackColor = 'success'
         this.snackText = 'Cambio de plan exitoso'
