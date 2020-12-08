@@ -318,7 +318,7 @@ export default {
           city(id: $city){
             name
             color
-            clients (start: 0, limit: 50){
+            clients (start: 0, limit: 25){
               _id
               code
               name
@@ -470,7 +470,7 @@ export default {
       key: 0,
       page: 1,
       pageCount: 0,
-      itemsPerPage: 50,
+      itemsPerPage: 25,
       searchClientInput: '',
       totalClients: 0,
       currentCity: 'Mariquita',
@@ -577,7 +577,7 @@ export default {
             this.totalClients = newClients.length
             this.dataTable = newClients
             this.isPaginationActive = false
-            this.activeClients()
+            this.activeClients(true)
             this.refreshLoading = false
           }
         })

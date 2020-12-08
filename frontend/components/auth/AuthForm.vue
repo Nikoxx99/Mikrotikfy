@@ -125,6 +125,8 @@ export default {
           Cookie.set('authToken', auth.accessToken)
           if (this.username === 'nohora') {
             window.location.href = '/lista?city=2'
+          } else if (this.username === 'natalia') {
+            window.location.href = '/lista?city=2'
           } else {
             window.location.href = '/lista?city=1'
           }
