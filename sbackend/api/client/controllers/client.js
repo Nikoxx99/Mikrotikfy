@@ -70,19 +70,7 @@ module.exports = {
       } else {
         return false
       }
-    }
-
-    const searchCity = search[0].city
-    const city = await strapi.services.city.find({})
-    const newCity = city[0].ip
-
-    // const plan = await Plan.find({ id: searchPlan })
-    // const savePlan = plan[0].id
-    // const newPlan = plan[0].mikrotik_name
-
-    // const dni = search[0].dni
-    // const model = search[0].newModel
-    
+    }  
   },
   async getClientStatus(ctx) {
     const search = await strapi.services.client.findOne({ id: ctx.query.id })
