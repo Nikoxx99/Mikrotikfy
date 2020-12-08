@@ -33,6 +33,7 @@
     </v-navigation-drawer>
     <v-app-bar
       app
+      :src="bg"
     >
       <div v-if="hasPendingChanges">
         <svg height="13" width="20" style="position:absolute;top:12px;left:43px;">
@@ -130,10 +131,17 @@ export default {
       miniVariant: false,
       right: true,
       rightDrawer: false,
-      title: 'ARNOProducciones SAS'
+      title: 'ARNOProducciones SAS',
+      bg: ''
     }
   },
   mounted () {
+    const date = new Date()
+    const month = date.getMonth()
+    console.log(month)
+    if (month === 11) {
+      this.bg = 'cbg.jpg'
+    }
     this.$apollo.query({
       query: gql`
       query($limit: Int) {
