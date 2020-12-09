@@ -571,13 +571,14 @@ export default {
             city: this.$route.query.city
           },
           // Transform the previous result with new data
-          updateQuery: (previousResult, { fetchMoreResult }) => {
+          updateQuery: async (previousResult, { fetchMoreResult }) => {
             const newClients = fetchMoreResult.searchClient
             this.itemsPerPage = newClients.length
             this.totalClients = newClients.length
             this.dataTable = newClients
+            console.log('dataTable updated')
             this.isPaginationActive = false
-            this.activeClients(true)
+            await this.activeClients(false)
             this.refreshLoading = false
           }
         })
@@ -653,7 +654,6 @@ export default {
     },
     async activeClients (refetch) {
       this.refreshLoading = true
-      this.online_users = this.ActiveClients.length
       if (refetch) {
         await this.$apollo.queries.ActiveClients.refetch()
         this.refreshLoading = false
@@ -662,6 +662,7 @@ export default {
         // eslint-disable-next-line eqeqeq
         const search = this.ActiveClients.find(c => c.name == this.dataTable[i].code)
         if (search) {
+          console.log('First client status updated')
           this.dataTable[i].status = 'green'
         } else {
           // eslint-disable-next-line eqeqeq
