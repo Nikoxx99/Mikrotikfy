@@ -576,7 +576,6 @@ export default {
             this.itemsPerPage = newClients.length
             this.totalClients = newClients.length
             this.dataTable = newClients
-            console.log('dataTable updated')
             this.isPaginationActive = false
             await this.activeClients(false)
             this.refreshLoading = false
@@ -662,7 +661,6 @@ export default {
         // eslint-disable-next-line eqeqeq
         const search = this.ActiveClients.find(c => c.name == this.dataTable[i].code)
         if (search) {
-          console.log('First client status updated')
           this.dataTable[i].status = 'green'
         } else {
           // eslint-disable-next-line eqeqeq
