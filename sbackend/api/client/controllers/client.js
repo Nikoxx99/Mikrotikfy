@@ -4,7 +4,7 @@
  * to customize this controller
  */
 const { sanitizeEntity } = require('strapi-utils');
-const { mkCreateClient, mkSetClientPlanInformation, mkClientStatus, mkGetComment, mkSetComment } = require('../../../mikrotik/functions')
+const { mkCreateClient, mkDeleteClient, mkSetClientPlanInformation, mkClientStatus, mkGetComment, mkSetComment } = require('../../../mikrotik/functions')
 module.exports = {
   async create(ctx) {
     let entity;
@@ -64,6 +64,28 @@ module.exports = {
       const mikrotikHost = reqCityIpArray[0]
       await mkSetComment(mikrotikHost, dni, code, model, comment)
     }
+    return sanitizeEntity(entity, { model: strapi.models.client });
+  },
+  async delete(ctx){
+    const { id } = ctx.params;
+    const search = await strapi.services.client.find({id: id})
+    const clientObj = search[0]
+    const dni = clientObj.dni
+    const code = clientObj.code
+    const model = clientObj.newModel
+    const reqCityIpArray = clientObj.city.ip
+    if (reqCityIpArray.length > 1) {
+      const successfulMikrotikResponses = []
+      for (let i = 0; i < reqCityIpArray.length; i++){
+        const mikrotikHost = reqCityIpArray[i]
+        const res = await mkDeleteClient(mikrotikHost, dni, code, model)
+        successfulMikrotikResponses.push(res)
+      }
+    } else {
+      const mikrotikHost = reqCityIpArray[0]
+      await mkDeleteClient(mikrotikHost, dni, code, model)
+    }
+    const entity = await strapi.services.client.delete({ id });
     return sanitizeEntity(entity, { model: strapi.models.client });
   },
   async count(ctx) {
