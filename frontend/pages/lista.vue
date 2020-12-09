@@ -571,13 +571,13 @@ export default {
             city: this.$route.query.city
           },
           // Transform the previous result with new data
-          updateQuery: (previousResult, { fetchMoreResult }) => {
+          updateQuery: async (previousResult, { fetchMoreResult }) => {
             const newClients = fetchMoreResult.searchClient
             this.itemsPerPage = newClients.length
             this.totalClients = newClients.length
             this.dataTable = newClients
             this.isPaginationActive = false
-            this.activeClients(true)
+            await this.activeClients(true)
             this.refreshLoading = false
           }
         })

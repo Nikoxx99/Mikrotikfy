@@ -6,7 +6,11 @@
  */
 
 module.exports = {
-  async findClient (params) {
-    return await strapi.query('client').model.find(params)
+  find (params) {
+    return strapi.query('client').model.find(params)
+    .populate('city')
+    .populate('plan')
+    .populate('neighborhood')
+    .populate('technology')
   },
 };
