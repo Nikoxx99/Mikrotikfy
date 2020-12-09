@@ -40,8 +40,8 @@
       "via": "clients"
     },
     "city": {
-      "via": "clients",
-      "model": "city"
+      "model": "city",
+      "via": "clients"
     },
     "plan": {
       "model": "plan",
@@ -65,6 +65,9 @@
     },
     "phone": {
       "type": "string"
+    },
+    "sendToMikrotik": {
+      "type": "boolean"
     }
   }
 }

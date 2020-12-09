@@ -235,7 +235,7 @@ export default {
       return {
         query: gql`
         query{
-          Cities{
+          cities{
             id
             name
           }
@@ -247,7 +247,7 @@ export default {
       return {
         query: gql`
         query{
-          Neighborhoods{
+          neighborhoods{
             id
             name
           }
@@ -259,7 +259,7 @@ export default {
       return {
         query: gql`
         query{
-          Plans{
+          plans{
             id
             name
           }
@@ -271,7 +271,7 @@ export default {
       return {
         query: gql`
         query{
-          Technologies{
+          technologies{
             id
             name
           }
@@ -284,29 +284,28 @@ export default {
     return {
       valid: false,
       Client: {
-        code: '',
-        name: '',
-        dni: '',
-        address: '',
+        code: '13000',
+        name: 'TEST',
+        dni: '12312313',
+        address: 'CARRERA 1 # 1 1',
         neighborhood: {
           id: 0,
           name: ''
         },
         city: '',
-        phone: '',
+        phone: '123123123',
         plan: {
           id: 0,
           name: ''
         },
-        wifi_ssid: '',
-        wifi_password: '',
+        wifi_ssid: '231312',
+        wifi_password: '131231',
         technology: {
           id: 0,
           name: ''
         },
-        mac_address: '',
-        comment: '',
-        created_at: '',
+        mac_address: '213131',
+        comment: '131231',
         newModel: 1,
         sendToMikrotik: true
       },
@@ -360,39 +359,29 @@ export default {
               name: this.Client.name,
               dni: this.Client.dni,
               address: this.Client.address,
-              neighborhood: {
-                id: this.Client.neighborhood.id,
-                name: this.Client.neighborhood.name
-              },
+              neighborhood: this.Client.neighborhood.id,
               city: this.Client.city,
               phone: this.Client.phone,
-              plan: {
-                id: this.Client.plan.id,
-                name: this.Client.plan.name
-              },
+              plan: this.Client.plan.id,
               wifi_ssid: this.Client.wifi_ssid,
               wifi_password: this.Client.wifi_password,
-              technology: {
-                id: this.Client.technology.id,
-                name: this.Client.technology.name
-              },
+              technology: this.Client.technology.id,
               mac_address: this.Client.mac_address,
               comment: this.Client.comment,
-              created_at: String(Date.now()),
               newModel: this.Client.newModel,
               sendToMikrotik: this.Client.sendToMikrotik
             }
           }
         }
       }).then((input) => {
-        if (input.data.createClient.code) {
+        if (input.data.createClient.code !== '0') {
           this.$emit('createClient', this.Client)
           this.$emit('createClientDialog', false)
           this.$emit('createClientSnack', true)
         } else {
           this.alertBox = true
           this.alertBoxColor = 'red darken-4'
-          this.createdMessage = input.data.createClient.errors[0].message
+          this.createdMessage = 'Error al crear el cliente. Reporta esto al gestor web'
           this.isSubmitting = false
         }
       }).catch((error) => {

@@ -1,5 +1,32 @@
 /* eslint-disable no-undef */
 const RouterOSAPI = require('node-routeros').RouterOSAPI
+module.exports.mkCreateClient = async function (mikrotikHost, plan, input, cityName,  planName, neightborhood, technology) {
+  console.log(mikrotikHost, plan, input)
+  const conn = new RouterOSAPI({
+    host: mikrotikHost,
+    user: 'API_ARNOP',
+    password: strapi.config.get('server.admin.mikrotik.secret', 'null'),
+    port: 8087
+  })
+  const comment = `${input.code} ${input.name} ${input.dni} ${input.address} ${neightborhood} ${cityName} ${input.phone} ${planName} ${input.wifi_ssid} ${input.wifi_password} ${technology} ${input.mac_address} ${input.comment}`
+  await conn.connect().then(() => {
+    console.log('Connected to Mikrotik Successfully >>>')
+  }).then(() => {
+    conn.write('/ppp/secret/add', [
+      '=name=' + input.code,
+      '=password=MAR' + input.code,
+      '=profile=' + plan,
+      '=service=pppoe',
+      '=comment=' + comment,
+    ]).then(() => {
+      conn.close()
+      console.log('Connection Closed <<<')
+    })
+  }).catch((err) => {
+    conn.close()
+    console.log(err)
+  })
+}
 module.exports.mkSetClientPlanInformation = async function (mikrotikHost, input) {
   const conn = new RouterOSAPI({
     host: mikrotikHost,
