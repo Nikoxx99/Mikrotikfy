@@ -3,9 +3,34 @@
  * Read the documentation (https://strapi.io/documentation/v3.x/concepts/controllers.html#core-controllers)
  * to customize this controller
  */
-const RouterOSAPI = require('node-routeros').RouterOSAPI
-const { mkSetClientPlanInformation, mkClientStatus } = require('../../../mikrotik/functions')
+const { sanitizeEntity } = require('strapi-utils');
+const { mkSetClientPlanInformation, mkClientStatus, mkGetComment, mkSetComment } = require('../../../mikrotik/functions')
 module.exports = {
+  async update(ctx) {
+    const { id } = ctx.params;
+    let entity;
+    entity = await strapi.services.client.update({ id }, ctx.request.body);
+    
+    const search = await strapi.services.client.find({id: id})
+    const clientObj = search[0]
+    const dni = clientObj.dni
+    const code = clientObj.code
+    const model = clientObj.newModel
+    const comment = ctx.request.body.comment
+    const reqCityIpArray = clientObj.city.ip
+    if (reqCityIpArray.length > 1) {
+      const successfulMikrotikResponses = []
+      for (let i = 0; i < reqCityIpArray.length; i++){
+        const mikrotikHost = reqCityIpArray[i]
+        const res = await mkSetComment(mikrotikHost, dni, code, model, comment)
+        successfulMikrotikResponses.push(res)
+      }
+    } else {
+      const mikrotikHost = reqCityIpArray[0]
+      await mkSetComment(mikrotikHost, dni, code, model, comment)
+    }
+    return sanitizeEntity(entity, { model: strapi.models.client });
+  },
   async count(ctx) {
     return await strapi.services.client.count({city: ctx.query._city});
   },
@@ -14,6 +39,29 @@ module.exports = {
   },
   async countDisable(ctx) {
     return await strapi.services.client.count({ city: ctx.query._city, active: false } )
+  },
+  async getClientComment (ctx) {
+    const id = ctx.query._id
+    const search = await strapi.services.client.find({ _id: id })
+    const clientObj = search[0]
+    const code = clientObj.code
+    const dni = clientObj.dni
+    const model = clientObj.newModel
+
+    const reqCityIpArray = clientObj.city.ip
+    if (reqCityIpArray.length > 1) {
+      const successfulMikrotikResponses = []
+      for (let i = 0; i < reqCityIpArray.length; i++){
+        const mikrotikHost = reqCityIpArray[i]
+        const res = await mkGetComment(mikrotikHost, dni, code, model)
+        successfulMikrotikResponses.push(res)
+      }
+      return successfulMikrotikResponses[0]
+    } else {
+      const mikrotikHost = reqCityIpArray[0]
+      const res = await mkGetComment(mikrotikHost, dni, code, model)
+      return res
+    }
   },
   async searchClient (ctx) {
     const search = ctx.query._search

@@ -58,7 +58,7 @@
             v-model="Client.neighborhood"
             item-text="name"
             item-value="id"
-            :items="Neighborhoods"
+            :items="neighborhoods"
             return-object
             label="Barrio"
             outlined
@@ -71,7 +71,7 @@
             v-model="Client.city"
             item-text="name"
             item-value="id"
-            :items="Cities"
+            :items="cities"
             return-object
             label="Ciudad"
             disabled
@@ -97,7 +97,7 @@
             v-model="Client.plan"
             item-text="name"
             item-value="id"
-            :items="Plans"
+            :items="plans"
             return-object
             label="Plan"
             outlined
@@ -132,7 +132,7 @@
             v-model="Client.technology"
             item-text="name"
             item-value="id"
-            :items="Technologies"
+            :items="technologies"
             return-object
             label="Tecnología"
             outlined
@@ -196,7 +196,7 @@
         :color="Client.citycolor"
         :loading="isSubmitting"
         :disabled="isSubmitting"
-        @click="editClient"
+        @click="updateClient"
       >
         Editar Cliente
       </v-btn>
@@ -210,11 +210,11 @@ import gql from 'graphql-tag'
 export default {
   name: 'EditForm',
   apollo: {
-    Cities () {
+    cities () {
       return {
         query: gql`
         query{
-          Cities{
+          cities{
             id
             name
           }
@@ -222,11 +222,11 @@ export default {
       `
       }
     },
-    Neighborhoods () {
+    neighborhoods () {
       return {
         query: gql`
         query{
-          Neighborhoods{
+          neighborhoods{
             id
             name
           }
@@ -234,11 +234,11 @@ export default {
       `
       }
     },
-    Plans () {
+    plans () {
       return {
         query: gql`
         query{
-          Plans{
+          plans{
             id
             name
           }
@@ -246,11 +246,11 @@ export default {
       `
       }
     },
-    Technologies () {
+    technologies () {
       return {
         query: gql`
         query{
-          Technologies{
+          technologies{
             id
             name
           }
@@ -405,15 +405,14 @@ export default {
     this.error = false
     this.commentLoading = true
     this.commentDisabled = true
-    this.$apollo.mutate({
-      mutation: gql`mutation ($id: ID, $code: String){
-        getClientComment(id: $id, code: $code){
+    this.$apollo.query({
+      query: gql`query ($id: ID){
+        getClientComment(id: $id){
           comment
         }
       }`,
       variables: {
-        id: this.Client._id,
-        code: this.Client.code
+        id: this.Client._id
       }
     }).then((input) => {
       this.commentLoading = false
@@ -432,46 +431,47 @@ export default {
     })
   },
   methods: {
-    editClient () {
+    updateClient () {
       this.isSubmitting = true
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: EditClientInput){
-          editClient(input: $input){
-            success
-            errors{
-              path
-              message
+        mutation: gql`mutation ($input: updateClientInput){
+          updateClient(input: $input){
+            client{
+              id
             }
           }
         }`,
         variables: {
           input: {
-            _id: this.Client._id,
-            code: this.Client.code,
-            name: this.Client.name,
-            dni: this.Client.dni,
-            address: this.Client.address,
-            neighborhood: this.Client.neighborhood.id,
-            city: this.Client.city.id,
-            phone: this.Client.phone,
-            plan: this.Client.plan.id,
-            technology: this.Client.technology.id,
-            wifi_ssid: this.Client.wifi_ssid,
-            wifi_password: this.Client.wifi_password,
-            mac_address: this.Client.mac_address,
-            comment: this.Client.comment,
-            operator: this.Client.operator,
-            newModel: this.Client.newModel
+            where: {
+              id: this.Client._id
+            },
+            data: {
+              code: this.Client.code,
+              name: this.Client.name,
+              dni: this.Client.dni,
+              address: this.Client.address,
+              neighborhood: this.Client.neighborhood.id,
+              phone: this.Client.phone,
+              plan: this.Client.plan.id,
+              technology: this.Client.technology.id,
+              wifi_ssid: this.Client.wifi_ssid,
+              wifi_password: this.Client.wifi_password,
+              mac_address: this.Client.mac_address,
+              comment: this.Client.comment,
+              operator: this.Client.operator,
+              newModel: this.Client.newModel
+            }
           }
         }
       }).then((input) => {
-        if (input.data.editClient.success) {
+        if (input.data.updateClient.client.id) {
           this.$emit('updateClient', this.Client)
           // window.location.reload(true)
         } else {
           this.alertBox = true
           this.alertBoxColor = 'red darken-4'
-          this.createdMessage = input.data.editClient.errors[0].message
+          this.createdMessage = input.data.updateClient.errors[0].message
           this.isSubmitting = false
         }
       }).catch((error) => {

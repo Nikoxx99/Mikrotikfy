@@ -95,7 +95,7 @@
             v-model="Client.neighborhood"
             item-text="name"
             item-value="id"
-            :items="Neighborhoods"
+            :items="neighborhoods"
             label="Barrio"
             outlined
             dense
@@ -108,7 +108,7 @@
             v-model="Client.city"
             item-text="name"
             item-value="id"
-            :items="Cities"
+            :items="cities"
             label="Ciudad"
             disabled
             outlined
@@ -133,7 +133,7 @@
             v-model="Client.plan"
             item-text="name"
             item-value="id"
-            :items="Plans"
+            :items="plans"
             label="Plan"
             outlined
             dense
@@ -170,7 +170,7 @@
             v-model="Client.technology"
             item-text="name"
             item-value="id"
-            :items="Technologies"
+            :items="technologies"
             label="Tecnología"
             outlined
             dense
@@ -231,7 +231,7 @@ export default {
     }
   },
   apollo: {
-    Cities () {
+    cities () {
       return {
         query: gql`
         query{
@@ -243,7 +243,7 @@ export default {
       `
       }
     },
-    Neighborhoods () {
+    neighborhoods () {
       return {
         query: gql`
         query{
@@ -255,7 +255,7 @@ export default {
       `
       }
     },
-    Plans () {
+    plans () {
       return {
         query: gql`
         query{
@@ -267,7 +267,7 @@ export default {
       `
       }
     },
-    Technologies () {
+    technologies () {
       return {
         query: gql`
         query{
@@ -292,7 +292,7 @@ export default {
           id: 0,
           name: ''
         },
-        city: 1,
+        city: '',
         phone: '',
         plan: {
           id: 0,
@@ -339,53 +339,53 @@ export default {
   },
   mounted () {
     if (this.$route.query.city) {
-      this.Client.city = parseInt(this.$route.query.city)
+      this.Client.city = this.$route.query.city
     }
   },
   methods: {
     createClient () {
       this.isSubmitting = !this.isSubmitting
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: ClientInput){
+        mutation: gql`mutation ($input: createClientInput){
           createClient(input: $input){
-            success
-            errors{
-              path
-              message
+            client {
+              code
             }
           }
         }`,
         variables: {
           input: {
-            code: this.Client.code,
-            name: this.Client.name,
-            dni: this.Client.dni,
-            address: this.Client.address,
-            neighborhood: {
-              id: this.Client.neighborhood.id,
-              name: this.Client.neighborhood.name
-            },
-            city: this.Client.city,
-            phone: this.Client.phone,
-            plan: {
-              id: this.Client.plan.id,
-              name: this.Client.plan.name
-            },
-            wifi_ssid: this.Client.wifi_ssid,
-            wifi_password: this.Client.wifi_password,
-            technology: {
-              id: this.Client.technology.id,
-              name: this.Client.technology.name
-            },
-            mac_address: this.Client.mac_address,
-            comment: this.Client.comment,
-            created_at: String(Date.now()),
-            newModel: this.Client.newModel,
-            sendToMikrotik: this.Client.sendToMikrotik
+            data: {
+              code: this.Client.code,
+              name: this.Client.name,
+              dni: this.Client.dni,
+              address: this.Client.address,
+              neighborhood: {
+                id: this.Client.neighborhood.id,
+                name: this.Client.neighborhood.name
+              },
+              city: this.Client.city,
+              phone: this.Client.phone,
+              plan: {
+                id: this.Client.plan.id,
+                name: this.Client.plan.name
+              },
+              wifi_ssid: this.Client.wifi_ssid,
+              wifi_password: this.Client.wifi_password,
+              technology: {
+                id: this.Client.technology.id,
+                name: this.Client.technology.name
+              },
+              mac_address: this.Client.mac_address,
+              comment: this.Client.comment,
+              created_at: String(Date.now()),
+              newModel: this.Client.newModel,
+              sendToMikrotik: this.Client.sendToMikrotik
+            }
           }
         }
       }).then((input) => {
-        if (input.data.createClient.success) {
+        if (input.data.createClient.code) {
           this.$emit('createClient', this.Client)
           this.$emit('createClientDialog', false)
           this.$emit('createClientSnack', true)

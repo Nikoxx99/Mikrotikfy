@@ -209,3 +209,66 @@ module.exports.mkClientStatus = async function (mikrotikHost, code, dni, model) 
     conn.close()
   }
 }
+module.exports.mkGetComment = async function (mikrotikHost, dni, code, model) {
+  try {
+    const conn = new RouterOSAPI({
+      host: mikrotikHost,
+      user: 'API_ARNOP',
+      password: strapi.config.get('server.admin.mikrotik.secret', 'null'),
+      port: 8087
+    })
+    await conn.connect()
+    if (model === 1) {
+      // eslint-disable-next-line no-unused-vars
+      var com1 = await conn.write('/ppp/secret/print', [
+        '=.proplist=comment',
+        '?=name=' + code
+      ])
+    } else {
+      // eslint-disable-next-line no-redeclare
+      var com1 = await conn.write('/ppp/secret/print', [
+        '=.proplist=comment',
+        '?=name=' + dni
+      ])
+    }
+    conn.close()
+    return com1[0]
+  } catch (error) {
+    conn.close()
+    return error
+  }
+}
+module.exports.mkSetComment = async function (mikrotikHost, dni, code, model, comment) {
+  const conn = new RouterOSAPI({
+    host: mikrotikHost,
+    user: 'API_ARNOP',
+    password: strapi.config.get('server.admin.mikrotik.secret', 'null'),
+    port: 8087
+  })
+  await conn.connect()
+  if (comment !== '' && comment != '0' && comment != null && comment != 'null') {
+    console.log(typeof comment)
+    if (model === 1) {
+      // eslint-disable-next-line no-unused-vars
+      var com1 = await conn.write('/ppp/secret/set', [
+        '=.id=' + code,
+        '=comment=' + comment
+      ])
+    } else {
+      // eslint-disable-next-line no-redeclare
+      var com1 = await conn.write('/ppp/secret/set', [
+        '=.id=' + dni,
+        '=comment=' + comment
+      ])
+    }
+  } else {
+    conn.close()
+    return true
+  }
+  conn.close()
+  if (com1.length > 0){
+    return true
+  } else {
+    return false
+  }
+}

@@ -29,6 +29,9 @@ module.exports = {
       created_at: String
       newModel: Int
     }
+    type ClientComment {
+      comment: String
+    }
   `,
   query: `
     ClientStatus(id: ID): ClientStatus
@@ -36,6 +39,7 @@ module.exports = {
     clientCountActive(city: String): Int
     clientCountDisable(city: String): Int
     searchClient(search: String, limit: Int, city: String): [SearchClient]
+    getClientComment(id: ID): ClientComment
   `,
   mutation: `
     editClientPlan(id: String, plan: String): Boolean
@@ -66,6 +70,10 @@ module.exports = {
       searchClient: {
         description: 'Search for a Client',
         resolver: 'application::client.client.searchClient'
+      },
+      getClientComment: {
+        description: 'Gets Client comment',
+        resolver: 'application::client.client.getClientComment'
       }
     },
     Mutation: {
