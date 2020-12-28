@@ -124,11 +124,11 @@ export default {
           Cookie.set('auth', auth)
           Cookie.set('authToken', auth.accessToken)
           if (this.username === 'nohora') {
-            window.location.href = '/lista?city=2'
+            window.location.href = '/lista?city=5fc3f0408e3de73d204cd430'
           } else if (this.username === 'natalia') {
-            window.location.href = '/lista?city=2'
+            window.location.href = '/lista?city=5fc3f0408e3de73d204cd430'
           } else {
-            window.location.href = '/lista?city=1'
+            window.location.href = '/lista?city=5f832e8fb0c43e2c64b37437'
           }
         } else {
           this.loginFailed = true

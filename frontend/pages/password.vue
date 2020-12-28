@@ -26,7 +26,7 @@
             <v-data-table
               :key="key"
               :headers="headers"
-              :items="PasswordChanges"
+              :items="passwordchanges"
               :search="search"
               :items-per-page="itemsPerPage"
               :page.sync="page"
@@ -107,11 +107,11 @@ export default {
   },
   middleware: 'authenticated',
   apollo: {
-    PasswordChanges () {
+    passwordchanges () {
       return {
         query: gql`
         query{
-          PasswordChanges(limit: 100000){
+          passwordchanges(limit: 100000){
             _id
             dni
             client {
@@ -122,11 +122,8 @@ export default {
             }
             old_password
             new_password
-            closed {
-              name
-              value
-            }
-            created_at
+            closed
+            createdAt
           }
         }
       `
@@ -186,13 +183,7 @@ export default {
     save (id, status) {
       this.$apollo.mutate({
         mutation: gql`mutation ($input: UpdatePasswordChangeInput){
-          updatePasswordChangeRequest(input: $input){
-            success
-            errors{
-              path
-              message
-            }
-          }
+          updatePasswordChangeRequest(input: $input)
         }`,
         variables: {
           input: {

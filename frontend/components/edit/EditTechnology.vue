@@ -47,16 +47,12 @@ export default {
       type: Object,
       default: () => {},
       id: {
-        type: Number,
+        type: String,
         default: 0
       },
       name: {
         type: String,
         default: ''
-      },
-      ip: {
-        type: Number,
-        default: 1
       }
     }
   },

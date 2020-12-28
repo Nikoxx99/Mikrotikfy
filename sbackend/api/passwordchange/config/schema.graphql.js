@@ -11,10 +11,21 @@ module.exports = {
       new_password: String
       closed: ClosedObject
     }
+    input UpdatePasswordChangeInput {
+      _id: ID
+      closed: ClosedObjectInput
+    }
+    input ClosedObjectInput {
+      name: String
+      value: Boolean
+    }
   `,
   query: `
     TestPasswordChange(dni: String): PasswordChangeType
     passwordchangesq(dni: String): [PasswordChangeType]
+  `,
+  mutation: `
+    updatePasswordChangeRequest(input: UpdatePasswordChangeInput): Boolean
   `,
   type: {
     TestPasswordChange: {
@@ -32,5 +43,11 @@ module.exports = {
         resolver: 'application::passwordchange.passwordchange.PasswordChangeCtrl'
       }
     },
+    Mutation: {
+      updatePasswordChangeRequest: {
+        description: 'Update passsword change request state',
+        resolver: 'application::passwordchange.passwordchange.updatePasswordChangeRequest'
+      }
+    }
   },
 };

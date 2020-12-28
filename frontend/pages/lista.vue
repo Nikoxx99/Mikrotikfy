@@ -121,7 +121,7 @@
                         outlined
                         class="mr-4 d-none d-sm-flex d-md-flex d-lg-flex d-xl-flex"
                       >
-                        En Linea: {{ online_users }}
+                        En Linea: {{ ActiveClients.length }}
                       </v-chip>
                       <v-chip
                         color="green darken-3 white--text"

@@ -55,51 +55,53 @@
               <v-card-title class="blue darken-3">
                 Ciudades
               </v-card-title>
-              <v-data-table
-                :headers="headers"
-                :items="cities"
-                class="elevation-1"
-              >
-                <template v-slot:item.color="{ item }">
-                  <svg height="13" width="20">
-                    <circle cx="10" cy="8" r="5" :fill="item.color" />
-                  </svg>
-                </template>
-                <template v-slot:item.actions="{ item }">
-                  <v-dialog v-model="dialogEdit" max-width="500px" :retain-focus="false">
-                    <v-card>
-                      <v-card-title>
-                        <span class="headline">Editar Ciudades</span>
-                      </v-card-title>
-                      <v-card-text>
-                        <v-container>
-                          <EditCity
-                            v-bind="edit"
-                            @updateCity="updateCity($event)"
-                          />
-                        </v-container>
-                      </v-card-text>
-                    </v-card>
-                  </v-dialog>
-                  <v-tooltip top>
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-btn
-                        v-bind="attrs"
-                        class="yellow darken-4"
-                        small
-                        v-on="on"
-                        @click="editItem(item)"
-                      >
-                        <v-icon>
-                          mdi-pencil
-                        </v-icon>
-                      </v-btn>
-                    </template>
-                    <span>Editar Ciudad</span>
-                  </v-tooltip>
-                  <ModalDeleteCity :name="item.name" :cityid="item.id" />
-                </template>
-              </v-data-table>
+              <client-only>
+                <v-data-table
+                  :headers="headers"
+                  :items="cities"
+                  class="elevation-1"
+                >
+                  <template v-slot:item.color="{ item }">
+                    <svg height="13" width="20">
+                      <circle cx="10" cy="8" r="5" :fill="item.color" />
+                    </svg>
+                  </template>
+                  <template v-slot:item.actions="{ item }">
+                    <v-dialog v-model="dialogEdit" max-width="500px" :retain-focus="false">
+                      <v-card>
+                        <v-card-title>
+                          <span class="headline">Editar Ciudades</span>
+                        </v-card-title>
+                        <v-card-text>
+                          <v-container>
+                            <EditCity
+                              v-bind="edit"
+                              @updateCity="updateCity($event)"
+                            />
+                          </v-container>
+                        </v-card-text>
+                      </v-card>
+                    </v-dialog>
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-btn
+                          v-bind="attrs"
+                          class="yellow darken-4"
+                          small
+                          v-on="on"
+                          @click="editItem(item)"
+                        >
+                          <v-icon>
+                            mdi-pencil
+                          </v-icon>
+                        </v-btn>
+                      </template>
+                      <span>Editar Ciudad</span>
+                    </v-tooltip>
+                    <ModalDeleteCity :name="item.name" :cityid="item.id" />
+                  </template>
+                </v-data-table>
+              </client-only>
             </v-card>
           </v-container>
         </v-row>
@@ -155,7 +157,7 @@ export default {
     }
     this.$apollo.query({
       query: gql`query ($limit: Int){
-        Cities(limit: $limit){
+        cities(limit: $limit){
           id
           name
           ip
@@ -166,7 +168,7 @@ export default {
         limit: 1000
       }
     }).then((input) => {
-      this.cities = input.data.Cities
+      this.cities = input.data.cities
     }).catch((error) => {
       // eslint-disable-next-line no-console
       console.error(error)
