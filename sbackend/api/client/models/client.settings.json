@@ -68,6 +68,10 @@
     },
     "sendToMikrotik": {
       "type": "boolean"
+    },
+    "passwordchanges": {
+      "via": "client",
+      "collection": "passwordchange"
     }
   }
 }

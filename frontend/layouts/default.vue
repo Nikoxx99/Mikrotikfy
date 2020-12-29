@@ -122,6 +122,12 @@ export default {
           info: 0
         },
         {
+          icon: 'mdi-key',
+          title: 'Sol. Clave',
+          to: '/cambio',
+          info: 0
+        },
+        {
           icon: 'mdi-close-network',
           title: 'Suspencion por Mora',
           to: '/cortes'

@@ -4,12 +4,12 @@ module.exports = {
       name: String
       value: Boolean
     }
-    type PasswordChangeType {
+    input PasswordChangeInput {
       dni: String
-      client: Client
       old_password: String
+      closed: ClosedObjectInput
       new_password: String
-      closed: ClosedObject
+      created_at: String
     }
     input UpdatePasswordChangeInput {
       _id: ID
@@ -21,10 +21,10 @@ module.exports = {
     }
   `,
   query: `
-    TestPasswordChange(dni: String): PasswordChangeType
-    passwordchangesq(dni: String): [PasswordChangeType]
+    TestPasswordChange(dni: String): Boolean
   `,
   mutation: `
+    createPasswordChangeRequest(input: PasswordChangeInput): Boolean
     updatePasswordChangeRequest(input: UpdatePasswordChangeInput): Boolean
   `,
   type: {
@@ -36,18 +36,18 @@ module.exports = {
     Query: {
       TestPasswordChange: {
         description: 'Return old password changes queries for test',
-        resolver: 'application::passwordchange.passwordchange.getTestPasswordChange'
+        resolver: 'application::passwordchange.passwordchange.TestPasswordChange'
       },
-      passwordchangesq: {
-        description: 'Return password change request',
-        resolver: 'application::passwordchange.passwordchange.PasswordChangeCtrl'
-      }
     },
     Mutation: {
       updatePasswordChangeRequest: {
         description: 'Update passsword change request state',
         resolver: 'application::passwordchange.passwordchange.updatePasswordChangeRequest'
-      }
+      },
+      createPasswordChangeRequest: {
+        description: 'Update passsword change request state',
+        resolver: 'application::passwordchange.passwordchange.createPasswordChangeRequest'
+      },
     }
   },
 };

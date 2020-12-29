@@ -71,7 +71,7 @@
               </template>
               <template v-slot:item.created_at="{ item }">
                 <span>
-                  {{ getDate(item.created_at) }}
+                  {{ getDate(item.createdAt) }}
                 </span>
               </template>
             </v-data-table>
@@ -111,7 +111,7 @@ export default {
       return {
         query: gql`
         query{
-          passwordchanges(limit: 100000){
+          passwordchanges(sort: "createdAt:desc"){
             _id
             dni
             client {
@@ -162,7 +162,7 @@ export default {
   },
   methods: {
     getDate (date) {
-      const dateObject = new Date(parseInt(date))
+      const dateObject = new Date(date)
       const humanDateFormat = dateObject.toLocaleString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric' })
       return humanDateFormat
     },

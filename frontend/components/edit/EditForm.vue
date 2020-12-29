@@ -424,6 +424,8 @@ export default {
       this.error = false
     }).catch((error) => {
       this.success = false
+      this.commentLoading = false
+      this.commentDisabled = false
       this.error = true
       this.errorMessage = 'Comentario no sincronizado'
       // eslint-disable-next-line no-console
