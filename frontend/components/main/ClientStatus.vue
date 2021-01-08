@@ -44,7 +44,8 @@
               type="error"
               class="my-4"
             >
-              Fuera de Linea desde <strong>{{ offlineTime }}</strong>
+              Fuera de Linea desde <strong>{{ offlineTime }}</strong> <br>
+              Razón de la desconexión: <strong>{{ disconnectReason }}</strong>
             </v-alert>
             <v-alert
               v-else
@@ -119,6 +120,7 @@ export default {
     mac_address: 0,
     uptime: 0,
     offlineTime: 0,
+    disconnectReason: '',
     download: 0,
     upload: 0
   }),
@@ -135,6 +137,7 @@ export default {
             mikrotik
             mac_address
             offlineTime
+            disconnectReason
             uptime
             download
             upload
@@ -152,6 +155,7 @@ export default {
           this.mac_address = input.data.ClientStatus.mac_address
           this.uptime = input.data.ClientStatus.uptime
           this.offlineTime = input.data.ClientStatus.offlineTime
+          this.disconnectReason = input.data.ClientStatus.disconnectReason
           this.download = input.data.ClientStatus.download
           this.upload = input.data.ClientStatus.upload
           if (input.data.ClientStatus.address) {

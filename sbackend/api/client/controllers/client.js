@@ -4,7 +4,8 @@
  * to customize this controller
  */
 const { sanitizeEntity } = require('strapi-utils');
-const { mkCreateClient, mkDeleteClient, mkSetClientPlanInformation, mkClientStatus, mkGetComment, mkSetComment } = require('../../../mikrotik/functions')
+const { mkCreateClient, mkDeleteClient, mkSetClientPlanInformation, mkClientStatus, mkGetComment, mkSetComment, mkDxClient } = require('../../../mikrotik/functions');
+const client = require('../services/client');
 module.exports = {
   async create(ctx) {
     let entity;
@@ -202,5 +203,45 @@ module.exports = {
     const model = search.newModel
     const res = await mkClientStatus(mikrotikHost, code, dni, model)
     return res
+  },
+  async dxClient(ctx) {
+    const process = []
+    const input = ctx.request.body.input
+    const search = await strapi.services.client.findOne({ 'code': input.code, 'city': input.dxCity })
+    const clientObj = search
+    const code = clientObj.code
+    if (search.length < 1) {
+      process.push({ code: input.dx.code, name: 'NO ENCONTRADO', success: false })
+      return process
+    }
+    const dni = clientObj.dni
+    const model = clientObj.newModel
+    const planDx = input.dxPlan.id
+    const planDxMk = clientObj.plan.mikrotik_name
+    const kick = input.dxKick
+    const reqCityIpArray = clientObj.city.ip
+    if (reqCityIpArray.length > 1) {
+      for(let i = 0; i < reqCityIpArray.length; i++){
+        const cityIp = reqCityIpArray[i]
+        const res = await strapi.services.client.update({ _id: clientObj._id }, { plan: planDx })
+        const resMk = await mkDxClient({ dni, code, cityIp, model, planDxMk, kick })
+        if (res && resMk) {
+          process.push({ code: code, name: clientObj.name, success: true })
+        } else {
+          process.push({ code: code, name: clientObj.name, success: false })
+        }
+      }
+      return process
+    } else {
+        const cityIp = reqCityIpArray[0]
+        const res = await strapi.services.client.update({ _id: clientObj._id }, { plan: planDx })
+        const resMk = await mkDxClient({ dni, code, cityIp, model, planDxMk, kick })
+        if (res && resMk) {
+          process.push({ code: code, name: clientObj.name, success: true })
+        } else {
+          process.push({ code: code, name: clientObj.name, success: false })
+        }
+        return process
+    }
   },
 };

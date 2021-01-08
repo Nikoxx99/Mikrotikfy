@@ -130,7 +130,7 @@ module.exports.mkClientStatus = async function (mikrotikHost, code, dni, model) 
   try {
     if (model === 1) {
       var com1 = await conn.write('/interface/print', [
-        '=.proplist=tx-byte,rx-byte,last-link-up-time',
+        '=.proplist=tx-byte,rx-byte,last-link-up-time,last-disconnect-reason',
         '?=name=<pppoe-' + code + '>',
       ])
       var com2 = await conn.write('/ppp/active/print', [
@@ -140,7 +140,7 @@ module.exports.mkClientStatus = async function (mikrotikHost, code, dni, model) 
     } else {
       // eslint-disable-next-line no-redeclare
       var com1 = await conn.write('/interface/print', [
-        '=.proplist=tx-byte,rx-byte,last-link-up-time',
+        '=.proplist=tx-byte,rx-byte,last-link-up-time,last-disconnect-reason',
         '?=name=<pppoe-' + dni + '>',
       ])
       // eslint-disable-next-line no-redeclare
@@ -156,6 +156,7 @@ module.exports.mkClientStatus = async function (mikrotikHost, code, dni, model) 
       client.download = com1[0]['tx-byte']
       client.upload = com1[0]['rx-byte']
       client.offlineTime = com1[0]['last-link-up-time']
+      client.disconnectReason = com1[0]['last-disconnect-reason']
       client.address = com2[0]['address']
       client.mac_address = com2[0]['caller-id']
       client.uptime = com2[0].uptime
@@ -164,13 +165,13 @@ module.exports.mkClientStatus = async function (mikrotikHost, code, dni, model) 
     } else {
       if (model === 1) {
         var com3 = await conn.write('/ppp/secret/print', [
-          '=.proplist=last-logged-out',
+          '=.proplist=last-logged-out,last-disconnect-reason',
           '?=name=' + code,
         ])
       } else {
         // eslint-disable-next-line no-redeclare
         var com3 = await conn.write('/ppp/secret/print', [
-          '=.proplist=last-logged-out',
+          '=.proplist=last-logged-out,last-disconnect-reason',
           '?=name=' + dni,
         ])
       }
@@ -178,6 +179,7 @@ module.exports.mkClientStatus = async function (mikrotikHost, code, dni, model) 
         var client_old_mk = {}
         client_old_mk.status = true
         client_old_mk.offlineTime = com3[0]['last-logged-out']
+        client_old_mk.disconnectReason = com3[0]['last-disconnect-reason']
         conn.close()
         if (mikrotikHost === '191.102.86.50') {
           const conn = new RouterOSAPI({
@@ -191,7 +193,7 @@ module.exports.mkClientStatus = async function (mikrotikHost, code, dni, model) 
             if (model === 1) {
               // eslint-disable-next-line no-redeclare
               var com1 = await conn.write('/interface/print', [
-                '=.proplist=tx-byte,rx-byte,last-link-up-time',
+                '=.proplist=tx-byte,rx-byte,last-link-up-time,last-disconnect-reason',
                 '?=name=<pppoe-' + code + '>',
               ])
               // eslint-disable-next-line no-redeclare
@@ -202,7 +204,7 @@ module.exports.mkClientStatus = async function (mikrotikHost, code, dni, model) 
             } else {
               // eslint-disable-next-line no-redeclare
               var com1 = await conn.write('/interface/print', [
-                '=.proplist=tx-byte,rx-byte,last-link-up-time',
+                '=.proplist=tx-byte,rx-byte,last-link-up-time,last-disconnect-reason',
                 '?=name=<pppoe-' + dni + '>',
               ])
               // eslint-disable-next-line no-redeclare
@@ -218,6 +220,7 @@ module.exports.mkClientStatus = async function (mikrotikHost, code, dni, model) 
               client.download = com1[0]['tx-byte']
               client.upload = com1[0]['rx-byte']
               client.offlineTime = com1[0]['last-link-up-time']
+              client.disconnectReason = com1[0]['last-disconnect-reason']
               client.address = com2[0]['address']
               client.mac_address = com2[0]['caller-id']
               client.uptime = com2[0].uptime
@@ -227,21 +230,21 @@ module.exports.mkClientStatus = async function (mikrotikHost, code, dni, model) 
               if (model === 1) {
                 // eslint-disable-next-line no-redeclare
                 var com3 = await conn.write('/ppp/secret/print', [
-                  '=.proplist=last-logged-out',
+                  '=.proplist=last-logged-out,last-disconnect-reason',
                   '?=name=' + code,
                 ])
               } else {
                 // eslint-disable-next-line no-redeclare
                 var com3 = await conn.write('/ppp/secret/print', [
-                  '=.proplist=last-logged-out',
+                  '=.proplist=last-logged-out,last-disconnect-reason',
                   '?=name=' + dni,
                 ])
               }
               if (com3[0]['last-logged-out'] !== 'jan/01/1970 00:00:00') {
-                console.log('this', client_old_mk)
                 let client = {}
                 client.status = true
                 client.offlineTime = com3[0]['last-logged-out']
+                client.disconnectReason = com3[0]['last-disconnect-reason']
                 conn.close()
                 return client
               }
@@ -333,5 +336,65 @@ module.exports.mkSetComment = async function (mikrotikHost, dni, code, model, co
     return true
   } else {
     return false
+  }
+}
+module.exports.mkDxClient = async function (input) {
+  const conn = new RouterOSAPI({
+    host: input.cityIp,
+    user: 'API_ARNOP',
+    password: strapi.config.get('server.admin.mikrotik.secret', 'null'),
+    port: 8087
+  })
+  try {
+    await conn.connect()
+    if (input.model === 1) {
+      // eslint-disable-next-line no-unused-vars
+      var com1 = await conn.write('/ppp/secret/getall', [
+        '=.proplist=.id',
+        '?=name=' + input.code,
+      ])
+      if (input.kick === 2) {
+        var removeActive = await conn.write('/ppp/active/getall', [
+          '=.proplist=.id',
+          '?=name=' + input.code,
+        ])
+      }
+    } else {
+      // eslint-disable-next-line no-redeclare
+      var com1 = await conn.write('/ppp/secret/getall', [
+        '=.proplist=.id',
+        '?=name=' + input.dni,
+      ])
+      if (input.kick === 2) {
+        // eslint-disable-next-line no-redeclare
+        var removeActive = await conn.write('/ppp/active/getall', [
+          '=.proplist=.id',
+          '?=name=' + input.dni,
+        ])
+      }
+    }
+    if (com1.length > 0) {
+      await conn.write('/ppp/secret/set', [
+        '=.id=' + com1[0]['.id'],
+        '=profile=' + input.planDxMk,
+      ])
+      if (input.kick === 2) {
+        if (removeActive.length > 0) {
+          // eslint-disable-next-line no-redeclare
+          var removeActive = await conn.write('/ppp/active/remove', [
+            '=.proplist=.id',
+            '=.id=' + removeActive[0]['.id'],
+          ])
+        }
+      }
+      conn.close()
+      return true
+    } else {
+      console.log('Failed setting client information')
+      conn.close()
+      return false
+    }
+  } catch (error) {
+    console.log(error)
   }
 }

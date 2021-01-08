@@ -6,6 +6,7 @@ module.exports = {
       mikrotik: Boolean
       mac_address: String
       offlineTime: String
+      disconnectReason: String
       uptime: String
       download: String
       upload: String
@@ -32,6 +33,26 @@ module.exports = {
     type ClientComment {
       comment: String
     }
+    type dxResponse {
+      code: String
+      name: String
+      success: Boolean
+    }
+    input DxClientInput {
+      code: String
+      name: String
+      plan: planDxInput
+    }
+    input DxInfoInput {
+      dx: DxClientInput
+      dxPlan: planDxInput
+      dxKick: Int
+      dxCity: String
+    }
+    input planDxInput {
+      id: String
+      name: String
+    }
   `,
   query: `
     ClientStatus(id: ID): ClientStatus
@@ -43,6 +64,7 @@ module.exports = {
   `,
   mutation: `
     editClientPlan(id: String, plan: String): Boolean
+    dxClient(input: DxInfoInput): [dxResponse]
   `,
   type: {
     ActiveClientList: {
@@ -80,6 +102,10 @@ module.exports = {
       editClientPlan: {
         description: 'Edit client plan',
         resolver: 'application::client.client.editClientPlan',
+      },
+      dxClient: {
+        description: 'dx client processor',
+        resolver: 'application::client.client.dxClient',
       }
     }
   },
