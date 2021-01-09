@@ -47,12 +47,13 @@ module.exports = {
     let entity;
     entity = await strapi.services.client.update({ id }, ctx.request.body);
 
-    const search = await strapi.services.client.find({ id: id })
+    const search = await strapi.services.client.find({ _id: id })
     const clientObj = search[0]
     const dni = clientObj.dni
     const code = clientObj.code
     const model = clientObj.newModel
     const comment = ctx.request.body.comment
+    console.log(search)
     const reqCityIpArray = clientObj.city.ip
     if (reqCityIpArray.length > 1) {
       const successfulMikrotikResponses = []
@@ -69,7 +70,7 @@ module.exports = {
   },
   async delete(ctx) {
     const { id } = ctx.params;
-    const search = await strapi.services.client.find({ id: id })
+    const search = await strapi.services.client.find({ _id: id })
     const clientObj = search[0]
     const dni = clientObj.dni
     const code = clientObj.code

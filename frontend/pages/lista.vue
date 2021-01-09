@@ -191,7 +191,7 @@
                       </v-card-text>
                     </v-card>
                   </v-dialog>
-                  <v-dialog v-model="dialogEdit" max-width="500px" :retain-focus="false" fullscreen>
+                  <v-dialog v-if="dialogEdit" v-model="dialogEdit" max-width="500px" :retain-focus="false" fullscreen>
                     <v-card>
                       <v-card-title>
                         <v-toolbar
@@ -210,7 +210,6 @@
                       <v-card-text>
                         <v-container>
                           <EditForm
-                            v-if="dialogEdit"
                             v-bind="client"
                             @updateClient="updateClient($event)"
                             @updateComment="updateComment($event)"
@@ -243,7 +242,7 @@
               <!-- ########################### -->
             </v-data-table>
           </client-only>
-          <div class="text-center pt-2">
+          <div class="text-center pt-2 justify-center" style="max-width:80%;margin:auto;">
             <v-pagination
               v-if="isPaginationActive"
               v-model="page"
@@ -314,11 +313,11 @@ export default {
     city () {
       return {
         query: gql`
-        query($city: ID!) {
+        query($city: ID!, $start: Int, $limit: Int) {
           city(id: $city){
             name
             color
-            clients (start: 0, limit: 25){
+            clients (start: $start, limit: $limit, sort: "createdAt:desc"){
               _id
               code
               name
@@ -352,7 +351,9 @@ export default {
         }
       `,
         variables: {
-          city: this.$route.query.city
+          city: this.$route.query.city,
+          start: 0,
+          limit: 25
         }
       }
     },
@@ -588,7 +589,7 @@ export default {
       if (!this.searchClientInput) {
         this.getDataFromApi().then((data) => {
           this.dataTable = data.items
-          this.totalClients = this.city.clientCount
+          this.totalClients = this.clientCount
           this.loadingDataTable = false
           this.isPaginationActive = true
           this.activeClients(false)
@@ -679,20 +680,20 @@ export default {
       this.dialogEdit = true
     },
     getColor (plan) {
-      if (plan === 1) {
+      if (plan === '5f52a6fe2824f015ac8ceb58') {
         return 'blue'
-      } else if (plan === 2) {
+      } else if (plan === '5f52a70a2824f015ac8ceb59') {
         return 'green'
-      } else if (plan === 7) {
+      } else if (plan === '5f52a7572824f015ac8ceb5e') {
         return 'red'
-      } else if (plan === 8) {
+      } else if (plan === '5f52a75f2824f015ac8ceb5f') {
         return 'black'
       }
     },
     getTechnology (technology) {
-      if (technology === 0) {
+      if (technology === '5f832eadb0c43e2c64b3743b') {
         return 'cyan'
-      } else if (technology === 1) {
+      } else if (technology === '5f832ea7b0c43e2c64b3743a') {
         return 'green'
       }
     },
