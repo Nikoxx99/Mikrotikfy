@@ -160,11 +160,12 @@ module.exports = {
   async editClientPlan(ctx) {
     const id = ctx.request.body.id
     const newClientPlanSearch = ctx.request.body.plan
-    const searchPlan = await strapi.services.plan.find({ id: newClientPlanSearch })
+    const searchPlan = await strapi.services.plan.find({ _id: newClientPlanSearch })
     const newClientPlan = searchPlan[0].mikrotik_name
 
-    const search = await strapi.services.client.find({ id: id })
+    const search = await strapi.services.client.find({ _id: id })
     const clientObj = search[0]
+    console.log(search, ' ', ctx.request.body)
     const dni = clientObj.dni
     const code = clientObj.code
     const model = clientObj.newModel
@@ -222,7 +223,7 @@ module.exports = {
     const kick = input.dxKick
     const reqCityIpArray = clientObj.city.ip
     if (reqCityIpArray.length > 1) {
-      for(let i = 0; i < reqCityIpArray.length; i++){
+      for (let i = 0; i < reqCityIpArray.length; i++) {
         const cityIp = reqCityIpArray[i]
         const res = await strapi.services.client.update({ _id: clientObj._id }, { plan: planDx })
         const resMk = await mkDxClient({ dni, code, cityIp, model, planDxMk, kick })
@@ -234,15 +235,15 @@ module.exports = {
       }
       return process
     } else {
-        const cityIp = reqCityIpArray[0]
-        const res = await strapi.services.client.update({ _id: clientObj._id }, { plan: planDx })
-        const resMk = await mkDxClient({ dni, code, cityIp, model, planDxMk, kick })
-        if (res && resMk) {
-          process.push({ code: code, name: clientObj.name, success: true })
-        } else {
-          process.push({ code: code, name: clientObj.name, success: false })
-        }
-        return process
+      const cityIp = reqCityIpArray[0]
+      const res = await strapi.services.client.update({ _id: clientObj._id }, { plan: planDx })
+      const resMk = await mkDxClient({ dni, code, cityIp, model, planDxMk, kick })
+      if (res && resMk) {
+        process.push({ code: code, name: clientObj.name, success: true })
+      } else {
+        process.push({ code: code, name: clientObj.name, success: false })
+      }
+      return process
     }
   },
 };
