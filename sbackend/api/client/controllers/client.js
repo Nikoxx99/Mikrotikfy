@@ -172,7 +172,7 @@ module.exports = {
     const removeActive = true
     const reqCityIpArray = clientObj.city.ip
     const successfulMikrotikResponses = []
-
+    await strapi.services.client.update({ _id }, { plan: newClientPlanSearch })
     if (reqCityIpArray.length > 1) {
       //for loop
       for (let i = 0; i < reqCityIpArray.length; i++) {
