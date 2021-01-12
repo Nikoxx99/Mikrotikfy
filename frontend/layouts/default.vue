@@ -168,6 +168,7 @@ export default {
   methods: {
     logout () {
       Cookie.remove('auth')
+      Cookie.remove('authToken')
       this.$store.commit('setAuth', null)
       this.$router.replace('/login')
     }
