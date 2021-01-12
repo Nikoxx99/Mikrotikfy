@@ -191,7 +191,7 @@
                       </v-card-text>
                     </v-card>
                   </v-dialog>
-                  <v-dialog v-if="dialogEdit" v-model="dialogEdit" max-width="500px" :retain-focus="false" fullscreen>
+                  <v-dialog v-if="dialogEdit" v-model="dialogEdit" max-width="800px" :retain-focus="false" :fullscreen="getResolution()">
                     <v-card>
                       <v-card-title>
                         <v-toolbar
@@ -524,7 +524,8 @@ export default {
       inactive_users: 0,
       online_users: 0,
       title: ' Base de datos',
-      dataTable: []
+      dataTable: [],
+      clientRes: true
     }
   },
   computed: {
@@ -562,6 +563,17 @@ export default {
     this.clientApiCall()
   },
   methods: {
+    getResolution () {
+      const res = document.body.clientWidth
+      console.log(res)
+      if (res < 800) {
+        const clientRes = true
+        return clientRes
+      } else {
+        const clientRes = false
+        return clientRes
+      }
+    },
     async getClientBySearch () {
       const search = this.searchClientInput
       if (search || search.length > 3) {
