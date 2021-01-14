@@ -7,6 +7,7 @@ module.exports = {
       mac_address: String
       offlineTime: String
       disconnectReason: String
+      lastCallerId: String
       uptime: String
       download: String
       upload: String

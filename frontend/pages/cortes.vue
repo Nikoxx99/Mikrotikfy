@@ -200,6 +200,15 @@ export default {
                 id
                 name
               }
+              technology{
+                id
+                name
+              }
+              wifi_ssid
+              wifi_password
+              mac_address
+              comment
+              createdAt
               newModel
             }
           }
@@ -209,12 +218,28 @@ export default {
           city: this.$route.query.city
         }
       }).then((input) => {
+        this.cityName = input.data.city.name
         for (let i = 0; i < input.data.city.clients.length; i++) {
-          this.cityName = input.data.city.name
           const dataTable = {}
+          dataTable._id = input.data.city.clients[i]._id
+          dataTable.status = '#777'
           dataTable.code = input.data.city.clients[i].code
           dataTable.name = input.data.city.clients[i].name
+          dataTable.dni = input.data.city.clients[i].dni
+          dataTable.address = input.data.city.clients[i].address
+          dataTable.neighborhood = input.data.city.clients[i].neighborhood
+          dataTable.city = input.data.city.clients[i].city
+          dataTable.phone = input.data.city.clients[i].phone
           dataTable.plan = input.data.city.clients[i].plan
+          dataTable.technology = input.data.city.clients[i].technology
+          dataTable.wifi_ssid = input.data.city.clients[i].wifi_ssid
+          dataTable.wifi_password = input.data.city.clients[i].wifi_password
+          dataTable.mac_address = input.data.city.clients[i].mac_address
+          dataTable.comment = input.data.city.clients[i].comment
+          dataTable.operator = input.data.city.clients[i].operator
+          dataTable.created_at = input.data.city.clients[i].created_at
+          dataTable.newModel = input.data.city.clients[i].newModel
+          dataTable.citycolor = input.data.city.color
           this.dataTable.push(dataTable)
         }
         this.initialLoading = false

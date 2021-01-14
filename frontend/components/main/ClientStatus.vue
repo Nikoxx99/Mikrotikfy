@@ -44,8 +44,9 @@
               type="error"
               class="my-4"
             >
-              Fuera de Linea desde <strong>{{ offlineTime }}</strong> <br>
-              Razón de la desconexión: <strong>{{ disconnectReason }}</strong>
+              Fuera de linea desde <strong>{{ offlineTime }}</strong> <br>
+              Razón de la desconexión: <strong>{{ disconnectReason }}</strong> <br>
+              Última MAC conocida: <strong>{{ lastCallerId }}</strong>
             </v-alert>
             <v-alert
               v-else
@@ -65,6 +66,8 @@
                   <h3>Mac: {{ mac_address }}</h3>
                   <v-spacer />
                   <h3>Uptime: {{ uptime }}</h3>
+                  <v-space />
+                  <h3>Clave: 4Rn0P{{ code }}</h3>
                 </v-col>
                 <v-col>
                   <h3>Descarga: <strong>{{ formatBytes(download) }}</strong></h3>
@@ -121,6 +124,7 @@ export default {
     uptime: 0,
     offlineTime: 0,
     disconnectReason: '',
+    lastCallerId: '',
     download: 0,
     upload: 0
   }),
@@ -138,6 +142,7 @@ export default {
             mac_address
             offlineTime
             disconnectReason
+            lastCallerId
             uptime
             download
             upload
@@ -156,6 +161,7 @@ export default {
           this.uptime = input.data.ClientStatus.uptime
           this.offlineTime = input.data.ClientStatus.offlineTime
           this.disconnectReason = input.data.ClientStatus.disconnectReason
+          this.lastCallerId = input.data.ClientStatus.lastCallerId
           this.download = input.data.ClientStatus.download
           this.upload = input.data.ClientStatus.upload
           if (input.data.ClientStatus.address) {

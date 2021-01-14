@@ -600,11 +600,11 @@ export default {
       this.loadingDataTable = true
       if (!this.searchClientInput) {
         this.getDataFromApi().then((data) => {
-          this.dataTable = data.items
+          this.mapDatabase(data.items)
           this.totalClients = this.clientCount
           this.loadingDataTable = false
           this.isPaginationActive = true
-          this.activeClients(false)
+          // this.activeClients(false)
           this.initialLoad = false
           this.refreshLoading = false
         })
@@ -638,6 +638,18 @@ export default {
         total
       }
     },
+    async mapDatabase (items) {
+      // const newClientsMod = items.map(function (c) {
+      //   c.status = 'white'
+      //   return c
+      // })
+      for (let i = 0; i < items.length; i++) {
+        this.$set(items[i], status, 'blue')
+        console.log(items)
+      }
+      console.log(items)
+      this.dataTable = items
+    },
     async getClients (start, limit) {
       if (this.city.clients < 1) {
         return {}
@@ -658,6 +670,7 @@ export default {
               c.status = 'white'
               return c
             })
+            console.log(newClientsMod)
             this.dataTable = newClientsMod
           }
         })

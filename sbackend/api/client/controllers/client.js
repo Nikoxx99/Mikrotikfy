@@ -53,7 +53,7 @@ module.exports = {
     const code = clientObj.code
     const model = clientObj.newModel
     const comment = ctx.request.body.comment
-    console.log(search)
+    // console.log(entity)
     const reqCityIpArray = clientObj.city.ip
     if (reqCityIpArray.length > 1) {
       const successfulMikrotikResponses = []
@@ -66,7 +66,8 @@ module.exports = {
       const mikrotikHost = reqCityIpArray[0]
       await mkSetComment(mikrotikHost, dni, code, model, comment)
     }
-    return sanitizeEntity(entity, { model: strapi.models.client });
+    const res = sanitizeEntity(entity, { model: strapi.models.client });
+    return res
   },
   async delete(ctx) {
     const { id } = ctx.params;
@@ -172,7 +173,7 @@ module.exports = {
     const removeActive = true
     const reqCityIpArray = clientObj.city.ip
     const successfulMikrotikResponses = []
-    await strapi.services.client.update({ _id }, { plan: newClientPlanSearch })
+    await strapi.services.client.update({ id }, { plan: newClientPlanSearch })
     if (reqCityIpArray.length > 1) {
       //for loop
       for (let i = 0; i < reqCityIpArray.length; i++) {
