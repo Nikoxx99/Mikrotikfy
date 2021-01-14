@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 const RouterOSAPI = require('node-routeros').RouterOSAPI
-module.exports.mkCreateClient = async function (mikrotikHost, plan, input, cityName,  planName, neightborhood, technology) {
+module.exports.mkCreateClient = async function (mikrotikHost, plan, input, cityName, planName, neightborhood, technology) {
   console.log(mikrotikHost, plan, input)
   const conn = new RouterOSAPI({
     host: mikrotikHost,
@@ -36,7 +36,7 @@ module.exports.mkDeleteClient = async function (mikrotikHost, dni, code, model) 
   })
   try {
     await conn.connect()
-    if (model === 1){
+    if (model === 1) {
       var com1 = await conn.write('/ppp/secret/getall', [
         '=.proplist=.id',
         '?=name=' + code,
@@ -46,7 +46,7 @@ module.exports.mkDeleteClient = async function (mikrotikHost, dni, code, model) 
       ])
       conn.close()
       return true
-    }else{
+    } else {
       var com1 = await conn.write('/ppp/secret/getall', [
         '=.proplist=.id',
         '?=name=' + dni,
@@ -57,7 +57,7 @@ module.exports.mkDeleteClient = async function (mikrotikHost, dni, code, model) 
       conn.close()
       return true
     }
-    
+
   } catch (error) {
     conn.close()
     return false
@@ -130,7 +130,7 @@ module.exports.mkClientStatus = async function (mikrotikHost, code, dni, model) 
   try {
     if (model === 1) {
       var com1 = await conn.write('/interface/print', [
-        '=.proplist=tx-byte,rx-byte,last-link-up-time,last-disconnect-reason',
+        '=.proplist=tx-byte,rx-byte,last-link-up-time,last-disconnect-reason,last-caller-id',
         '?=name=<pppoe-' + code + '>',
       ])
       var com2 = await conn.write('/ppp/active/print', [
@@ -140,7 +140,7 @@ module.exports.mkClientStatus = async function (mikrotikHost, code, dni, model) 
     } else {
       // eslint-disable-next-line no-redeclare
       var com1 = await conn.write('/interface/print', [
-        '=.proplist=tx-byte,rx-byte,last-link-up-time,last-disconnect-reason',
+        '=.proplist=tx-byte,rx-byte,last-link-up-time,last-disconnect-reason,last-caller-id',
         '?=name=<pppoe-' + dni + '>',
       ])
       // eslint-disable-next-line no-redeclare
@@ -157,6 +157,7 @@ module.exports.mkClientStatus = async function (mikrotikHost, code, dni, model) 
       client.upload = com1[0]['rx-byte']
       client.offlineTime = com1[0]['last-link-up-time']
       client.disconnectReason = com1[0]['last-disconnect-reason']
+      client.lastCallerId = com1[0]['last-caller-id']
       client.address = com2[0]['address']
       client.mac_address = com2[0]['caller-id']
       client.uptime = com2[0].uptime
@@ -165,13 +166,13 @@ module.exports.mkClientStatus = async function (mikrotikHost, code, dni, model) 
     } else {
       if (model === 1) {
         var com3 = await conn.write('/ppp/secret/print', [
-          '=.proplist=last-logged-out,last-disconnect-reason',
+          '=.proplist=last-logged-out,last-disconnect-reason,last-caller-id',
           '?=name=' + code,
         ])
       } else {
         // eslint-disable-next-line no-redeclare
         var com3 = await conn.write('/ppp/secret/print', [
-          '=.proplist=last-logged-out,last-disconnect-reason',
+          '=.proplist=last-logged-out,last-disconnect-reason,last-caller-id',
           '?=name=' + dni,
         ])
       }
@@ -180,6 +181,7 @@ module.exports.mkClientStatus = async function (mikrotikHost, code, dni, model) 
         client_old_mk.status = true
         client_old_mk.offlineTime = com3[0]['last-logged-out']
         client_old_mk.disconnectReason = com3[0]['last-disconnect-reason']
+        client_old_mk.lastCallerId = com3[0]['last-caller-id']
         conn.close()
         if (mikrotikHost === '191.102.86.50') {
           const conn = new RouterOSAPI({
@@ -193,7 +195,7 @@ module.exports.mkClientStatus = async function (mikrotikHost, code, dni, model) 
             if (model === 1) {
               // eslint-disable-next-line no-redeclare
               var com1 = await conn.write('/interface/print', [
-                '=.proplist=tx-byte,rx-byte,last-link-up-time,last-disconnect-reason',
+                '=.proplist=tx-byte,rx-byte,last-link-up-time,last-disconnect-reason,last-caller-id',
                 '?=name=<pppoe-' + code + '>',
               ])
               // eslint-disable-next-line no-redeclare
@@ -204,7 +206,7 @@ module.exports.mkClientStatus = async function (mikrotikHost, code, dni, model) 
             } else {
               // eslint-disable-next-line no-redeclare
               var com1 = await conn.write('/interface/print', [
-                '=.proplist=tx-byte,rx-byte,last-link-up-time,last-disconnect-reason',
+                '=.proplist=tx-byte,rx-byte,last-link-up-time,last-disconnect-reason,last-caller-id',
                 '?=name=<pppoe-' + dni + '>',
               ])
               // eslint-disable-next-line no-redeclare
@@ -221,6 +223,7 @@ module.exports.mkClientStatus = async function (mikrotikHost, code, dni, model) 
               client.upload = com1[0]['rx-byte']
               client.offlineTime = com1[0]['last-link-up-time']
               client.disconnectReason = com1[0]['last-disconnect-reason']
+              client.lastCallerId = com1[0]['last-caller-id']
               client.address = com2[0]['address']
               client.mac_address = com2[0]['caller-id']
               client.uptime = com2[0].uptime
@@ -230,13 +233,13 @@ module.exports.mkClientStatus = async function (mikrotikHost, code, dni, model) 
               if (model === 1) {
                 // eslint-disable-next-line no-redeclare
                 var com3 = await conn.write('/ppp/secret/print', [
-                  '=.proplist=last-logged-out,last-disconnect-reason',
+                  '=.proplist=last-logged-out,last-disconnect-reason,last-caller-id',
                   '?=name=' + code,
                 ])
               } else {
                 // eslint-disable-next-line no-redeclare
                 var com3 = await conn.write('/ppp/secret/print', [
-                  '=.proplist=last-logged-out,last-disconnect-reason',
+                  '=.proplist=last-logged-out,last-disconnect-reason,last-caller-id',
                   '?=name=' + dni,
                 ])
               }
@@ -245,6 +248,7 @@ module.exports.mkClientStatus = async function (mikrotikHost, code, dni, model) 
                 client.status = true
                 client.offlineTime = com3[0]['last-logged-out']
                 client.disconnectReason = com3[0]['last-disconnect-reason']
+                client.lastCallerId = com3[0]['last-caller-id']
                 conn.close()
                 return client
               }
@@ -313,29 +317,41 @@ module.exports.mkSetComment = async function (mikrotikHost, dni, code, model, co
   })
   await conn.connect()
   if (comment !== '' && comment != '0' && comment != null && comment != 'null') {
-    console.log(typeof comment)
     if (model === 1) {
       // eslint-disable-next-line no-unused-vars
-      var com1 = await conn.write('/ppp/secret/set', [
-        '=.id=' + code,
-        '=comment=' + comment
-      ])
+      try {
+        var com1 = await conn.write('/ppp/secret/set', [
+          '=.id=' + code,
+          '=comment=' + comment
+        ])
+      } catch (error) {
+        conn.close()
+        return error
+      }
     } else {
-      // eslint-disable-next-line no-redeclare
-      var com1 = await conn.write('/ppp/secret/set', [
-        '=.id=' + dni,
-        '=comment=' + comment
-      ])
+      try {
+        // eslint-disable-next-line no-redeclare
+        var com1 = await conn.write('/ppp/secret/set', [
+          '=.id=' + dni,
+          '=comment=' + comment
+        ])
+      } catch (error) {
+        conn.close()
+        return error
+      }
     }
   } else {
+    console.log('invaled comment')
     conn.close()
     return true
   }
   conn.close()
-  if (com1.length > 0){
+  if (com1.length > 0) {
+    console.log('valid comment')
     return true
   } else {
-    return false
+    console.log('invaled response')
+    return true
   }
 }
 module.exports.mkDxClient = async function (input) {

@@ -563,39 +563,6 @@ export default {
     this.clientApiCall()
   },
   methods: {
-    getResolution () {
-      const res = document.body.clientWidth
-      console.log(res)
-      if (res < 800) {
-        const clientRes = true
-        return clientRes
-      } else {
-        const clientRes = false
-        return clientRes
-      }
-    },
-    async getClientBySearch () {
-      const search = this.searchClientInput
-      if (search || search.length > 3) {
-        await this.$apollo.queries.searchClient.fetchMore({
-        // New variables
-          variables: {
-            search,
-            city: this.$route.query.city
-          },
-          // Transform the previous result with new data
-          updateQuery: async (previousResult, { fetchMoreResult }) => {
-            const newClients = fetchMoreResult.searchClient
-            this.itemsPerPage = newClients.length
-            this.totalClients = newClients.length
-            this.dataTable = newClients
-            this.isPaginationActive = false
-            await this.activeClients(false)
-            this.refreshLoading = false
-          }
-        })
-      }
-    },
     clientApiCall () {
       this.loadingDataTable = true
       if (!this.searchClientInput) {
@@ -604,7 +571,7 @@ export default {
           this.totalClients = this.clientCount
           this.loadingDataTable = false
           this.isPaginationActive = true
-          // this.activeClients(false)
+          this.activeClients(false)
           this.initialLoad = false
           this.refreshLoading = false
         })
@@ -639,15 +606,9 @@ export default {
       }
     },
     async mapDatabase (items) {
-      // const newClientsMod = items.map(function (c) {
-      //   c.status = 'white'
-      //   return c
-      // })
       for (let i = 0; i < items.length; i++) {
-        this.$set(items[i], status, 'blue')
-        console.log(items)
+        this.$set(items[i], 'status', 'white')
       }
-      console.log(items)
       this.dataTable = items
     },
     async getClients (start, limit) {
@@ -658,12 +619,10 @@ export default {
         return await this.city.clients
       } else {
         await this.$apollo.queries.city.fetchMore({
-          // New variables
           variables: {
             start,
             limit
           },
-          // Transform the previous result with new data
           updateQuery: (previousResult, { fetchMoreResult }) => {
             const newClients = fetchMoreResult.city.clients
             const newClientsMod = newClients.map(function (c) {
@@ -697,6 +656,26 @@ export default {
             this.dataTable[i].status = 'red'
           }
         }
+      }
+    },
+    async getClientBySearch () {
+      const search = this.searchClientInput
+      if (search || search.length > 3) {
+        await this.$apollo.queries.searchClient.fetchMore({
+          variables: {
+            search,
+            city: this.$route.query.city
+          },
+          updateQuery: async (previousResult, { fetchMoreResult }) => {
+            const newClients = fetchMoreResult.searchClient
+            this.itemsPerPage = newClients.length
+            this.totalClients = newClients.length
+            this.dataTable = newClients
+            this.isPaginationActive = false
+            await this.activeClients(false)
+            this.refreshLoading = false
+          }
+        })
       }
     },
     editItem (item) {
@@ -786,7 +765,18 @@ export default {
     close () {
       // eslint-disable-next-line no-console
       console.log('Info closed')
-    }
+    },
+    getResolution () {
+      const res = document.body.clientWidth
+      console.log(res)
+      if (res < 800) {
+        const clientRes = true
+        return clientRes
+      } else {
+        const clientRes = false
+        return clientRes
+      }
+    },
   },
   head () {
     return {

@@ -142,15 +142,12 @@ export default {
   mounted () {
     this.$apollo.query({
       query: gql`
-      query($limit: Int) {
-        passwordchanges(limit: $limit){
+      query {
+        passwordchanges{
           closed
         }
       }
-      `,
-      variables: {
-        limit: 1000
-      }
+      `
     }).then((input) => {
       for (let i = 0; i < input.data.passwordchanges.length; i++) {
         if (input.data.passwordchanges[i].closed.value === false) {

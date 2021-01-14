@@ -16,7 +16,8 @@
       type="error"
       tile
     >
-      Credenciales Inválidas, intenta de nuevo.
+      Credenciales Inválidas, intenta de nuevo. <br>
+      <span class="text-subtitle-2">{{ errorMessages }}</span>
     </v-alert>
     <v-card-title class="justify-center">
       Ingresa tu usuario
@@ -76,7 +77,8 @@ export default {
     showPassword: false,
     firstTime: false,
     loginFailed: false,
-    isLoading: false
+    isLoading: false,
+    errorMessages: ''
   }),
   mounted () {
     if (this.$route.query.firstTime) {
@@ -136,7 +138,9 @@ export default {
         }
       }).catch((error) => {
         // eslint-disable-next-line no-console
-        console.error(error)
+        this.errorMessages = error.message
+        this.loginFailed = true
+        this.isLoading = false
       })
     }
   }
