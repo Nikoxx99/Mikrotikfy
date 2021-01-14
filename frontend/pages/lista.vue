@@ -670,7 +670,7 @@ export default {
             const newClients = fetchMoreResult.searchClient
             this.itemsPerPage = newClients.length
             this.totalClients = newClients.length
-            this.dataTable = newClients
+            this.mapDatabase(newClients)
             this.isPaginationActive = false
             await this.activeClients(false)
             this.refreshLoading = false
