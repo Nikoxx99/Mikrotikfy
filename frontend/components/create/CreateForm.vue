@@ -284,28 +284,28 @@ export default {
     return {
       valid: false,
       Client: {
-        code: '13000',
-        name: 'TEST',
-        dni: '12312313',
-        address: 'CARRERA 1 # 1 1',
+        code: '',
+        name: '',
+        dni: '',
+        address: '',
         neighborhood: {
           id: 0,
           name: ''
         },
         city: '',
-        phone: '123123123',
+        phone: '',
         plan: {
           id: 0,
           name: ''
         },
-        wifi_ssid: '231312',
-        wifi_password: '131231',
+        wifi_ssid: '',
+        wifi_password: '',
         technology: {
           id: 0,
           name: ''
         },
-        mac_address: '213131',
-        comment: '131231',
+        mac_address: '',
+        comment: '',
         newModel: 1,
         sendToMikrotik: true
       },
