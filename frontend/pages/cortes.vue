@@ -133,6 +133,7 @@ export default {
           plans{
             _id
             name
+            mikrotik_name
           }
         }
       `
@@ -316,7 +317,7 @@ export default {
                 dx: pendingDx[i],
                 dxPlan: {
                   id: this.setPlan._id,
-                  name: this.setPlan.name
+                  name: this.setPlan.mikrotik_name
                 },
                 dxKick: this.kickStat.id,
                 dxCity: city
