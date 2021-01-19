@@ -210,7 +210,7 @@ module.exports = {
   async dxClient(ctx) {
     const process = []
     const input = ctx.request.body.input
-    const search = await strapi.services.client.findOne({ 'code': input.code, 'city': input.dxCity })
+    const search = await strapi.services.client.findOne({ 'code': input.dx.code, 'city': input.dxCity })
     const clientObj = search
     const code = clientObj.code
     if (search.length < 1) {
@@ -220,7 +220,7 @@ module.exports = {
     const dni = clientObj.dni
     const model = clientObj.newModel
     const planDx = input.dxPlan.id
-    const planDxMk = clientObj.plan.mikrotik_name
+    const planDxMk = input.dxPlan.name
     const kick = input.dxKick
     const reqCityIpArray = clientObj.city.ip
     if (reqCityIpArray.length > 1) {
