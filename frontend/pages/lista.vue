@@ -191,52 +191,19 @@
                       </v-card-text>
                     </v-card>
                   </v-dialog>
-                  <v-dialog v-if="dialogEdit" v-model="dialogEdit" max-width="800px" :retain-focus="false" :fullscreen="getResolution()">
-                    <v-card>
-                      <v-card-title>
-                        <v-toolbar
-                          dark
-                        >
-                          <v-btn
-                            icon
-                            dark
-                            @click="dialogEdit = false"
-                          >
-                            <v-icon>mdi-close</v-icon>
-                          </v-btn>
-                          <v-toolbar-title>Editar Cliente</v-toolbar-title>
-                        </v-toolbar>
-                      </v-card-title>
-                      <v-card-text>
-                        <v-container>
-                          <EditForm
-                            v-bind="client"
-                            @updateClient="updateClient($event)"
-                            @updateComment="updateComment($event)"
-                          />
-                        </v-container>
-                      </v-card-text>
-                    </v-card>
-                  </v-dialog>
                 </v-toolbar>
               </template>
-              <!-- ########################### -->
+              <!-- COMPONENTS IMPLEMETATION -->
               <!-- eslint-disable -->
               <template v-slot:item.actions="{ item }">
                 <ClientStatus :name="item.name" :clientid="item._id" :code="item.code" />
-                <v-tooltip top>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-icon
-                      v-bind="attrs"
-                      color="yellow darken-4"
-                      v-on="on"
-                      @click="editItem(item)"
-                    >
-                      mdi-pencil
-                    </v-icon>
-                  </template>
-                  <span>Editar Cliente</span>
-                </v-tooltip>
+                <EditForm
+                    :item="item"
+                    :editIndex="dataTable.indexOf(item)"
+                    :dataTable="dataTable"
+                    @updateClient="updateClient($event)"
+                    @updateComment="updateComment($event)"
+                  />
                 <DeleteClient :name="item.name" :clientid="item._id" />
               </template>
               <!-- ########################### -->
@@ -271,7 +238,7 @@
       v-model="editSnack"
       :timeout="3000"
       color="yellow darken-4"
-      top
+      bottom
       vertical
     >
       {{ editSnackText }}
@@ -479,7 +446,6 @@ export default {
       cityColor: '',
       alertBox: false,
       dialog: false,
-      dialogEdit: false,
       options: {},
       headers: [
         { text: 'Codigo', sortable: true, value: 'code', align: ' d-none d-lg-table-cell'},
@@ -495,26 +461,6 @@ export default {
         { text: 'Aciones', value: 'actions', sortable: false }
       ],
       editedIndex: -1,
-      client: {
-        Client: {
-          code: 1,
-          name: '',
-          dni: '',
-          address: '',
-          neighborhood: 0,
-          city: 0,
-          phone: '',
-          plan: 0,
-          wifi_ssid: '',
-          wifi_password: '',
-          technology: '',
-          mac_address: '',
-          comment: '',
-          created_at: '',
-          newModel: 0,
-          citycolor: '1'
-        }
-      },
       snack: false,
       snackColor: '',
       snackText: '',
@@ -561,6 +507,7 @@ export default {
     // eslint-disable-next-line no-undef
     this.debouncedGetResult = _.debounce(this.getDataFromApi, 100)
     this.clientApiCall()
+    console.log(this.$options.components)
   },
   methods: {
     clientApiCall () {
@@ -677,11 +624,6 @@ export default {
         })
       }
     },
-    editItem (item) {
-      this.editedIndex = this.dataTable.indexOf(item)
-      this.client.Client = Object.assign({}, item)
-      this.dialogEdit = true
-    },
     getColor (plan) {
       if (plan === '5f52a6fe2824f015ac8ceb58') {
         return 'blue'
@@ -710,13 +652,12 @@ export default {
         return 'cyan'
       }
     },
-    updateClient (input) {
-      if (this.editedIndex > -1) {
-        Object.assign(this.dataTable[this.editedIndex], input)
+    updateClient (input, editIndex) {
+      if (editIndex > -1) {
+        Object.assign(this.dataTable[this.editIndex], input)
       } else {
         this.dataTable.push(input)
       }
-      this.dialogEdit = false
       this.editSnack = true
       this.editSnackText = 'Cliente editado exitosamente'
     },
@@ -763,18 +704,7 @@ export default {
     close () {
       // eslint-disable-next-line no-console
       console.log('Info closed')
-    },
-    getResolution () {
-      const res = document.body.clientWidth
-      console.log(res)
-      if (res < 800) {
-        const clientRes = true
-        return clientRes
-      } else {
-        const clientRes = false
-        return clientRes
-      }
-    },
+    }
   },
   head () {
     return {

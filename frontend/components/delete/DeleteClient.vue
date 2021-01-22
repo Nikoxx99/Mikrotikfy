@@ -53,6 +53,7 @@
 <script>
 import gql from 'graphql-tag'
 export default {
+  name: 'DeleteClient',
   props: {
     clientid: {
       type: String,

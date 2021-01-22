@@ -1,207 +1,242 @@
 <template>
-  <div>
-    <v-alert
-      v-if="alertBox"
-      type="info"
-      :class="alertBoxColor"
-      tile
-      dismissible
-    >
-      {{ createdMessage }}
-    </v-alert>
-    <v-form v-model="valid">
-      <v-row>
-        <v-col>
-          <v-text-field
-            v-model="Client.code"
-            type="number"
-            label="Codigo"
-            required
-            outlined
-            dense
-            hide-details
-          />
-        </v-col>
-        <v-col>
-          <v-text-field
-            v-model="Client.dni"
-            type="number"
-            label="Cedula"
-            required
-            outlined
-            dense
-            hide-details
-          />
-        </v-col>
-      </v-row>
-      <v-text-field
-        v-model="Client.name"
-        label="Nombre Completo"
-        required
-        outlined
-        dense
-        hide-details
-        class="pb-3"
-      />
-      <v-row>
-        <v-col cols="6" lg="3" md="3">
-          <v-text-field
-            v-model="Client.address"
-            label="Direccion"
-            outlined
-            dense
-            hide-details
-          />
-        </v-col>
-        <v-col cols="6" lg="3" md="3">
-          <v-autocomplete
-            v-model="Client.neighborhood"
-            item-text="name"
-            item-value="id"
-            :items="neighborhoods"
-            return-object
-            label="Barrio"
-            outlined
-            dense
-            hide-details
-          />
-        </v-col>
-        <v-col cols="6" lg="3" md="3">
-          <v-select
-            v-model="Client.city"
-            item-text="name"
-            item-value="id"
-            :items="cities"
-            return-object
-            label="Ciudad"
-            disabled
-            outlined
-            dense
-            hide-details
-          />
-        </v-col>
-        <v-col cols="6" lg="3" md="3">
-          <v-text-field
-            v-model="Client.phone"
-            label="Telefono"
-            required
-            outlined
-            dense
-            hide-details
-          />
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="12" lg="4" md="4">
-          <v-select
-            v-model="Client.plan"
-            item-text="name"
-            item-value="id"
-            :items="plans"
-            return-object
-            label="Plan"
-            outlined
-            dense
-            hide-details
-          />
-        </v-col>
-        <v-col cols="6" lg="4" md="4">
-          <v-text-field
-            v-model="Client.wifi_ssid"
-            label="Nombre de Red"
-            required
-            outlined
-            dense
-            hide-details
-          />
-        </v-col>
-        <v-col cols="6" lg="4" md="4">
-          <v-text-field
-            v-model="Client.wifi_password"
-            label="Clave de Red"
-            required
-            outlined
-            dense
-            hide-details
-          />
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col>
-          <v-select
-            v-model="Client.technology"
-            item-text="name"
-            item-value="id"
-            :items="technologies"
-            return-object
-            label="Tecnología"
-            outlined
-            dense
-            hide-details
-          />
-        </v-col>
-        <v-col>
-          <v-text-field
-            v-model="Client.mac_address"
-            label="Mac Equipo"
-            required
-            outlined
-            dense
-            hide-details
-          />
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col>
-          <v-select
-            v-model="Client.newModel"
-            :items="idwith"
-            item-text="name"
-            item-value="id"
-            mandatory
-            label="Identificar con:"
-            outlined
-            dense
-          />
-        </v-col>
-        <v-col>
-          <v-text-field
-            :value="getDate(Client.created_at)"
-            label="Fecha de Creación"
-            required
-            outlined
-            dense
-            readonly
-            disabled
-            hide-details
-          />
-        </v-col>
-      </v-row>
-      <v-textarea
-        v-model="Client.comment"
-        auto-grow
-        :success.sync="success"
-        :success-messages="successMessage"
-        :error="error"
-        :error-messages="errorMessage"
-        :loading="commentLoading"
-        :disabled="commentDisabled"
-        persistent-hint
-        outlined
-        label="Comentario"
-        dense
-      />
-      <v-btn
-        class="mr-4"
-        :color="Client.citycolor"
-        :loading="isSubmitting"
-        :disabled="isSubmitting"
-        @click="updateClient"
-      >
-        Editar Cliente
-      </v-btn>
-    </v-form>
-  </div>
+  <span>
+    <v-tooltip top>
+      <template v-slot:activator="{ on, attrs }">
+        <v-icon
+          v-bind="attrs"
+          color="yellow darken-4"
+          v-on="on"
+          @click="dialogEdit = true, createModal()"
+        >
+          mdi-pencil
+        </v-icon>
+      </template>
+      <span>Editar Cliente</span>
+    </v-tooltip>
+    <v-dialog v-if="dialogEdit" v-model="dialogEdit" max-width="800px" :retain-focus="false" :fullscreen="getResolution()">
+      <v-card>
+        <v-card-title>
+          <v-toolbar
+            dark
+          >
+            <v-btn
+              icon
+              dark
+              @click="dialogEdit = false"
+            >
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+            <v-toolbar-title>Editar Cliente</v-toolbar-title>
+          </v-toolbar>
+        </v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-alert
+              v-if="alertBox"
+              type="info"
+              :class="alertBoxColor"
+              tile
+              dismissible
+            >
+              {{ createdMessage }}
+            </v-alert>
+            <v-form v-model="valid">
+              <v-row>
+                <v-col>
+                  <v-text-field
+                    v-model="item.code"
+                    type="number"
+                    label="Codigo"
+                    required
+                    outlined
+                    dense
+                    hide-details
+                  />
+                </v-col>
+                <v-col>
+                  <v-text-field
+                    v-model="item.dni"
+                    type="number"
+                    label="Cedula"
+                    required
+                    outlined
+                    dense
+                    hide-details
+                  />
+                </v-col>
+              </v-row>
+              <v-text-field
+                v-model="item.name"
+                label="Nombre Completo"
+                required
+                outlined
+                dense
+                hide-details
+                class="pb-3"
+              />
+              <v-row>
+                <v-col cols="6" lg="3" md="3">
+                  <v-text-field
+                    v-model="item.address"
+                    label="Direccion"
+                    outlined
+                    dense
+                    hide-details
+                  />
+                </v-col>
+                <v-col cols="6" lg="3" md="3">
+                  <v-autocomplete
+                    v-model="item.neighborhood"
+                    item-text="name"
+                    item-value="id"
+                    :items="neighborhoods"
+                    return-object
+                    label="Barrio"
+                    outlined
+                    dense
+                    hide-details
+                  />
+                </v-col>
+                <v-col cols="6" lg="3" md="3">
+                  <v-select
+                    v-model="item.city"
+                    item-text="name"
+                    item-value="id"
+                    :items="cities"
+                    return-object
+                    label="Ciudad"
+                    disabled
+                    outlined
+                    dense
+                    hide-details
+                  />
+                </v-col>
+                <v-col cols="6" lg="3" md="3">
+                  <v-text-field
+                    v-model="item.phone"
+                    label="Telefono"
+                    required
+                    outlined
+                    dense
+                    hide-details
+                  />
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12" lg="4" md="4">
+                  <v-select
+                    v-model="item.plan"
+                    item-text="name"
+                    item-value="id"
+                    :items="plans"
+                    return-object
+                    label="Plan"
+                    outlined
+                    dense
+                    hide-details
+                  />
+                </v-col>
+                <v-col cols="6" lg="4" md="4">
+                  <v-text-field
+                    v-model="item.wifi_ssid"
+                    label="Nombre de Red"
+                    required
+                    outlined
+                    dense
+                    hide-details
+                  />
+                </v-col>
+                <v-col cols="6" lg="4" md="4">
+                  <v-text-field
+                    v-model="item.wifi_password"
+                    label="Clave de Red"
+                    required
+                    outlined
+                    dense
+                    hide-details
+                  />
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col>
+                  <v-select
+                    v-model="item.technology"
+                    item-text="name"
+                    item-value="id"
+                    :items="technologies"
+                    return-object
+                    label="Tecnología"
+                    outlined
+                    dense
+                    hide-details
+                  />
+                </v-col>
+                <v-col>
+                  <v-text-field
+                    v-model="item.mac_address"
+                    label="Mac Equipo"
+                    required
+                    outlined
+                    dense
+                    hide-details
+                  />
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col>
+                  <v-select
+                    v-model="item.newModel"
+                    :items="idwith"
+                    item-text="name"
+                    item-value="id"
+                    mandatory
+                    label="Identificar con:"
+                    outlined
+                    dense
+                  />
+                </v-col>
+                <v-col>
+                  <v-text-field
+                    :value="getDate(item.created_at)"
+                    label="Fecha de Creación"
+                    required
+                    outlined
+                    dense
+                    readonly
+                    disabled
+                    hide-details
+                  />
+                </v-col>
+              </v-row>
+              <v-textarea
+                v-model="item.comment"
+                auto-grow
+                :success.sync="success"
+                :success-messages="successMessage"
+                :error="error"
+                :error-messages="errorMessage"
+                :loading="commentLoading"
+                :disabled="commentDisabled"
+                persistent-hint
+                outlined
+                label="Comentario"
+                dense
+              />
+              <v-btn
+                class="mr-4"
+                :color="item.citycolor"
+                :loading="isSubmitting"
+                :disabled="isSubmitting"
+                @click="updateClient"
+              >
+                Editar Cliente
+              </v-btn>
+            </v-form>
+          </v-container>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+  </span>
 </template>
 
 <script>
@@ -260,109 +295,17 @@ export default {
     }
   },
   props: {
-    Client: {
+    item: {
       type: Object,
-      default: () => {},
-      _id: {
-        type: String,
-        default: ''
-      },
-      code: {
-        type: String,
-        default: 1
-      },
-      name: {
-        type: String,
-        default: ''
-      },
-      dni: {
-        type: String,
-        default: ''
-      },
-      address: {
-        type: String,
-        default: ''
-      },
-      neighborhood: {
-        type: Object,
-        default: () => { this.neighborhood = 1 },
-        id: {
-          type: Number,
-          default: 1
-        },
-        name: {
-          type: String,
-          default: ''
-        }
-      },
-      city: {
-        type: Object,
-        default: () => {},
-        id: {
-          type: Number,
-          default: 0
-        },
-        name: {
-          type: String,
-          default: ''
-        }
-      },
-      phone: {
-        type: String,
-        default: ''
-      },
-      plan: {
-        type: Object,
-        default: () => {},
-        id: {
-          type: Number,
-          default: 0
-        },
-        name: {
-          type: String,
-          default: ''
-        }
-      },
-      wifi_ssid: {
-        type: String,
-        default: ''
-      },
-      wifi_password: {
-        type: String,
-        default: ''
-      },
-      technology: {
-        type: Object,
-        default: () => {},
-        id: {
-          type: Number,
-          default: 0
-        },
-        name: {
-          type: String,
-          default: ''
-        }
-      },
-      mac_address: {
-        type: String,
-        default: ''
-      },
-      comment: {
-        type: String,
-        default: ''
-      },
-      created_at: {
-        type: String,
-        default: ''
-      },
-      newModel: {
-        type: Number,
-        default: 1
-      },
-      citycolor: {
-        type: String,
-        default: ''
-      }
+      default: () => {}
+    },
+    dataTable: {
+      type: Array,
+      default: () => []
+    },
+    editIdex: {
+      type: Number,
+      default: 0
     }
   },
   data: () => {
@@ -384,6 +327,7 @@ export default {
         'CASA',
         'DIAGONAL'
       ],
+      dialogEdit: false,
       alertBox: false,
       alertBoxColor: '',
       createdMessage: '',
@@ -397,42 +341,63 @@ export default {
       commentDisabled: false,
       successMessage: '',
       errorMessage: '',
-      commentLoading: false
+      commentLoading: false,
+      client: {
+        Client: {
+          code: 1,
+          name: '',
+          dni: '',
+          address: '',
+          neighborhood: 0,
+          city: 0,
+          phone: '',
+          plan: 0,
+          wifi_ssid: '',
+          wifi_password: '',
+          technology: '',
+          mac_address: '',
+          comment: '',
+          created_at: '',
+          newModel: 0,
+          citycolor: '1'
+        }
+      }
     }
   },
-  mounted () {
-    this.success = false
-    this.error = false
-    this.commentLoading = true
-    this.commentDisabled = true
-    this.$apollo.query({
-      query: gql`query ($id: ID){
-        getClientComment(id: $id){
-          comment
-        }
-      }`,
-      variables: {
-        id: this.Client._id
-      }
-    }).then((input) => {
-      this.commentLoading = false
-      this.commentDisabled = false
-      this.Client.comment = input.data.getClientComment.comment
-      this.$emit('updateComment', this.Client.comment)
-      this.success = true
-      this.successMessage = 'Comentario sincronizado con la Mikrotik'
-      this.error = false
-    }).catch((error) => {
-      this.success = false
-      this.commentLoading = false
-      this.commentDisabled = false
-      this.error = true
-      this.errorMessage = 'Comentario no sincronizado'
-      // eslint-disable-next-line no-console
-      console.log(error)
-    })
-  },
   methods: {
+    createModal () {
+      this.success = false
+      this.error = false
+      this.commentLoading = true
+      this.commentDisabled = true
+      this.$apollo.query({
+        query: gql`query ($id: ID){
+          getClientComment(id: $id){
+            comment
+          }
+        }`,
+        variables: {
+          id: this.item._id
+        }
+      }).then((input) => {
+        console.log('this')
+        this.commentLoading = false
+        this.commentDisabled = false
+        this.item.comment = input.data.getClientComment.comment
+        this.$emit('updateComment', this.item.comment)
+        this.success = true
+        this.successMessage = 'Comentario sincronizado con la Mikrotik'
+        this.error = false
+      }).catch((error) => {
+        this.success = false
+        this.commentLoading = false
+        this.commentDisabled = false
+        this.error = true
+        this.errorMessage = 'Comentario no sincronizado'
+        // eslint-disable-next-line no-console
+        console.log(error)
+      })
+    },
     updateClient () {
       this.isSubmitting = true
       this.$apollo.mutate({
@@ -446,29 +411,30 @@ export default {
         variables: {
           input: {
             where: {
-              id: this.Client._id
+              id: this.item._id
             },
             data: {
-              code: this.Client.code,
-              name: this.Client.name,
-              dni: this.Client.dni,
-              address: this.Client.address,
-              neighborhood: this.Client.neighborhood.id,
-              phone: this.Client.phone,
-              plan: this.Client.plan.id,
-              technology: this.Client.technology.id,
-              wifi_ssid: this.Client.wifi_ssid,
-              wifi_password: this.Client.wifi_password,
-              mac_address: this.Client.mac_address,
-              comment: this.Client.comment,
-              operator: this.Client.operator,
-              newModel: this.Client.newModel
+              code: this.item.code,
+              name: this.item.name,
+              dni: this.item.dni,
+              address: this.item.address,
+              neighborhood: this.item.neighborhood.id,
+              phone: this.item.phone,
+              plan: this.item.plan.id,
+              technology: this.item.technology.id,
+              wifi_ssid: this.item.wifi_ssid,
+              wifi_password: this.item.wifi_password,
+              mac_address: this.item.mac_address,
+              comment: this.item.comment,
+              operator: this.item.operator,
+              newModel: this.item.newModel
             }
           }
         }
       }).then((input) => {
         if (input.data.updateClient.client.id) {
-          this.$emit('updateClient', this.Client)
+          this.$emit('updateClient', this.item, this.editIndex)
+          this.dialogEdit = false
           // window.location.reload(true)
         } else {
           this.alertBox = true
@@ -490,6 +456,16 @@ export default {
       const dateObject = new Date(parseInt(date))
       const humanDateFormat = dateObject.toLocaleString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric' })
       return humanDateFormat
+    },
+    getResolution () {
+      const res = document.body.clientWidth
+      if (res < 800) {
+        const clientRes = true
+        return clientRes
+      } else {
+        const clientRes = false
+        return clientRes
+      }
     }
   }
 }

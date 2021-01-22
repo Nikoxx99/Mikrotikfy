@@ -97,6 +97,7 @@
 <script>
 import gql from 'graphql-tag'
 export default {
+  name: 'ClientStatus',
   props: {
     clientid: {
       type: String,
