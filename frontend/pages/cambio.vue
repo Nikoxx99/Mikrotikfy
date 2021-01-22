@@ -132,7 +132,7 @@
           <v-btn
             color="primary"
             text
-            @click="sendRequest()"
+            @click.once="sendRequest()"
           >
             Confirmar y Enviar
           </v-btn>

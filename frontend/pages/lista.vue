@@ -254,9 +254,9 @@
     </v-row>
     <v-snackbar
       v-model="snack"
-      :timeout="3000"
+      :timeout="1000"
       :color="snackColor"
-      top
+      bottom
       vertical
     >
       {{ snackText }}
@@ -629,7 +629,6 @@ export default {
               c.status = 'white'
               return c
             })
-            console.log(newClientsMod)
             this.dataTable = newClientsMod
           }
         })
@@ -747,9 +746,8 @@ export default {
           plan: newPlan,
         }
       }).then((input) => {
-        console.log(input)
         this.snack = true
-        this.snackColor = 'success'
+        this.snackColor = 'info'
         this.snackText = 'Cambio de plan exitoso'
       }).catch((error) => {
         this.snack = true
