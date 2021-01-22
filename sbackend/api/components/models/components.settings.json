@@ -1,0 +1,24 @@
+{
+  "kind": "collectionType",
+  "collectionName": "components",
+  "info": {
+    "name": "Components",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "roles": {
+      "plugin": "users-permissions",
+      "collection": "role",
+      "via": "allowed_components",
+      "dominant": true
+    }
+  }
+}
