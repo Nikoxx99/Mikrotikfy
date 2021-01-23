@@ -66,7 +66,7 @@
                   <h3>Mac: {{ mac_address }}</h3>
                   <v-spacer />
                   <h3>Uptime: {{ uptime }}</h3>
-                  <v-space />
+                  <v-spacer />
                   <h3>Clave: 4Rn0P{{ code }}</h3>
                 </v-col>
                 <v-col>

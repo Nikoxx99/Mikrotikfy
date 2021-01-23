@@ -106,6 +106,7 @@
                   <v-dialog v-model="dialog" max-width="650px" :retain-focus="false" fullscreen>
                     <template v-slot:activator="{ on, attrs }">
                       <v-btn
+                        v-if="can('CreateForm')"
                         :color="city.color"
                         dark
                         class="mr-4"
@@ -196,15 +197,16 @@
               <!-- COMPONENTS IMPLEMETATION -->
               <!-- eslint-disable -->
               <template v-slot:item.actions="{ item }">
-                <ClientStatus :name="item.name" :clientid="item._id" :code="item.code" />
+                <ClientStatus v-if="can('ClientStatus')" :name="item.name" :clientid="item._id" :code="item.code" />
                 <EditForm
+                    v-if="can('EditForm')"
                     :item="item"
                     :editIndex="dataTable.indexOf(item)"
                     :dataTable="dataTable"
                     @updateClient="updateClient($event)"
                     @updateComment="updateComment($event)"
                   />
-                <DeleteClient :name="item.name" :clientid="item._id" />
+                <DeleteClient v-if="can('DeleteClient')" :name="item.name" :clientid="item._id" />
               </template>
               <!-- ########################### -->
             </v-data-table>
@@ -334,6 +336,23 @@ export default {
           }
         }
       `
+      }
+    },
+    role () {
+      return {
+        query: gql`
+        query($id: ID!){
+          role(id: $id){
+            name
+            allowed_components{
+              name
+            }
+          }
+        }
+      `,
+        variables: {
+          id: this.$store.state.auth.role
+        }
       }
     },
     ActiveClients () {
@@ -471,7 +490,8 @@ export default {
       online_users: 0,
       title: ' Base de datos',
       dataTable: [],
-      clientRes: true
+      clientRes: true,
+      allowed_components: []
     }
   },
   computed: {
@@ -507,7 +527,10 @@ export default {
     // eslint-disable-next-line no-undef
     this.debouncedGetResult = _.debounce(this.getDataFromApi, 100)
     this.clientApiCall()
-    console.log(this.$options.components)
+    this.allowed_components = this.role.allowed_components.map(c => {
+      return c.name
+    })
+    // console.log(this.$options.components)
   },
   methods: {
     clientApiCall () {
@@ -704,6 +727,11 @@ export default {
     close () {
       // eslint-disable-next-line no-console
       console.log('Info closed')
+    },
+    can (component) {
+      const allowed_components = this.allowed_components
+      const current_component = component
+      return allowed_components.includes(current_component)
     }
   },
   head () {

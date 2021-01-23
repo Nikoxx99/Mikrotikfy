@@ -103,7 +103,7 @@ export default {
             user{
               username
               role{
-                name
+                id
               }
             }
           }
@@ -120,7 +120,7 @@ export default {
           const auth = {
             accessToken: input.data.login.jwt,
             username: input.data.login.user.username,
-            role: input.data.login.user.role.name
+            role: input.data.login.user.role.id
           }
           this.$store.commit('setAuth', auth)
           Cookie.set('auth', auth)
