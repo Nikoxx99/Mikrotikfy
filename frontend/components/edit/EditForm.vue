@@ -193,12 +193,27 @@
                     label="Identificar con:"
                     outlined
                     dense
+                    hide-details
+                  />
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col>
+                  <v-text-field
+                    :value="getDate(item.createdAt)"
+                    label="Fecha de Creación"
+                    required
+                    outlined
+                    dense
+                    readonly
+                    disabled
+                    hide-details
                   />
                 </v-col>
                 <v-col>
                   <v-text-field
-                    :value="getDate(item.created_at)"
-                    label="Fecha de Creación"
+                    :value="getDate(item.updatedAt)"
+                    label="Última actualización"
                     required
                     outlined
                     dense
@@ -453,7 +468,7 @@ export default {
       this.Client.address = `${this.dir1} ${this.dir2} ${this.dir3} ${this.dir4}`
     },
     getDate (date) {
-      const dateObject = new Date(parseInt(date))
+      const dateObject = new Date(date)
       const humanDateFormat = dateObject.toLocaleString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric' })
       return humanDateFormat
     },

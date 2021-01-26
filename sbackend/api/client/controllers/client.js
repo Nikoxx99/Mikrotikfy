@@ -11,13 +11,28 @@ module.exports = {
     let entity;
     entity = await strapi.services.client.create(ctx.request.body);
     const sendToMikrotik = ctx.request.body.sendToMikrotik
-    if (sendToMikrotik) {
-      const searchCity = await strapi.services.city.find({ id: ctx.request.body.city })
-      const searchPlan = await strapi.services.plan.find({ id: ctx.request.body.plan })
-      const searchNeighborhood = await strapi.services.neighborhood.find({ id: ctx.request.body.neighborhood })
-      const searchTechnology = await strapi.services.technology.find({ id: ctx.request.body.technology })
-      if (searchCity[0].ip.length > 1) {
-        for (let i = 0; i < searchCity[0].ip.length; i++) {
+    const operator_role = ctx.request.body.operator_role
+    if (operator_role === 'admin') {
+      if (sendToMikrotik) {
+        const searchCity = await strapi.services.city.find({ id: ctx.request.body.city })
+        const searchPlan = await strapi.services.plan.find({ id: ctx.request.body.plan })
+        const searchNeighborhood = await strapi.services.neighborhood.find({ id: ctx.request.body.neighborhood })
+        const searchTechnology = await strapi.services.technology.find({ id: ctx.request.body.technology })
+        if (searchCity[0].ip.length > 1) {
+          for (let i = 0; i < searchCity[0].ip.length; i++) {
+            const mikrotikHost = searchCity[0].ip[i]
+            const plan = searchPlan[0].mikrotik_name
+            const planName = searchPlan[0].name
+            const cityName = searchCity[0].name
+            const neighborhoodName = searchNeighborhood[0].name
+            const technologyName = searchTechnology[0].name
+            mkCreateClient(mikrotikHost, plan, ctx.request.body, cityName, planName, neighborhoodName, technologyName)
+          }
+        } else {
+          const searchCity = await strapi.services.city.find({ id: ctx.request.body.city })
+          const searchPlan = await strapi.services.plan.find({ id: ctx.request.body.plan })
+          const searchNeighborhood = await strapi.services.neighborhood.find({ id: ctx.request.body.neighborhood })
+          const searchTechnology = await strapi.services.technology.find({ id: ctx.request.body.technology })
           const mikrotikHost = searchCity[0].ip[i]
           const plan = searchPlan[0].mikrotik_name
           const planName = searchPlan[0].name
@@ -26,18 +41,6 @@ module.exports = {
           const technologyName = searchTechnology[0].name
           mkCreateClient(mikrotikHost, plan, ctx.request.body, cityName, planName, neighborhoodName, technologyName)
         }
-      } else {
-        const searchCity = await strapi.services.city.find({ id: ctx.request.body.city })
-        const searchPlan = await strapi.services.plan.find({ id: ctx.request.body.plan })
-        const searchNeighborhood = await strapi.services.neighborhood.find({ id: ctx.request.body.neighborhood })
-        const searchTechnology = await strapi.services.technology.find({ id: ctx.request.body.technology })
-        const mikrotikHost = searchCity[0].ip[i]
-        const plan = searchPlan[0].mikrotik_name
-        const planName = searchPlan[0].name
-        const cityName = searchCity[0].name
-        const neighborhoodName = searchNeighborhood[0].name
-        const technologyName = searchTechnology[0].name
-        mkCreateClient(mikrotikHost, plan, ctx.request.body, cityName, planName, neighborhoodName, technologyName)
       }
     }
     return sanitizeEntity(entity, { model: strapi.models.client });

@@ -228,6 +228,10 @@ export default {
     citycolor: {
       type: String,
       default: ''
+    },
+    role: {
+      type: String,
+      default: ''
     }
   },
   apollo: {
@@ -369,7 +373,8 @@ export default {
               mac_address: this.Client.mac_address,
               comment: this.Client.comment,
               newModel: this.Client.newModel,
-              sendToMikrotik: this.Client.sendToMikrotik
+              sendToMikrotik: this.Client.sendToMikrotik,
+              operator_role: this.role
             }
           }
         }
@@ -396,11 +401,11 @@ export default {
     },
     calculateSsid () {
       const name = this.Client.name.split(' ')
-      if (name[2] && this.Client.dni) {
+      if (name[2] && this.Client.code) {
         const lastNameLowerCase = name[2].toLowerCase()
         const nombreLowerCase = name[0].toLowerCase()
         const processedName = nombreLowerCase.charAt(0).toUpperCase() + nombreLowerCase.slice(1)
-        this.Client.wifi_password = processedName + this.Client.dni
+        this.Client.wifi_password = processedName + this.Client.code
         this.Client.wifi_ssid = `ARNOP${lastNameLowerCase.charAt(0).toUpperCase() + lastNameLowerCase.slice(1)}`
       } else {
         return false

@@ -70,8 +70,11 @@
       "type": "boolean"
     },
     "passwordchanges": {
-      "via": "client",
-      "collection": "passwordchange"
+      "collection": "passwordchange",
+      "via": "client"
+    },
+    "operator_role": {
+      "type": "string"
     }
   }
 }

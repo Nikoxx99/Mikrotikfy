@@ -95,6 +95,28 @@
               </template>
               <!-- ########################### -->
               <!-- eslint-disable -->
+              <template v-slot:item.active="props">
+                <v-tooltip top>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                      v-if="can('CreateForm')"
+                      :color="props.item.active ? 'green darken-3' : 'red darken-3'"
+                      dark
+                      small
+                      v-bind="attrs"
+                      text
+                      v-on="on"
+                      @click="updateStatus(props.item.active, dataTable.map(function(x) {return x._id; }).indexOf(props.item._id))"
+                    >
+                      <v-icon>mdi-{{ props.item.active ? 'check' : 'close' }} {{ props.index }}</v-icon>
+                    </v-btn>
+                  </template>
+                <span>Activar Cliente</span>
+                </v-tooltip>
+              </template>
+              <!-- ########################### -->
+              <!-- ########################### -->
+              <!-- eslint-disable -->
               <template v-slot:item.status="{ item }">
                 <svg height="13" width="20">
                   <circle :id="item._id" cx="10" cy="8" r="5" :fill="item.status" />
@@ -184,6 +206,7 @@
                           <CreateForm
                             v-if="dialog"
                             :citycolor="city.color"
+                            :role="role.name"
                             @createClient="createClient($event)"
                             @createClientDialog="createClientDialog($event)"
                             @createClientSnack="createClientSnack($event)"
@@ -314,7 +337,9 @@ export default {
               mac_address
               comment
               createdAt
+              updatedAt
               newModel
+              active
             }
           }
         }
@@ -477,6 +502,7 @@ export default {
         { text: 'Plan', sortable: true, value: 'plan.name' },
         { text: 'Tecnologia', sortable: true, value: 'technology.name', align: ' d-none d-lg-table-cell' },
         { text: 'Tipo', sortable: true, value: 'newModel', align: ' d-none d-lg-table-cell' },
+        { text: 'Activo', sortable: true, value: 'active' },
         { text: 'Aciones', value: 'actions', sortable: false }
       ],
       editedIndex: -1,
@@ -732,6 +758,13 @@ export default {
       const allowed_components = this.allowed_components
       const current_component = component
       return allowed_components.includes(current_component)
+    },
+    updateStatus (status, index) {
+      if (status === true) {
+        return
+      }
+      this.dataTable[index].active = !this.dataTable[index].active
+      console.log(status, index)
     }
   },
   head () {
