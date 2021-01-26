@@ -42,7 +42,7 @@
               :page.sync="page"
               :options.sync="options"
               :loading="loadingDataTable"
-              no-data-text="No hay informacion para mostrar aun..."
+              no-data-text="No hay resultados a la busqueda..."
               loading-text="Cargando información de clientes..."
               dense
               hide-default-footer
