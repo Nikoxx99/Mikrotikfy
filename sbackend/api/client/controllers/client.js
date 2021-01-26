@@ -8,7 +8,10 @@ const { mkCreateClient, mkDeleteClient, mkSetClientPlanInformation, mkClientStat
 module.exports = {
   async create(ctx) {
     let entity;
-    entity = await strapi.services.client.create(ctx.request.body);
+    const newClient = ctx.request.body.map(c => {
+      c.active = true
+    })
+    entity = await strapi.services.client.create(newClient);
     const sendToMikrotik = ctx.request.body.sendToMikrotik
     const operator_role = ctx.request.body.operator_role
     if (operator_role === 'admin') {
@@ -41,8 +44,12 @@ module.exports = {
           mkCreateClient(mikrotikHost, plan, ctx.request.body, cityName, planName, neighborhoodName, technologyName)
         }
       }
+      return sanitizeEntity(entity, { model: strapi.models.client });
+    } else {
+      let entity;
+      entity = await strapi.services.client.create(ctx.request.body);
+      return sanitizeEntity(entity, { model: strapi.models.client });
     }
-    return sanitizeEntity(entity, { model: strapi.models.client });
   },
   async adminCreate(ctx) {
     const id = ctx.request.body.input.id

@@ -558,6 +558,9 @@ export default {
       return c.name
     })
     // console.log(this.$options.components)
+    if(!this.can('active')){
+      this.headers.splice(10,1)
+    }
   },
   methods: {
     clientApiCall () {
