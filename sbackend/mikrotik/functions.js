@@ -1,7 +1,6 @@
 /* eslint-disable no-undef */
 const RouterOSAPI = require('node-routeros').RouterOSAPI
 module.exports.mkCreateClient = async function (mikrotikHost, plan, input, cityName, planName, neightborhood, technology) {
-  console.log(mikrotikHost, plan, input)
   const conn = new RouterOSAPI({
     host: mikrotikHost,
     user: 'API_ARNOP',
@@ -10,7 +9,6 @@ module.exports.mkCreateClient = async function (mikrotikHost, plan, input, cityN
   })
   const comment = `${input.code} ${input.name} ${input.dni} ${input.address} ${neightborhood} ${cityName} ${input.phone} ${planName} ${input.wifi_ssid} ${input.wifi_password} ${technology} ${input.mac_address} ${input.comment}`
   await conn.connect().then(() => {
-    console.log('Connected to Mikrotik Successfully >>>')
   }).then(() => {
     conn.write('/ppp/secret/add', [
       '=name=' + input.code,
@@ -20,7 +18,6 @@ module.exports.mkCreateClient = async function (mikrotikHost, plan, input, cityN
       '=comment=' + comment,
     ]).then(() => {
       conn.close()
-      console.log('Connection Closed <<<')
     })
   }).catch((err) => {
     conn.close()
@@ -111,7 +108,6 @@ module.exports.mkSetClientPlanInformation = async function (mikrotikHost, input)
       conn.close()
       return true
     } else {
-      console.log('Failed setting client information')
       conn.close()
       return false
     }
@@ -341,16 +337,13 @@ module.exports.mkSetComment = async function (mikrotikHost, dni, code, model, co
       }
     }
   } else {
-    console.log('invaled comment')
     conn.close()
     return true
   }
   conn.close()
   if (com1.length > 0) {
-    console.log('valid comment')
     return true
   } else {
-    console.log('invaled response')
     return true
   }
 }
@@ -406,7 +399,6 @@ module.exports.mkDxClient = async function (input) {
       conn.close()
       return true
     } else {
-      console.log('Failed setting client information')
       conn.close()
       return false
     }

@@ -776,6 +776,9 @@ export default {
           }
         }).then((input) => {
           this.dataTable[index].loading = !this.dataTable[index].loading
+          this.snack = true
+          this.snackColor = 'red'
+          this.snackText = 'Cliente eliminado de la mikrotik'
         }).catch((error) => {
           this.snack = true
           this.snackColor = 'red'
@@ -809,6 +812,9 @@ export default {
           }
         }).then((input) => {
           this.dataTable[index].loading = !this.dataTable[index].loading
+          this.snack = true
+          this.snackColor = 'info'
+          this.snackText = 'Cliente aprovado'
         }).catch((error) => {
           this.snack = true
           this.snackColor = 'red'

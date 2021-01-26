@@ -60,6 +60,7 @@ module.exports = {
         const neighborhoodName = searchNeighborhood[0].name
         const technologyName = searchTechnology[0].name
         mkCreateClient(mikrotikHost, plan, ctx.request.body.input, cityName, planName, neighborhoodName, technologyName)
+        return true
       }
     } else {
       const searchCity = await strapi.services.city.find({ id: ctx.request.body.input.city })
@@ -73,6 +74,7 @@ module.exports = {
       const neighborhoodName = searchNeighborhood[0].name
       const technologyName = searchTechnology[0].name
       mkCreateClient(mikrotikHost, plan, ctx.request.body.input, cityName, planName, neighborhoodName, technologyName)
+      return true
     }
   },
   async update(ctx) {
@@ -139,10 +141,12 @@ module.exports = {
         const mikrotikHost = reqCityIpArray[i]
         const res = await mkDeleteClient(mikrotikHost, dni, code, model)
         successfulMikrotikResponses.push(res)
+        return true
       }
     } else {
       const mikrotikHost = reqCityIpArray[0]
       await mkDeleteClient(mikrotikHost, dni, code, model)
+      return true
     }
   },
   async count(ctx) {
@@ -228,7 +232,6 @@ module.exports = {
 
     const search = await strapi.services.client.find({ _id: id })
     const clientObj = search[0]
-    console.log(search, ' ', ctx.request.body)
     const dni = clientObj.dni
     const code = clientObj.code
     const model = clientObj.newModel
