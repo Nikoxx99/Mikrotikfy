@@ -1,0 +1,80 @@
+{
+  "kind": "collectionType",
+  "collectionName": "clients",
+  "info": {
+    "name": "Client",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "dni": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "wifi_ssid": {
+      "type": "string"
+    },
+    "wifi_password": {
+      "type": "string"
+    },
+    "mac_address": {
+      "type": "string"
+    },
+    "comment": {
+      "type": "richtext"
+    },
+    "newModel": {
+      "type": "integer"
+    },
+    "neighborhood": {
+      "model": "neighborhood",
+      "via": "clients"
+    },
+    "city": {
+      "model": "city",
+      "via": "clients"
+    },
+    "plan": {
+      "model": "plan",
+      "via": "clients"
+    },
+    "technology": {
+      "model": "technology",
+      "via": "clients"
+    },
+    "operator": {
+      "plugin": "users-permissions",
+      "model": "user",
+      "via": "clients"
+    },
+    "active": {
+      "type": "boolean",
+      "default": false
+    },
+    "code": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "sendToMikrotik": {
+      "type": "boolean"
+    },
+    "passwordchanges": {
+      "collection": "passwordchange",
+      "via": "client"
+    },
+    "operator_role": {
+      "type": "string"
+    }
+  }
+}

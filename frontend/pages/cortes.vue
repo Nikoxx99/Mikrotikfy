@@ -57,7 +57,7 @@
               </v-btn>
               <v-select
                 v-model="setPlan"
-                :items="Plans"
+                :items="plans"
                 label="Aplicar Plan"
                 item-value="id"
                 item-text="name"
@@ -126,13 +126,14 @@
 import gql from 'graphql-tag'
 export default {
   apollo: {
-    Plans () {
+    plans () {
       return {
         query: gql`
         query{
-          Plans{
-            id
+          plans{
+            _id
             name
+            mikrotik_name
           }
         }
       `
@@ -188,25 +189,14 @@ export default {
       this.dataTable = []
       this.$apollo.query({
         query: gql`
-        query($city: Int) {
-          City(id: $city){
+        query($city: ID!) {
+          city(id: $city){
             name
-            color
             clients{
               _id
               code
               name
               dni
-              address
-              neighborhood{
-                id
-                name
-              }
-              city{
-                id
-                name
-              }
-              phone
               plan{
                 id
                 name
@@ -219,43 +209,41 @@ export default {
               wifi_password
               mac_address
               comment
-              operator
-              created_at
+              createdAt
               newModel
             }
           }
         }
       `,
         variables: {
-          city: parseInt(this.$route.query.city, 10)
+          city: this.$route.query.city
         }
       }).then((input) => {
-        this.cityName = input.data.City.name
-        for (let i = 0; i < input.data.City.clients.length; i++) {
+        this.cityName = input.data.city.name
+        for (let i = 0; i < input.data.city.clients.length; i++) {
           const dataTable = {}
-          dataTable._id = input.data.City.clients[i]._id
+          dataTable._id = input.data.city.clients[i]._id
           dataTable.status = '#777'
-          dataTable.code = input.data.City.clients[i].code
-          dataTable.name = input.data.City.clients[i].name
-          dataTable.dni = input.data.City.clients[i].dni
-          dataTable.address = input.data.City.clients[i].address
-          dataTable.neighborhood = input.data.City.clients[i].neighborhood
-          dataTable.city = input.data.City.clients[i].city
-          dataTable.phone = input.data.City.clients[i].phone
-          dataTable.plan = input.data.City.clients[i].plan
-          dataTable.technology = input.data.City.clients[i].technology
-          dataTable.wifi_ssid = input.data.City.clients[i].wifi_ssid
-          dataTable.wifi_password = input.data.City.clients[i].wifi_password
-          dataTable.mac_address = input.data.City.clients[i].mac_address
-          dataTable.comment = input.data.City.clients[i].comment
-          dataTable.operator = input.data.City.clients[i].operator
-          dataTable.created_at = input.data.City.clients[i].created_at
-          dataTable.newModel = input.data.City.clients[i].newModel
-          dataTable.citycolor = input.data.City.color
+          dataTable.code = input.data.city.clients[i].code
+          dataTable.name = input.data.city.clients[i].name
+          dataTable.dni = input.data.city.clients[i].dni
+          dataTable.address = input.data.city.clients[i].address
+          dataTable.neighborhood = input.data.city.clients[i].neighborhood
+          dataTable.city = input.data.city.clients[i].city
+          dataTable.phone = input.data.city.clients[i].phone
+          dataTable.plan = input.data.city.clients[i].plan
+          dataTable.technology = input.data.city.clients[i].technology
+          dataTable.wifi_ssid = input.data.city.clients[i].wifi_ssid
+          dataTable.wifi_password = input.data.city.clients[i].wifi_password
+          dataTable.mac_address = input.data.city.clients[i].mac_address
+          dataTable.comment = input.data.city.clients[i].comment
+          dataTable.operator = input.data.city.clients[i].operator
+          dataTable.created_at = input.data.city.clients[i].created_at
+          dataTable.newModel = input.data.city.clients[i].newModel
+          dataTable.citycolor = input.data.city.color
           this.dataTable.push(dataTable)
         }
         this.initialLoading = false
-        this.Plans.push({ id: 0, name: 'SELEC. PLAN' })
       }).catch((error) => {
         // eslint-disable-next-line no-console
         console.error(error)
@@ -304,7 +292,7 @@ export default {
     },
     async exec () {
       this.loading = true
-      const city = parseInt(this.$route.query.city, 10)
+      const city = this.$route.query.city
       const pendingDx = this.pendingCuts
       if (this.setPlan.id === 0 || this.pendingCuts.length < 1) {
         this.snack = true
@@ -328,8 +316,8 @@ export default {
               input: {
                 dx: pendingDx[i],
                 dxPlan: {
-                  id: this.setPlan.id,
-                  name: this.setPlan.name
+                  id: this.setPlan._id,
+                  name: this.setPlan.mikrotik_name
                 },
                 dxKick: this.kickStat.id,
                 dxCity: city

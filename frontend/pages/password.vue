@@ -26,7 +26,7 @@
             <v-data-table
               :key="key"
               :headers="headers"
-              :items="PasswordChanges"
+              :items="passwordchanges"
               :search="search"
               :items-per-page="itemsPerPage"
               :page.sync="page"
@@ -71,7 +71,7 @@
               </template>
               <template v-slot:item.created_at="{ item }">
                 <span>
-                  {{ getDate(item.created_at) }}
+                  {{ getDate(item.createdAt) }}
                 </span>
               </template>
             </v-data-table>
@@ -107,11 +107,11 @@ export default {
   },
   middleware: 'authenticated',
   apollo: {
-    PasswordChanges () {
+    passwordchanges () {
       return {
         query: gql`
         query{
-          PasswordChanges(limit: 100000){
+          passwordchanges(sort: "createdAt:desc"){
             _id
             dni
             client {
@@ -122,11 +122,8 @@ export default {
             }
             old_password
             new_password
-            closed {
-              name
-              value
-            }
-            created_at
+            closed
+            createdAt
           }
         }
       `
@@ -165,7 +162,7 @@ export default {
   },
   methods: {
     getDate (date) {
-      const dateObject = new Date(parseInt(date))
+      const dateObject = new Date(date)
       const humanDateFormat = dateObject.toLocaleString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric' })
       return humanDateFormat
     },
@@ -186,13 +183,7 @@ export default {
     save (id, status) {
       this.$apollo.mutate({
         mutation: gql`mutation ($input: UpdatePasswordChangeInput){
-          updatePasswordChangeRequest(input: $input){
-            success
-            errors{
-              path
-              message
-            }
-          }
+          updatePasswordChangeRequest(input: $input)
         }`,
         variables: {
           input: {

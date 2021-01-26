@@ -53,7 +53,7 @@ export default {
       type: Object,
       default: () => {},
       id: {
-        type: Number,
+        type: String,
         default: 0
       },
       name: {

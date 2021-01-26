@@ -53,6 +53,7 @@
 <script>
 import gql from 'graphql-tag'
 export default {
+  name: 'DeleteClient',
   props: {
     clientid: {
       type: String,
@@ -69,17 +70,19 @@ export default {
   methods: {
     deleteClient (clientid) {
       this.$apollo.mutate({
-        mutation: gql`mutation ($id: ID){
-          deleteClient(id: $id){
-            success
-            errors{
-              path
-              message
+        mutation: gql`mutation ($input: deleteClientInput){
+          deleteClient(input: $input){
+            client {
+              id
             }
           }
         }`,
         variables: {
-          id: this.clientid
+          input: {
+            where: {
+              id: this.clientid
+            }
+          }
         }
       }).then((input) => {
         window.location.reload(true)

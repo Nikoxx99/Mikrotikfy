@@ -18,10 +18,10 @@
       >
         <v-card>
           <v-card-title>
-            Clientes {{ City.name }}
+            Clientes {{ city.name }}
             <v-spacer />
             <v-text-field
-              v-model="searchClient"
+              v-model="searchClientInput"
               prepend-icon="mdi-magnify"
               label="Buscar Cliente"
               single-line
@@ -58,7 +58,7 @@
                   large
                   cancel-text="Cancelar"
                   save-text="Guardar"
-                  @save="save(props.item._id, props.item.plan.id, props.item.newModel)"
+                  @save="save(props.item._id, props.item.plan.id)"
                   @cancel="cancel"
                   @close="close"
                 >
@@ -70,7 +70,7 @@
                       v-model="props.item.plan"
                       item-text="name"
                       item-value="id"
-                      :items="Plans"
+                      :items="plans"
                       return-object
                       single-line
                       label="Plan"
@@ -95,6 +95,28 @@
               </template>
               <!-- ########################### -->
               <!-- eslint-disable -->
+              <template v-slot:item.active="props">
+                <v-tooltip top>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                      v-if="can('CreateForm')"
+                      :color="props.item.active ? 'green darken-3' : 'red darken-3'"
+                      dark
+                      small
+                      v-bind="attrs"
+                      text
+                      v-on="on"
+                      @click="updateStatus(props.item.active, dataTable.map(function(x) {return x._id; }).indexOf(props.item._id))"
+                    >
+                      <v-icon>mdi-{{ props.item.active ? 'check' : 'close' }} {{ props.index }}</v-icon>
+                    </v-btn>
+                  </template>
+                <span>Activar Cliente</span>
+                </v-tooltip>
+              </template>
+              <!-- ########################### -->
+              <!-- ########################### -->
+              <!-- eslint-disable -->
               <template v-slot:item.status="{ item }">
                 <svg height="13" width="20">
                   <circle :id="item._id" cx="10" cy="8" r="5" :fill="item.status" />
@@ -106,7 +128,8 @@
                   <v-dialog v-model="dialog" max-width="650px" :retain-focus="false" fullscreen>
                     <template v-slot:activator="{ on, attrs }">
                       <v-btn
-                        :color="City.color"
+                        v-if="can('CreateForm')"
+                        :color="city.color"
                         dark
                         class="mr-4"
                         v-bind="attrs"
@@ -121,35 +144,35 @@
                         outlined
                         class="mr-4 d-none d-sm-flex d-md-flex d-lg-flex d-xl-flex"
                       >
-                        En Linea: {{ online_users }}
+                        En Linea: {{ ActiveClients.length }}
                       </v-chip>
                       <v-chip
                         color="green darken-3 white--text"
                         small
                         class="mr-4 d-none d-md-flex d-lg-flex d-xl-flex"
                       >
-                        Activos: {{ City.clientActiveCount }}
+                        Activos: {{ clientCountActive }}
                       </v-chip>
                       <v-chip
                         color="red lighten-1 white--text"
                         small
                         class="mr-4 d-none d-md-flex d-lg-flex d-xl-flex"
                       >
-                        En Mora: {{ City.clientDisabledCount }}
+                        En Mora: {{ clientCountDisable }}
                       </v-chip>
                       <v-chip
                         color="primary"
                         small
                         class="mr-4 d-none d-sm-flex d-md-flex d-lg-flex d-xl-flex"
                       >
-                        Totales: {{ City.clientCount }}
+                        Totales: {{ clientCount }}
                       </v-chip>
                       <v-tooltip bottom>
                         <!-- eslint-disable -->
                         <template v-slot:activator="{ on, attrs }">
                           <v-btn
                             v-bind="attrs"
-                            :color="City.color"
+                            :color="city.color"
                             dark
                             class="mr-4"
                             :disabled="refreshLoading"
@@ -175,14 +198,15 @@
                           >
                             <v-icon>mdi-close</v-icon>
                           </v-btn>
-                          <v-toolbar-title><span class="headline">Crear Cliente en {{ City.name }}</span></v-toolbar-title>
+                          <v-toolbar-title><span class="headline">Crear Cliente en {{ city.name }}</span></v-toolbar-title>
                         </v-toolbar>
                       </v-card-title>
                       <v-card-text>
                         <v-container>
                           <CreateForm
                             v-if="dialog"
-                            :citycolor="City.color"
+                            :citycolor="city.color"
+                            :role="role.name"
                             @createClient="createClient($event)"
                             @createClientDialog="createClientDialog($event)"
                             @createClientSnack="createClientSnack($event)"
@@ -191,59 +215,26 @@
                       </v-card-text>
                     </v-card>
                   </v-dialog>
-                  <v-dialog v-model="dialogEdit" max-width="500px" :retain-focus="false" fullscreen>
-                    <v-card>
-                      <v-card-title>
-                        <v-toolbar
-                          dark
-                        >
-                          <v-btn
-                            icon
-                            dark
-                            @click="dialogEdit = false"
-                          >
-                            <v-icon>mdi-close</v-icon>
-                          </v-btn>
-                          <v-toolbar-title>Editar Cliente</v-toolbar-title>
-                        </v-toolbar>
-                      </v-card-title>
-                      <v-card-text>
-                        <v-container>
-                          <EditForm
-                            v-if="dialogEdit"
-                            v-bind="client"
-                            @updateClient="updateClient($event)"
-                            @updateComment="updateComment($event)"
-                          />
-                        </v-container>
-                      </v-card-text>
-                    </v-card>
-                  </v-dialog>
                 </v-toolbar>
               </template>
-              <!-- ########################### -->
+              <!-- COMPONENTS IMPLEMETATION -->
               <!-- eslint-disable -->
               <template v-slot:item.actions="{ item }">
-                <ClientStatus :name="item.name" :clientid="item._id" :code="item.code" />
-                <v-tooltip top>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-icon
-                      v-bind="attrs"
-                      color="yellow darken-4"
-                      v-on="on"
-                      @click="editItem(item)"
-                    >
-                      mdi-pencil
-                    </v-icon>
-                  </template>
-                  <span>Editar Cliente</span>
-                </v-tooltip>
-                <DeleteClient :name="item.name" :clientid="item._id" />
+                <ClientStatus v-if="can('ClientStatus')" :name="item.name" :clientid="item._id" :code="item.code" />
+                <EditForm
+                    v-if="can('EditForm')"
+                    :item="item"
+                    :editIndex="dataTable.indexOf(item)"
+                    :dataTable="dataTable"
+                    @updateClient="updateClient($event)"
+                    @updateComment="updateComment($event)"
+                  />
+                <DeleteClient v-if="can('DeleteClient')" :name="item.name" :clientid="item._id" />
               </template>
               <!-- ########################### -->
             </v-data-table>
           </client-only>
-          <div class="text-center pt-2">
+          <div class="text-center pt-2 justify-center" style="max-width:80%;margin:auto;">
             <v-pagination
               v-if="isPaginationActive"
               v-model="page"
@@ -255,7 +246,7 @@
     </v-row>
     <v-snackbar
       v-model="snack"
-      :timeout="3000"
+      :timeout="1000"
       :color="snackColor"
       bottom
       vertical
@@ -311,43 +302,14 @@ export default {
   },
   middleware: ['defaultCity', 'authenticated'],
   apollo: {
-    Plans () {
+    city () {
       return {
         query: gql`
-        query{
-          Plans{
-            id
-            name
-          }
-        }
-      `
-      }
-    },
-    getActiveClients () {
-      return {
-        query: gql`
-        query($city: Int){
-          getActiveClients(city: $city){
-            name
-          }
-        }
-      `,
-        variables: {
-          city: parseInt(this.$route.query.city, 10)
-        }
-      }
-    },
-    City () {
-      return {
-        query: gql`
-        query($city: Int, $startIndex: Int, $limit: Int) {
-          City(id: $city){
+        query($city: ID!, $start: Int, $limit: Int) {
+          city(id: $city){
             name
             color
-            clientCount
-            clientActiveCount
-            clientDisabledCount
-            clients (startIndex: $startIndex, limit: $limit){
+            clients (start: $start, limit: $limit, sort: "createdAt:desc"){
               _id
               code
               name
@@ -374,25 +336,105 @@ export default {
               wifi_password
               mac_address
               comment
-              operator
-              created_at
+              createdAt
+              updatedAt
               newModel
+              active
             }
           }
         }
       `,
         variables: {
-          city: parseInt(this.$route.query.city, 10),
-          startIndex: 0,
+          city: this.$route.query.city,
+          start: 0,
           limit: 25
         }
       }
     },
-    SearchClient () {
+    plans () {
       return {
         query: gql`
-        query($search: String, $limit: Int, $city: Int){
-          SearchClient(search: $search, limit: $limit, city: $city) {
+        query{
+          plans{
+            id
+            name
+          }
+        }
+      `
+      }
+    },
+    role () {
+      return {
+        query: gql`
+        query($id: ID!){
+          role(id: $id){
+            name
+            allowed_components{
+              name
+            }
+          }
+        }
+      `,
+        variables: {
+          id: this.$store.state.auth.role
+        }
+      }
+    },
+    ActiveClients () {
+      return {
+        query: gql`
+        query($city: String){
+          ActiveClients(city: $city){
+            name
+          }
+        }
+      `,
+        variables: {
+          city: this.$route.query.city
+        }
+      }
+    },
+    clientCount () {
+      return {
+        query: gql`
+          query($city: String) {
+            clientCount(city: $city)
+          }
+        `,
+        variables: {
+          city: this.$route.query.city
+        }
+      }
+    },
+    clientCountActive () {
+      return {
+        query: gql`
+          query($city: String) {
+            clientCountActive(city: $city)
+          }
+        `,
+        variables: {
+          city: this.$route.query.city
+        }
+      }
+    },
+    clientCountDisable () {
+      return {
+        query: gql`
+          query($city: String) {
+            clientCountDisable(city: $city)
+          }
+        `,
+        variables: {
+          city: this.$route.query.city
+        }
+      }
+    },
+    searchClient () {
+      return {
+        query: gql`
+        query($search: String, $limit: Int, $city: String){
+          searchClient(search: $search, limit: $limit, city: $city) {
             _id
             code
             name
@@ -441,14 +483,13 @@ export default {
       page: 1,
       pageCount: 0,
       itemsPerPage: 25,
-      searchClient: '',
+      searchClientInput: '',
       totalClients: 0,
       currentCity: 'Mariquita',
       cityName: '',
       cityColor: '',
       alertBox: false,
       dialog: false,
-      dialogEdit: false,
       options: {},
       headers: [
         { text: 'Codigo', sortable: true, value: 'code', align: ' d-none d-lg-table-cell'},
@@ -461,29 +502,10 @@ export default {
         { text: 'Plan', sortable: true, value: 'plan.name' },
         { text: 'Tecnologia', sortable: true, value: 'technology.name', align: ' d-none d-lg-table-cell' },
         { text: 'Tipo', sortable: true, value: 'newModel', align: ' d-none d-lg-table-cell' },
+        { text: 'Activo', sortable: true, value: 'active' },
         { text: 'Aciones', value: 'actions', sortable: false }
       ],
       editedIndex: -1,
-      client: {
-        Client: {
-          code: 1,
-          name: '',
-          dni: '',
-          address: '',
-          neighborhood: 0,
-          city: 0,
-          phone: '',
-          plan: 0,
-          wifi_ssid: '',
-          wifi_password: '',
-          technology: '',
-          mac_address: '',
-          comment: '',
-          created_at: '',
-          newModel: 0,
-          citycolor: '1'
-        }
-      },
       snack: false,
       snackColor: '',
       snackText: '',
@@ -493,7 +515,9 @@ export default {
       inactive_users: 0,
       online_users: 0,
       title: ' Base de datos',
-      dataTable: []
+      dataTable: [],
+      clientRes: true,
+      allowed_components: []
     }
   },
   computed: {
@@ -506,10 +530,10 @@ export default {
   },
   watch: {
     // eslint-disable-next-line object-shorthand
-    searchClient: function () {
-      if (this.searchClient.length > 3 || !this.searchClient) {
+    searchClientInput: function () {
+      if (this.searchClientInput.length > 3 || !this.searchClientInput) {
         this.debouncedGetAnswer()
-        if (!this.searchClient) {
+        if (!this.searchClientInput) {
           this.clientApiCall()
         }
       }
@@ -523,60 +547,24 @@ export default {
       deep: true
     }
   },
-  created () {
-    if (this.$route.query.created) {
-      this.alertBox = true
-      this.alertBoxColor = 'blue darken-4'
-      this.createdMessage = 'Cliente Creado Satisfactoriamente'
-    }
-    if (this.$route.query.edited) {
-      this.alertBox = true
-      this.alertBoxColor = 'yellow darken-4'
-      this.createdMessage = 'Cliente Editado Satisfactoriamente.'
-    }
-    if (this.$route.query.deleted) {
-      this.alertBox = true
-      this.alertBoxColor = 'red darken-4'
-      this.createdMessage = 'Cliente Eliminado Satisfactoriamente.'
-    }
-  },
   mounted () {
     // eslint-disable-next-line no-undef
     this.debouncedGetAnswer = _.debounce(this.getClientBySearch, 700)
     // eslint-disable-next-line no-undef
     this.debouncedGetResult = _.debounce(this.getDataFromApi, 100)
     this.clientApiCall()
+    this.allowed_components = this.role.allowed_components.map(c => {
+      return c.name
+    })
+    // console.log(this.$options.components)
   },
   methods: {
-    async getClientBySearch () {
-      const search = this.searchClient
-      if (search || search.length > 4) {
-        await this.$apollo.queries.SearchClient.fetchMore({
-        // New variables
-          variables: {
-            search,
-            limit: 100,
-            city: parseInt(this.$route.query.city, 10)
-          },
-          // Transform the previous result with new data
-          updateQuery: (previousResult, { fetchMoreResult }) => {
-            const newClients = fetchMoreResult.SearchClient
-            this.itemsPerPage = newClients.length
-            this.totalClients = newClients.length
-            this.dataTable = newClients
-            this.isPaginationActive = false
-            this.activeClients(false)
-            this.refreshLoading = false
-          }
-        })
-      }
-    },
     clientApiCall () {
       this.loadingDataTable = true
-      if (!this.searchClient) {
+      if (!this.searchClientInput) {
         this.getDataFromApi().then((data) => {
-          this.dataTable = data.items
-          this.totalClients = this.City.clientCount
+          this.mapDatabase(data.items)
+          this.totalClients = this.clientCount
           this.loadingDataTable = false
           this.isPaginationActive = true
           this.activeClients(false)
@@ -613,22 +601,26 @@ export default {
         total
       }
     },
-    async getClients (startIndex, limit) {
-      if (this.City.clients < 1) {
+    async mapDatabase (items) {
+      for (let i = 0; i < items.length; i++) {
+        this.$set(items[i], 'status', 'white')
+      }
+      this.dataTable = items
+    },
+    async getClients (start, limit) {
+      if (this.city.clients < 1) {
         return {}
       }
       if (this.initialLoad) {
-        return await this.City.clients
+        return await this.city.clients
       } else {
-        await this.$apollo.queries.City.fetchMore({
-          // New variables
+        await this.$apollo.queries.city.fetchMore({
           variables: {
-            startIndex,
+            start,
             limit
           },
-          // Transform the previous result with new data
           updateQuery: (previousResult, { fetchMoreResult }) => {
-            const newClients = fetchMoreResult.City.clients
+            const newClients = fetchMoreResult.city.clients
             const newClientsMod = newClients.map(function (c) {
               c.status = 'white'
               return c
@@ -641,19 +633,18 @@ export default {
     },
     async activeClients (refetch) {
       this.refreshLoading = true
-      this.online_users = this.getActiveClients.length
       if (refetch) {
-        await this.$apollo.queries.getActiveClients.refetch()
+        await this.$apollo.queries.ActiveClients.refetch()
         this.refreshLoading = false
       }
       for (let i = 0; i < this.dataTable.length; i++) {
         // eslint-disable-next-line eqeqeq
-        const search = this.getActiveClients.find(c => c.name == this.dataTable[i].code)
+        const search = this.ActiveClients.find(c => c.name == this.dataTable[i].code)
         if (search) {
           this.dataTable[i].status = 'green'
         } else {
           // eslint-disable-next-line eqeqeq
-          const search2 = this.getActiveClients.find(c => c.name == this.dataTable[i].dni)
+          const search2 = this.ActiveClients.find(c => c.name == this.dataTable[i].dni)
           if (search2) {
             this.dataTable[i].status = 'green'
           } else {
@@ -662,26 +653,41 @@ export default {
         }
       }
     },
-    editItem (item) {
-      this.editedIndex = this.dataTable.indexOf(item)
-      this.client.Client = Object.assign({}, item)
-      this.dialogEdit = true
+    async getClientBySearch () {
+      const search = this.searchClientInput
+      if (search || search.length > 3) {
+        await this.$apollo.queries.searchClient.fetchMore({
+          variables: {
+            search,
+            city: this.$route.query.city
+          },
+          updateQuery: async (previousResult, { fetchMoreResult }) => {
+            const newClients = fetchMoreResult.searchClient
+            this.itemsPerPage = newClients.length
+            this.totalClients = newClients.length
+            this.mapDatabase(newClients)
+            this.isPaginationActive = false
+            await this.activeClients(false)
+            this.refreshLoading = false
+          }
+        })
+      }
     },
     getColor (plan) {
-      if (plan === 1) {
+      if (plan === '5f52a6fe2824f015ac8ceb58') {
         return 'blue'
-      } else if (plan === 2) {
+      } else if (plan === '5f52a70a2824f015ac8ceb59') {
         return 'green'
-      } else if (plan === 7) {
+      } else if (plan === '5f52a7572824f015ac8ceb5e') {
         return 'red'
-      } else if (plan === 8) {
+      } else if (plan === '5f52a75f2824f015ac8ceb5f') {
         return 'black'
       }
     },
     getTechnology (technology) {
-      if (technology === 0) {
+      if (technology === '5f832eadb0c43e2c64b3743b') {
         return 'cyan'
-      } else if (technology === 1) {
+      } else if (technology === '5f832ea7b0c43e2c64b3743a') {
         return 'green'
       }
     },
@@ -695,13 +701,12 @@ export default {
         return 'cyan'
       }
     },
-    updateClient (input) {
-      if (this.editedIndex > -1) {
-        Object.assign(this.dataTable[this.editedIndex], input)
+    updateClient (input, editIndex) {
+      if (editIndex > -1) {
+        Object.assign(this.dataTable[this.editIndex], input)
       } else {
         this.dataTable.push(input)
       }
-      this.dialogEdit = false
       this.editSnack = true
       this.editSnackText = 'Cliente editado exitosamente'
     },
@@ -721,28 +726,19 @@ export default {
       this.snackText = 'Cliente creado con éxito!'
       this.snackColor = 'info'
     },
-    save (clientId, newPlan, newModel) {
+    save (clientId, newPlan) {
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: EditClientPlanInput){
-          editClientPlan(input: $input){
-            success
-            errors{
-              path
-              message
-            }
-          }
+        mutation: gql`mutation ($id: String, $plan: String){
+          editClientPlan(id: $id, plan: $plan)
         }`,
         variables: {
-          input: {
-            id: clientId,
-            plan: newPlan,
-            model: newModel
-          }
+          id: clientId,
+          plan: newPlan,
         }
       }).then((input) => {
         this.snack = true
         this.snackColor = 'info'
-        this.snackText = 'Cambio de plan exitoso!'
+        this.snackText = 'Cambio de plan exitoso'
       }).catch((error) => {
         this.snack = true
         this.snackColor = 'red'
@@ -757,11 +753,23 @@ export default {
     close () {
       // eslint-disable-next-line no-console
       console.log('Info closed')
+    },
+    can (component) {
+      const allowed_components = this.allowed_components
+      const current_component = component
+      return allowed_components.includes(current_component)
+    },
+    updateStatus (status, index) {
+      if (status === true) {
+        return
+      }
+      this.dataTable[index].active = !this.dataTable[index].active
+      console.log(status, index)
     }
   },
   head () {
     return {
-      title: this.City.name + this.title,
+      title: this.city.name + this.title,
       meta: [
         { hid: 'language', name: 'language', content: 'es' },
         { hid: 'audience', name: 'audience', content: 'all' },

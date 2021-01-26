@@ -45,7 +45,7 @@
       <v-spacer />
       <div v-if="$store.state.auth">
         <v-btn
-          v-for="city in Cities"
+          v-for="city in cities"
           :key="city.id"
           class="mr-4"
           :color="city.color"
@@ -87,11 +87,11 @@ import gql from 'graphql-tag'
 import Cookie from 'js-cookie'
 export default {
   apollo: {
-    Cities () {
+    cities () {
       return {
         query: gql`
         query{
-          Cities{
+          cities{
             id
             name
             color
@@ -123,6 +123,12 @@ export default {
           info: 0
         },
         {
+          icon: 'mdi-key',
+          title: 'Sol. Clave',
+          to: '/cambio',
+          info: 0
+        },
+        {
           icon: 'mdi-close-network',
           title: 'Suspencion por Mora',
           to: '/cortes'
@@ -144,21 +150,15 @@ export default {
     }
     this.$apollo.query({
       query: gql`
-      query($limit: Int) {
-        PasswordChanges(limit: $limit){
-          closed {
-            name
-            value
-          }
+      query {
+        passwordchanges{
+          closed
         }
       }
-      `,
-      variables: {
-        limit: 1000
-      }
+      `
     }).then((input) => {
-      for (let i = 0; i < input.data.PasswordChanges.length; i++) {
-        if (input.data.PasswordChanges[i].closed.value === false) {
+      for (let i = 0; i < input.data.passwordchanges.length; i++) {
+        if (input.data.passwordchanges[i].closed.value === false) {
           this.items[2].info++
         }
       }
@@ -173,6 +173,7 @@ export default {
   methods: {
     logout () {
       Cookie.remove('auth')
+      Cookie.remove('authToken')
       this.$store.commit('setAuth', null)
       this.$router.replace('/login')
     }

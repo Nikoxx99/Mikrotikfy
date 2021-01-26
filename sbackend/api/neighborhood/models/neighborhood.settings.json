@@ -1,0 +1,27 @@
+{
+  "kind": "collectionType",
+  "collectionName": "neighborhoods",
+  "info": {
+    "name": "Neighborhood",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "cities": {
+      "via": "neighborhoods",
+      "collection": "city",
+      "dominant": true
+    },
+    "clients": {
+      "via": "neighborhood",
+      "collection": "client"
+    }
+  }
+}

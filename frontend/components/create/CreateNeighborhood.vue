@@ -42,47 +42,49 @@
               <v-card-title class="blue darken-3">
                 Barrios
               </v-card-title>
-              <v-data-table
-                :headers="headers"
-                :items="neighborhoods"
-                sort-by="calories"
-                class="elevation-1"
-              >
-                <template v-slot:item.actions="{ item }">
-                  <v-dialog v-model="dialogEdit" max-width="500px" :retain-focus="false">
-                    <v-card>
-                      <v-card-title>
-                        <span class="headline">Editar Barrio</span>
-                      </v-card-title>
-                      <v-card-text>
-                        <v-container>
-                          <EditNeighborhood
-                            v-bind="edit"
-                            @updateNeighborhood="updateNeighborhood($event)"
-                          />
-                        </v-container>
-                      </v-card-text>
-                    </v-card>
-                  </v-dialog>
-                  <v-tooltip top>
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-btn
-                        v-bind="attrs"
-                        class="yellow darken-4"
-                        small
-                        v-on="on"
-                        @click="editItem(item)"
-                      >
-                        <v-icon>
-                          mdi-pencil
-                        </v-icon>
-                      </v-btn>
-                    </template>
-                    <span>Editar Barrio</span>
-                  </v-tooltip>
-                  <ModalDeleteNeighborhood :name="item.name" :neighborhoodid="item.id" />
-                </template>
-              </v-data-table>
+              <client-only>
+                <v-data-table
+                  :headers="headers"
+                  :items="neighborhoods"
+                  sort-by="calories"
+                  class="elevation-1"
+                >
+                  <template v-slot:item.actions="{ item }">
+                    <v-dialog v-model="dialogEdit" max-width="500px" :retain-focus="false">
+                      <v-card>
+                        <v-card-title>
+                          <span class="headline">Editar Barrio</span>
+                        </v-card-title>
+                        <v-card-text>
+                          <v-container>
+                            <EditNeighborhood
+                              v-bind="edit"
+                              @updateNeighborhood="updateNeighborhood($event)"
+                            />
+                          </v-container>
+                        </v-card-text>
+                      </v-card>
+                    </v-dialog>
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-btn
+                          v-bind="attrs"
+                          class="yellow darken-4"
+                          small
+                          v-on="on"
+                          @click="editItem(item)"
+                        >
+                          <v-icon>
+                            mdi-pencil
+                          </v-icon>
+                        </v-btn>
+                      </template>
+                      <span>Editar Barrio</span>
+                    </v-tooltip>
+                    <ModalDeleteNeighborhood :name="item.name" :neighborhoodid="item.id" />
+                  </template>
+                </v-data-table>
+              </client-only>
             </v-card>
           </v-container>
         </v-row>
@@ -131,7 +133,7 @@ export default {
     }
     this.$apollo.query({
       query: gql`query ($limit: Int){
-        Neighborhoods(limit: $limit){
+        neighborhoods(limit: $limit){
           id
           name
         }
@@ -140,7 +142,7 @@ export default {
         limit: 1000
       }
     }).then((input) => {
-      this.neighborhoods = input.data.Neighborhoods
+      this.neighborhoods = input.data.neighborhoods
     }).catch((error) => {
       // eslint-disable-next-line no-console
       console.error(error)

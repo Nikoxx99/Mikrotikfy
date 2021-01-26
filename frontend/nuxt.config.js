@@ -51,7 +51,9 @@ export default {
   apollo: {
     clientConfigs: {
       default: {
-        httpEndpoint: process.env.API_ENDPOINT
+        httpEndpoint: process.env.API_ENDPOINT,
+        authenticationType: 'Bearer',
+        tokenName: 'authToken'
       }
     }
   },

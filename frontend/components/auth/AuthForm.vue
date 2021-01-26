@@ -16,7 +16,8 @@
       type="error"
       tile
     >
-      Credenciales Inválidas, intenta de nuevo.
+      Credenciales Inválidas, intenta de nuevo. <br>
+      <span class="text-subtitle-2">{{ errorMessages }}</span>
     </v-alert>
     <v-card-title class="justify-center">
       Ingresa tu usuario
@@ -76,7 +77,8 @@ export default {
     showPassword: false,
     firstTime: false,
     loginFailed: false,
-    isLoading: false
+    isLoading: false,
+    errorMessages: ''
   }),
   mounted () {
     if (this.$route.query.firstTime) {
@@ -95,39 +97,40 @@ export default {
       this.isLoading = true
       this.loginFailed = false
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: LoginInput!){
+        mutation: gql`mutation ($input: UsersPermissionsLoginInput!){
           login(input: $input){
-            success
-            token
-            username
-            role
-            errors{
-              path
-              message
+            jwt
+            user{
+              username
+              role{
+                id
+              }
             }
           }
         }`,
         variables: {
           input: {
-            username: this.username,
-            password: this.password
+            identifier: this.username,
+            password: this.password,
+            provider: 'local'
           }
         }
       }).then((input) => {
-        if (input.data.login.success) {
+        if (!input.errors) {
           const auth = {
-            accessToken: input.data.login.token,
-            username: input.data.login.username,
-            role: input.data.login.role
+            accessToken: input.data.login.jwt,
+            username: input.data.login.user.username,
+            role: input.data.login.user.role.id
           }
           this.$store.commit('setAuth', auth)
           Cookie.set('auth', auth)
+          Cookie.set('authToken', auth.accessToken)
           if (this.username === 'nohora') {
-            window.location.href = '/lista?city=2'
+            window.location.href = '/lista?city=5fc3f0408e3de73d204cd430'
           } else if (this.username === 'natalia') {
-            window.location.href = '/lista?city=2'
+            window.location.href = '/lista?city=5fc3f0408e3de73d204cd430'
           } else {
-            window.location.href = '/lista?city=1'
+            window.location.href = '/lista?city=5f832e8fb0c43e2c64b37437'
           }
         } else {
           this.loginFailed = true
@@ -135,7 +138,9 @@ export default {
         }
       }).catch((error) => {
         // eslint-disable-next-line no-console
-        console.error(error)
+        this.errorMessages = error.message
+        this.loginFailed = true
+        this.isLoading = false
       })
     }
   }

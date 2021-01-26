@@ -132,7 +132,7 @@
           <v-btn
             color="primary"
             text
-            @click="sendRequest()"
+            @click.once="sendRequest()"
           >
             Confirmar y Enviar
           </v-btn>
@@ -166,7 +166,7 @@
               type="success"
               elevation="2"
             >
-              Petición enviada con exito. Pronto el cambio se hará efectivo.
+              Petición enviada con éxito.
             </v-alert>
           </v-card-text>
           <v-card-actions>
@@ -224,30 +224,19 @@ export default {
         this.$apollo.query({
           query: gql`
           query($dni: String) {
-            PasswordChange(dni: $dni){
-              closed {
-                name
-                value
-              }
-            }
+            TestPasswordChange(dni: $dni)
           }
         `,
           variables: {
             dni: this.user_dni
           }
         }).then((input) => {
-          if (input.data.PasswordChange !== null) {
-            const res = input.data.PasswordChange.closed.value
-            if (res === true) {
-              this.error = false
-              this.e1 = 2
-            } else {
-              this.error = true
-              this.errorMessage = 'Ya existe un proceso activo para el cambio de tu clave.'
-            }
-          } else {
+          if (input.data.TestPasswordChange !== false) {
             this.error = false
             this.e1 = 2
+          } else {
+            this.error = true
+            this.errorMessage = 'Ya existe un proceso activo para el cambio de tu clave. Será realizado hasta 3 días hábiles luego de tu solicitud.'
           }
         }).catch((error) => {
           // eslint-disable-next-line no-console
@@ -269,24 +258,22 @@ export default {
       if (this.valid) {
         this.$apollo.mutate({
           mutation: gql`mutation ($input: PasswordChangeInput){
-          createPasswordChangeRequest(input: $input){
-            success
-            errors{
-              path
-              message
-            }
-          }
+          createPasswordChangeRequest(input: $input)
         }`,
           variables: {
             input: {
               dni: this.user_dni,
               old_password: this.user_old_password,
               new_password: this.user_new_password,
+              closed: {
+                name: 'Cerrado',
+                value: false
+              },
               created_at: String(date)
             }
           }
         }).then((input) => {
-          if (input.data.createPasswordChangeRequest.success) {
+          if (input.data.createPasswordChangeRequest) {
             this.done = true
           } else {
             this.error = true

@@ -20,7 +20,6 @@ module.exports.mkCreateClient = async function (city, input) {
       '=comment=' + comment,
     ]).then(() => {
       conn.close()
-      console.log('Connection Closed <<<')
     })
   }).catch((err) => {
     conn.close()

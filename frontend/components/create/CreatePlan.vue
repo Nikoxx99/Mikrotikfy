@@ -49,46 +49,48 @@
               <v-card-title class="blue darken-3">
                 Planes
               </v-card-title>
-              <v-data-table
-                :headers="headers"
-                :items="plans"
-                class="elevation-1"
-              >
-                <template v-slot:item.actions="{ item }">
-                  <v-dialog v-model="dialogEdit" max-width="500px" :retain-focus="false">
-                    <v-card>
-                      <v-card-title>
-                        <span class="headline">Editar Planes</span>
-                      </v-card-title>
-                      <v-card-text>
-                        <v-container>
-                          <EditPlan
-                            v-bind="edit"
-                            @updatePlan="updatePlan($event)"
-                          />
-                        </v-container>
-                      </v-card-text>
-                    </v-card>
-                  </v-dialog>
-                  <v-tooltip top>
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-btn
-                        v-bind="attrs"
-                        class="yellow darken-4"
-                        small
-                        v-on="on"
-                        @click="editItem(item)"
-                      >
-                        <v-icon>
-                          mdi-pencil
-                        </v-icon>
-                      </v-btn>
-                    </template>
-                    <span>Editar Ciudad</span>
-                  </v-tooltip>
-                  <ModalDeletePlan :name="item.name" :planid="item.id" />
-                </template>
-              </v-data-table>
+              <client-only>
+                <v-data-table
+                  :headers="headers"
+                  :items="plans"
+                  class="elevation-1"
+                >
+                  <template v-slot:item.actions="{ item }">
+                    <v-dialog v-model="dialogEdit" max-width="500px" :retain-focus="false">
+                      <v-card>
+                        <v-card-title>
+                          <span class="headline">Editar Planes</span>
+                        </v-card-title>
+                        <v-card-text>
+                          <v-container>
+                            <EditPlan
+                              v-bind="edit"
+                              @updatePlan="updatePlan($event)"
+                            />
+                          </v-container>
+                        </v-card-text>
+                      </v-card>
+                    </v-dialog>
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-btn
+                          v-bind="attrs"
+                          class="yellow darken-4"
+                          small
+                          v-on="on"
+                          @click="editItem(item)"
+                        >
+                          <v-icon>
+                            mdi-pencil
+                          </v-icon>
+                        </v-btn>
+                      </template>
+                      <span>Editar Ciudad</span>
+                    </v-tooltip>
+                    <ModalDeletePlan :name="item.name" :planid="item.id" />
+                  </template>
+                </v-data-table>
+              </client-only>
             </v-card>
           </v-container>
         </v-row>
@@ -141,7 +143,7 @@ export default {
     }
     this.$apollo.query({
       query: gql`query ($limit: Int){
-        Plans(limit: $limit){
+        plans(limit: $limit){
           id
           name
           mikrotik_name
@@ -151,7 +153,7 @@ export default {
         limit: 1000
       }
     }).then((input) => {
-      this.plans = input.data.Plans
+      this.plans = input.data.plans
     }).catch((error) => {
       // eslint-disable-next-line no-console
       console.error(error)

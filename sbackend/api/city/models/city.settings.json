@@ -1,0 +1,32 @@
+{
+  "kind": "collectionType",
+  "collectionName": "cities",
+  "info": {
+    "name": "City",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "clients": {
+      "via": "city",
+      "collection": "client"
+    },
+    "color": {
+      "type": "string"
+    },
+    "neighborhoods": {
+      "collection": "neighborhood",
+      "via": "cities"
+    },
+    "ip": {
+      "type": "json"
+    }
+  }
+}

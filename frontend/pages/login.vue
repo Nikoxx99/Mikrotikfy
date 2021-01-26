@@ -24,18 +24,14 @@
 <script>
 import AuthForm from '../components/auth/AuthForm.vue'
 export default {
+  layout: 'outuser',
   components: {
     AuthForm
-  },
-  data () {
-    return {
-      title: 'Ingresar | ARNOProducciones'
-    }
   },
   middleware: 'notAuthenticated',
   head () {
     return {
-      title: this.title,
+      title: 'Ingreso API',
       meta: [
         { hid: 'language', name: 'language', content: 'es' },
         { hid: 'audience', name: 'audience', content: 'all' },

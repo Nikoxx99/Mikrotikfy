@@ -59,16 +59,16 @@ export default {
       type: Object,
       default: () => {},
       id: {
-        type: Number,
-        default: 0
+        type: String,
+        default: ''
       },
       name: {
         type: String,
         default: ''
       },
       ip: {
-        type: Number,
-        default: 1
+        type: Array,
+        default: []
       },
       color: {
         type: String,

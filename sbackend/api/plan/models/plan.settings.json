@@ -1,0 +1,24 @@
+{
+  "kind": "collectionType",
+  "collectionName": "plans",
+  "info": {
+    "name": "Plan"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "mikrotik_name": {
+      "type": "string"
+    },
+    "clients": {
+      "via": "plan",
+      "collection": "client"
+    }
+  }
+}

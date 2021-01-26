@@ -1,0 +1,52 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/neighborhoods",
+      "handler": "neighborhood.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/neighborhoods/count",
+      "handler": "neighborhood.count",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/neighborhoods/:id",
+      "handler": "neighborhood.findOne",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/neighborhoods",
+      "handler": "neighborhood.create",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/neighborhoods/:id",
+      "handler": "neighborhood.update",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/neighborhoods/:id",
+      "handler": "neighborhood.delete",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}
