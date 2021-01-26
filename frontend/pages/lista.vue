@@ -96,13 +96,14 @@
               <!-- ########################### -->
               <!-- eslint-disable -->
               <template v-slot:item.active="props">
-                <v-tooltip top>
+                <v-tooltip left>
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn
                       v-if="can('CreateForm')"
                       :color="props.item.active ? 'green darken-3' : 'red darken-3'"
                       dark
                       small
+                      :loading="props.item.loading"
                       v-bind="attrs"
                       text
                       v-on="on"
@@ -604,6 +605,7 @@ export default {
     async mapDatabase (items) {
       for (let i = 0; i < items.length; i++) {
         this.$set(items[i], 'status', 'white')
+        this.$set(items[i], 'loading', false)
       }
       this.dataTable = items
     },
@@ -761,10 +763,58 @@ export default {
     },
     updateStatus (status, index) {
       if (status === true) {
-        return
+        this.dataTable[index].active = !this.dataTable[index].active
+        this.dataTable[index].loading = !this.dataTable[index].loading
+        this.$apollo.mutate({
+          mutation: gql`mutation ($input: adminDeleteInput){
+            adminDelete(input: $input)
+          }`,
+          variables: {
+            input: {
+              id: this.dataTable[index]._id
+            }
+          }
+        }).then((input) => {
+          this.dataTable[index].loading = !this.dataTable[index].loading
+        }).catch((error) => {
+          this.snack = true
+          this.snackColor = 'red'
+          this.snackText = error
+        })
+      } else {
+        this.dataTable[index].active = !this.dataTable[index].active
+        this.dataTable[index].loading = !this.dataTable[index].loading
+        const currentClientToCreate = this.dataTable[index]
+        this.$apollo.mutate({
+          mutation: gql`mutation ($input: adminCreateInput){
+            adminCreate(input: $input)
+          }`,
+          variables: {
+            input: {
+              id: currentClientToCreate._id,
+              code: currentClientToCreate.code,
+              name: currentClientToCreate.name,
+              dni: currentClientToCreate.dni,
+              address: currentClientToCreate.address,
+              neighborhood: currentClientToCreate.neighborhood.id,
+              city: currentClientToCreate.city.id,
+              phone: currentClientToCreate.phone,
+              plan: currentClientToCreate.plan.id,
+              wifi_ssid: currentClientToCreate.wifi_ssid,
+              wifi_password: currentClientToCreate.wifi_password,
+              technology: currentClientToCreate.technology.id,
+              mac_address: currentClientToCreate.mac_address,
+              comment: currentClientToCreate.comment
+            }
+          }
+        }).then((input) => {
+          this.dataTable[index].loading = !this.dataTable[index].loading
+        }).catch((error) => {
+          this.snack = true
+          this.snackColor = 'red'
+          this.snackText = error
+        })
       }
-      this.dataTable[index].active = !this.dataTable[index].active
-      console.log(status, index)
     }
   },
   head () {

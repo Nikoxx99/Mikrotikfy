@@ -5,7 +5,6 @@
  */
 const { sanitizeEntity } = require('strapi-utils');
 const { mkCreateClient, mkDeleteClient, mkSetClientPlanInformation, mkClientStatus, mkGetComment, mkSetComment, mkDxClient } = require('../../../mikrotik/functions');
-const client = require('../services/client');
 module.exports = {
   async create(ctx) {
     let entity;
@@ -33,7 +32,7 @@ module.exports = {
           const searchPlan = await strapi.services.plan.find({ id: ctx.request.body.plan })
           const searchNeighborhood = await strapi.services.neighborhood.find({ id: ctx.request.body.neighborhood })
           const searchTechnology = await strapi.services.technology.find({ id: ctx.request.body.technology })
-          const mikrotikHost = searchCity[0].ip[i]
+          const mikrotikHost = searchCity[0].ip
           const plan = searchPlan[0].mikrotik_name
           const planName = searchPlan[0].name
           const cityName = searchCity[0].name
@@ -44,6 +43,37 @@ module.exports = {
       }
     }
     return sanitizeEntity(entity, { model: strapi.models.client });
+  },
+  async adminCreate(ctx) {
+    const id = ctx.request.body.input.id
+    await strapi.services.client.update({ id }, { 'active': true });
+    const searchCity = await strapi.services.city.find({ id: ctx.request.body.input.city })
+    const searchPlan = await strapi.services.plan.find({ id: ctx.request.body.input.plan })
+    const searchNeighborhood = await strapi.services.neighborhood.find({ id: ctx.request.body.input.neighborhood })
+    const searchTechnology = await strapi.services.technology.find({ id: ctx.request.body.input.technology })
+    if (searchCity[0].ip.length > 1) {
+      for (let i = 0; i < searchCity[0].ip.length; i++) {
+        const mikrotikHost = searchCity[0].ip[i]
+        const plan = searchPlan[0].mikrotik_name
+        const planName = searchPlan[0].name
+        const cityName = searchCity[0].name
+        const neighborhoodName = searchNeighborhood[0].name
+        const technologyName = searchTechnology[0].name
+        mkCreateClient(mikrotikHost, plan, ctx.request.body.input, cityName, planName, neighborhoodName, technologyName)
+      }
+    } else {
+      const searchCity = await strapi.services.city.find({ id: ctx.request.body.input.city })
+      const searchPlan = await strapi.services.plan.find({ id: ctx.request.body.input.plan })
+      const searchNeighborhood = await strapi.services.neighborhood.find({ id: ctx.request.body.input.neighborhood })
+      const searchTechnology = await strapi.services.technology.find({ id: ctx.request.body.input.technology })
+      const mikrotikHost = searchCity[0].ip
+      const plan = searchPlan[0].mikrotik_name
+      const planName = searchPlan[0].name
+      const cityName = searchCity[0].name
+      const neighborhoodName = searchNeighborhood[0].name
+      const technologyName = searchTechnology[0].name
+      mkCreateClient(mikrotikHost, plan, ctx.request.body.input, cityName, planName, neighborhoodName, technologyName)
+    }
   },
   async update(ctx) {
     const { id } = ctx.params;
@@ -94,14 +124,43 @@ module.exports = {
     const entity = await strapi.services.client.delete({ id });
     return sanitizeEntity(entity, { model: strapi.models.client });
   },
+  async adminDelete(ctx) {
+    const { id } = ctx.request.body.input
+    await strapi.services.client.update({ id }, { 'active': false });
+    const search = await strapi.services.client.find({ _id: id })
+    const clientObj = search[0]
+    const dni = clientObj.dni
+    const code = clientObj.code
+    const model = clientObj.newModel
+    const reqCityIpArray = clientObj.city.ip
+    if (reqCityIpArray.length > 1) {
+      const successfulMikrotikResponses = []
+      for (let i = 0; i < reqCityIpArray.length; i++) {
+        const mikrotikHost = reqCityIpArray[i]
+        const res = await mkDeleteClient(mikrotikHost, dni, code, model)
+        successfulMikrotikResponses.push(res)
+      }
+    } else {
+      const mikrotikHost = reqCityIpArray[0]
+      await mkDeleteClient(mikrotikHost, dni, code, model)
+    }
+  },
   async count(ctx) {
     return await strapi.services.client.count({ city: ctx.query._city });
   },
   async countActive(ctx) {
-    return await strapi.services.client.count({ city: ctx.query._city, active: true });
+    const mb3 = await strapi.services.client.count({ city: ctx.query._city, plan: '5f52a7232824f015ac8ceb5a' })
+    const mb4 = await strapi.services.client.count({ city: ctx.query._city, plan: '5f52a73c2824f015ac8ceb5c' })
+    const mb6 = await strapi.services.client.count({ city: ctx.query._city, plan: '5f52a7442824f015ac8ceb5d' })
+    const mb8 = await strapi.services.client.count({ city: ctx.query._city, plan: '5f52a6fe2824f015ac8ceb58' })
+    const mb10 = await strapi.services.client.count({ city: ctx.query._city, plan: '5f52a70a2824f015ac8ceb59' })
+    const mb100 = await strapi.services.client.count({ city: ctx.query._city, plan: '5f52a72d2824f015ac8ceb5b' })
+    return mb3 + mb4 + mb6 + mb8 + mb10 + mb100
   },
   async countDisable(ctx) {
-    return await strapi.services.client.count({ city: ctx.query._city, active: false })
+    const disconnected = await strapi.services.client.count({ city: ctx.query._city, plan: '5f52a7572824f015ac8ceb5e' })
+    const retired = await strapi.services.client.count({ city: ctx.query._city, plan: '5f52a75f2824f015ac8ceb5f' })
+    return retired + disconnected
   },
   async getClientComment(ctx) {
     const id = ctx.query.id

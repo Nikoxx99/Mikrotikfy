@@ -54,6 +54,25 @@ module.exports = {
       id: String
       name: String
     }
+    input adminCreateInput {
+      id: String
+      code: String
+      name: String
+      dni: String
+      address: String
+      neighborhood: String
+      city: String
+      phone: String
+      plan: String
+      wifi_ssid: String
+      wifi_password: String
+      technology: String
+      mac_address: String
+      comment: String
+    }
+    input adminDeleteInput {
+      id: String
+    }
   `,
   query: `
     ClientStatus(id: ID): ClientStatus
@@ -66,6 +85,8 @@ module.exports = {
   mutation: `
     editClientPlan(id: String, plan: String): Boolean
     dxClient(input: DxInfoInput): [dxResponse]
+    adminCreate(input: adminCreateInput): Boolean
+    adminDelete(input: adminDeleteInput): Boolean
   `,
   type: {
     ActiveClientList: {
@@ -107,6 +128,14 @@ module.exports = {
       dxClient: {
         description: 'dx client processor',
         resolver: 'application::client.client.dxClient',
+      },
+      adminCreate: {
+        description: 'Create client on admin approvation',
+        resolver: 'application::client.client.adminCreate',
+      },
+      adminDelete: {
+        description: 'Delete client on admin unapprovation',
+        resolver: 'application::client.client.adminDelete',
       }
     }
   },
