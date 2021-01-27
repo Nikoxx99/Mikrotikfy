@@ -7,14 +7,17 @@ const { sanitizeEntity } = require('strapi-utils');
 const { mkCreateClient, mkDeleteClient, mkSetClientPlanInformation, mkClientStatus, mkGetComment, mkSetComment, mkDxClient } = require('../../../mikrotik/functions');
 module.exports = {
   async create(ctx) {
-    let entity;
-    const newClient = ctx.request.body.map(c => {
-      c.active = true
-    })
-    entity = await strapi.services.client.create(newClient);
     const sendToMikrotik = ctx.request.body.sendToMikrotik
     const operator_role = ctx.request.body.operator_role
     if (operator_role === 'admin') {
+      let entity;
+      let request = []
+      request[0] = ctx.request.body
+      const newClient = request.map(c => {
+        c.active = true
+        return c
+      })
+      entity = await strapi.services.client.create(newClient[0]);
       if (sendToMikrotik) {
         const searchCity = await strapi.services.city.find({ id: ctx.request.body.city })
         const searchPlan = await strapi.services.plan.find({ id: ctx.request.body.plan })
@@ -67,7 +70,6 @@ module.exports = {
         const neighborhoodName = searchNeighborhood[0].name
         const technologyName = searchTechnology[0].name
         mkCreateClient(mikrotikHost, plan, ctx.request.body.input, cityName, planName, neighborhoodName, technologyName)
-        return true
       }
     } else {
       const searchCity = await strapi.services.city.find({ id: ctx.request.body.input.city })
@@ -83,6 +85,7 @@ module.exports = {
       mkCreateClient(mikrotikHost, plan, ctx.request.body.input, cityName, planName, neighborhoodName, technologyName)
       return true
     }
+    return true
   },
   async update(ctx) {
     const { id } = ctx.params;
@@ -148,13 +151,13 @@ module.exports = {
         const mikrotikHost = reqCityIpArray[i]
         const res = await mkDeleteClient(mikrotikHost, dni, code, model)
         successfulMikrotikResponses.push(res)
-        return true
       }
     } else {
       const mikrotikHost = reqCityIpArray[0]
       await mkDeleteClient(mikrotikHost, dni, code, model)
       return true
     }
+    return true
   },
   async count(ctx) {
     return await strapi.services.client.count({ city: ctx.query._city });
@@ -162,11 +165,12 @@ module.exports = {
   async countActive(ctx) {
     const mb3 = await strapi.services.client.count({ city: ctx.query._city, plan: '5f52a7232824f015ac8ceb5a' })
     const mb4 = await strapi.services.client.count({ city: ctx.query._city, plan: '5f52a73c2824f015ac8ceb5c' })
+    const mb4lte = await strapi.services.client.count({ city: ctx.query._city, plan: '60116a1396f2053b1bbc3e09' })
     const mb6 = await strapi.services.client.count({ city: ctx.query._city, plan: '5f52a7442824f015ac8ceb5d' })
     const mb8 = await strapi.services.client.count({ city: ctx.query._city, plan: '5f52a6fe2824f015ac8ceb58' })
     const mb10 = await strapi.services.client.count({ city: ctx.query._city, plan: '5f52a70a2824f015ac8ceb59' })
     const mb100 = await strapi.services.client.count({ city: ctx.query._city, plan: '5f52a72d2824f015ac8ceb5b' })
-    return mb3 + mb4 + mb6 + mb8 + mb10 + mb100
+    return mb3 + mb4 + mb4lte + mb6 + mb8 + mb10 + mb100
   },
   async countDisable(ctx) {
     const disconnected = await strapi.services.client.count({ city: ctx.query._city, plan: '5f52a7572824f015ac8ceb5e' })

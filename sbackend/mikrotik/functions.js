@@ -18,6 +18,9 @@ module.exports.mkCreateClient = async function (mikrotikHost, plan, input, cityN
       '=comment=' + comment,
     ]).then(() => {
       conn.close()
+    }).catch((err) => {
+      conn.close()
+      console.log(err)
     })
   }).catch((err) => {
     conn.close()
