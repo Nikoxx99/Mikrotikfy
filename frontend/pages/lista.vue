@@ -465,6 +465,7 @@ export default {
             operator
             created_at
             newModel
+            active
           }
         }
         `,
