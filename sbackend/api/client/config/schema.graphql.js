@@ -30,6 +30,7 @@ module.exports = {
       operator: Int
       created_at: String
       newModel: Int
+      active: Boolean
     }
     type ClientComment {
       comment: String
