@@ -239,12 +239,12 @@
               />
               <v-btn
                 class="mr-4"
-                :color="item.citycolor"
+                color="info"
                 :loading="isSubmitting"
                 :disabled="isSubmitting"
                 @click="updateClient"
               >
-                Editar Cliente
+                Confirmar
               </v-btn>
             </v-form>
           </v-container>
@@ -395,7 +395,6 @@ export default {
           id: this.item._id
         }
       }).then((input) => {
-        console.log('this')
         this.commentLoading = false
         this.commentDisabled = false
         this.item.comment = input.data.getClientComment.comment
@@ -449,6 +448,8 @@ export default {
       }).then((input) => {
         if (input.data.updateClient.client.id) {
           this.$emit('updateClient', this.item, this.editIndex)
+          this.dialogEdit = false
+          this.isSubmitting = false
           this.dialogEdit = false
           // window.location.reload(true)
         } else {

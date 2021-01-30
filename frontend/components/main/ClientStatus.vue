@@ -130,11 +130,11 @@ export default {
     upload: 0
   }),
   methods: {
-    initComponent () {
+    async initComponent () {
       this.modal = true
       this.online = false
       this.loading = true
-      this.$apollo.query({
+      await this.$apollo.query({
         query: gql`query ($id: ID){
           ClientStatus(id: $id){
             status
