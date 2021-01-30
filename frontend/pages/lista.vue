@@ -54,7 +54,6 @@
               <template v-slot:item.plan.name="props">
                 <v-edit-dialog
                   :return-value.sync="props.item.plan"
-                  persistent
                   large
                   cancel-text="Cancelar"
                   save-text="Guardar"
@@ -62,7 +61,7 @@
                   @cancel="cancel"
                   @close="close"
                 >
-                  <v-chip small :color="getColor(props.item.plan.id)" class="white--text">
+                  <v-chip small label :color="getColor(props.item.plan.id)" class="white--text">
                     {{ props.item.plan.name }}
                   </v-chip>
                   <template v-slot:input>
@@ -80,21 +79,18 @@
                 </v-edit-dialog>
               </template>
               <!-- ########################### -->
-              <!-- eslint-disable -->
               <template v-slot:item.technology.name="{ item }">
                 <span :class="getTechnology(item.technology.id) + '--text'">
                   {{ item.technology.name }}
                 </span>
               </template>
               <!-- ########################### -->
-              <!-- eslint-disable -->
               <template v-slot:item.newModel="{ item }">
                 <svg height="13" width="20">
                   <circle cx="10" cy="8" r="5" :fill="getModel(item.newModel)" />
                 </svg>
               </template>
               <!-- ########################### -->
-              <!-- eslint-disable -->
               <template v-slot:item.active="props">
                 <v-tooltip left>
                   <template v-slot:activator="{ on, attrs }">
@@ -116,8 +112,6 @@
                 </v-tooltip>
               </template>
               <!-- ########################### -->
-              <!-- ########################### -->
-              <!-- eslint-disable -->
               <template v-slot:item.status="{ item }">
                 <svg height="13" width="20">
                   <circle :id="item._id" cx="10" cy="8" r="5" :fill="item.status" />
@@ -348,7 +342,7 @@ export default {
         variables: {
           city: this.$route.query.city,
           start: 0,
-          limit: 25
+          limit: 15
         }
       }
     },
@@ -484,7 +478,7 @@ export default {
       key: 0,
       page: 1,
       pageCount: 0,
-      itemsPerPage: 25,
+      itemsPerPage: 15,
       searchClientInput: '',
       totalClients: 0,
       currentCity: 'Mariquita',
