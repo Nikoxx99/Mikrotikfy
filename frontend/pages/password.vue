@@ -122,6 +122,7 @@ export default {
             }
             old_password
             new_password
+            address
             closed
             createdAt
           }
@@ -147,6 +148,7 @@ export default {
       headers: [
         { text: 'NOMBRE', sortable: true, value: 'client.name' },
         { text: 'Cedula', sortable: true, value: 'dni' },
+        { text: 'Dirección', sortable: true, value: 'address' },
         { text: 'Clave Anterior', sortable: false, value: 'old_password' },
         { text: 'Clave Nueva', sortable: true, value: 'new_password' },
         { text: 'Ciudad', sortable: true, value: 'client.city.name' },

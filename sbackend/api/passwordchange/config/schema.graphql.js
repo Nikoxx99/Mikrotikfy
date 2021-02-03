@@ -9,6 +9,7 @@ module.exports = {
       old_password: String
       closed: ClosedObjectInput
       new_password: String
+      address: String
       created_at: String
     }
     input UpdatePasswordChangeInput {

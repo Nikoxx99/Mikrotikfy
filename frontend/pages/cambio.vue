@@ -33,7 +33,13 @@
 
                 <v-divider />
 
-                <v-stepper-step step="3">
+                <v-stepper-step :complete="e1 > 2" step="3">
+                  Direccion de residencia
+                </v-stepper-step>
+
+                <v-divider />
+
+                <v-stepper-step step="4">
                   Nueva Clave
                 </v-stepper-step>
               </v-stepper-header>
@@ -81,6 +87,27 @@
                   </v-btn>
                 </v-stepper-content>
                 <v-stepper-content step="3">
+                  <v-card>
+                    <v-col
+                      align-self="center"
+                    >
+                      <v-text-field
+                        v-model="user_address"
+                        label="Ingresa dirección de residencia"
+                        hint="Es la dirección donde esta instalado el servicio al que deseas actualizar la contraseña."
+                        persistent-hint
+                        outlined
+                      />
+                    </v-col>
+                  </v-card>
+                  <v-btn class="mt-4" color="primary" @click="e1 = 4">
+                    Continuar
+                  </v-btn>
+                  <v-btn class="mt-4" color="grey" @click="e1 = 2">
+                    Volver y Corregir
+                  </v-btn>
+                </v-stepper-content>
+                <v-stepper-content step="4">
                   <v-card>
                     <v-col
                       align-self="center"
@@ -201,11 +228,12 @@ export default {
       user_dni: '',
       user_old_password: '',
       user_new_password: '',
+      user_address: '',
       valid_dni: [
         value => !!value || 'Este campo no puede estar vacío'
       ],
       valid_new_password: [
-        value => !!value || 'Required.',
+        value => !!value || 'Debes especificar la nueva contraseña deseada.',
         value => (value || '').length >= 8 || 'La clave debe tener al menos 8 caracteres.',
         (value) => {
           const pattern = /^[A-Za-z0-9]+$/
@@ -265,6 +293,7 @@ export default {
               dni: this.user_dni,
               old_password: this.user_old_password,
               new_password: this.user_new_password,
+              address: this.user_address,
               closed: {
                 name: 'Cerrado',
                 value: false

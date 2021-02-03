@@ -447,7 +447,7 @@ export default {
         }
       }).then((input) => {
         if (input.data.updateClient.client.id) {
-          this.$emit('updateClient', this.item, this.editIndex)
+          // this.$emit('updateClient', this.item, this.editIndex)
           this.dialogEdit = false
           this.isSubmitting = false
           this.dialogEdit = false

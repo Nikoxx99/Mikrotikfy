@@ -221,7 +221,6 @@
                     :item="item"
                     :editIndex="dataTable.indexOf(item)"
                     :dataTable="dataTable"
-                    @updateClient="updateClient($event)"
                     @updateComment="updateComment($event)"
                   />
                 <DeleteClient v-if="can('DeleteClient')" :name="item.name" :clientid="item._id" />
@@ -701,15 +700,15 @@ export default {
         return 'cyan'
       }
     },
-    updateClient (input, editIndex) {
-      if (editIndex > -1) {
-        Object.assign(this.dataTable[this.editIndex], input)
-      } else {
-        this.dataTable.push(input)
-      }
-      this.editSnack = true
-      this.editSnackText = 'Cliente editado exitosamente'
-    },
+    // updateClient (input, editIndex) {
+    //   if (editIndex > -1) {
+    //     Object.assign(this.dataTable[this.editIndex], input)
+    //   } else {
+    //     this.dataTable.push(input)
+    //   }
+    //   this.editSnack = true
+    //   this.editSnackText = 'Cliente editado exitosamente'
+    // },
     updateComment (input) {
       if (this.editedIndex > -1) {
         this.dataTable[this.editedIndex].comment = input
