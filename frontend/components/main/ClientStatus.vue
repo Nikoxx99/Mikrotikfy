@@ -14,7 +14,6 @@
       <span>Estatus</span>
     </v-tooltip>
     <v-dialog
-      v-if="modal"
       v-model="modal"
       max-width="590"
     >
@@ -98,6 +97,32 @@
 import gql from 'graphql-tag'
 export default {
   name: 'ClientStatus',
+  apollo: {
+    ClientStatus () {
+      return {
+        query: gql`query ($id: ID){
+          ClientStatus(id: $id){
+            status
+            address
+            mikrotik
+            mac_address
+            offlineTime
+            disconnectReason
+            lastCallerId
+            uptime
+            download
+            upload
+          }
+        }`,
+        variables: {
+          id: this.clientid
+        },
+        skip () {
+          return true
+        }
+      }
+    }
+  },
   props: {
     clientid: {
       type: String,
@@ -112,7 +137,7 @@ export default {
       default: ''
     },
     role: {
-      type: Object,
+      type: Array,
       default: () => {}
     }
   },
@@ -135,62 +160,46 @@ export default {
   }),
   methods: {
     async initComponent () {
+      this.loading = true
       this.modal = true
       this.online = false
-      this.loading = true
-      await this.$apollo.query({
-        query: gql`query ($id: ID){
-          ClientStatus(id: $id){
-            status
-            address
-            mikrotik
-            mac_address
-            offlineTime
-            disconnectReason
-            lastCallerId
-            uptime
-            download
-            upload
-          }
-        }`,
+      this.$apollo.queries.ClientStatus.skip = false
+      await this.$apollo.queries.ClientStatus.fetchMore({
         variables: {
           id: this.clientid
-        }
-      }).then((input) => {
-        console.log(input)
-        const status = input.data.ClientStatus.status
-        if (status) {
-          this.loading = false
-          this.address = input.data.ClientStatus.address
-          this.mikrotik = input.data.ClientStatus.mikrotik
-          this.mac_address = input.data.ClientStatus.mac_address
-          this.uptime = input.data.ClientStatus.uptime
-          this.offlineTime = input.data.ClientStatus.offlineTime
-          this.disconnectReason = input.data.ClientStatus.disconnectReason
-          this.lastCallerId = input.data.ClientStatus.lastCallerId
-          this.download = input.data.ClientStatus.download
-          this.upload = input.data.ClientStatus.upload
-          if (input.data.ClientStatus.address) {
+        },
+        updateQuery: (_, { fetchMoreResult }) => {
+          const newStatusInfo = fetchMoreResult.ClientStatus
+          const status = newStatusInfo.status
+          if (status) {
             this.loading = false
-            this.clientExists = true
-            this.online = true
-            this.showCard = true
+            this.address = newStatusInfo.address
+            this.mikrotik = newStatusInfo.mikrotik
+            this.mac_address = newStatusInfo.mac_address
+            this.uptime = newStatusInfo.uptime
+            this.offlineTime = newStatusInfo.offlineTime
+            this.disconnectReason = newStatusInfo.disconnectReason
+            this.lastCallerId = newStatusInfo.lastCallerId
+            this.download = newStatusInfo.download
+            this.upload = newStatusInfo.upload
+            if (newStatusInfo.address) {
+              this.loading = false
+              this.clientExists = true
+              this.online = true
+              this.showCard = true
+            } else {
+              this.loading = false
+              this.clientExists = true
+              this.online = false
+              this.showCard = true
+            }
           } else {
             this.loading = false
-            this.clientExists = true
+            this.clientExists = false
             this.online = false
             this.showCard = true
           }
-        } else {
-          this.loading = false
-          this.clientExists = false
-          this.online = false
-          this.showCard = true
         }
-      }).catch((error) => {
-        // eslint-disable-next-line no-console
-        console.error(error)
-        this.loading = false
       })
     },
     formatBytes (bytes, decimals = 2) {

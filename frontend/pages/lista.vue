@@ -215,21 +215,23 @@
               <!-- COMPONENTS IMPLEMETATION -->
               <!-- eslint-disable -->
               <template v-slot:item.actions="{ item }">
-                <ClientStatus
-                  v-if="can('ClientStatus')"
-                  :name="item.name"
-                  :clientid="item._id"
-                  :code="item.code"
-                  :role="allowed_components"
-                />
-                <EditForm
-                    v-if="can('EditForm')"
-                    :item="item"
-                    :editIndex="dataTable.indexOf(item)"
-                    :dataTable="dataTable"
-                    @updateComment="updateComment($event)"
+                <div style="white-space:nowrap">
+                  <ClientStatus
+                    v-if="can('ClientStatus')"
+                    :name="item.name"
+                    :clientid="item._id"
+                    :code="item.code"
+                    :role="allowed_components"
                   />
-                <DeleteClient v-if="can('DeleteClient')" :name="item.name" :clientid="item._id" />
+                  <EditForm
+                      v-if="can('EditForm')"
+                      :item="item"
+                      :editIndex="dataTable.indexOf(item)"
+                      :dataTable="dataTable"
+                      @updateComment="updateComment($event)"
+                    />
+                  <DeleteClient v-if="can('DeleteClient')" :name="item.name" :clientid="item._id" />
+                </div>
               </template>
               <!-- ########################### -->
             </v-data-table>
@@ -470,6 +472,9 @@ export default {
         `,
         variables: {
           limit: 1
+        },
+        skip () {
+          return true
         }
       }
     }
@@ -659,6 +664,7 @@ export default {
       }
     },
     async getClientBySearch () {
+      this.$apollo.queries.searchClient.skip = false
       const search = this.searchClientInput
       if (search || search.length > 3) {
         await this.$apollo.queries.searchClient.fetchMore({

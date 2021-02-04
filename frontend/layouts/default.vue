@@ -49,6 +49,7 @@
           v-for="city in cities"
           :key="city.id"
           class="mr-4"
+          small
           :color="city.color"
           :href="`/lista?city=${city.id}`"
         >
@@ -146,7 +147,6 @@ export default {
   mounted () {
     const date = new Date()
     const month = date.getMonth()
-    console.log(month)
     if (month === 11) {
       this.bg = 'cbg.jpg'
     }
