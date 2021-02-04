@@ -67,7 +67,7 @@
                   <v-spacer />
                   <h3>Uptime: {{ uptime }}</h3>
                   <v-spacer />
-                  <h3>Clave: 4Rn0P{{ code }}</h3>
+                  <h3 v-if="can('access_password')">Clave: 4Rn0P{{ code }}</h3>
                 </v-col>
                 <v-col>
                   <h3>Descarga: <strong>{{ formatBytes(download) }}</strong></h3>
@@ -110,6 +110,10 @@ export default {
     code: {
       type: String,
       default: ''
+    },
+    role: {
+      type: Object,
+      default: () => {}
     }
   },
   data: () => ({
@@ -153,6 +157,7 @@ export default {
           id: this.clientid
         }
       }).then((input) => {
+        console.log(input)
         const status = input.data.ClientStatus.status
         if (status) {
           this.loading = false
@@ -198,6 +203,13 @@ export default {
       const i = Math.floor(Math.log(bytes) / Math.log(k))
 
       return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
+    },
+    can (component) {
+      // eslint-disable-next-line camelcase
+      const allowed_components = this.role
+      // eslint-disable-next-line camelcase
+      const current_component = component
+      return allowed_components.includes(current_component)
     }
   }
 }

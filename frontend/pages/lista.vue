@@ -137,7 +137,7 @@
                         color="white white--text"
                         small
                         outlined
-                        class="mr-4 d-none d-sm-flex d-md-flex d-lg-flex d-xl-flex"
+                        class="mr-4"
                       >
                         En Linea: {{ ActiveClients.length }}
                       </v-chip>
@@ -215,7 +215,13 @@
               <!-- COMPONENTS IMPLEMETATION -->
               <!-- eslint-disable -->
               <template v-slot:item.actions="{ item }">
-                <ClientStatus v-if="can('ClientStatus')" :name="item.name" :clientid="item._id" :code="item.code" />
+                <ClientStatus
+                  v-if="can('ClientStatus')"
+                  :name="item.name"
+                  :clientid="item._id"
+                  :code="item.code"
+                  :role="allowed_components"
+                />
                 <EditForm
                     v-if="can('EditForm')"
                     :item="item"
@@ -487,16 +493,16 @@ export default {
       dialog: false,
       options: {},
       headers: [
-        { text: 'Codigo', sortable: true, value: 'code', align: ' d-none d-lg-table-cell'},
+        { text: 'Codigo', sortable: true, value: 'code'},
         { text: 'Estado', sortable: false, value: 'status' },
         { text: 'Nombre', sortable: true, value: 'name' },
-        { text: 'Cedula', sortable: true, value: 'dni', align: ' d-none d-lg-table-cell' },
+        { text: 'Cedula', sortable: true, value: 'dni' },
         { text: 'Direccion', sortable: false, value: 'address'},
-        { text: 'Barrio', sortable: true, value: 'neighborhood.name', align: ' d-none d-lg-table-cell' },
-        { text: 'Telefono', sortable: false, value: 'phone', align: ' d-none d-lg-table-cell' },
+        { text: 'Barrio', sortable: true, value: 'neighborhood.name' },
+        { text: 'Telefono', sortable: false, value: 'phone' },
         { text: 'Plan', sortable: true, value: 'plan.name' },
-        { text: 'Tecnologia', sortable: true, value: 'technology.name', align: ' d-none d-lg-table-cell' },
-        { text: 'Tipo', sortable: true, value: 'newModel', align: ' d-none d-lg-table-cell' },
+        { text: 'Tecnologia', sortable: true, value: 'technology.name' },
+        { text: 'Tipo', sortable: true, value: 'newModel' },
         { text: 'Activo', sortable: true, value: 'active' },
         { text: 'Aciones', value: 'actions', sortable: false }
       ],

@@ -44,6 +44,7 @@
       <v-toolbar-title class="d-none d-md-flex d-lg-flex d-xl-flex" v-text="title" />
       <v-spacer />
       <div v-if="$store.state.auth">
+        <span class="mr-4">{{ $store.state.auth.username.charAt(0).toUpperCase() + $store.state.auth.username.slice(1) }}</span>
         <v-btn
           v-for="city in cities"
           :key="city.id"
