@@ -89,8 +89,9 @@ module.exports = {
   },
   async update(ctx) {
     const { id } = ctx.params;
-    let entity;
+    let entity, history;
     entity = await strapi.services.client.update({ id }, ctx.request.body);
+    await strapi.services.history.create(ctx.request.body);
 
     const search = await strapi.services.client.find({ _id: id })
     const clientObj = search[0]
@@ -250,6 +251,8 @@ module.exports = {
     const reqCityIpArray = clientObj.city.ip
     const successfulMikrotikResponses = []
     await strapi.services.client.update({ id }, { plan: newClientPlanSearch })
+    // console.log(clientObj)
+    // await strapi.services.history.create(clientObj);
     if (reqCityIpArray.length > 1) {
       //for loop
       for (let i = 0; i < reqCityIpArray.length; i++) {

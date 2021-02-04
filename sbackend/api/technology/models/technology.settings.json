@@ -16,6 +16,10 @@
     "clients": {
       "via": "technology",
       "collection": "client"
+    },
+    "histories": {
+      "via": "technology",
+      "collection": "history"
     }
   }
 }

@@ -22,6 +22,10 @@
     "clients": {
       "via": "neighborhood",
       "collection": "client"
+    },
+    "histories": {
+      "via": "neighborhood",
+      "collection": "history"
     }
   }
 }

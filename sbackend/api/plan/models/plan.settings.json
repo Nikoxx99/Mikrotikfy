@@ -19,6 +19,10 @@
     "clients": {
       "via": "plan",
       "collection": "client"
+    },
+    "histories": {
+      "via": "plan",
+      "collection": "history"
     }
   }
 }

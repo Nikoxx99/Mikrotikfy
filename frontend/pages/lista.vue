@@ -727,7 +727,7 @@ export default {
       }
     },
     createClient (client) {
-      this.dataTable.push(client)
+      Object.assign(this.dataTable[0], client)
     },
     createClientDialog (value) {
       this.dialog = false

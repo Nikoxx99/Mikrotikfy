@@ -27,6 +27,10 @@
     },
     "ip": {
       "type": "json"
+    },
+    "histories": {
+      "via": "city",
+      "collection": "history"
     }
   }
 }

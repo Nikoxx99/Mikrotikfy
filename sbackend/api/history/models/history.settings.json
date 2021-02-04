@@ -1,9 +1,8 @@
 {
   "kind": "collectionType",
-  "collectionName": "clients",
+  "collectionName": "histories",
   "info": {
-    "name": "Client",
-    "description": ""
+    "name": "History"
   },
   "options": {
     "increments": true,
@@ -37,48 +36,32 @@
     },
     "neighborhood": {
       "model": "neighborhood",
-      "via": "clients"
+      "via": "histories"
     },
     "city": {
       "model": "city",
-      "via": "clients"
+      "via": "histories"
     },
     "plan": {
       "model": "plan",
-      "via": "clients"
+      "via": "histories"
     },
     "technology": {
       "model": "technology",
-      "via": "clients"
+      "via": "histories"
     },
-    "operator": {
-      "plugin": "users-permissions",
-      "model": "user",
-      "via": "clients"
+    "client": {
+      "model": "client",
+      "via": "histories"
     },
     "active": {
-      "type": "boolean",
-      "default": false
+      "type": "boolean"
     },
     "code": {
       "type": "string"
     },
     "phone": {
       "type": "string"
-    },
-    "sendToMikrotik": {
-      "type": "boolean"
-    },
-    "passwordchanges": {
-      "via": "client",
-      "collection": "passwordchange"
-    },
-    "operator_role": {
-      "type": "string"
-    },
-    "histories": {
-      "via": "client",
-      "collection": "history"
     }
   }
 }
