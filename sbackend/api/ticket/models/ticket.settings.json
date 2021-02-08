@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "tickets",
+  "info": {
+    "name": "Ticket",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "active": {
+      "type": "boolean"
+    },
+    "client": {
+      "model": "client",
+      "via": "tickets"
+    },
+    "city": {
+      "model": "city",
+      "via": "tickets"
+    },
+    "tickettype": {
+      "model": "tickettype"
+    },
+    "assiganted": {
+      "plugin": "users-permissions",
+      "model": "user",
+      "via": "tickets"
+    },
+    "details": {
+      "type": "string"
+    }
+  }
+}

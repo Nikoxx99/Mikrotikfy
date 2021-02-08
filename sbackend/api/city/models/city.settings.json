@@ -31,6 +31,10 @@
     "histories": {
       "via": "city",
       "collection": "history"
+    },
+    "tickets": {
+      "via": "city",
+      "collection": "ticket"
     }
   }
 }

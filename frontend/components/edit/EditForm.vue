@@ -13,7 +13,7 @@
       </template>
       <span>Editar Cliente</span>
     </v-tooltip>
-    <v-dialog v-if="dialogEdit" v-model="dialogEdit" max-width="800px" :retain-focus="false" :fullscreen="getResolution()">
+    <v-dialog v-if="dialogEdit" v-model="dialogEdit" max-width="1100px" :retain-focus="false" :fullscreen="getResolution()">
       <v-card>
         <v-card-title>
           <v-toolbar
@@ -222,6 +222,18 @@
                     hide-details
                   />
                 </v-col>
+                <!-- <v-col>
+                  <v-text-field
+                    :value="item.operator.username"
+                    label="Creado por"
+                    required
+                    outlined
+                    dense
+                    readonly
+                    disabled
+                    hide-details
+                  />
+                </v-col> -->
               </v-row>
               <v-textarea
                 v-model="item.comment"
@@ -356,27 +368,12 @@ export default {
       commentDisabled: false,
       successMessage: '',
       errorMessage: '',
-      commentLoading: false,
-      client: {
-        Client: {
-          code: 1,
-          name: '',
-          dni: '',
-          address: '',
-          neighborhood: 0,
-          city: 0,
-          phone: '',
-          plan: 0,
-          wifi_ssid: '',
-          wifi_password: '',
-          technology: '',
-          mac_address: '',
-          comment: '',
-          created_at: '',
-          newModel: 0,
-          citycolor: '1'
-        }
-      }
+      commentLoading: false
+      // item: {
+      //   operator: {
+      //     username: 'No registra'
+      //   }
+      // }
     }
   },
   methods: {
@@ -440,7 +437,7 @@ export default {
               wifi_password: this.item.wifi_password,
               mac_address: this.item.mac_address,
               comment: this.item.comment,
-              operator: this.item.operator,
+              operator: this.$store.state.auth.id,
               newModel: this.item.newModel
             }
           }

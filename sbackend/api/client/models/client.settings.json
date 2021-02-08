@@ -79,6 +79,10 @@
     "histories": {
       "via": "client",
       "collection": "history"
+    },
+    "tickets": {
+      "via": "client",
+      "collection": "ticket"
     }
   }
 }

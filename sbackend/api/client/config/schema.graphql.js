@@ -69,6 +69,7 @@ module.exports = {
       wifi_password: String
       technology: String
       mac_address: String
+      operator: String
       comment: String
     }
     input adminDeleteInput {

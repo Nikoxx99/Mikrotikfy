@@ -57,6 +57,10 @@
     "clients": {
       "via": "operator",
       "collection": "client"
+    },
+    "tickets": {
+      "via": "assiganted",
+      "collection": "ticket"
     }
   }
 }

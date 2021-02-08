@@ -4,7 +4,7 @@
  * to customize this controller
  */
 const { sanitizeEntity } = require('strapi-utils');
-const { mkCreateClient, mkDeleteClient, mkSetClientPlanInformation, mkClientStatus, mkGetComment, mkSetComment, mkDxClient } = require('../../../mikrotik/functions');
+const { mkCreateClient, mkDeleteClient, mkSetClientPlanInformation, mkClientStatus, mkGetComment, mkSetComment, mkDxClient, simpleTelegramCreate, simpleTelegramDelete, simpleTelegramUpdate, simpleTelegramUpdatePlan } = require('../../../mikrotik/functions');
 module.exports = {
   async create(ctx) {
     const sendToMikrotik = ctx.request.body.sendToMikrotik
@@ -18,6 +18,7 @@ module.exports = {
         return c
       })
       entity = await strapi.services.client.create(newClient[0]);
+      simpleTelegramCreate(entity)
       if (sendToMikrotik) {
         const searchCity = await strapi.services.city.find({ id: ctx.request.body.city })
         const searchPlan = await strapi.services.plan.find({ id: ctx.request.body.plan })
@@ -51,12 +52,13 @@ module.exports = {
     } else {
       let entity;
       entity = await strapi.services.client.create(ctx.request.body);
+      simpleTelegramCreate(entity)
       return sanitizeEntity(entity, { model: strapi.models.client });
     }
   },
   async adminCreate(ctx) {
     const id = ctx.request.body.input.id
-    await strapi.services.client.update({ id }, { 'active': true });
+    await strapi.services.client.update({ id }, { 'active': true })
     const searchCity = await strapi.services.city.find({ id: ctx.request.body.input.city })
     const searchPlan = await strapi.services.plan.find({ id: ctx.request.body.input.plan })
     const searchNeighborhood = await strapi.services.neighborhood.find({ id: ctx.request.body.input.neighborhood })
@@ -90,16 +92,15 @@ module.exports = {
   async update(ctx) {
     const { id } = ctx.params;
     let entity, history;
-    entity = await strapi.services.client.update({ id }, ctx.request.body);
-    await strapi.services.history.create(ctx.request.body);
-
+    entity = await strapi.services.client.update({ id }, ctx.request.body)
+    simpleTelegramUpdate(entity)
+    await strapi.services.history.create(ctx.request.body)
     const search = await strapi.services.client.find({ _id: id })
     const clientObj = search[0]
     const dni = clientObj.dni
     const code = clientObj.code
     const model = clientObj.newModel
     const comment = ctx.request.body.comment
-    // console.log(entity)
     const reqCityIpArray = clientObj.city.ip
     if (reqCityIpArray.length > 1) {
       const successfulMikrotikResponses = []
@@ -112,7 +113,7 @@ module.exports = {
       const mikrotikHost = reqCityIpArray[0]
       await mkSetComment(mikrotikHost, dni, code, model, comment)
     }
-    const res = sanitizeEntity(entity, { model: strapi.models.client });
+    const res = sanitizeEntity(entity, { model: strapi.models.client })
     return res
   },
   async delete(ctx) {
@@ -135,6 +136,7 @@ module.exports = {
       await mkDeleteClient(mikrotikHost, dni, code, model)
     }
     const entity = await strapi.services.client.delete({ id });
+    simpleTelegramDelete(entity)
     return sanitizeEntity(entity, { model: strapi.models.client });
   },
   async adminDelete(ctx) {
@@ -241,7 +243,6 @@ module.exports = {
     const newClientPlanSearch = ctx.request.body.plan
     const searchPlan = await strapi.services.plan.find({ _id: newClientPlanSearch })
     const newClientPlan = searchPlan[0].mikrotik_name
-
     const search = await strapi.services.client.find({ _id: id })
     const clientObj = search[0]
     const dni = clientObj.dni
@@ -250,7 +251,8 @@ module.exports = {
     const removeActive = true
     const reqCityIpArray = clientObj.city.ip
     const successfulMikrotikResponses = []
-    await strapi.services.client.update({ id }, { plan: newClientPlanSearch })
+    const entity = await strapi.services.client.update({ id }, { plan: newClientPlanSearch })
+    simpleTelegramUpdatePlan(entity)
     // console.log(clientObj)
     // await strapi.services.history.create(clientObj);
     if (reqCityIpArray.length > 1) {

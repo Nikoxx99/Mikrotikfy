@@ -101,6 +101,7 @@ export default {
           login(input: $input){
             jwt
             user{
+              id
               username
               role{
                 id
@@ -119,6 +120,7 @@ export default {
         if (!input.errors) {
           const auth = {
             accessToken: input.data.login.jwt,
+            id: input.data.login.user.id,
             username: input.data.login.user.username,
             role: input.data.login.user.role.id
           }

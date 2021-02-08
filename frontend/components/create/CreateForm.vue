@@ -374,6 +374,7 @@ export default {
               comment: this.Client.comment,
               newModel: this.Client.newModel,
               sendToMikrotik: this.Client.sendToMikrotik,
+              operator: this.$store.state.auth.id,
               operator_role: this.role
             }
           }

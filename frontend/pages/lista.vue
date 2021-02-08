@@ -216,6 +216,14 @@
               <!-- eslint-disable -->
               <template v-slot:item.actions="{ item }">
                 <div style="white-space:nowrap">
+                  <CreateTicket
+                    v-if="can('CreateTicket')"
+                    :name="item.name"
+                    :city="item.city.id"
+                    :assignated="$store.state.auth.id"
+                    :clientid="item._id"
+                    :role="allowed_components"
+                  />
                   <ClientStatus
                     v-if="can('ClientStatus')"
                     :name="item.name"
@@ -294,13 +302,15 @@ import CreateForm from '../components/create/CreateForm'
 import EditForm from '../components/edit/EditForm'
 import DeleteClient from '../components/delete/DeleteClient'
 import ClientStatus from '../components/main/ClientStatus'
+import CreateTicket from '../components/create/CreateTicket'
 export default {
   name: 'Lista',
   components: {
     CreateForm,
     EditForm,
     DeleteClient,
-    ClientStatus
+    ClientStatus,
+    CreateTicket
   },
   middleware: ['defaultCity', 'authenticated'],
   apollo: {
@@ -340,6 +350,10 @@ export default {
               comment
               createdAt
               updatedAt
+              operator {
+                id
+                username
+              }
               newModel
               active
             }
@@ -463,7 +477,10 @@ export default {
             wifi_password
             mac_address
             comment
-            operator
+            operator {
+              id
+              username
+            }
             created_at
             newModel
             active

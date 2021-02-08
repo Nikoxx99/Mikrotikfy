@@ -11,6 +11,7 @@
   },
   "devDependencies": {},
   "dependencies": {
+    "cross-fetch": "^3.0.6",
     "node-routeros": "^1.6.8",
     "strapi": "3.2.3",
     "strapi-admin": "3.2.3",
