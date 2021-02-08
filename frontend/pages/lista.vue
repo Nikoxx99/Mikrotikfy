@@ -756,12 +756,13 @@ export default {
     },
     save (clientId, newPlan) {
       this.$apollo.mutate({
-        mutation: gql`mutation ($id: String, $plan: String){
-          editClientPlan(id: $id, plan: $plan)
+        mutation: gql`mutation ($id: String, $plan: String, $operator: String){
+          editClientPlan(id: $id, plan: $plan, operator: $operator)
         }`,
         variables: {
           id: clientId,
           plan: newPlan,
+          operator: this.$store.state.auth.username
         }
       }).then((input) => {
         this.snack = true

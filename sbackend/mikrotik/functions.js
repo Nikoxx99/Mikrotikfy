@@ -433,13 +433,14 @@ module.exports.simpleTelegramUpdate = async function (input) {
     console.log("Booo");
   });
 }
-module.exports.simpleTelegramUpdatePlan = async function (input) {
+module.exports.simpleTelegramUpdatePlan = async function (input, operator) {
+  console.log(input)
   const fetch = require('cross-fetch');
   const line1 = 'CAMBIO DE PLAN'
   const line2 = input.code
   const line3 = input.name
   const line4 = input.plan.name
-  const line5 = input.operator.username
+  const line5 = operator
   const message = `${line1}\n${line2}\n${line3}\n${line4}\n${line5}`
   console.log(message)
   const getRequest = 'https://api.telegram.org/bot1639941731:AAF1_Y7Q2WPtztCb3LEPoQGjr9A4C1q68js/sendMessage?chat_id=-507474942&text=' + message

@@ -241,6 +241,7 @@ module.exports = {
   async editClientPlan(ctx) {
     const id = ctx.request.body.id
     const newClientPlanSearch = ctx.request.body.plan
+    const operator = ctx.request.body.operator
     const searchPlan = await strapi.services.plan.find({ _id: newClientPlanSearch })
     const newClientPlan = searchPlan[0].mikrotik_name
     const search = await strapi.services.client.find({ _id: id })
@@ -252,7 +253,7 @@ module.exports = {
     const reqCityIpArray = clientObj.city.ip
     const successfulMikrotikResponses = []
     const entity = await strapi.services.client.update({ id }, { plan: newClientPlanSearch })
-    simpleTelegramUpdatePlan(entity)
+    simpleTelegramUpdatePlan(entity, operator)
     // console.log(clientObj)
     // await strapi.services.history.create(clientObj);
     if (reqCityIpArray.length > 1) {
