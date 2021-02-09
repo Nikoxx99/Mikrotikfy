@@ -115,6 +115,11 @@ export default {
           to: '/lista'
         },
         {
+          icon: 'mdi-comment-account-outline',
+          title: 'Tickets',
+          to: '/tickets'
+        },
+        {
           icon: 'mdi-cog',
           title: 'Ajustes',
           to: '/config'

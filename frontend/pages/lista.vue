@@ -12,6 +12,7 @@
         </v-alert>
       </v-col>
     </v-row>
+    <Tickets />
     <v-row>
       <v-col
         cols="12"
@@ -302,6 +303,7 @@ import CreateForm from '../components/create/CreateForm'
 import EditForm from '../components/edit/EditForm'
 import DeleteClient from '../components/delete/DeleteClient'
 import ClientStatus from '../components/main/ClientStatus'
+import Tickets from '../components/main/Tickets'
 import CreateTicket from '../components/create/CreateTicket'
 export default {
   name: 'Lista',
@@ -310,6 +312,7 @@ export default {
     EditForm,
     DeleteClient,
     ClientStatus,
+    Tickets,
     CreateTicket
   },
   middleware: ['defaultCity', 'authenticated'],
@@ -363,7 +366,7 @@ export default {
         variables: {
           city: this.$route.query.city,
           start: 0,
-          limit: 15
+          limit: 5
         }
       }
     },
@@ -505,7 +508,7 @@ export default {
       key: 0,
       page: 1,
       pageCount: 0,
-      itemsPerPage: 15,
+      itemsPerPage: 5,
       searchClientInput: '',
       totalClients: 0,
       currentCity: 'Mariquita',

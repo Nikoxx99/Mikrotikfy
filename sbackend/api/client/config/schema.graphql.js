@@ -27,10 +27,14 @@ module.exports = {
       technology: Technology
       mac_address: String
       comment: String
-      operator: Int
+      operator: operator
       created_at: String
       newModel: Int
       active: Boolean
+    }
+    type operator {
+      id: String
+      username: String
     }
     type ClientComment {
       comment: String
