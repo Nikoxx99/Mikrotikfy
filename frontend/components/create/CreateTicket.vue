@@ -6,7 +6,7 @@
           v-bind="attrs"
           color="cyan darken-4"
           v-on="on"
-          @click="modal = true"
+          @click="initComponent()"
         >
           mdi-plus
         </v-icon>
@@ -128,12 +128,13 @@ export default {
       assignated: ''
     }
   }),
-  mounted () {
-    this.ticketPayload.client = this.clientid
-    this.ticketPayload.city = this.city
-    this.ticketPayload.assignated = this.assignated
-  },
   methods: {
+    initComponent () {
+      this.modal = true
+      this.ticketPayload.client = this.clientid
+      this.ticketPayload.city = this.city
+      this.ticketPayload.assignated = this.assignated
+    },
     createTicket () {
       this.$apollo.mutate({
         mutation: gql`mutation ($input: createTicketInput){
