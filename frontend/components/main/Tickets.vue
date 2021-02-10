@@ -9,6 +9,12 @@
             :style="`color:${cityColor};`"
           >
             Tickets
+            <v-switch
+              v-model="showClosedValue"
+              class="ml-4"
+              label="Mostrar cerrados"
+              @change="showClosed(showClosedValue)"
+            />
             <v-spacer />
             <v-text-field
               v-model="search"
@@ -26,7 +32,7 @@
             <v-data-table
               :key="key"
               :headers="headers"
-              :items="tickets"
+              :items="ticketList"
               :search="search"
               :items-per-page="itemsPerPage"
               :page.sync="page"
@@ -42,7 +48,11 @@
               @page-count="pageCount = $event"
             >
               <template v-slot:item.active="props">
-                <v-edit-dialog
+                <CreateTicketAdvance
+                  :ticketid="props.item.id"
+                  :name="props.item.client.name"
+                />
+                <!-- <v-edit-dialog
                   :return-value.sync="props.item.active"
                   persistent
                   large
@@ -66,7 +76,7 @@
                       dense
                     />
                   </template>
-                </v-edit-dialog>
+                </v-edit-dialog> -->
               </template>
               <template v-slot:item.createdAt="{ item }">
                 <span>
@@ -101,9 +111,11 @@
 
 <script>
 import gql from 'graphql-tag'
+import CreateTicketAdvance from '../create/CreateTicketAdvance'
 export default {
   name: 'TicketChanges',
   components: {
+    CreateTicketAdvance
   },
   apollo: {
     tickets () {
@@ -149,6 +161,7 @@ export default {
       dialog: false,
       dialogEdit: false,
       initialLoading: false,
+      showClosedValue: false,
       headers: [
         { text: 'Estado', sortable: true, value: 'active' },
         { text: 'Cliente', sortable: true, value: 'client.name' },
@@ -161,10 +174,28 @@ export default {
       States: [{ name: 'Abierto', value: true }, { name: 'Cerrado', value: false }],
       snack: false,
       snackColor: '',
-      snackText: ''
+      snackText: '',
+      ticketList: []
     }
   },
+  mounted () {
+    this.ticketList = this.tickets
+    this.showClosed(false)
+  },
   methods: {
+    showClosed (value) {
+      const newData = []
+      this.tickets.map((ticket) => {
+        if (value === false) {
+          if (ticket.active) {
+            newData.push(ticket)
+          }
+        } else {
+          newData.push(ticket)
+        }
+      })
+      this.ticketList = newData
+    },
     getDate (date) {
       const dateObject = new Date(date)
       const humanDateFormat = dateObject.toLocaleString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric' })

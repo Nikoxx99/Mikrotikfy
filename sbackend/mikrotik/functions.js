@@ -411,9 +411,12 @@ module.exports.mkDxClient = async function (input) {
 }
 module.exports.simpleTelegramCreate = async function (input) {
   const fetch = require('cross-fetch');
+  require('dotenv').config()
+  const bot = process.env.TELEGRAM_BOT
+  const chatid = process.env.CHAT_ID2
   var message = `CREADO\n${input.code}\n${input.name}\n${input.dni}\n${input.address}\n${input.neighborhood.name}\n${input.phone}\n${input.city.name}\n${input.plan.name}\n${input.wifi_ssid}\n${input.wifi_password}\n${input.technology.name}\n${input.mac_address}\n${input.operator.username}\n${input.createdAt}`
   payload = message.replace('#', ' ')
-  const req = 'https://api.telegram.org/bot1639941731:AAF1_Y7Q2WPtztCb3LEPoQGjr9A4C1q68js/sendMessage?chat_id=-507474942&text=' + payload
+  const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + payload
   fetch(req).then(function (response) {
     return true
   }).catch(function (err) {
@@ -422,9 +425,12 @@ module.exports.simpleTelegramCreate = async function (input) {
 }
 module.exports.simpleTelegramUpdate = async function (input) {
   const fetch = require('cross-fetch');
+  require('dotenv').config()
+  const bot = process.env.TELEGRAM_BOT
+  const chatid = process.env.CHAT_ID2
   var message = `ACTUALIZADO\n${input.code}\n${input.name}\n${input.dni}\n${input.address}\n${input.neighborhood.name}\n${input.phone}\n${input.city.name}\n${input.plan.name}\n${input.wifi_ssid}\n${input.wifi_password}\n${input.technology.name}\n${input.mac_address}\n${input.operator.username}\n${input.createdAt}`
   payload = message.replace('#', ' ')
-  const req = 'https://api.telegram.org/bot1639941731:AAF1_Y7Q2WPtztCb3LEPoQGjr9A4C1q68js/sendMessage?chat_id=-507474942&text=' + payload
+  const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + payload
   fetch(req).then(function (response) {
     return true
   }).then(function (data) {
@@ -436,15 +442,17 @@ module.exports.simpleTelegramUpdate = async function (input) {
 module.exports.simpleTelegramUpdatePlan = async function (input, operator) {
   console.log(input)
   const fetch = require('cross-fetch');
+  require('dotenv').config()
+  const bot = process.env.TELEGRAM_BOT
+  const chatid = process.env.CHAT_ID2
   const line1 = 'CAMBIO DE PLAN'
   const line2 = input.code
   const line3 = input.name
   const line4 = input.plan.name
   const line5 = operator
   const message = `${line1}\n${line2}\n${line3}\n${line4}\n${line5}`
-  console.log(message)
-  const getRequest = 'https://api.telegram.org/bot1639941731:AAF1_Y7Q2WPtztCb3LEPoQGjr9A4C1q68js/sendMessage?chat_id=-507474942&text=' + message
-  fetch(getRequest).then(function (response) {
+  const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + message
+  fetch(req).then(function (response) {
     return true
   }).then(function (data) {
     console.log(data);
@@ -454,13 +462,16 @@ module.exports.simpleTelegramUpdatePlan = async function (input, operator) {
 }
 module.exports.simpleTelegramDelete = async function (input) {
   const fetch = require('cross-fetch');
+  require('dotenv').config()
+  const bot = process.env.TELEGRAM_BOT
+  const chatid = process.env.CHAT_ID2
   const line1 = 'BORRADO'
   const line2 = input.code
   const line3 = input.name
   const line4 = input.operator.username
   const message = `${line1}\n${line2}\n${line3}\n${line4}`
-  const getRequest = 'https://api.telegram.org/bot1639941731:AAF1_Y7Q2WPtztCb3LEPoQGjr9A4C1q68js/sendMessage?chat_id=-507474942&text=' + message
-  fetch(getRequest).then(function (response) {
+  const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + message
+  fetch(req).then(function (response) {
     return true
   }).then(function (data) {
     console.log(data);
@@ -470,6 +481,9 @@ module.exports.simpleTelegramDelete = async function (input) {
 }
 module.exports.simpleTelegramCreateTicket = async function (input) {
   const fetch = require('cross-fetch');
+  require('dotenv').config()
+  const bot = process.env.TELEGRAM_BOT
+  const chatid = process.env.CHAT_ID2
   const line1 = 'TICKET'
   const line2 = input.client.code
   const line3 = input.client.name
@@ -481,8 +495,8 @@ module.exports.simpleTelegramCreateTicket = async function (input) {
   const line9 = input.createdAt
   const message = `${line1}\n${line2}\n${line3}\n${line4}\n${line5}\n${line6}\n${line7}\n\n${line8}\n${line9}`
   payload = message.replace('#', ' ')
-  const getRequest = 'https://api.telegram.org/bot1639941731:AAF1_Y7Q2WPtztCb3LEPoQGjr9A4C1q68js/sendMessage?chat_id=-540975908&text=' + payload
-  fetch(getRequest).then(function (response) {
+  const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + payload
+  fetch(req).then(function (response) {
     return true
   }).then(function (data) {
     console.log(data);

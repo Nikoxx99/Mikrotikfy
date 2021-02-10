@@ -161,6 +161,13 @@ export default {
       }).then((input) => {
         if (input.data.createTicket.ticket.client.code) {
           // this.$emit('updateClient', this.item, this.editIndex)
+          this.ticketPayload = {
+            client: '',
+            type: {},
+            details: '',
+            city: '',
+            assignated: ''
+          }
           this.modal = false
           this.loading = false
           // window.location.reload(true)
