@@ -527,7 +527,7 @@ module.exports.simpleTelegramCreateTicketAdvance = async function (input, client
   } else {
     line8 = 'TICKET ACTIVO'
   }
-  const line9 = assiganted.username
+  const line9 = assiganted
   const line10 = input.createdAt
   const message = `${line1}\n${line2}\n${line3}\n${line4}\n${line5}\n${line6}\n\n${line7}\n${line8}\n\n${line9}\n${line10}`
   payload = message.replace('#', ' ')

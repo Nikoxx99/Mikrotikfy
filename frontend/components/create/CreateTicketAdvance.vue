@@ -135,11 +135,12 @@ export default {
         }
       }).then(() => {
         this.$apollo.mutate({
-          mutation: gql`mutation ($id: ID!, $details: String){
+          mutation: gql`mutation ($id: ID!, $details: String, $operator: ID!){
             createTicketdetail(input: {
               data: {
                 ticket: $id
                 details: $details
+                operator: $operator
               }
             }) {
               ticketdetail{
@@ -151,7 +152,8 @@ export default {
           }`,
           variables: {
             id: this.ticketAdvance.id,
-            details: this.ticketAdvance.details
+            details: this.ticketAdvance.details,
+            operator: this.$store.state.auth.id
           }
         }).then((input) => {
           this.modal = false
