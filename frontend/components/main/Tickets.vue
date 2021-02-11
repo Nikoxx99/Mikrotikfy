@@ -118,6 +118,9 @@ export default {
             client{
               name
               address
+              neighborhood{
+                name
+              }
             }
             tickettype{
               name
@@ -153,11 +156,12 @@ export default {
       showClosedValue: false,
       headers: [
         { text: 'Estado', sortable: true, value: 'active', width: '5%' },
-        { text: 'Cliente', sortable: true, value: 'client.name' },
+        { text: 'Cliente', sortable: true, value: 'client.name', width: 150 },
         { text: 'Dirección', sortable: true, value: 'client.address', width: 200 },
-        { text: 'Tipo', sortable: true, value: 'tickettype.name' },
-        { text: 'Operador', sortable: false, value: 'assiganted.username' },
-        { text: 'Detalles', sortable: true, value: 'details', width: 300 },
+        { text: 'Barrio', sortable: true, value: 'client.neighborhood.name', width: 100 },
+        { text: 'Tipo', sortable: true, value: 'tickettype.name', width: 150 },
+        { text: 'Operador', sortable: false, value: 'assiganted.username', width: 60 },
+        { text: 'Detalles', sortable: true, value: 'details', width: 400 },
         { text: 'Creado', sortable: true, value: 'createdAt' },
         { text: 'Acciones', sortable: true, value: 'actions' }
       ],
