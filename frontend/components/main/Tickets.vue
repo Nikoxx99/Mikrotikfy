@@ -23,7 +23,6 @@
               single-line
               hide-details
               outlined
-              autofocus
               dense
               class="white--text"
             />
@@ -44,7 +43,7 @@
               loading-text="Cargando información de tickets..."
               dense
               hide-default-footer
-              mobile-breakpoint="100"
+              mobile-breakpoint="600"
               @page-count="pageCount = $event"
             >
               <template v-slot:item.actions="props">
