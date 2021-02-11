@@ -81,6 +81,10 @@ import gql from 'graphql-tag'
 export default {
   name: 'CreateTicketAdvance',
   props: {
+    editindex: {
+      type: Number,
+      default: -1
+    },
     ticketid: {
       type: String,
       default: ''
@@ -99,13 +103,15 @@ export default {
     ticketAdvance: {
       id: '',
       details: '',
-      closeTicket: false
+      closeTicket: false,
+      editindex: -1
     }
   }),
   methods: {
     initComponent () {
       this.modal = true
       this.ticketAdvance.id = this.ticketid
+      this.ticketAdvance.editindex = this.editindex
     },
     CreateTicketAdvance () {
       this.$apollo.mutate({
@@ -125,7 +131,7 @@ export default {
         }`,
         variables: {
           id: this.ticketAdvance.id,
-          status: this.ticketAdvance.closeTicket
+          status: !this.ticketAdvance.closeTicket
         }
       }).then(() => {
         this.$apollo.mutate({
@@ -148,6 +154,8 @@ export default {
             details: this.ticketAdvance.details
           }
         }).then((input) => {
+          this.modal = false
+          this.$emit('updateTicketStatus', this.ticketAdvance)
           this.snack = true
           this.snackColor = 'info'
           this.snackText = 'Ticket actualizado con éxito.'

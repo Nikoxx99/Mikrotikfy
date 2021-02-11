@@ -9,10 +9,9 @@ const { simpleTelegramCreateTicket } = require('../../../mikrotik/functions');
 
 module.exports = {
   async create(ctx) {
-    console.log(ctx.request.body)
     let entity;
     entity = await strapi.services.ticket.create(ctx.request.body);
     simpleTelegramCreateTicket(entity)
-    return sanitizeEntity(entity, { model: strapi.models.client });
+    return sanitizeEntity(entity, { model: strapi.models.ticket });
   }
 }

@@ -504,3 +504,39 @@ module.exports.simpleTelegramCreateTicket = async function (input) {
     console.log("Booo");
   });
 }
+module.exports.simpleTelegramCreateTicketAdvance = async function (input, client, tickettype, assiganted) {
+  const fetch = require('cross-fetch');
+  require('dotenv').config()
+  const bot = process.env.TELEGRAM_BOT
+  const chatid = process.env.CHAT_ID2
+  let line1 = ''
+  if (!input.ticket.active) {
+    line1 = 'TICKET CERRADO'
+  } else {
+    line1 = 'AVANCE DE TICKET'
+  }
+  const line2 = client.code
+  const line3 = client.name
+  const line4 = client.address
+  const line5 = client.phone
+  const line6 = tickettype.name
+  const line7 = input.details
+  let line8 = ''
+  if (!input.ticket.active) {
+    line8 = 'TICKET CERRADO'
+  } else {
+    line8 = 'TICKET ACTIVO'
+  }
+  const line9 = assiganted.username
+  const line10 = input.createdAt
+  const message = `${line1}\n${line2}\n${line3}\n${line4}\n${line5}\n${line6}\n\n${line7}\n${line8}\n\n${line9}\n${line10}`
+  payload = message.replace('#', ' ')
+  const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + payload
+  fetch(req).then(function (response) {
+    return true
+  }).then(function (data) {
+    console.log(data);
+  }).catch(function () {
+    console.log("Booo");
+  });
+}

@@ -49,8 +49,10 @@
             >
               <template v-slot:item.actions="props">
                 <CreateTicketAdvance
+                  :editindex="tickets.indexOf(props.item)"
                   :ticketid="props.item.id"
                   :name="props.item.client.name"
+                  @updateTicketStatus="updateTicketStatus($event)"
                 />
                 <TicketAdvanceHistory
                   :ticketid="props.item.id"
@@ -170,6 +172,11 @@ export default {
     this.showClosed(false)
   },
   methods: {
+    updateTicketStatus (value) {
+      if (value.editindex > -1) {
+        this.tickets[value.editindex].active = !value.closeTicket
+      }
+    },
     showClosed (value) {
       const newData = []
       this.tickets.map((ticket) => {
@@ -201,45 +208,6 @@ export default {
       } else {
         return 'Cerrado'
       }
-    },
-    save (id, status) {
-      this.$apollo.mutate({
-        mutation: gql`mutation ($id: ID!, $status: Boolean){
-          updateTicket(input: {
-          where: {
-            id: $id
-          }
-          data: {
-            active: $status
-          }
-        }){
-          ticket{
-            id
-          }
-        }
-        }`,
-        variables: {
-          id,
-          status
-        }
-      }).then((input) => {
-        this.snack = true
-        this.snackColor = 'info'
-        this.snackText = 'Ticket actualizado con éxito.'
-      }).catch((error) => {
-        this.snack = true
-        this.snackColor = 'red'
-        this.snackText = error
-      })
-    },
-    cancel () {
-      this.snack = true
-      this.snackColor = 'error'
-      this.snackText = 'Operacion cancelada'
-    },
-    close () {
-      // eslint-disable-next-line no-console
-      console.log('Info closed')
     }
   }
 }

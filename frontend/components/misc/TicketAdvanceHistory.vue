@@ -15,7 +15,7 @@
     </v-tooltip>
     <v-dialog
       v-model="modal"
-      max-width="590"
+      max-width="990"
     >
       <v-card
         :loading="loading"
@@ -30,6 +30,8 @@
               :headers="headers"
               :items="ticketdetails"
               :items-per-page="10"
+              no-data-text="No hay avances para mostrar aun..."
+              loading-text="Cargando información de tickets..."
             />
           </v-card-text>
         </div>
@@ -53,6 +55,39 @@
 import gql from 'graphql-tag'
 export default {
   name: 'TicketAdvanceHistory',
+  apollo: {
+    ticketdetails () {
+      return {
+        query: gql`
+          query($id: ID!){
+            ticketdetails(where: {
+              ticket: $id
+            }){
+              ticket{
+                client{
+                  name
+                }
+                tickettype{
+                  name
+                }
+                createdAt
+                assiganted {
+                  username
+                }
+              }
+              details
+            }
+          }
+        `,
+        variables: {
+          id: this.ticketid
+        },
+        skip () {
+          return true
+        }
+      }
+    }
+  },
   props: {
     ticketid: {
       type: String,
@@ -65,111 +100,32 @@ export default {
   },
   data: () => ({
     modal: false,
-    loading: false,
+    loading: true,
     snack: false,
     snackText: '',
     snackColor: '',
     ticketdetails: [],
     headers: [
-      { text: 'Estado', sortable: true, value: 'active' },
-      { text: 'Cliente', sortable: true, value: 'client.name' },
-      { text: 'Tipo', sortable: true, value: 'tickettype.name' },
-      { text: 'Operador', sortable: false, value: 'assiganted.username' },
+      { text: 'Cliente', sortable: true, value: 'ticket.client.name' },
+      { text: 'Tipo', sortable: true, value: 'ticket.tickettype.name' },
+      { text: 'Operador', sortable: false, value: 'ticket.assiganted.username' },
       { text: 'Detalles', sortable: true, value: 'details' },
-      { text: 'Creado', sortable: true, value: 'createdAt' }
+      { text: 'Creado', sortable: true, value: 'ticket.createdAt' }
     ]
   }),
   methods: {
-    initComponent () {
+    async initComponent () {
       this.modal = true
-      this.$apollo.query({
-        query: gql`
-          query($id: ID!){
-            ticketdetails(where: {
-              ticket: $id
-            }){
-              ticket{
-                active
-                client{
-                  name
-                }
-                tickettype{
-                  name
-                }
-                createdAt
-                assiganted {
-                  username
-                }
-                details
-              }
-            }
-          }
-        `,
+      this.loading = false
+      this.$apollo.queries.ticketdetails.skip = false
+      await this.$apollo.queries.ticketdetails.fetchMore({
         variables: {
           id: this.ticketid
+        },
+        updateQuery: (_, { fetchMoreResult }) => {
+          const newInfo = fetchMoreResult.ticketdetails
+          this.ticketdetails = newInfo
         }
-      }).then((input) => {
-        console.log(input)
-        this.ticketdetails = input.data.ticketdetails
-      }).catch((error) => {
-        this.snack = true
-        this.snackColor = 'red'
-        this.snackText = error
-      })
-    },
-    CreateTicketAdvance () {
-      this.$apollo.mutate({
-        mutation: gql`mutation ($id: ID!, $status: Boolean){
-          updateTicket(input: {
-          where: {
-            id: $id
-          }
-          data: {
-            active: $status
-          }
-        }){
-          ticket{
-            id
-          }
-        }
-        }`,
-        variables: {
-          id: this.ticketAdvance.id,
-          status: this.ticketAdvance.closeTicket
-        }
-      }).then(() => {
-        this.$apollo.mutate({
-          mutation: gql`mutation ($id: ID!, $details: String){
-            createTicketdetail(input: {
-              data: {
-                ticket: $id
-                details: $details
-              }
-            }) {
-              ticketdetail{
-                ticket{
-                  id
-                }
-              }
-            }
-          }`,
-          variables: {
-            id: this.ticketAdvance.id,
-            details: this.ticketAdvance.details
-          }
-        }).then((input) => {
-          this.snack = true
-          this.snackColor = 'info'
-          this.snackText = 'Ticket actualizado con éxito.'
-        }).catch((error) => {
-          this.snack = true
-          this.snackColor = 'red'
-          this.snackText = error
-        })
-      }).catch((error) => {
-        this.snack = true
-        this.snackColor = 'red'
-        this.snackText = error
       })
     },
     can (component) {
