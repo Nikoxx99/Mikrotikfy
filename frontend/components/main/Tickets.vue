@@ -117,6 +117,7 @@ export default {
             active
             client{
               name
+              address
             }
             tickettype{
               name
@@ -151,11 +152,12 @@ export default {
       initialLoading: false,
       showClosedValue: false,
       headers: [
-        { text: 'Estado', sortable: true, value: 'active' },
+        { text: 'Estado', sortable: true, value: 'active', width: '5%' },
         { text: 'Cliente', sortable: true, value: 'client.name' },
+        { text: 'Dirección', sortable: true, value: 'client.address', width: 200 },
         { text: 'Tipo', sortable: true, value: 'tickettype.name' },
         { text: 'Operador', sortable: false, value: 'assiganted.username' },
-        { text: 'Detalles', sortable: true, value: 'details' },
+        { text: 'Detalles', sortable: true, value: 'details', width: 300 },
         { text: 'Creado', sortable: true, value: 'createdAt' },
         { text: 'Acciones', sortable: true, value: 'actions' }
       ],

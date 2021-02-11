@@ -1,5 +1,8 @@
 /* eslint-disable no-undef */
 const RouterOSAPI = require('node-routeros').RouterOSAPI
+function removePunctuation(text) {
+  return text.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+}
 module.exports.mkCreateClient = async function (mikrotikHost, plan, input, cityName, planName, neightborhood, technology) {
   const conn = new RouterOSAPI({
     host: mikrotikHost,
@@ -410,7 +413,7 @@ module.exports.mkDxClient = async function (input) {
   }
 }
 module.exports.simpleTelegramCreate = async function (input) {
-  const fetch = require('cross-fetch');
+  const fetch = require('node-fetch');
   require('dotenv').config()
   const bot = process.env.TELEGRAM_BOT
   const chatid = process.env.CHAT_ID2
@@ -424,7 +427,7 @@ module.exports.simpleTelegramCreate = async function (input) {
   });
 }
 module.exports.simpleTelegramUpdate = async function (input) {
-  const fetch = require('cross-fetch');
+  const fetch = require('node-fetch');
   require('dotenv').config()
   const bot = process.env.TELEGRAM_BOT
   const chatid = process.env.CHAT_ID2
@@ -441,7 +444,7 @@ module.exports.simpleTelegramUpdate = async function (input) {
 }
 module.exports.simpleTelegramUpdatePlan = async function (input, operator) {
   console.log(input)
-  const fetch = require('cross-fetch');
+  const fetch = require('node-fetch');
   require('dotenv').config()
   const bot = process.env.TELEGRAM_BOT
   const chatid = process.env.CHAT_ID2
@@ -461,7 +464,7 @@ module.exports.simpleTelegramUpdatePlan = async function (input, operator) {
   });
 }
 module.exports.simpleTelegramDelete = async function (input) {
-  const fetch = require('cross-fetch');
+  const fetch = require('node-fetch');
   require('dotenv').config()
   const bot = process.env.TELEGRAM_BOT
   const chatid = process.env.CHAT_ID2
@@ -480,7 +483,7 @@ module.exports.simpleTelegramDelete = async function (input) {
   });
 }
 module.exports.simpleTelegramCreateTicket = async function (input) {
-  const fetch = require('cross-fetch');
+  const fetch = require('node-fetch');
   require('dotenv').config()
   const bot = process.env.TELEGRAM_BOT
   const chatid = process.env.CHAT_ID2
@@ -495,17 +498,18 @@ module.exports.simpleTelegramCreateTicket = async function (input) {
   const line9 = input.createdAt
   const message = `${line1}\n${line2}\n${line3}\n${line4}\n${line5}\n${line6}\n${line7}\n\n${line8}\n${line9}`
   payload = message.replace('#', ' ')
-  const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + payload
+  const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + removePunctuation(payload)
   fetch(req).then(function (response) {
+    console.log(response)
     return true
   }).then(function (data) {
     console.log(data);
-  }).catch(function () {
-    console.log("Booo");
+  }).catch(function (err) {
+    console.log("Booo", err);
   });
 }
 module.exports.simpleTelegramCreateTicketAdvance = async function (input, client, tickettype, assiganted) {
-  const fetch = require('cross-fetch');
+  const fetch = require('node-fetch');
   require('dotenv').config()
   const bot = process.env.TELEGRAM_BOT
   const chatid = process.env.CHAT_ID2
@@ -531,8 +535,9 @@ module.exports.simpleTelegramCreateTicketAdvance = async function (input, client
   const line10 = input.createdAt
   const message = `${line1}\n${line2}\n${line3}\n${line4}\n${line5}\n${line6}\n\n${line7}\n${line8}\n\n${line9}\n${line10}`
   payload = message.replace('#', ' ')
-  const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + payload
+  const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + removePunctuation(payload)
   fetch(req).then(function (response) {
+    console.log(response)
     return true
   }).then(function (data) {
     console.log(data);
