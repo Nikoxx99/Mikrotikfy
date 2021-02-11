@@ -8,13 +8,30 @@
           <v-card-title
             :style="`color:${cityColor};`"
           >
-            Tickets
+            <span class="mr-4">Tickets</span>
             <v-switch
               v-model="showClosedValue"
-              class="ml-4"
+              class="mr-4"
               label="Mostrar cerrados"
               @change="showClosed(showClosedValue)"
             />
+            <v-tooltip top>
+              <!-- eslint-disable -->
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  v-bind="attrs"
+                  color="blue darken-4"
+                  dark
+                  :disabled="refreshLoading"
+                  :loading="refreshLoading"
+                  v-on="on"
+                  @click="refreshTickets()"
+                >
+                  <v-icon>mdi-reload</v-icon>
+                </v-btn>
+              </template>
+              <span>Refrescar Tickets</span>
+            </v-tooltip>
             <v-spacer />
             <v-text-field
               v-model="search"
@@ -153,6 +170,7 @@ export default {
       dialogEdit: false,
       initialLoading: false,
       showClosedValue: false,
+      refreshLoading: false,
       headers: [
         { text: 'Estado', sortable: true, value: 'active', width: '5%' },
         { text: 'Cliente', sortable: true, value: 'client.name', width: 150 },
@@ -177,6 +195,20 @@ export default {
     this.showClosed(false)
   },
   methods: {
+    async refreshTickets () {
+      this.refreshLoading = true
+      await this.$apollo.queries.tickets.fetchMore({
+        variables: {
+          id: this.$route.query.city
+        },
+        updateQuery: (_, { fetchMoreResult }) => {
+          const newTickets = fetchMoreResult.tickets
+          this.tickets = newTickets
+          this.showClosed(this.showClosedValue)
+          this.refreshLoading = false
+        }
+      })
+    },
     updateTicketStatus (value) {
       if (value.editindex > -1) {
         this.tickets[value.editindex].active = !value.closeTicket
