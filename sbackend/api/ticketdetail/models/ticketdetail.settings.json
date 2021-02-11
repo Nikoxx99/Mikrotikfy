@@ -1,0 +1,21 @@
+{
+  "kind": "collectionType",
+  "collectionName": "ticketdetails",
+  "info": {
+    "name": "Ticketdetail"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "ticket": {
+      "model": "ticket",
+      "via": "ticketdetails"
+    },
+    "details": {
+      "type": "string"
+    }
+  }
+}

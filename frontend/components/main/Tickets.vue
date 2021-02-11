@@ -47,36 +47,20 @@
               mobile-breakpoint="100"
               @page-count="pageCount = $event"
             >
-              <template v-slot:item.active="props">
+              <template v-slot:item.actions="props">
                 <CreateTicketAdvance
                   :ticketid="props.item.id"
                   :name="props.item.client.name"
                 />
-                <!-- <v-edit-dialog
-                  :return-value.sync="props.item.active"
-                  persistent
-                  large
-                  cancel-text="Cancelar"
-                  save-text="Guardar"
-                  @save="save(props.item.id, props.item.active)"
-                  @cancel="cancel"
-                  @close="close"
-                >
-                  <v-chip small :color="getColor(props.item.active)" class="white--text">
-                    {{ getState(props.item.active) }}
-                  </v-chip>
-                  <template v-slot:input>
-                    <v-select
-                      v-model="props.item.active"
-                      item-text="name"
-                      item-value="value"
-                      :items="States"
-                      single-line
-                      label="Estado"
-                      dense
-                    />
-                  </template>
-                </v-edit-dialog> -->
+                <TicketAdvanceHistory
+                  :ticketid="props.item.id"
+                  :name="props.item.client.name"
+                />
+              </template>
+              <template v-slot:item.active="props">
+                <v-chip small :color="getColor(props.item.active)" class="white--text">
+                  {{ getState(props.item.active) }}
+                </v-chip>
               </template>
               <template v-slot:item.createdAt="{ item }">
                 <span>
@@ -112,10 +96,12 @@
 <script>
 import gql from 'graphql-tag'
 import CreateTicketAdvance from '../create/CreateTicketAdvance'
+import TicketAdvanceHistory from '../misc/TicketAdvanceHistory'
 export default {
   name: 'TicketChanges',
   components: {
-    CreateTicketAdvance
+    CreateTicketAdvance,
+    TicketAdvanceHistory
   },
   apollo: {
     tickets () {
@@ -168,7 +154,8 @@ export default {
         { text: 'Tipo', sortable: true, value: 'tickettype.name' },
         { text: 'Operador', sortable: false, value: 'assiganted.username' },
         { text: 'Detalles', sortable: true, value: 'details' },
-        { text: 'Creado', sortable: true, value: 'createdAt' }
+        { text: 'Creado', sortable: true, value: 'createdAt' },
+        { text: 'Acciones', sortable: true, value: 'actions' }
       ],
       title: 'Cambios de Clave',
       States: [{ name: 'Abierto', value: true }, { name: 'Cerrado', value: false }],

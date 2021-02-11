@@ -8,10 +8,10 @@
           v-on="on"
           @click="initComponent()"
         >
-          mdi-plus
+          mdi-server
         </v-icon>
       </template>
-      <span>Crear Avance</span>
+      <span>Historial de Avances</span>
     </v-tooltip>
     <v-dialog
       v-model="modal"
@@ -21,31 +21,19 @@
         :loading="loading"
       >
         <v-card-title class="headline">
-          Crear Avance en Ticket
+          Historial de Avances
         </v-card-title>
         <div v-if="!loading">
           <v-card-text>
             <h2> {{ name }} </h2>
-            <v-textarea
-              v-model="ticketAdvance.details"
-              outlined
-              class="mt-4"
-              label="Detalles adicionales"
-            />
-            <v-switch
-              v-model="ticketAdvance.closeTicket"
-              label="Cerrar Ticket?"
+            <v-data-table
+              :headers="headers"
+              :items="ticketdetails"
+              :items-per-page="10"
             />
           </v-card-text>
         </div>
         <v-card-actions>
-          <v-btn
-            color="blue darken-4"
-            text
-            @click="CreateTicketAdvance()"
-          >
-            Crear Avance
-          </v-btn>
           <v-spacer />
 
           <v-btn
@@ -58,28 +46,13 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-snackbar
-      v-model="snack"
-      :timeout="1000"
-      :color="snackColor"
-      bottom
-      vertical
-    >
-      {{ snackText }}
-
-      <template v-slot:action="{ attrs }">
-        <v-btn v-bind="attrs" text @click="snack = false">
-          Cerrar
-        </v-btn>
-      </template>
-    </v-snackbar>
   </span>
 </template>
 
 <script>
 import gql from 'graphql-tag'
 export default {
-  name: 'CreateTicketAdvance',
+  name: 'TicketAdvanceHistory',
   props: {
     ticketid: {
       type: String,
@@ -96,16 +69,53 @@ export default {
     snack: false,
     snackText: '',
     snackColor: '',
-    ticketAdvance: {
-      id: '',
-      details: '',
-      closeTicket: false
-    }
+    ticketdetails: [],
+    headers: [
+      { text: 'Estado', sortable: true, value: 'active' },
+      { text: 'Cliente', sortable: true, value: 'client.name' },
+      { text: 'Tipo', sortable: true, value: 'tickettype.name' },
+      { text: 'Operador', sortable: false, value: 'assiganted.username' },
+      { text: 'Detalles', sortable: true, value: 'details' },
+      { text: 'Creado', sortable: true, value: 'createdAt' }
+    ]
   }),
   methods: {
     initComponent () {
       this.modal = true
-      this.ticketAdvance.id = this.ticketid
+      this.$apollo.query({
+        query: gql`
+          query($id: ID!){
+            ticketdetails(where: {
+              ticket: $id
+            }){
+              ticket{
+                active
+                client{
+                  name
+                }
+                tickettype{
+                  name
+                }
+                createdAt
+                assiganted {
+                  username
+                }
+                details
+              }
+            }
+          }
+        `,
+        variables: {
+          id: this.ticketid
+        }
+      }).then((input) => {
+        console.log(input)
+        this.ticketdetails = input.data.ticketdetails
+      }).catch((error) => {
+        this.snack = true
+        this.snackColor = 'red'
+        this.snackText = error
+      })
     },
     CreateTicketAdvance () {
       this.$apollo.mutate({

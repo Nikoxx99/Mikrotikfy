@@ -32,6 +32,10 @@
     },
     "details": {
       "type": "string"
+    },
+    "ticketdetails": {
+      "via": "ticket",
+      "collection": "ticketdetail"
     }
   }
 }
