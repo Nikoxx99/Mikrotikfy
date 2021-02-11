@@ -416,7 +416,7 @@ module.exports.simpleTelegramCreate = async function (input) {
   const fetch = require('node-fetch');
   require('dotenv').config()
   const bot = process.env.TELEGRAM_BOT
-  const chatid = process.env.CHAT_ID2
+  const chatid = process.env.CHAT_ID
   var message = `CREADO\n${input.code}\n${input.name}\n${input.dni}\n${input.address}\n${input.neighborhood.name}\n${input.phone}\n${input.city.name}\n${input.plan.name}\n${input.wifi_ssid}\n${input.wifi_password}\n${input.technology.name}\n${input.mac_address}\n${input.operator.username}\n${input.createdAt}`
   payload = message.replace('#', ' ')
   const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + payload
@@ -430,7 +430,7 @@ module.exports.simpleTelegramUpdate = async function (input) {
   const fetch = require('node-fetch');
   require('dotenv').config()
   const bot = process.env.TELEGRAM_BOT
-  const chatid = process.env.CHAT_ID2
+  const chatid = process.env.CHAT_ID
   var message = `ACTUALIZADO\n${input.code}\n${input.name}\n${input.dni}\n${input.address}\n${input.neighborhood.name}\n${input.phone}\n${input.city.name}\n${input.plan.name}\n${input.wifi_ssid}\n${input.wifi_password}\n${input.technology.name}\n${input.mac_address}\n${input.operator.username}\n${input.createdAt}`
   payload = message.replace('#', ' ')
   const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + payload
@@ -447,7 +447,7 @@ module.exports.simpleTelegramUpdatePlan = async function (input, operator) {
   const fetch = require('node-fetch');
   require('dotenv').config()
   const bot = process.env.TELEGRAM_BOT
-  const chatid = process.env.CHAT_ID2
+  const chatid = process.env.CHAT_ID
   const line1 = 'CAMBIO DE PLAN'
   const line2 = input.code
   const line3 = input.name
@@ -467,7 +467,7 @@ module.exports.simpleTelegramDelete = async function (input) {
   const fetch = require('node-fetch');
   require('dotenv').config()
   const bot = process.env.TELEGRAM_BOT
-  const chatid = process.env.CHAT_ID2
+  const chatid = process.env.CHAT_ID
   const line1 = 'BORRADO'
   const line2 = input.code
   const line3 = input.name
