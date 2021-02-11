@@ -40,7 +40,7 @@
               sort-by="createdAt"
               calculate-widths
               sort-desc
-              no-data-text="No hay informacion para mostrar aun..."
+              no-data-text="No hay Tickets abiertos aún..."
               loading-text="Cargando información de tickets..."
               dense
               hide-default-footer
