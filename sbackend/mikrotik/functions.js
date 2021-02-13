@@ -1,7 +1,9 @@
 /* eslint-disable no-undef */
 const RouterOSAPI = require('node-routeros').RouterOSAPI
-function removePunctuation(text) {
-  return text.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+function sanitizeString(str) {
+  const res1 = str.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+  const res2 = res1.replace(/[^a-z0-9áéíóúñü \.\n,_-]/gim, "");
+  return res2
 }
 module.exports.mkCreateClient = async function (mikrotikHost, plan, input, cityName, planName, neightborhood, technology) {
   const conn = new RouterOSAPI({
@@ -418,8 +420,8 @@ module.exports.simpleTelegramCreate = async function (input) {
   const bot = process.env.TELEGRAM_BOT
   const chatid = process.env.CHAT_ID
   var message = `CREADO\n${input.code}\n${input.name}\n${input.dni}\n${input.address}\n${input.neighborhood.name}\n${input.phone}\n${input.city.name}\n${input.plan.name}\n${input.wifi_ssid}\n${input.wifi_password}\n${input.technology.name}\n${input.mac_address}\n${input.operator.username}\n${input.createdAt}`
-  payload = message.replace('#', ' ')
-  const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + payload
+  var payload = message.replace('#', ' ')
+  const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + sanitizeString(message)
   fetch(req).then(function (response) {
     return true
   }).catch(function (err) {
@@ -433,7 +435,7 @@ module.exports.simpleTelegramUpdate = async function (input) {
   const chatid = process.env.CHAT_ID
   var message = `ACTUALIZADO\n${input.code}\n${input.name}\n${input.dni}\n${input.address}\n${input.neighborhood.name}\n${input.phone}\n${input.city.name}\n${input.plan.name}\n${input.wifi_ssid}\n${input.wifi_password}\n${input.technology.name}\n${input.mac_address}\n${input.operator.username}\n${input.createdAt}`
   payload = message.replace('#', ' ')
-  const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + payload
+  const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + sanitizeString(message)
   fetch(req).then(function (response) {
     return true
   }).then(function (data) {
@@ -454,7 +456,7 @@ module.exports.simpleTelegramUpdatePlan = async function (input, operator) {
   const line4 = input.plan.name
   const line5 = operator
   const message = `${line1}\n${line2}\n${line3}\n${line4}\n${line5}`
-  const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + message
+  const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + sanitizeString(message)
   fetch(req).then(function (response) {
     return true
   }).then(function (data) {
@@ -473,7 +475,7 @@ module.exports.simpleTelegramDelete = async function (input) {
   const line3 = input.name
   const line4 = input.operator.username
   const message = `${line1}\n${line2}\n${line3}\n${line4}`
-  const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + message
+  const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + sanitizeString(message)
   fetch(req).then(function (response) {
     return true
   }).then(function (data) {
@@ -497,8 +499,7 @@ module.exports.simpleTelegramCreateTicket = async function (input) {
   const line8 = input.assiganted.username
   const line9 = input.createdAt
   const message = `${line1}\n${line2}\n${line3}\n${line4}\n${line5}\n${line6}\n${line7}\n\n${line8}\n${line9}`
-  payload = message.replace('#', ' ')
-  const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + removePunctuation(payload)
+  const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + sanitizeString(message)
   fetch(req).then(function (response) {
     console.log(response)
     return true
@@ -534,8 +535,7 @@ module.exports.simpleTelegramCreateTicketAdvance = async function (input, client
   const line9 = assiganted
   const line10 = input.createdAt
   const message = `${line1}\n${line2}\n${line3}\n${line4}\n${line5}\n${line6}\n\n${line7}\n${line8}\n\n${line9}\n${line10}`
-  payload = message.replace('#', ' ')
-  const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + removePunctuation(payload)
+  const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + sanitizeString(message)
   fetch(req).then(function (response) {
     console.log(response)
     return true
