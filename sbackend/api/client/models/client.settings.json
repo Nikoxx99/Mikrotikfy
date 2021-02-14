@@ -70,19 +70,23 @@
       "type": "boolean"
     },
     "passwordchanges": {
-      "via": "client",
-      "collection": "passwordchange"
+      "collection": "passwordchange",
+      "via": "client"
     },
     "operator_role": {
       "type": "string"
     },
     "histories": {
-      "via": "client",
-      "collection": "history"
+      "collection": "history",
+      "via": "client"
     },
     "tickets": {
-      "via": "client",
-      "collection": "ticket"
+      "collection": "ticket",
+      "via": "client"
+    },
+    "hasRepeater": {
+      "type": "boolean",
+      "default": false
     }
   }
 }

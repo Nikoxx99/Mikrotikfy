@@ -232,10 +232,10 @@
                     :role="allowed_components"
                   />
                   <EditForm
-                      v-if="can('EditForm')"
                       :item="item"
                       :editIndex="dataTable.indexOf(item)"
                       :dataTable="dataTable"
+                      :role="allowed_components"
                       @updateComment="updateComment($event)"
                     />
                   <DeleteClient v-if="can('DeleteClient')" :name="item.name" :clientid="item._id" />
@@ -356,6 +356,7 @@ export default {
                 id
                 username
               }
+              hasRepeater
               newModel
               active
             }
@@ -485,6 +486,7 @@ export default {
             }
             created_at
             newModel
+            hasRepeater
             active
           }
         }

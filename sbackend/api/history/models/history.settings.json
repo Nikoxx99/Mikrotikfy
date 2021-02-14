@@ -51,8 +51,8 @@
       "via": "histories"
     },
     "client": {
-      "model": "client",
-      "via": "histories"
+      "via": "histories",
+      "model": "client"
     },
     "active": {
       "type": "boolean"

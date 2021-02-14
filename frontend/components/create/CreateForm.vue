@@ -206,7 +206,8 @@
         dense
         hide-details
       />
-      <v-checkbox v-model="Client.sendToMikrotik" input-value="true" label="Crear en Mikrotik?" />
+      <v-switch v-model="Client.hasRepeater" hide-details input-value="false" label="Tiene repetidor?" />
+      <v-switch v-model="Client.sendToMikrotik" input-value="true" label="Crear en Mikrotik?" />
       <v-btn
         class="mr-4"
         :color="citycolor"
@@ -311,6 +312,7 @@ export default {
         mac_address: '',
         comment: '',
         newModel: 1,
+        hasRepeater: false,
         sendToMikrotik: true
       },
       dir1: '',
@@ -374,6 +376,7 @@ export default {
               comment: this.Client.comment,
               newModel: this.Client.newModel,
               sendToMikrotik: this.Client.sendToMikrotik,
+              hasRepeater: this.Client.hasRepeater,
               operator: this.$store.state.auth.id,
               operator_role: this.role
             }
