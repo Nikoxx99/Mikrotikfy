@@ -1,0 +1,117 @@
+[{
+  "_id": {
+    "$oid": "600b468b02cd0343c0bce737"
+  },
+  "name": "EditForm",
+  "published_at": {
+    "$date": "2021-01-22T21:41:33.116Z"
+  },
+  "createdAt": {
+    "$date": "2021-01-22T21:41:31.210Z"
+  },
+  "updatedAt": {
+    "$date": "2021-01-22T21:50:51.330Z"
+  },
+  "__v": 0,
+  "created_by": {
+    "$oid": "5fc4217c6a07442714f1bc34"
+  },
+  "role": {
+    "$oid": "5f833946726c2b119073701a"
+  },
+  "updated_by": {
+    "$oid": "5fc4217c6a07442714f1bc34"
+  },
+  "roles": [
+    {
+      "$oid": "5f833946726c2b119073701a"
+    }
+  ]
+},{
+  "_id": {
+    "$oid": "600b46a002cd0343c0bce738"
+  },
+  "name": "DeleteClient",
+  "published_at": {
+    "$date": "2021-01-22T21:41:54.111Z"
+  },
+  "createdAt": {
+    "$date": "2021-01-22T21:41:52.992Z"
+  },
+  "updatedAt": {
+    "$date": "2021-01-22T21:50:58.071Z"
+  },
+  "__v": 0,
+  "created_by": {
+    "$oid": "5fc4217c6a07442714f1bc34"
+  },
+  "role": {
+    "$oid": "5f833946726c2b119073701a"
+  },
+  "updated_by": {
+    "$oid": "5fc4217c6a07442714f1bc34"
+  },
+  "roles": [
+    {
+      "$oid": "5f833946726c2b119073701a"
+    }
+  ]
+},{
+  "_id": {
+    "$oid": "600b46af02cd0343c0bce739"
+  },
+  "name": "CreateForm",
+  "published_at": {
+    "$date": "2021-01-22T21:42:08.866Z"
+  },
+  "createdAt": {
+    "$date": "2021-01-22T21:42:07.664Z"
+  },
+  "updatedAt": {
+    "$date": "2021-01-25T17:27:46Z"
+  },
+  "__v": 0,
+  "created_by": {
+    "$oid": "5fc4217c6a07442714f1bc34"
+  },
+  "role": {
+    "$oid": "5f833946726c2b119073701a"
+  },
+  "updated_by": {
+    "$oid": "5fc4217c6a07442714f1bc34"
+  },
+  "roles": [
+    {
+      "$oid": "5f833946726c2b119073701a"
+    }
+  ]
+},{
+  "_id": {
+    "$oid": "600b46fae270db36fc2775bd"
+  },
+  "roles": [
+    {
+      "$oid": "5f833946726c2b119073701a"
+    },
+    {
+      "$oid": "600b021ece2f480cd0b1d9b9"
+    }
+  ],
+  "name": "ClientStatus",
+  "published_at": {
+    "$date": "2021-01-22T21:43:29.114Z"
+  },
+  "createdAt": {
+    "$date": "2021-01-22T21:43:22.813Z"
+  },
+  "updatedAt": {
+    "$date": "2021-01-22T21:43:29.122Z"
+  },
+  "__v": 0,
+  "created_by": {
+    "$oid": "5fc4217c6a07442714f1bc34"
+  },
+  "updated_by": {
+    "$oid": "5fc4217c6a07442714f1bc34"
+  }
+}]
