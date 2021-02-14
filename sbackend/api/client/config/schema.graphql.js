@@ -29,6 +29,7 @@ module.exports = {
       comment: String
       operator: operator
       created_at: String
+      hasRepeater: Boolean
       newModel: Int
       active: Boolean
     }

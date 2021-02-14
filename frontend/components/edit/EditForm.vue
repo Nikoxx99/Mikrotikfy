@@ -45,6 +45,7 @@
                 <v-col>
                   <v-text-field
                     v-model="item.code"
+                    :disabled="!can('EditFormCode')"
                     type="number"
                     label="Codigo"
                     required
@@ -56,6 +57,7 @@
                 <v-col>
                   <v-text-field
                     v-model="item.dni"
+                    :disabled="!can('EditFormDni')"
                     type="number"
                     label="Cedula"
                     required
@@ -67,6 +69,7 @@
               </v-row>
               <v-text-field
                 v-model="item.name"
+                :disabled="!can('EditFormName')"
                 label="Nombre Completo"
                 required
                 outlined
@@ -78,6 +81,7 @@
                 <v-col cols="6" lg="3" md="3">
                   <v-text-field
                     v-model="item.address"
+                    :disabled="!can('EditFormAddress')"
                     label="Direccion"
                     outlined
                     dense
@@ -87,6 +91,7 @@
                 <v-col cols="6" lg="3" md="3">
                   <v-autocomplete
                     v-model="item.neighborhood"
+                    :disabled="!can('EditFormNeighborhood')"
                     item-text="name"
                     item-value="id"
                     :items="neighborhoods"
@@ -114,6 +119,7 @@
                 <v-col cols="6" lg="3" md="3">
                   <v-text-field
                     v-model="item.phone"
+                    :disabled="!can('EditFormPhone')"
                     label="Telefono"
                     required
                     outlined
@@ -126,6 +132,7 @@
                 <v-col cols="12" lg="4" md="4">
                   <v-select
                     v-model="item.plan"
+                    :disabled="!can('EditFormPlan')"
                     item-text="name"
                     item-value="id"
                     :items="plans"
@@ -139,6 +146,7 @@
                 <v-col cols="6" lg="4" md="4">
                   <v-text-field
                     v-model="item.wifi_ssid"
+                    :disabled="!can('EditFormWifiSsid')"
                     label="Nombre de Red"
                     required
                     outlined
@@ -149,6 +157,7 @@
                 <v-col cols="6" lg="4" md="4">
                   <v-text-field
                     v-model="item.wifi_password"
+                    :disabled="!can('EditFormWifiPassword')"
                     label="Clave de Red"
                     required
                     outlined
@@ -161,6 +170,7 @@
                 <v-col>
                   <v-select
                     v-model="item.technology"
+                    :disabled="!can('EditFormTechnology')"
                     item-text="name"
                     item-value="id"
                     :items="technologies"
@@ -174,6 +184,7 @@
                 <v-col>
                   <v-text-field
                     v-model="item.mac_address"
+                    :disabled="!can('EditFormMacAddress')"
                     label="Mac Equipo"
                     required
                     outlined
@@ -186,6 +197,7 @@
                 <v-col>
                   <v-select
                     v-model="item.newModel"
+                    :disabled="!can('EditFormNewModel')"
                     :items="idwith"
                     item-text="name"
                     item-value="id"
@@ -237,6 +249,7 @@
               </v-row>
               <v-textarea
                 v-model="item.comment"
+                :v-if="!can('EditFormComment')"
                 auto-grow
                 :success.sync="success"
                 :success-messages="successMessage"
@@ -249,6 +262,7 @@
                 label="Comentario"
                 dense
               />
+              <v-switch v-model="item.hasRepeater" hide-details input-value="false" label="Tiene repetidor?" />
               <v-btn
                 class="mr-4"
                 color="info"
@@ -333,6 +347,10 @@ export default {
     editIdex: {
       type: Number,
       default: 0
+    },
+    role: {
+      type: Array,
+      default: () => []
     }
   },
   data: () => {
@@ -438,6 +456,7 @@ export default {
               mac_address: this.item.mac_address,
               comment: this.item.comment,
               operator: this.$store.state.auth.id,
+              hasRepeater: this.item.hasRepeater,
               newModel: this.item.newModel
             }
           }
@@ -479,6 +498,13 @@ export default {
         const clientRes = false
         return clientRes
       }
+    },
+    can (component) {
+      // eslint-disable-next-line camelcase
+      const allowed_components = this.role
+      // eslint-disable-next-line camelcase
+      const current_component = component
+      return allowed_components.includes(current_component)
     }
   }
 }
