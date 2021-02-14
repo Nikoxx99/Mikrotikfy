@@ -45,9 +45,12 @@ export default {
     // Doc: https://github.com/nuxt-community/eslint-module
     '@nuxtjs/eslint-module',
     '@nuxtjs/apollo',
-    '@nuxtjs/vuetify'
+    '@nuxtjs/vuetify',
+    'nuxt-build-optimisations'
   ],
-
+  buildOptimisations: {
+    profile: 'risky'
+  },
   apollo: {
     clientConfigs: {
       default: {
