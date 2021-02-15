@@ -151,6 +151,9 @@ export default {
       `,
         variables: {
           city: this.$route.query.city
+        },
+        skip () {
+          return true
         }
       }
     }
@@ -190,9 +193,18 @@ export default {
       ticketList: []
     }
   },
-  mounted () {
-    this.ticketList = this.tickets
-    this.showClosed(false)
+  async mounted () {
+    this.$apollo.queries.tickets.skip = false
+    await this.$apollo.queries.tickets.fetchMore({
+      variables: {
+        city: this.$route.query.city
+      },
+      updateQuery: (_, { fetchMoreResult }) => {
+        const newTickets = fetchMoreResult.tickets
+        this.ticketList = newTickets
+      }
+    })
+    await this.showClosed(false)
   },
   methods: {
     async refreshTickets () {

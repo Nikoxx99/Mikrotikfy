@@ -108,7 +108,10 @@ export default {
             color
           }
         }
-      `
+      `,
+        skip () {
+          return true
+        }
       }
     }
   },
@@ -121,11 +124,6 @@ export default {
           icon: 'mdi-apps',
           title: 'Base de Datos',
           to: '/lista'
-        },
-        {
-          icon: 'mdi-comment-account-outline',
-          title: 'Tickets',
-          to: '/tickets'
         },
         {
           icon: 'mdi-cog',
@@ -154,10 +152,12 @@ export default {
       right: true,
       rightDrawer: false,
       title: 'ARNOProducciones SAS',
-      bg: ''
+      bg: '',
+      cities: {}
     }
   },
   mounted () {
+    this.populareCities()
     const date = new Date()
     const month = date.getMonth()
     if (month === 11) {
@@ -186,6 +186,15 @@ export default {
     })
   },
   methods: {
+    async populareCities () {
+      this.$apollo.queries.cities.skip = false
+      await this.$apollo.queries.cities.fetchMore({
+        updateQuery: (_, { fetchMoreResult }) => {
+          const newCitiesInfo = fetchMoreResult.cities
+          this.cities = newCitiesInfo
+        }
+      })
+    },
     logout () {
       Cookie.remove('auth')
       Cookie.remove('authToken')

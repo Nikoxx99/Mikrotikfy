@@ -1,5 +1,10 @@
 <template>
-  <div v-if="dataTable">
+  <div v-if="dataTable.length < 1">
+    <v-skeleton-loader
+      type="table-tbody"
+    />
+  </div>
+  <div v-else>
     <v-row v-if="alertBox">
       <v-col>
         <v-alert
@@ -231,6 +236,7 @@
                     :role="allowed_components"
                   />
                   <EditForm
+                      v-if="can('EditForm')"
                       :item="item"
                       :editIndex="dataTable.indexOf(item)"
                       :dataTable="dataTable"
@@ -363,6 +369,9 @@ export default {
           city: this.$route.query.city,
           start: 0,
           limit: 5
+        },
+        skip () {
+          return true
         }
       }
     },
@@ -375,7 +384,10 @@ export default {
             name
           }
         }
-      `
+      `,
+        skip () {
+          return true
+        }
       }
     },
     role () {
@@ -392,6 +404,9 @@ export default {
       `,
         variables: {
           id: this.$store.state.auth.role
+        },
+        skip () {
+          return true
         }
       }
     },
@@ -406,6 +421,9 @@ export default {
       `,
         variables: {
           city: this.$route.query.city
+        },
+        skip () {
+          return true
         }
       }
     },
@@ -418,6 +436,9 @@ export default {
         `,
         variables: {
           city: this.$route.query.city
+        },
+        skip () {
+          return true
         }
       }
     },
@@ -430,6 +451,9 @@ export default {
         `,
         variables: {
           city: this.$route.query.city
+        },
+        skip () {
+          return true
         }
       }
     },
@@ -442,6 +466,9 @@ export default {
         `,
         variables: {
           city: this.$route.query.city
+        },
+        skip () {
+          return true
         }
       }
     },
@@ -540,7 +567,13 @@ export default {
       title: ' Base de datos',
       dataTable: [],
       clientRes: true,
-      allowed_components: []
+      allowed_components: [],
+      ActiveClients: [],
+      plans: {},
+      role: {},
+      clientCount: 0,
+      clientCountActive: 0,
+      clientCountDisable: 0
     }
   },
   computed: {
@@ -570,23 +603,40 @@ export default {
       deep: true
     }
   },
-  mounted () {
+  async mounted () {
     // eslint-disable-next-line no-undef
     this.debouncedGetAnswer = _.debounce(this.getClientBySearch, 700)
     // eslint-disable-next-line no-undef
     this.debouncedGetResult = _.debounce(this.getDataFromApi, 100)
-    this.clientApiCall()
-    this.allowed_components = this.role.allowed_components.map(c => {
-      return c.name
-    })
+    await this.activeClientInitialCall()
+    await this.popularePlans()
+    await this.populareRole()
+    await this.populareClientCount()
+    await this.populareClientCountActive()
+    await this.populareClientCountDisable()
+    await this.clientApiCall()
+    
     // console.log(this.$options.components)
     if(!this.can('active')){
       this.headers.splice(10,1)
     }
   },
   methods: {
-    clientApiCall () {
+    async clientApiCall () {
       this.loadingDataTable = true
+      this.$apollo.queries.city.skip = false
+      await this.$apollo.queries.city.fetchMore({
+          variables: {
+            city: this.$route.query.city,
+            start: 0,
+            limit: 5
+          },
+          updateQuery: (_, { fetchMoreResult }) => {
+            const newClients = fetchMoreResult.city.clients
+            this.cityName = fetchMoreResult.city.name
+            this.dataTable = newClients
+          }
+        })
       if (!this.searchClientInput) {
         this.getDataFromApi().then((data) => {
           this.mapDatabase(data.items)
@@ -635,11 +685,11 @@ export default {
       this.dataTable = items
     },
     async getClients (start, limit) {
-      if (this.city.clients < 1) {
+      if (this.dataTable < 1) {
         return {}
       }
       if (this.initialLoad) {
-        return await this.city.clients
+        return await this.dataTable
       } else {
         await this.$apollo.queries.city.fetchMore({
           variables: {
@@ -788,6 +838,66 @@ export default {
       const current_component = component
       return allowed_components.includes(current_component)
     },
+    async activeClientInitialCall () {
+      this.$apollo.queries.ActiveClients.skip = false
+      await this.$apollo.queries.ActiveClients.fetchMore({
+        variables: {
+          city: this.$route.query.city
+        },
+        updateQuery: async (previousResult, { fetchMoreResult }) => {
+          const newClients = fetchMoreResult.ActiveClients
+          this.ActiveClients = newClients
+        }
+      })
+    },
+    async popularePlans () {
+      this.$apollo.queries.plans.skip = false
+      await this.$apollo.queries.plans.fetchMore({
+        updateQuery: (_, { fetchMoreResult }) => {
+          const newPlansInfo = fetchMoreResult.plans
+          this.cities = newPlansInfo
+        }
+      })
+    },
+    async populareRole () {
+      this.$apollo.queries.role.skip = false
+      await this.$apollo.queries.role.fetchMore({
+        updateQuery: (_, { fetchMoreResult }) => {
+          const newRoleInfo = fetchMoreResult.role
+          this.role = newRoleInfo
+        }
+      })
+      this.allowed_components = this.role.allowed_components.map(c => {
+        return c.name
+      })
+    },
+    async populareClientCount () {
+      this.$apollo.queries.clientCount.skip = false
+      await this.$apollo.queries.clientCount.fetchMore({
+        updateQuery: (_, { fetchMoreResult }) => {
+          const newClientCountInfo = fetchMoreResult.clientCount
+          this.clientCount = newClientCountInfo
+        }
+      })
+    },
+    async populareClientCountActive () {
+      this.$apollo.queries.clientCountActive.skip = false
+      await this.$apollo.queries.clientCountActive.fetchMore({
+        updateQuery: (_, { fetchMoreResult }) => {
+          const newClientCountActiveInfo = fetchMoreResult.clientCountActive
+          this.clientCountActive = newClientCountActiveInfo
+        }
+      })
+    },
+    async populareClientCountDisable () {
+      this.$apollo.queries.clientCountDisable.skip = false
+      await this.$apollo.queries.clientCountDisable.fetchMore({
+        updateQuery: (_, { fetchMoreResult }) => {
+          const newClientCountDisableInfo = fetchMoreResult.clientCountDisable
+          this.clientCountDisable = newClientCountDisableInfo
+        }
+      })
+    },
     updateStatus (status, index) {
       if (status === true) {
         this.dataTable[index].active = !this.dataTable[index].active
@@ -852,7 +962,7 @@ export default {
   },
   head () {
     return {
-      title: this.city.name + this.title,
+      title: this.cityName + this.title,
       meta: [
         { hid: 'language', name: 'language', content: 'es' },
         { hid: 'audience', name: 'audience', content: 'all' },

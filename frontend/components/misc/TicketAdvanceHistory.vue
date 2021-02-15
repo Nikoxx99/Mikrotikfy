@@ -71,9 +71,9 @@ export default {
                   name
                 }
                 createdAt
-                assiganted {
-                  username
-                }
+              }
+              operator {
+                username
               }
               details
             }
@@ -108,7 +108,7 @@ export default {
     headers: [
       { text: 'Cliente', sortable: true, value: 'ticket.client.name' },
       { text: 'Tipo', sortable: true, value: 'ticket.tickettype.name' },
-      { text: 'Operador', sortable: false, value: 'ticket.assiganted.username' },
+      { text: 'Operador', sortable: false, value: 'operator.username' },
       { text: 'Detalles', sortable: true, value: 'details' },
       { text: 'Creado', sortable: true, value: 'ticket.createdAt' }
     ]
