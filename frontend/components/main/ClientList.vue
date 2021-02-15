@@ -1,10 +1,5 @@
 <template>
-  <div v-if="dataTable.length < 1">
-    <v-skeleton-loader
-      type="table-tbody"
-    />
-  </div>
-  <div v-else>
+  <div v-if="dataTable">
     <v-row v-if="alertBox">
       <v-col>
         <v-alert
@@ -23,7 +18,7 @@
       >
         <v-card>
           <v-card-title>
-            Clientes {{ city.name }}
+            Clientes {{ cityName }}
             <v-spacer />
             <v-text-field
               v-model="searchClientInput"
@@ -37,7 +32,13 @@
             />
           </v-card-title>
           <client-only>
+            <div v-if="dataTable.length < 1 && initialLoad">
+              <v-skeleton-loader
+                type="table-tbody"
+              />
+            </div>
             <v-data-table
+              v-else
               :key="key"
               :headers="headers"
               :items.sync="dataTable"
