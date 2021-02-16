@@ -137,6 +137,7 @@ export default {
               neighborhood{
                 name
               }
+              phone
             }
             tickettype{
               name
@@ -179,6 +180,7 @@ export default {
         { text: 'Cliente', sortable: true, value: 'client.name', width: 150 },
         { text: 'Dirección', sortable: true, value: 'client.address', width: 200 },
         { text: 'Barrio', sortable: true, value: 'client.neighborhood.name', width: 100 },
+        { text: 'Telefono', sortable: true, value: 'client.phone', width: 100 },
         { text: 'Tipo', sortable: true, value: 'tickettype.name', width: 150 },
         { text: 'Operador', sortable: false, value: 'assiganted.username', width: 60 },
         { text: 'Detalles', sortable: true, value: 'details', width: 400 },
