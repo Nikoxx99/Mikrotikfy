@@ -259,7 +259,7 @@ export default {
             dni: this.user_dni
           }
         }).then((input) => {
-          if (input.data.TestPasswordChange !== false) {
+          if (input.data.TestPasswordChange === true) {
             this.error = false
             this.e1 = 2
           } else {
