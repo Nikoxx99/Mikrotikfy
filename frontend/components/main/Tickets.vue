@@ -178,7 +178,7 @@ export default {
       refreshLoading: false,
       headers: [
         { text: 'Estado', sortable: true, value: 'active', width: '5%' },
-        { text: 'Codigo', sortable: true, value: 'client.code', width: 150 },
+        { text: 'Codigo', sortable: true, value: 'client.code', width: 60 },
         { text: 'Cliente', sortable: true, value: 'client.name', width: 150 },
         { text: 'Dirección', sortable: true, value: 'client.address', width: 200 },
         { text: 'Barrio', sortable: true, value: 'client.neighborhood.name', width: 100 },
