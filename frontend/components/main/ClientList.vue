@@ -51,7 +51,7 @@
               loading-text="Cargando información de clientes..."
               dense
               hide-default-footer
-              mobile-breakpoint="600"
+              mobile-breakpoint="100"
               @page-count="pageCount = $event"
             >
               <!-- ########################### -->
@@ -229,6 +229,10 @@
                     :clientid="item._id"
                     :role="allowed_components"
                   />
+                  <TicketHistory
+                    :clientid="item._id"
+                    :name="item.name"
+                  />
                   <ClientStatus
                     v-if="can('ClientStatus')"
                     :name="item.name"
@@ -309,6 +313,7 @@ import EditForm from '../edit/EditForm'
 import DeleteClient from '../delete/DeleteClient'
 import ClientStatus from '../main/ClientStatus'
 import CreateTicket from '../create/CreateTicket'
+import TicketHistory from '../misc/TicketHistory'
 export default {
   name: 'ClientList',
   components: {
@@ -316,7 +321,8 @@ export default {
     EditForm,
     DeleteClient,
     ClientStatus,
-    CreateTicket
+    CreateTicket,
+    TicketHistory
   },
   apollo: {
     city () {

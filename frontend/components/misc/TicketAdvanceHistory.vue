@@ -8,7 +8,7 @@
           v-on="on"
           @click="initComponent()"
         >
-          mdi-server
+          mdi-history
         </v-icon>
       </template>
       <span>Historial de Avances</span>
@@ -26,20 +26,27 @@
         <div v-if="!loading">
           <v-card-text>
             <h2> {{ name }} </h2>
-            <v-data-table
-              :headers="headers"
-              :items="ticketdetails"
-              :items-per-page="10"
-              no-data-text="No hay avances para mostrar aun..."
-              loading-text="Cargando información de tickets..."
-            />
+            <client-only>
+              <v-data-table
+                :headers="headers"
+                :items="ticketdetails"
+                :items-per-page="itemsPerPage"
+                :page.sync="page"
+                no-data-text="No hay avances para mostrar aun..."
+                loading-text="Cargando información de tickets..."
+                hide-default-footer
+                mobile-breakpoint="100"
+                @page-count="pageCount = $event"
+              />
+            </client-only>
+            <div class="text-center pt-2">
+              <v-pagination v-model="page" :length="pageCount" />
+            </div>
           </v-card-text>
         </div>
         <v-card-actions>
           <v-spacer />
-
           <v-btn
-            color="green darken-1"
             text
             @click="modal = false"
           >
@@ -103,6 +110,9 @@ export default {
     loading: true,
     snack: false,
     snackText: '',
+    page: 1,
+    pageCount: 0,
+    itemsPerPage: 5,
     snackColor: '',
     ticketdetails: [],
     headers: [

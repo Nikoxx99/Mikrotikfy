@@ -158,6 +158,7 @@
                   <v-text-field
                     v-model="item.wifi_password"
                     :disabled="!can('EditFormWifiPassword')"
+                    :type="!can('EditFormWifiPasswordVisibility') ? 'password' : 'text'"
                     label="Clave de Red"
                     required
                     outlined
@@ -247,21 +248,22 @@
                   />
                 </v-col> -->
               </v-row>
-              <v-textarea
-                v-model="item.comment"
-                :v-if="!can('EditFormComment')"
-                auto-grow
-                :success.sync="success"
-                :success-messages="successMessage"
-                :error="error"
-                :error-messages="errorMessage"
-                :loading="commentLoading"
-                :disabled="commentDisabled"
-                persistent-hint
-                outlined
-                label="Comentario"
-                dense
-              />
+              <div v-if="can('EditFormComment')">
+                <v-textarea
+                  v-model="item.comment"
+                  auto-grow
+                  :success.sync="success"
+                  :success-messages="successMessage"
+                  :error="error"
+                  :error-messages="errorMessage"
+                  :loading="commentLoading"
+                  :disabled="commentDisabled"
+                  persistent-hint
+                  outlined
+                  label="Comentario"
+                  dense
+                />
+              </div>
               <v-switch v-model="item.hasRepeater" hide-details input-value="false" label="Tiene repetidor?" />
               <v-btn
                 class="mr-4"

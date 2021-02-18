@@ -4,7 +4,7 @@
       <template v-slot:activator="{ on, attrs }">
         <v-icon
           v-bind="attrs"
-          color="blue darken-4"
+          color="cyan darken-4"
           v-on="on"
           @click="initComponent()"
         >
@@ -41,15 +41,12 @@
         <v-card-actions>
           <v-btn
             color="blue darken-4"
-            text
             @click="CreateTicketAdvance()"
           >
             Crear Avance
           </v-btn>
           <v-spacer />
-
           <v-btn
-            color="green darken-1"
             text
             @click="modal = false"
           >

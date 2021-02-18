@@ -64,7 +64,6 @@
           <v-spacer />
 
           <v-btn
-            color="green darken-1"
             text
             @click="modal = false"
           >

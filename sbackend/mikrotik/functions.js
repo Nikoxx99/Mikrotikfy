@@ -2,7 +2,7 @@
 const RouterOSAPI = require('node-routeros').RouterOSAPI
 function sanitizeString(str) {
   const res1 = str.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
-  const res2 = res1.replace(/[^a-z0-9áéíóúñü \.\n,_-]/gim, "");
+  const res2 = res1.replace(/[^a-z0-9áéíóúñü \.\n@ñ,_-]/gim, "");
   return res2
 }
 module.exports.mkCreateClient = async function (mikrotikHost, plan, input, cityName, planName, neightborhood, technology) {
