@@ -125,8 +125,8 @@ export default {
             role: input.data.login.user.role.id
           }
           this.$store.commit('setAuth', auth)
-          Cookie.set('auth', auth)
-          Cookie.set('authToken', auth.accessToken)
+          Cookie.set('auth', auth, { expires: 7 })
+          Cookie.set('authToken', auth.accessToken, { expires: 7 })
           if (this.username === 'nohora') {
             window.location.href = '/lista?city=5fc3f0408e3de73d204cd430'
           } else if (this.username === 'natalia') {
