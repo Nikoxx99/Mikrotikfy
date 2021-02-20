@@ -62,7 +62,7 @@
                   large
                   cancel-text="Cancelar"
                   save-text="Guardar"
-                  @save="save(props.item._id, props.item.plan.id)"
+                  @save="save(props.item._id, props.item.plan.id, isRx)"
                   @cancel="cancel"
                   @close="close"
                 >
@@ -79,6 +79,10 @@
                       single-line
                       label="Plan"
                       dense
+                    />
+                    <v-switch
+                      v-model="isRx"
+                      label="Es reconexion?"
                     />
                   </template>
                 </v-edit-dialog>
@@ -547,6 +551,7 @@ export default {
       cityColor: '',
       alertBox: false,
       dialog: false,
+      isRx: true,
       options: {},
       headers: [
         { text: 'Codigo', sortable: true, value: 'code'},
@@ -811,14 +816,15 @@ export default {
       this.snackText = 'Cliente creado con éxito!'
       this.snackColor = 'info'
     },
-    save (clientId, newPlan) {
+    save (clientId, newPlan, isRx) {
       this.$apollo.mutate({
-        mutation: gql`mutation ($id: String, $plan: String, $operator: String){
-          editClientPlan(id: $id, plan: $plan, operator: $operator)
+        mutation: gql`mutation ($id: String, $plan: String, $isRx: Boolean, $operator: String){
+          editClientPlan(id: $id, plan: $plan, isRx: $isRx, operator: $operator)
         }`,
         variables: {
           id: clientId,
           plan: newPlan,
+          isRx,
           operator: this.$store.state.auth.username
         }
       }).then((input) => {

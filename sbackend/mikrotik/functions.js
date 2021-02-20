@@ -444,13 +444,18 @@ module.exports.simpleTelegramUpdate = async function (input) {
     console.log("Booo");
   });
 }
-module.exports.simpleTelegramUpdatePlan = async function (input, operator) {
+module.exports.simpleTelegramUpdatePlan = async function (input, operator, isRx) {
   console.log(input)
   const fetch = require('node-fetch');
   require('dotenv').config()
   const bot = process.env.TELEGRAM_BOT
   const chatid = process.env.CHAT_ID
-  const line1 = 'CAMBIO DE PLAN'
+  var line1 = ''
+  if (isRx) {
+    line1 = 'RECONEXIÓN'
+  } else {
+    line1 = 'CAMBIO DE PLAN'
+  }
   const line2 = input.code
   const line3 = input.name
   const line4 = input.plan.name

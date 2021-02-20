@@ -90,7 +90,7 @@ module.exports = {
     getClientComment(id: ID): ClientComment
   `,
   mutation: `
-    editClientPlan(id: String, plan: String, operator: String): Boolean
+    editClientPlan(id: String, plan: String, isRx: Boolean, operator: String): Boolean
     dxClient(input: DxInfoInput): [dxResponse]
     adminCreate(input: adminCreateInput): Boolean
     adminDelete(input: adminDeleteInput): Boolean
