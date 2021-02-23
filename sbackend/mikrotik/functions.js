@@ -489,7 +489,7 @@ module.exports.simpleTelegramDelete = async function (input) {
     console.log("Booo");
   });
 }
-module.exports.simpleTelegramCreateTicket = async function (input) {
+module.exports.simpleTelegramCreateTicket = async function (input, neighborhood) {
   const fetch = require('node-fetch');
   require('dotenv').config()
   const bot = process.env.TELEGRAM_BOT
@@ -498,12 +498,13 @@ module.exports.simpleTelegramCreateTicket = async function (input) {
   const line2 = input.client.code
   const line3 = input.client.name
   const line4 = input.client.address
-  const line5 = input.client.phone
-  const line6 = input.tickettype.name
-  const line7 = input.details
-  const line8 = input.assiganted.username
-  const line9 = input.createdAt
-  const message = `${line1}\n${line2}\n${line3}\n${line4}\n${line5}\n${line6}\n${line7}\n\n${line8}\n${line9}`
+  const line5 = neighborhood
+  const line6 = input.client.phone
+  const line7 = input.tickettype.name
+  const line8 = input.details
+  const line9 = input.assiganted.username
+  const line10 = input.createdAt
+  const message = `${line1}\n${line2}\n${line3}\n${line4}\n${line5}\n${line6}\n${line7}\n\n${line8}\n${line9}\n${line10}`
   const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + sanitizeString(message)
   fetch(req).then(function (response) {
     console.log(response)
