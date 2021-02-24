@@ -3,13 +3,21 @@ module.exports = {
     type ActiveClientList {
       name: String
     }
+    type MikrotikClientList {
+      name: String
+      comment: String
+    }
   `,
   query: `
     ActiveClients(city: String): [ActiveClientList]
+    MikrotikClient(city: String): [MikrotikClientList]
   `,
   type: {
-    ActiveClientList: {
+    ActiveClient: {
       name: 'returns the list of all active clients'
+    },
+    MikrotikClient: {
+      name: 'returns the list of all clients on mikrotik'
     }
   },
   resolver: {
@@ -17,6 +25,10 @@ module.exports = {
       ActiveClients: {
         description: 'Return the active clients',
         resolver: 'application::city.city.getActiveClients'
+      },
+      MikrotikClient: {
+        description: 'Return the clients on mikrotik',
+        resolver: 'application::city.city.getMikrotikClients'
       }
     },
   },

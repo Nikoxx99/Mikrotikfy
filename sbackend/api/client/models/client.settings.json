@@ -87,6 +87,10 @@
     "hasRepeater": {
       "type": "boolean",
       "default": false
+    },
+    "hasPendingRx": {
+      "type": "boolean",
+      "default": false
     }
   }
 }

@@ -327,7 +327,10 @@ module.exports.mkSetComment = async function (mikrotikHost, dni, code, model, co
         var com1 = await conn.write('/ppp/secret/set', [
           '=.id=' + code,
           '=comment=' + comment
-        ])
+        ]).catch((err) => {
+          console.log(err)
+          conn.close()
+        })
       } catch (error) {
         conn.close()
         return error
@@ -338,7 +341,10 @@ module.exports.mkSetComment = async function (mikrotikHost, dni, code, model, co
         var com1 = await conn.write('/ppp/secret/set', [
           '=.id=' + dni,
           '=comment=' + comment
-        ])
+        ]).catch((err) => {
+          console.log(err)
+          conn.close()
+        })
       } catch (error) {
         conn.close()
         return error

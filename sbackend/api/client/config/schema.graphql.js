@@ -88,12 +88,13 @@ module.exports = {
     clientCountDisable(city: String): Int
     searchClient(search: String, limit: Int, city: String): [SearchClient]
     getClientComment(id: ID): ClientComment
-  `,
+    `,
   mutation: `
     editClientPlan(id: String, plan: String, isRx: Boolean, operator: String): Boolean
     dxClient(input: DxInfoInput): [dxResponse]
     adminCreate(input: adminCreateInput): Boolean
     adminDelete(input: adminDeleteInput): Boolean
+    setClientComment(clientid:ID, comment: String): Boolean
   `,
   type: {
     ActiveClientList: {
@@ -143,6 +144,10 @@ module.exports = {
       adminDelete: {
         description: 'Delete client on admin unapprovation',
         resolver: 'application::client.client.adminDelete',
+      },
+      setClientComment: {
+        description: 'Sets client comment on mikrotik',
+        resolver: 'application::client.client.setClientComment'
       }
     }
   },

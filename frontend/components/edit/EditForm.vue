@@ -265,18 +265,27 @@
                 />
               </div>
               <v-switch v-model="item.hasRepeater" hide-details input-value="false" label="Tiene repetidor?" />
-              <v-btn
-                class="mr-4"
-                color="info"
-                :loading="isSubmitting"
-                :disabled="isSubmitting"
-                @click="updateClient"
-              >
-                Confirmar
-              </v-btn>
             </v-form>
           </v-container>
         </v-card-text>
+        <v-card-actions>
+          <v-btn
+            class="mr-4"
+            color="info"
+            :loading="isSubmitting"
+            :disabled="isSubmitting"
+            @click="updateClient()"
+          >
+            Confirmar
+          </v-btn>
+          <v-btn
+            class="mr-4"
+            color="success"
+            @click="createComment()"
+          >
+            Generar Comentario
+          </v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
   </span>
@@ -482,6 +491,12 @@ export default {
         this.createdMessage = error
         this.isSubmitting = false
       })
+    },
+    createComment () {
+      this.item.comment = ''
+      const client = this.item
+      const newComment = `${client.code} ${client.technology.name} ${client.neighborhood.name} ${client.address} ${client.name} ${client.dni} ${client.phone} ${client.plan.name} ${client.mac_address} ${client.wifi_password}`
+      this.item.comment = newComment
     },
     genAddress () {
       this.Client.address = `${this.dir1} ${this.dir2} ${this.dir3} ${this.dir4}`

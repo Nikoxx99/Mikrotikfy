@@ -6,6 +6,22 @@
  */
 const RouterOSAPI = require('node-routeros').RouterOSAPI
 module.exports = {
+  async getMikrotikClients(ctx) {
+    const cityQuery = await strapi.services.city.findOne({ _id: ctx.query._city });
+    const cityIpArray = cityQuery.ip[0]
+    const conn = new RouterOSAPI({
+      host: cityIpArray,
+      user: 'API_ARNOP',
+      password: strapi.config.get('server.admin.mikrotik.secret', 'null'),
+      port: 8087
+    })
+    await conn.connect()
+    const result2 = await conn.write('/ppp/secret/print', [
+      '=.proplist=name,comment',
+    ])
+    conn.close()
+    return result2
+  },
   async getActiveClients(ctx) {
     const cityQuery = await strapi.services.city.findOne({ _id: ctx.query._city });
     const cityIpArray = cityQuery.ip
@@ -40,6 +56,6 @@ module.exports = {
       conn.close()
       return result2
     }
-    
+
   },
 };

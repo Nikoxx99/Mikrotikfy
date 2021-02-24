@@ -116,6 +116,28 @@ module.exports = {
     const res = sanitizeEntity(entity, { model: strapi.models.client })
     return res
   },
+  async setClientComment(ctx) {
+    const { clientid, comment } = ctx.request.body
+    const search = await strapi.services.client.find({ _id: clientid })
+    const clientObj = search[0]
+    const dni = clientObj.dni
+    const code = clientObj.code
+    const model = clientObj.newModel
+    const reqCityIpArray = clientObj.city.ip
+    if (reqCityIpArray.length > 1) {
+      const successfulMikrotikResponses = []
+      for (let i = 0; i < reqCityIpArray.length; i++) {
+        const mikrotikHost = reqCityIpArray[i]
+        const res = await mkSetComment(mikrotikHost, dni, code, model, comment)
+        successfulMikrotikResponses.push(res)
+      }
+    } else {
+      const mikrotikHost = reqCityIpArray[0]
+      await mkSetComment(mikrotikHost, dni, code, model, comment)
+    }
+    const res = sanitizeEntity(entity, { model: strapi.models.client })
+    return res
+  },
   async delete(ctx) {
     const { id } = ctx.params;
     const search = await strapi.services.client.find({ _id: id })
@@ -329,5 +351,16 @@ module.exports = {
       }
       return process
     }
+  },
+  async find(ctx) {
+    let entities;
+    const search = ctx.query
+    if (ctx.query._q) {
+      entities = await strapi.services.client.search(ctx.query);
+    } else {
+      entities = await strapi.services.client.search(ctx.query);
+    }
+
+    return entities.map(entity => sanitizeEntity(entity, { model: strapi.models.client }));
   },
 };
