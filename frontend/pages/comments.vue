@@ -34,6 +34,20 @@
             >
               Clientes en Mikrotik: {{ MikrotikClient ? MikrotikClient.length : '' }}
             </v-chip>
+            <v-chip
+              color="cyan darken-4 white--text"
+              small
+              class="mr-4"
+            >
+              Exito: {{ successChanges }}
+            </v-chip>
+            <v-chip
+              color="red darken-4 white--text"
+              small
+              class="mr-4"
+            >
+              Errores: {{ errorChanges }}
+            </v-chip>
             <v-spacer />
             <v-btn
               color="red darken-4"
@@ -198,6 +212,8 @@ export default {
       itemsPerPage: 50,
       search: '',
       currentCity: 'Mariquita',
+      successChanges: 0,
+      errorChanges: 0,
       cityName: '',
       cityColor: '',
       alertBox: false,
@@ -239,28 +255,24 @@ export default {
         }
       }
     },
-    applyComments () {
+    async applyComments () {
       const newClientInfo = this.clients
       for (let i = 0; i < newClientInfo.length; i++) {
         this.$apollo.mutate({
-          mutation: gql`mutation ($clientid: ID, comment: String){
+          mutation: gql`mutation ($clientid: ID, $comment: String){
             setClientComment(clientid: $clientid, comment: $comment)
           }`,
           variables: {
-            input: {
-              clientid: newClientInfo[i]._id,
-              comment: newClientInfo[i].comment
-            }
+            clientid: newClientInfo[i]._id,
+            comment: newClientInfo[i].comment
           }
         }).then((input) => {
-          this.snack = true
-          this.snackColor = 'info'
-          this.snackText = 'Petición actualizada con éxito.'
+          this.successChanges++
         }).catch((error) => {
-          this.snack = true
-          this.snackColor = 'red'
-          this.snackText = error
+          this.errorChanges++
+          console.log(error)
         })
+        await this.sleep(1000)
       }
     },
     async populateClients () {
@@ -280,6 +292,9 @@ export default {
     },
     removeItem (index) {
       this.clients.splice(index, 1)
+    },
+    sleep (ms) {
+      return new Promise(resolve => setTimeout(resolve, ms))
     },
     getDate (date) {
       const dateObject = new Date(date)

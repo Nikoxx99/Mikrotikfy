@@ -91,6 +91,12 @@
     "hasPendingRx": {
       "type": "boolean",
       "default": false
+    },
+    "nap_onu_address": {
+      "type": "string"
+    },
+    "opticalPower": {
+      "type": "string"
     }
   }
 }

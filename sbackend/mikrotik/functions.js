@@ -12,7 +12,7 @@ module.exports.mkCreateClient = async function (mikrotikHost, plan, input, cityN
     password: strapi.config.get('server.admin.mikrotik.secret', 'null'),
     port: 8087
   })
-  const comment = `${input.code} ${input.name} ${input.dni} ${input.address} ${neightborhood} ${cityName} ${input.phone} ${planName} ${input.wifi_ssid} ${input.wifi_password} ${technology} ${input.mac_address} ${input.comment}`
+  const comment = `${input.code} ${technology} ${neightborhood} ${input.address} ${input.name} ${input.dni} ${cityName} ${planName} ${input.mac_address} NAP-ONU: ${input.nap_onu_address} POTENCIA: ${input.opticalPower} ${input.wifi_ssid} ${input.wifi_password}`
   await conn.connect().then(() => {
   }).then(() => {
     conn.write('/ppp/secret/add', [
@@ -327,9 +327,12 @@ module.exports.mkSetComment = async function (mikrotikHost, dni, code, model, co
         var com1 = await conn.write('/ppp/secret/set', [
           '=.id=' + code,
           '=comment=' + comment
-        ]).catch((err) => {
+        ]).then(() => {
+          return true
+        }).catch((err) => {
           console.log(err)
           conn.close()
+          return false
         })
       } catch (error) {
         conn.close()
@@ -341,9 +344,12 @@ module.exports.mkSetComment = async function (mikrotikHost, dni, code, model, co
         var com1 = await conn.write('/ppp/secret/set', [
           '=.id=' + dni,
           '=comment=' + comment
-        ]).catch((err) => {
+        ]).then(() => {
+          return true
+        }).catch((err) => {
           console.log(err)
           conn.close()
+          return false
         })
       } catch (error) {
         conn.close()
@@ -425,7 +431,7 @@ module.exports.simpleTelegramCreate = async function (input) {
   require('dotenv').config()
   const bot = process.env.TELEGRAM_BOT
   const chatid = process.env.CHAT_ID
-  var message = `CREADO\n${input.code}\n${input.name}\n${input.dni}\n${input.address}\n${input.neighborhood.name}\n${input.phone}\n${input.city.name}\n${input.plan.name}\n${input.wifi_ssid}\n${input.wifi_password}\n${input.technology.name}\n${input.mac_address}\n${input.operator.username}\n${input.createdAt}`
+  var message = `CREADO\n${input.code}\n${input.name}\n${input.dni}\n${input.address}\n${input.neighborhood.name}\n${input.phone}\n${input.city.name}\n${input.plan.name}\n${input.wifi_ssid}\n${input.wifi_password}\n${input.technology.name}\n${input.mac_address}\nNAP-ONU: ${input.nap_onu_address}\nPOTENCIA: ${input.opticalPower}\n${input.operator.username}\n${input.createdAt}`
   var payload = message.replace('#', ' ')
   const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + sanitizeString(message)
   fetch(req).then(function (response) {
@@ -439,7 +445,7 @@ module.exports.simpleTelegramUpdate = async function (input) {
   require('dotenv').config()
   const bot = process.env.TELEGRAM_BOT
   const chatid = process.env.CHAT_ID
-  var message = `ACTUALIZADO\n${input.code}\n${input.name}\n${input.dni}\n${input.address}\n${input.neighborhood.name}\n${input.phone}\n${input.city.name}\n${input.plan.name}\n${input.wifi_ssid}\n${input.wifi_password}\n${input.technology.name}\n${input.mac_address}\n${input.operator.username}\n${input.createdAt}`
+  var message = `ACTUALIZADO\n${input.code}\n${input.name}\n${input.dni}\n${input.address}\n${input.neighborhood.name}\n${input.phone}\n${input.city.name}\n${input.plan.name}\n${input.wifi_ssid}\n${input.wifi_password}\n${input.technology.name}\n${input.mac_address}\nNAP-ONU: ${input.nap_onu_address}\nPOTENCIA: ${input.opticalPower}dBm\n${input.operator.username}\n${input.createdAt}`
   payload = message.replace('#', ' ')
   const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + sanitizeString(message)
   fetch(req).then(function (response) {
@@ -556,4 +562,9 @@ module.exports.simpleTelegramCreateTicketAdvance = async function (input, client
   }).catch(function () {
     console.log("Booo");
   });
+}
+module.exports.createComment = async function (client) {
+  const newComment = `${client.code} ${client.technology.name} ${client.neighborhood.name} ${client.address} ${client.name} ${client.dni} ${client.phone} ${client.plan.name} ${client.mac_address} NAP-ONU: ${client.nap_onu_address} POTENCIA: ${client.opticalPower} ${client.wifi_ssid} ${client.wifi_password}`
+  console.log(newComment)
+  return newComment
 }

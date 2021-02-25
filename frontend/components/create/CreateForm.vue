@@ -36,13 +36,14 @@
         </v-col>
       </v-row>
       <v-text-field
-        v-model="Client.name"
+        :value="Client.name.toUpperCase()"
         label="Nombre Completo"
         required
         outlined
         dense
         hide-details
         @keyup="calculateSsid"
+        @input="Client.name = $event.toUpperCase()"
       />
       <v-row>
         <v-col cols="6" lg="3" md="3">
@@ -189,12 +190,28 @@
           />
         </v-col>
       </v-row>
-      <v-textarea
-        v-model="Client.comment"
-        outlined
-        label="Comentario"
-        dense
-      />
+      <v-row>
+        <v-col>
+          <v-text-field
+            :value="Client.nap_onu_address.toUpperCase()"
+            label="Direccion NAP/ONU"
+            outlined
+            dense
+            hide-details
+            @input="Client.nap_onu_address = $event.toUpperCase()"
+          />
+        </v-col>
+        <v-col>
+          <v-text-field
+            v-bind="Client.opticalPower"
+            label="Potencia Óptica (Solo numeros)"
+            outlined
+            dense
+            type="number"
+            hide-details
+          />
+        </v-col>
+      </v-row>
       <v-select
         v-model="Client.newModel"
         :items="idwith"
@@ -313,7 +330,9 @@ export default {
         comment: '',
         newModel: 1,
         hasRepeater: false,
-        sendToMikrotik: true
+        sendToMikrotik: true,
+        nap_onu_address: '',
+        opticalPower: ''
       },
       dir1: '',
       dir2: '',
@@ -377,6 +396,8 @@ export default {
               newModel: this.Client.newModel,
               sendToMikrotik: this.Client.sendToMikrotik,
               hasRepeater: this.Client.hasRepeater,
+              nap_onu_address: this.Client.nap_onu_address,
+              opticalPower: this.Client.opticalPower,
               operator: this.$store.state.auth.id,
               operator_role: this.role
             }

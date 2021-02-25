@@ -129,7 +129,7 @@
               <!-- ########################### -->
               <template v-slot:top>
                 <v-toolbar flat>
-                  <v-dialog v-model="dialog" max-width="650px" :retain-focus="false" fullscreen>
+                  <v-dialog v-model="dialog" max-width="1150px" :retain-focus="false">
                     <template v-slot:activator="{ on, attrs }">
                       <v-btn
                         v-if="can('CreateForm')"
@@ -371,6 +371,8 @@ export default {
               }
               hasRepeater
               newModel
+              nap_onu_address
+              opticalPower
               active
             }
           }
@@ -521,6 +523,8 @@ export default {
             created_at
             newModel
             hasRepeater
+            nap_onu_address
+            opticalPower
             active
           }
         }

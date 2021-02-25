@@ -4,7 +4,7 @@
  * to customize this controller
  */
 const { sanitizeEntity } = require('strapi-utils');
-const { mkCreateClient, mkDeleteClient, mkSetClientPlanInformation, mkClientStatus, mkGetComment, mkSetComment, mkDxClient, simpleTelegramCreate, simpleTelegramDelete, simpleTelegramUpdate, simpleTelegramUpdatePlan } = require('../../../mikrotik/functions');
+const { mkCreateClient, mkDeleteClient, mkSetClientPlanInformation, mkClientStatus, mkGetComment, mkSetComment, mkDxClient, simpleTelegramCreate, simpleTelegramDelete, simpleTelegramUpdate, simpleTelegramUpdatePlan, createComment } = require('../../../mikrotik/functions');
 module.exports = {
   async create(ctx) {
     const sendToMikrotik = ctx.request.body.sendToMikrotik
@@ -100,8 +100,8 @@ module.exports = {
     const dni = clientObj.dni
     const code = clientObj.code
     const model = clientObj.newModel
-    const comment = ctx.request.body.comment
     const reqCityIpArray = clientObj.city.ip
+    const comment = await createComment(clientObj)
     if (reqCityIpArray.length > 1) {
       const successfulMikrotikResponses = []
       for (let i = 0; i < reqCityIpArray.length; i++) {
@@ -125,18 +125,21 @@ module.exports = {
     const model = clientObj.newModel
     const reqCityIpArray = clientObj.city.ip
     if (reqCityIpArray.length > 1) {
-      const successfulMikrotikResponses = []
       for (let i = 0; i < reqCityIpArray.length; i++) {
         const mikrotikHost = reqCityIpArray[i]
-        const res = await mkSetComment(mikrotikHost, dni, code, model, comment)
-        successfulMikrotikResponses.push(res)
+        await mkSetComment(mikrotikHost, dni, code, model, comment)
+        if (reqCityIpArray.length - 1 === i) {
+          console.log('this ', model, comment)
+          return true
+        }
       }
     } else {
       const mikrotikHost = reqCityIpArray[0]
       await mkSetComment(mikrotikHost, dni, code, model, comment)
+      console.log('other ')
+      return true
     }
-    const res = sanitizeEntity(entity, { model: strapi.models.client })
-    return res
+    console.log('how')
   },
   async delete(ctx) {
     const { id } = ctx.params;

@@ -6,7 +6,7 @@
           v-bind="attrs"
           color="yellow darken-4"
           v-on="on"
-          @click="dialogEdit = true, createModal()"
+          @click="dialogEdit = true"
         >
           mdi-pencil
         </v-icon>
@@ -213,6 +213,29 @@
               <v-row>
                 <v-col>
                   <v-text-field
+                    :value="item.nap_onu_address ? item.nap_onu_address.toUpperCase() : ''"
+                    label="Direccion NAP/ONU"
+                    outlined
+                    dense
+                    hide-details
+                    @input="item.nap_onu_address = $event.toUpperCase()"
+                  />
+                </v-col>
+                <v-col>
+                  <v-text-field
+                    :value="item.opticalPower ? item.opticalPower.toUpperCase() : ''"
+                    label="Potencia Óptica (Solo numeros)"
+                    outlined
+                    dense
+                    type="number"
+                    hide-details
+                    @input="item.opticalPower = $event.toUpperCase()"
+                  />
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col>
+                  <v-text-field
                     :value="getDate(item.createdAt)"
                     label="Fecha de Creación"
                     required
@@ -252,16 +275,12 @@
                 <v-textarea
                   v-model="item.comment"
                   auto-grow
-                  :success.sync="success"
-                  :success-messages="successMessage"
-                  :error="error"
-                  :error-messages="errorMessage"
-                  :loading="commentLoading"
-                  :disabled="commentDisabled"
                   persistent-hint
                   outlined
-                  label="Comentario"
+                  label="Comentario Local (Solo API)"
                   dense
+                  readonly
+                  disabled
                 />
               </div>
               <v-switch v-model="item.hasRepeater" hide-details input-value="false" label="Tiene repetidor?" />
@@ -277,13 +296,6 @@
             @click="updateClient()"
           >
             Confirmar
-          </v-btn>
-          <v-btn
-            class="mr-4"
-            color="success"
-            @click="createComment()"
-          >
-            Generar Comentario
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -406,38 +418,6 @@ export default {
     }
   },
   methods: {
-    createModal () {
-      this.success = false
-      this.error = false
-      this.commentLoading = true
-      this.commentDisabled = true
-      this.$apollo.query({
-        query: gql`query ($id: ID){
-          getClientComment(id: $id){
-            comment
-          }
-        }`,
-        variables: {
-          id: this.item._id
-        }
-      }).then((input) => {
-        this.commentLoading = false
-        this.commentDisabled = false
-        this.item.comment = input.data.getClientComment.comment
-        this.$emit('updateComment', this.item.comment)
-        this.success = true
-        this.successMessage = 'Comentario sincronizado con la Mikrotik'
-        this.error = false
-      }).catch((error) => {
-        this.success = false
-        this.commentLoading = false
-        this.commentDisabled = false
-        this.error = true
-        this.errorMessage = 'Comentario no sincronizado'
-        // eslint-disable-next-line no-console
-        console.log(error)
-      })
-    },
     updateClient () {
       this.isSubmitting = true
       this.$apollo.mutate({
@@ -468,6 +448,8 @@ export default {
               comment: this.item.comment,
               operator: this.$store.state.auth.id,
               hasRepeater: this.item.hasRepeater,
+              nap_onu_address: this.item.nap_onu_address,
+              opticalPower: this.item.opticalPower,
               newModel: this.item.newModel
             }
           }
@@ -491,12 +473,6 @@ export default {
         this.createdMessage = error
         this.isSubmitting = false
       })
-    },
-    createComment () {
-      this.item.comment = ''
-      const client = this.item
-      const newComment = `${client.code} ${client.technology.name} ${client.neighborhood.name} ${client.address} ${client.name} ${client.dni} ${client.phone} ${client.plan.name} ${client.mac_address} ${client.wifi_password}`
-      this.item.comment = newComment
     },
     genAddress () {
       this.Client.address = `${this.dir1} ${this.dir2} ${this.dir3} ${this.dir4}`
