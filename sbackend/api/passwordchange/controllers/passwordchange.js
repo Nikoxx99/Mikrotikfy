@@ -8,7 +8,8 @@ const { sanitizeEntity } = require('strapi-utils');
 module.exports = {
   async TestPasswordChange(ctx) {
     const entity = await strapi.services.passwordchange.findOne({ dni: ctx.query._dni })
-    if (entity !== null) {
+    console.log(entity)
+    if (entity.closed.value === false) {
       return false
     } else {
       return true
