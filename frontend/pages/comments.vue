@@ -242,7 +242,6 @@ export default {
     generateComment (index) {
       const client = this.clients
       const newComment = `${client[index].code} ${client[index].technology.name} ${client[index].neighborhood.name} ${client[index].address} ${client[index].name} ${client[index].dni} ${client[index].phone} ${client[index].plan.name} ${client[index].mac_address} ${client[index].wifi_ssid} ${client[index].wifi_password}`
-      console.log(newComment)
       return newComment
     },
     async generateComments () {
@@ -270,7 +269,7 @@ export default {
           this.successChanges++
         }).catch((error) => {
           this.errorChanges++
-          console.log(error)
+          this.snackText = error
         })
         await this.sleep(1000)
       }
@@ -286,7 +285,6 @@ export default {
       this.$apollo.queries.MikrotikClient.skip = false
       await this.$apollo.queries.MikrotikClient.fetchMore({
         updateQuery: (_, { fetchMore }) => {
-          console.log(fetchMore)
         }
       })
     },

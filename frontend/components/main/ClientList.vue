@@ -640,8 +640,11 @@ export default {
 
     window.addEventListener("keydown", e => {
       console.log(e)
-      if (e.key === 'm' && (e.ctrlKey)) {
+      if (e.key === 'k' && (e.altKey)) {
         this.$refs.searchClient.focus()
+      }
+      if (e.key === 'Escape') {
+        this.searchClientInput = ''
       }
     });
   },

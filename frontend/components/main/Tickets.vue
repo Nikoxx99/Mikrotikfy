@@ -34,6 +34,7 @@
             </v-tooltip>
             <v-spacer />
             <v-text-field
+              ref="searchTicket"
               v-model="search"
               prepend-icon="mdi-magnify"
               label="Buscar Tickets"
@@ -209,6 +210,14 @@ export default {
       }
     })
     await this.showClosed(false)
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'j' && (e.altKey)) {
+        this.$refs.searchTicket.focus()
+      }
+      if (e.key === 'Escape') {
+        this.search = ''
+      }
+    })
   },
   methods: {
     async refreshTickets () {
