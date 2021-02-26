@@ -14,12 +14,6 @@
         <v-row>
           <v-container>
             <v-text-field
-              v-model.number="id"
-              type="number"
-              label="ID"
-              required
-            />
-            <v-text-field
               v-model="name"
               label="Nombre"
               required
@@ -112,7 +106,6 @@ export default {
     alertBoxColor: '',
     isSubmitting: false,
     headers: [
-      { text: 'ID', value: 'id' },
       { text: 'Nombre', value: 'name' },
       { text: 'A.', value: 'actions' }
     ],
@@ -165,23 +158,22 @@ export default {
     createNeighborhood () {
       this.isSubmitting = !this.isSubmitting
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: NeighborhoodInput){
+        mutation: gql`mutation ($input: createNeighborhoodInput){
           createNeighborhood(input: $input){
-            success
-            errors{
-              path
-              message
+            neighborhood{
+              name
             }
           }
         }`,
         variables: {
           input: {
-            id: this.id,
-            name: this.name
+            data: {
+              name: this.name
+            }
           }
         }
       }).then((input) => {
-        if (input.data.createNeighborhood.success) {
+        if (input.data.createNeighborhood.neighborhood.name) {
           window.location.reload(true)
         } else {
           this.alertBox = true
