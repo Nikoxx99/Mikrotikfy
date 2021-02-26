@@ -30,6 +30,8 @@ module.exports = {
       operator: operator
       created_at: String
       hasRepeater: Boolean
+      nap_onu_address: String
+      opticalPower: String
       newModel: Int
       active: Boolean
     }
