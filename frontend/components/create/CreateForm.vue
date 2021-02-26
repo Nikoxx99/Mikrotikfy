@@ -203,12 +203,13 @@
         </v-col>
         <v-col>
           <v-text-field
-            v-bind="Client.opticalPower"
+            :value="Client.opticalPower ? Client.opticalPower.toUpperCase() : ''"
             label="Potencia Óptica (Solo numeros)"
             outlined
             dense
             type="number"
             hide-details
+            @input="Client.opticalPower = $event.toUpperCase()"
           />
         </v-col>
       </v-row>

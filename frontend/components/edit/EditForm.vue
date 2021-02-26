@@ -68,7 +68,7 @@
                 </v-col>
               </v-row>
               <v-text-field
-                v-model="item.name"
+                :value="item.name ? item.name.toUpperCase() : ''"
                 :disabled="!can('EditFormName')"
                 label="Nombre Completo"
                 required
@@ -76,6 +76,7 @@
                 dense
                 hide-details
                 class="pb-3"
+                @input="item.name = $event.toUpperCase()"
               />
               <v-row>
                 <v-col cols="6" lg="3" md="3">
