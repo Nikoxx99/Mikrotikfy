@@ -21,6 +21,7 @@
             Clientes {{ cityName }}
             <v-spacer />
             <v-text-field
+              ref="searchClient"
               v-model="searchClientInput"
               prepend-icon="mdi-magnify"
               label="Buscar Cliente"
@@ -636,6 +637,13 @@ export default {
     if(!this.can('active')){
       this.headers.splice(10,1)
     }
+
+    window.addEventListener("keydown", e => {
+      console.log(e)
+      if (e.key === 'm' && (e.ctrlKey)) {
+        this.$refs.searchClient.focus()
+      }
+    });
   },
   methods: {
     async clientApiCall () {
