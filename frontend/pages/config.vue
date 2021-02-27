@@ -1,19 +1,19 @@
 <template>
   <v-container>
     <v-row>
-      <v-col>
+      <v-col cols="6">
         <h1>Crear Ciudad</h1>
         <CreateCity />
       </v-col>
-      <v-col>
+      <v-col cols="6">
         <h1>Crear Barrio</h1>
         <CreateNeighborhood />
       </v-col>
-      <v-col>
+      <v-col cols="6">
         <h1>Crear Plan</h1>
         <CreatePlan />
       </v-col>
-      <v-col>
+      <v-col cols="6">
         <h1>Crear Tecnologia</h1>
         <CreateTechnology />
       </v-col>

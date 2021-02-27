@@ -11,29 +11,23 @@
     </v-alert>
     <v-form v-model="valid">
       <v-text-field
-        v-model="cities.id"
-        label="Nombre"
-        required
-        readonly
-        disabled
-        dense
-      />
-      <v-text-field
         v-model="cities.name"
         label="Nombre"
         required
         dense
       />
-      <v-text-field
+      <v-combobox
         v-model="cities.ip"
         label="IP en Mikrotik"
-        required
+        :items="cities.ip"
         dense
+        multiple
+        chips
       />
       <v-color-picker
         v-model="cities.color"
         mode="hexa"
-        hide-canvas
+        hide-inputs
         flat
       />
       <v-btn
@@ -88,25 +82,24 @@ export default {
   methods: {
     updateCity () {
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: CityInput){
+        mutation: gql`mutation ($input: updateCityInput){
           updateCity(input: $input){
-            success
-            errors{
-              path
-              message
+            city {
+              name
             }
           }
         }`,
         variables: {
           input: {
-            id: this.cities.id,
-            name: this.cities.name,
-            ip: this.cities.ip,
-            color: this.cities.color
+            data: {
+              name: this.cities.name,
+              ip: this.cities.ip,
+              color: this.cities.color
+            }
           }
         }
       }).then((input) => {
-        if (input.data.updateCity.success) {
+        if (input.data.updateCity.city.name) {
           this.$emit('updateCity', this.cities)
           // window.location.reload(true)
         } else {

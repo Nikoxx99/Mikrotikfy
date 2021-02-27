@@ -14,27 +14,21 @@
         <v-row>
           <v-container>
             <v-text-field
-              v-model.number="id"
-              type="number"
-              label="ID"
-              required
-            />
-            <v-text-field
-              v-model="name"
+              :value="name ? name.toUpperCase() : ''"
               label="Nombre"
               required
+              @input="name = $event.toUpperCase()"
             />
-            <v-text-field
+            <v-combobox
               v-model="ip"
-              label="IP"
-              :hint="hint"
-              persistent-hint
-              required
+              label="Ingresa las IP separadas por tabulaciones."
+              multiple
+              chips
             />
             <v-color-picker
               v-model="color"
               mode="hexa"
-              hide-canvas
+              hide-inputs
               flat
             />
             <v-btn
@@ -191,26 +185,28 @@ export default {
     createCity () {
       this.isSubmitting = !this.isSubmitting
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: CityInput){
+        mutation: gql`mutation ($input: createCityInput){
           createCity(input: $input){
-            success
-            errors{
-              path
-              message
+            city {
+              name
             }
           }
         }`,
         variables: {
           input: {
-            id: this.id,
-            name: this.name,
-            ip: this.ip,
-            color: this.color
+            data: {
+              name: this.name,
+              ip: this.ip,
+              color: this.color
+            }
           }
         }
       }).then((input) => {
-        if (input.data.createCity.success) {
-          window.location.reload(true)
+        if (input.data.createCity.city.name) {
+          this.alertBox = true
+          this.alertBoxColor = 'info darken-4'
+          this.createdMessage = 'Ciudad creada con exito'
+          this.isSubmitting = false
         } else {
           this.alertBox = true
           this.alertBoxColor = 'red darken-4'
