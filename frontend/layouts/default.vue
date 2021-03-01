@@ -179,14 +179,34 @@ export default {
     })
   },
   methods: {
-    async populareCities () {
-      this.$apollo.queries.cities.skip = false
-      await this.$apollo.queries.cities.fetchMore({
-        updateQuery: (_, { fetchMoreResult }) => {
-          const newCitiesInfo = fetchMoreResult.cities
-          this.cities = newCitiesInfo
+    localStorageHandler (storage, action, payload) {
+      if (action === 'get') {
+        return JSON.parse(localStorage.getItem(storage))
+      }
+      if (action === 'set') {
+        localStorage.setItem(storage, JSON.stringify(payload))
+      }
+      if (action === 'count') {
+        if (localStorage.getItem(storage)) {
+          return true
+        } else {
+          return false
         }
-      })
+      }
+    },
+    async populareCities () {
+      if (this.localStorageHandler('cities', 'count')) {
+        this.cities = this.localStorageHandler('cities', 'get')
+      } else {
+        this.$apollo.queries.cities.skip = false
+        await this.$apollo.queries.cities.fetchMore({
+          updateQuery: (_, { fetchMoreResult }) => {
+            const newCitiesInfo = fetchMoreResult.cities
+            this.cities = newCitiesInfo
+            this.localStorageHandler('cities', 'set', newCitiesInfo)
+          }
+        })
+      }
     },
     logout () {
       Cookie.remove('auth')

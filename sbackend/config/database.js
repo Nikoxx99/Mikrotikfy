@@ -10,6 +10,7 @@ module.exports = ({ env }) => ({
         database: env('DATABASE_NAME', 'sbackend'), // db name
       },
       options: {
+        authenticationDatabase: env('AUTHENTICATION_DATABASE', 'admin'),
         ssl: env.bool('DATABASE_SSL', false),
       },
     },
