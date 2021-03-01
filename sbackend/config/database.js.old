@@ -7,6 +7,7 @@ module.exports = ({ env }) => ({
         host: env('DATABASE_HOST', '127.0.0.1'),
         srv: env.bool('DATABASE_SRV', false),
         port: env.int('DATABASE_PORT', 27017),
+<<<<<<< HEAD:sbackend/config/database.js.old
 <<<<<<< HEAD
         database: env('DATABASE_NAME', 'sbackend'),
         username: env('DATABASE_USERNAME', 'hentaini'),
@@ -14,6 +15,9 @@ module.exports = ({ env }) => ({
 =======
         database: env('DATABASE_NAME', 'sbackend'), // db name
 >>>>>>> 97f05b6b546cea0cc84ea7ae3fb3ba2d6c9ba771
+=======
+        database: env('DATABASE_NAME', 'sbackend'), // db name
+>>>>>>> 0d8c3642bfb1151e0ff66f88e8a624c8784a198e:sbackend/config/database.js
       },
       options: {
         authenticationDatabase: env('AUTHENTICATION_DATABASE', 'admin'),
