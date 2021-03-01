@@ -723,7 +723,7 @@ export default {
             start,
             limit
           },
-          updateQuery: (previousResult, { fetchMoreResult }) => {
+          updateQuery: (_, { fetchMoreResult }) => {
             const newClients = fetchMoreResult.city.clients
             const newClientsMod = newClients.map(function (c) {
               c.status = 'white'
@@ -867,64 +867,97 @@ export default {
       return allowed_components.includes(current_component)
     },
     async activeClientInitialCall () {
-      this.$apollo.queries.ActiveClients.skip = false
-      await this.$apollo.queries.ActiveClients.fetchMore({
-        variables: {
-          city: this.$route.query.city
-        },
-        updateQuery: async (previousResult, { fetchMoreResult }) => {
-          const newClients = fetchMoreResult.ActiveClients
-          this.ActiveClients = newClients
-        }
-      })
+      if (this.localStorageHandler('ActiveClients', 'count')) {
+        this.ActiveClients = this.localStorageHandler('ActiveClients', 'get')
+      } else {
+        this.$apollo.queries.ActiveClients.skip = false
+        await this.$apollo.queries.ActiveClients.fetchMore({
+          variables: {
+            city: this.$route.query.city
+          },
+          updateQuery: async (previousResult, { fetchMoreResult }) => {
+            const newClients = fetchMoreResult.ActiveClients
+            this.localStorageHandler('ActiveClients', 'set', newClients)
+            this.ActiveClients = newClients
+          }
+        })
+      }
     },
     async popularePlans () {
-      this.$apollo.queries.plans.skip = false
-      await this.$apollo.queries.plans.fetchMore({
-        updateQuery: (_, { fetchMoreResult }) => {
-          const newPlansInfo = fetchMoreResult.plans
-          this.cities = newPlansInfo
-        }
-      })
+      if (this.localStorageHandler('plans', 'count')) {
+        this.plans = this.localStorageHandler('plans', 'get')
+      } else {
+        this.$apollo.queries.plans.skip = false
+        await this.$apollo.queries.plans.fetchMore({
+          updateQuery: (_, { fetchMoreResult }) => {
+            const newPlansInfo = fetchMoreResult.plans
+            this.localStorageHandler('plans', 'set', newPlansInfo)
+            this.plans = newPlansInfo
+          }
+        })
+      }
     },
     async populareRole () {
-      this.$apollo.queries.role.skip = false
-      await this.$apollo.queries.role.fetchMore({
-        updateQuery: (_, { fetchMoreResult }) => {
-          const newRoleInfo = fetchMoreResult.role
-          this.role = newRoleInfo
-        }
-      })
-      this.allowed_components = this.role.allowed_components.map(c => {
-        return c.name
-      })
+      if (this.localStorageHandler('role', 'count')) {
+        this.role = this.localStorageHandler('role', 'get')
+        this.allowed_components = this.role.allowed_components.map(c => {
+          return c.name
+        })
+      } else {
+        this.$apollo.queries.role.skip = false
+        await this.$apollo.queries.role.fetchMore({
+          updateQuery: (_, { fetchMoreResult }) => {
+            const newRoleInfo = fetchMoreResult.role
+            this.localStorageHandler('role', 'set', newRoleInfo)
+            this.role = newRoleInfo
+          }
+        })
+        this.allowed_components = this.role.allowed_components.map(c => {
+          return c.name
+        })
+      }
     },
     async populareClientCount () {
-      this.$apollo.queries.clientCount.skip = false
-      await this.$apollo.queries.clientCount.fetchMore({
-        updateQuery: (_, { fetchMoreResult }) => {
-          const newClientCountInfo = fetchMoreResult.clientCount
-          this.clientCount = newClientCountInfo
-        }
-      })
+      if (this.localStorageHandler('clientCount', 'count')) {
+        this.clientCount = this.localStorageHandler('clientCount', 'get')
+      } else {
+        this.$apollo.queries.clientCount.skip = false
+        await this.$apollo.queries.clientCount.fetchMore({
+          updateQuery: (_, { fetchMoreResult }) => {
+            const newClientCountInfo = fetchMoreResult.clientCount
+            this.localStorageHandler('clientCount', 'set', newClientCountInfo)
+            this.clientCount = newClientCountInfo
+          }
+        })
+      }
     },
     async populareClientCountActive () {
-      this.$apollo.queries.clientCountActive.skip = false
-      await this.$apollo.queries.clientCountActive.fetchMore({
-        updateQuery: (_, { fetchMoreResult }) => {
-          const newClientCountActiveInfo = fetchMoreResult.clientCountActive
-          this.clientCountActive = newClientCountActiveInfo
-        }
-      })
+      if (this.localStorageHandler('clientCountActive', 'count')) {
+        this.clientCountActive = this.localStorageHandler('clientCountActive', 'get')
+      } else {
+        this.$apollo.queries.clientCountActive.skip = false
+        await this.$apollo.queries.clientCountActive.fetchMore({
+          updateQuery: (_, { fetchMoreResult }) => {
+            const newClientCountActiveInfo = fetchMoreResult.clientCountActive
+            this.localStorageHandler('clientCountActive', 'set', newClientCountActiveInfo)
+            this.clientCountActive = newClientCountActiveInfo
+          }
+        })
+      }
     },
     async populareClientCountDisable () {
-      this.$apollo.queries.clientCountDisable.skip = false
-      await this.$apollo.queries.clientCountDisable.fetchMore({
-        updateQuery: (_, { fetchMoreResult }) => {
-          const newClientCountDisableInfo = fetchMoreResult.clientCountDisable
-          this.clientCountDisable = newClientCountDisableInfo
-        }
-      })
+      if (this.localStorageHandler('clientCountDisable', 'count')) {
+        this.clientCountDisable = this.localStorageHandler('clientCountDisable', 'get')
+      } else {
+        this.$apollo.queries.clientCountDisable.skip = false
+        await this.$apollo.queries.clientCountDisable.fetchMore({
+          updateQuery: (_, { fetchMoreResult }) => {
+            const newClientCountDisableInfo = fetchMoreResult.clientCountDisable
+            this.localStorageHandler('clientCountDisable', 'set', newClientCountDisableInfo)
+            this.clientCountDisable = newClientCountDisableInfo
+          }
+        })
+      }
     },
     updateStatus (status, index) {
       if (status === true) {
@@ -985,6 +1018,23 @@ export default {
           this.snackColor = 'red'
           this.snackText = error
         })
+      }
+    },
+    localStorageHandler (storage, action, payload) {
+      if (action === 'get') {
+        console.log(storage)
+        return JSON.parse(localStorage.getItem(storage))
+      }
+      if (action === 'set') {
+        console.log('set', storage)
+        localStorage.setItem(storage, JSON.stringify(payload))
+      }
+      if (action === 'count') {
+        if (localStorage.getItem(storage)) {
+          return true
+        } else {
+          return false
+        }
       }
     }
   },
