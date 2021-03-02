@@ -7,7 +7,7 @@
 module.exports = {
   async TestPasswordChange(ctx) {
     const entity = await strapi.services.passwordchange.findOne({ dni: ctx.query._dni })
-    if (entity.length > 0) {
+    if (entity) {
       if (entity.closed.value === false) {
         return false
       } else {
