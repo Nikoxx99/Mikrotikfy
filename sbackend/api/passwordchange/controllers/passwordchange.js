@@ -4,13 +4,15 @@
  * Read the documentation (https://strapi.io/documentation/v3.x/concepts/controllers.html#core-controllers)
  * to customize this controller
  */
-const { sanitizeEntity } = require('strapi-utils');
 module.exports = {
   async TestPasswordChange(ctx) {
     const entity = await strapi.services.passwordchange.findOne({ dni: ctx.query._dni })
-    console.log(entity)
-    if (entity.closed.value === false) {
-      return false
+    if (entity.length > 0) {
+      if (entity.closed.value === false) {
+        return false
+      } else {
+        return true
+      }
     } else {
       return true
     }
