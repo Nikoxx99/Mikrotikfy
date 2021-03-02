@@ -867,21 +867,14 @@ export default {
       return allowed_components.includes(current_component)
     },
     async activeClientInitialCall () {
-      if (this.localStorageHandler('ActiveClients', 'count')) {
-        this.ActiveClients = this.localStorageHandler('ActiveClients', 'get')
-      } else {
-        this.$apollo.queries.ActiveClients.skip = false
-        await this.$apollo.queries.ActiveClients.fetchMore({
-          variables: {
-            city: this.$route.query.city
-          },
-          updateQuery: async (previousResult, { fetchMoreResult }) => {
-            const newClients = fetchMoreResult.ActiveClients
-            this.localStorageHandler('ActiveClients', 'set', newClients)
-            this.ActiveClients = newClients
-          }
-        })
-      }
+      this.$apollo.queries.ActiveClients.skip = false
+      await this.$apollo.queries.ActiveClients.fetchMore({
+        variables: {
+          city: this.$route.query.city
+        },
+        updateQuery: async () => {
+        }
+      })
     },
     async popularePlans () {
       if (this.localStorageHandler('plans', 'count')) {
