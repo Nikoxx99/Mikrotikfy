@@ -259,12 +259,25 @@
               <!-- ########################### -->
             </v-data-table>
           </client-only>
-          <div class="text-center pt-2 justify-center" style="max-width:80%;margin:auto;">
-            <v-pagination
-              v-if="isPaginationActive"
-              v-model="page"
-              :length="pageCount"
-            />
+          <div v-if="isPaginationActive" class="text-center pt-2 justify-center" style="max-width:90%;margin:auto;">
+            <v-row>
+              <v-col cols="12" sm="12" md="10" lg="11">
+                <v-pagination
+                  v-model="page"
+                  :length="pageCount"
+                />
+              </v-col>
+              <v-col cols="12" sm="12" md="2" lg="1">
+                <v-text-field
+                  :value="options.itemsPerPage"
+                  label="Clientes por Pagina"
+                  type="number"
+                  min="5"
+                  max="50"
+                  @input="options.itemsPerPage = parseInt($event, 10)"
+                />
+              </v-col>
+            </v-row>
           </div>
         </v-card>
       </v-col>
@@ -382,7 +395,7 @@ export default {
         variables: {
           city: this.$route.query.city,
           start: 0,
-          limit: 5
+          limit: this.itemsPerPage
         },
         skip () {
           return true
@@ -548,7 +561,7 @@ export default {
       key: 0,
       page: 1,
       pageCount: 0,
-      itemsPerPage: 5,
+      itemsPerPage: 20,
       searchClientInput: '',
       totalClients: 0,
       currentCity: 'Mariquita',
@@ -656,7 +669,7 @@ export default {
           variables: {
             city: this.$route.query.city,
             start: 0,
-            limit: 5
+            limit: this.itemsPerPage
           },
           updateQuery: (_, { fetchMoreResult }) => {
             const newClients = fetchMoreResult.city.clients
@@ -1015,11 +1028,9 @@ export default {
     },
     localStorageHandler (storage, action, payload) {
       if (action === 'get') {
-        console.log(storage)
         return JSON.parse(localStorage.getItem(storage))
       }
       if (action === 'set') {
-        console.log('set', storage)
         localStorage.setItem(storage, JSON.stringify(payload))
       }
       if (action === 'count') {

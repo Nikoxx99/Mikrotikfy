@@ -211,6 +211,7 @@ export default {
     logout () {
       Cookie.remove('auth')
       Cookie.remove('authToken')
+      localStorage.clear()
       this.$store.commit('setAuth', null)
       this.$router.replace('/login')
     }

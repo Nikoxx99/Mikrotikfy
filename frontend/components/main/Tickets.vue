@@ -65,6 +65,13 @@
               @page-count="pageCount = $event"
             >
               <template v-slot:item.actions="props">
+                <ClientStatus
+                    v-if="can('ClientStatus')"
+                    :name="props.item.client.name"
+                    :clientid="props.item.client.id"
+                    :code="props.item.client.code"
+                    :role="allowed_components"
+                  />
                 <CreateTicketAdvance
                   :editindex="tickets.indexOf(props.item)"
                   :ticketid="props.item.id"
@@ -116,11 +123,13 @@
 import gql from 'graphql-tag'
 import CreateTicketAdvance from '../create/CreateTicketAdvance'
 import TicketAdvanceHistory from '../misc/TicketAdvanceHistory'
+import ClientStatus from '../main/ClientStatus'
 export default {
   name: 'TicketChanges',
   components: {
     CreateTicketAdvance,
-    TicketAdvanceHistory
+    TicketAdvanceHistory,
+    ClientStatus
   },
   apollo: {
     tickets () {
@@ -133,6 +142,7 @@ export default {
             id
             active
             client{
+              id
               code
               name
               address
@@ -154,6 +164,26 @@ export default {
       `,
         variables: {
           city: this.$route.query.city
+        },
+        skip () {
+          return true
+        }
+      }
+    },
+    role () {
+      return {
+        query: gql`
+        query($id: ID!){
+          role(id: $id){
+            name
+            allowed_components{
+              name
+            }
+          }
+        }
+      `,
+        variables: {
+          id: this.$store.state.auth.role
         },
         skip () {
           return true
@@ -190,15 +220,16 @@ export default {
         { text: 'Creado', sortable: true, value: 'createdAt' },
         { text: 'Acciones', sortable: true, value: 'actions' }
       ],
-      title: 'Cambios de Clave',
       States: [{ name: 'Abierto', value: true }, { name: 'Cerrado', value: false }],
       snack: false,
       snackColor: '',
       snackText: '',
-      ticketList: []
+      ticketList: [],
+      allowed_components: []
     }
   },
   async mounted () {
+    this.populareRole()
     this.$apollo.queries.tickets.skip = false
     await this.$apollo.queries.tickets.fetchMore({
       variables: {
@@ -270,6 +301,48 @@ export default {
       } else {
         return 'Cerrado'
       }
+    },
+    async populareRole () {
+      if (this.localStorageHandler('role', 'count')) {
+        this.role = this.localStorageHandler('role', 'get')
+        this.allowed_components = this.role.allowed_components.map((c) => {
+          return c.name
+        })
+      } else {
+        this.$apollo.queries.role.skip = false
+        await this.$apollo.queries.role.fetchMore({
+          updateQuery: (_, { fetchMoreResult }) => {
+            const newRoleInfo = fetchMoreResult.role
+            this.localStorageHandler('role', 'set', newRoleInfo)
+            this.role = newRoleInfo
+          }
+        })
+        this.allowed_components = this.role.allowed_components.map((c) => {
+          return c.name
+        })
+      }
+    },
+    localStorageHandler (storage, action, payload) {
+      if (action === 'get') {
+        return JSON.parse(localStorage.getItem(storage))
+      }
+      if (action === 'set') {
+        localStorage.setItem(storage, JSON.stringify(payload))
+      }
+      if (action === 'count') {
+        if (localStorage.getItem(storage)) {
+          return true
+        } else {
+          return false
+        }
+      }
+    },
+    can (component) {
+      // eslint-disable-next-line camelcase
+      const allowed_components = this.allowed_components
+      // eslint-disable-next-line camelcase
+      const current_component = component
+      return allowed_components.includes(current_component)
     }
   }
 }
