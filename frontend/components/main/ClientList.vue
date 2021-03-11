@@ -143,10 +143,22 @@
                         <v-icon>mdi-plus</v-icon>
                         Nuevo Cliente
                       </v-btn>
+                      <v-text-field
+                        :value="options.itemsPerPage"
+                        label="Clientes por Pagina"
+                        type="number"
+                        min="5"
+                        max="50"
+                        width="80px"
+                        hide-details
+                        @input="options.itemsPerPage = parseInt($event, 10)"
+                      />
+                      <v-spacer />
                       <v-chip
                         color="white white--text"
                         small
                         outlined
+                        label
                         class="mr-4"
                       >
                         En Linea: {{ ActiveClients.length }}
@@ -154,6 +166,8 @@
                       <v-chip
                         color="green darken-3 white--text"
                         small
+                        label
+                        outlined
                         class="mr-4 d-none d-md-flex d-lg-flex d-xl-flex"
                       >
                         Activos: {{ clientCountActive }}
@@ -161,6 +175,8 @@
                       <v-chip
                         color="red lighten-1 white--text"
                         small
+                        outlined
+                        label
                         class="mr-4 d-none d-md-flex d-lg-flex d-xl-flex"
                       >
                         En Mora: {{ clientCountDisable }}
@@ -168,6 +184,8 @@
                       <v-chip
                         color="primary"
                         small
+                        outlined
+                        label
                         class="mr-4 d-none d-sm-flex d-md-flex d-lg-flex d-xl-flex"
                       >
                         Totales: {{ clientCount }}
@@ -259,22 +277,12 @@
               <!-- ########################### -->
             </v-data-table>
           </client-only>
-          <div v-if="isPaginationActive" class="text-center pt-2 justify-center" style="max-width:90%;margin:auto;">
+          <div v-if="isPaginationActive" class="text-center pt-2 justify-center">
             <v-row>
-              <v-col cols="12" sm="12" md="10" lg="11">
+              <v-col cols="12" sm="8" md="10" lg="11" style="max-width:90%;margin:auto;">
                 <v-pagination
                   v-model="page"
                   :length="pageCount"
-                />
-              </v-col>
-              <v-col cols="12" sm="12" md="2" lg="1">
-                <v-text-field
-                  :value="options.itemsPerPage"
-                  label="Clientes por Pagina"
-                  type="number"
-                  min="5"
-                  max="50"
-                  @input="options.itemsPerPage = parseInt($event, 10)"
                 />
               </v-col>
             </v-row>
@@ -561,7 +569,7 @@ export default {
       key: 0,
       page: 1,
       pageCount: 0,
-      itemsPerPage: 20,
+      itemsPerPage: 5,
       searchClientInput: '',
       totalClients: 0,
       currentCity: 'Mariquita',
@@ -572,17 +580,17 @@ export default {
       isRx: true,
       options: {},
       headers: [
-        { text: 'Codigo', sortable: true, value: 'code'},
+        { text: 'Codigo', value: 'code'},
         { text: 'Estado', sortable: false, value: 'status' },
-        { text: 'Nombre', sortable: true, value: 'name' },
-        { text: 'Cedula', sortable: true, value: 'dni' },
+        { text: 'Nombre', value: 'name' },
+        { text: 'Cedula', value: 'dni' },
         { text: 'Direccion', sortable: false, value: 'address'},
-        { text: 'Barrio', sortable: true, value: 'neighborhood.name' },
+        { text: 'Barrio', value: 'neighborhood.name' },
         { text: 'Telefono', sortable: false, value: 'phone' },
-        { text: 'Plan', sortable: true, value: 'plan.name' },
-        { text: 'Tecnologia', sortable: true, value: 'technology.name' },
-        { text: 'Tipo', sortable: true, value: 'newModel' },
-        { text: 'Activo', sortable: true, value: 'active' },
+        { text: 'Plan', value: 'plan.name' },
+        { text: 'Tecnologia', value: 'technology.name' },
+        { text: 'Tipo', value: 'newModel' },
+        { text: 'Activo', value: 'active' },
         { text: 'Aciones', value: 'actions', sortable: false }
       ],
       editedIndex: -1,
