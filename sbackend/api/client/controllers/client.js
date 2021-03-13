@@ -89,6 +89,42 @@ module.exports = {
     }
     return true
   },
+  async adminCreateFromRequest(ctx) {
+    const id = ctx.request.body.input.id
+    const newMac_address = ctx.request.body.input.mac_address
+    const newNap_onu_address = ctx.request.body.input.nap_onu_address
+    const newOpticalPower = ctx.request.body.input.opticalPower
+    await strapi.services.client.update({ id }, { 'active': true, mac_address: newMac_address, nap_onu_address: newNap_onu_address, opticalPower: newOpticalPower})
+    const searchCity = await strapi.services.city.find({ id: ctx.request.body.input.city })
+    const searchPlan = await strapi.services.plan.find({ id: ctx.request.body.input.plan })
+    const searchNeighborhood = await strapi.services.neighborhood.find({ id: ctx.request.body.input.neighborhood })
+    const searchTechnology = await strapi.services.technology.find({ id: ctx.request.body.input.technology })
+    if (searchCity[0].ip.length > 1) {
+      for (let i = 0; i < searchCity[0].ip.length; i++) {
+        const mikrotikHost = searchCity[0].ip[i]
+        const plan = searchPlan[0].mikrotik_name
+        const planName = searchPlan[0].name
+        const cityName = searchCity[0].name
+        const neighborhoodName = searchNeighborhood[0].name
+        const technologyName = searchTechnology[0].name
+        mkCreateClient(mikrotikHost, plan, ctx.request.body.input, cityName, planName, neighborhoodName, technologyName)
+      }
+    } else {
+      const searchCity = await strapi.services.city.find({ id: ctx.request.body.input.city })
+      const searchPlan = await strapi.services.plan.find({ id: ctx.request.body.input.plan })
+      const searchNeighborhood = await strapi.services.neighborhood.find({ id: ctx.request.body.input.neighborhood })
+      const searchTechnology = await strapi.services.technology.find({ id: ctx.request.body.input.technology })
+      const mikrotikHost = searchCity[0].ip
+      const plan = searchPlan[0].mikrotik_name
+      const planName = searchPlan[0].name
+      const cityName = searchCity[0].name
+      const neighborhoodName = searchNeighborhood[0].name
+      const technologyName = searchTechnology[0].name
+      mkCreateClient(mikrotikHost, plan, ctx.request.body.input, cityName, planName, neighborhoodName, technologyName)
+      return true
+    }
+    return true
+  },
   async update(ctx) {
     const { id } = ctx.params;
     let entity, history;

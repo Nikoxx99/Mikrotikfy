@@ -35,6 +35,10 @@
     "tickets": {
       "via": "city",
       "collection": "ticket"
+    },
+    "activationrequests": {
+      "via": "city",
+      "collection": "activationrequest"
     }
   }
 }

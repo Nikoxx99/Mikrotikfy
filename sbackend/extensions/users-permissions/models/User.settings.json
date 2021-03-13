@@ -65,6 +65,10 @@
     "ticketdetails": {
       "via": "operator",
       "collection": "ticketdetail"
+    },
+    "requests": {
+      "via": "operator",
+      "collection": "activationrequest"
     }
   }
 }

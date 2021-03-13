@@ -67,7 +67,7 @@
                   @cancel="cancel"
                   @close="close"
                 >
-                  <v-chip small label :color="getColor(props.item.plan.id)" class="white--text">
+                  <v-chip small label outlined :color="getColor(props.item.plan.id)" class="white--text">
                     {{ props.item.plan.name }}
                   </v-chip>
                   <template v-slot:input>
@@ -102,10 +102,9 @@
               </template>
               <!-- ########################### -->
               <template v-slot:item.active="props">
-                <v-tooltip left>
+                <v-tooltip v-if="can('CreateForm')" left>
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn
-                      v-if="can('CreateForm')"
                       :color="props.item.active ? 'green darken-3' : 'red darken-3'"
                       dark
                       small
@@ -120,6 +119,10 @@
                   </template>
                 <span>Activar Cliente</span>
                 </v-tooltip>
+                <ActivationRequest
+                  :item="props.item"
+                  :allowedComponents="allowed_components"
+                />
               </template>
               <!-- ########################### -->
               <template v-slot:item.status="{ item }">
@@ -340,6 +343,7 @@ import DeleteClient from '../delete/DeleteClient'
 import ClientStatus from '../main/ClientStatus'
 import CreateTicket from '../create/CreateTicket'
 import TicketHistory from '../misc/TicketHistory'
+import ActivationRequest from '../misc/ActivationRequest'
 export default {
   name: 'ClientList',
   components: {
@@ -348,7 +352,8 @@ export default {
     DeleteClient,
     ClientStatus,
     CreateTicket,
-    TicketHistory
+    TicketHistory,
+    ActivationRequest
   },
   apollo: {
     city () {
@@ -580,17 +585,17 @@ export default {
       isRx: true,
       options: {},
       headers: [
-        { text: 'Codigo', value: 'code'},
+        { text: 'Codigo', value: 'code', sortable: false},
         { text: 'Estado', sortable: false, value: 'status' },
-        { text: 'Nombre', value: 'name' },
-        { text: 'Cedula', value: 'dni' },
+        { text: 'Nombre', value: 'name', sortable: false },
+        { text: 'Cedula', value: 'dni', sortable: false },
         { text: 'Direccion', sortable: false, value: 'address'},
-        { text: 'Barrio', value: 'neighborhood.name' },
+        { text: 'Barrio', value: 'neighborhood.name', sortable: false },
         { text: 'Telefono', sortable: false, value: 'phone' },
-        { text: 'Plan', value: 'plan.name' },
-        { text: 'Tecnologia', value: 'technology.name' },
-        { text: 'Tipo', value: 'newModel' },
-        { text: 'Activo', value: 'active' },
+        { text: 'Plan', value: 'plan.name', sortable: false },
+        { text: 'Tecnologia', value: 'technology.name', sortable: false },
+        { text: 'Tipo', value: 'newModel', sortable: false },
+        { text: 'Activo', value: 'active', sortable: false },
         { text: 'Aciones', value: 'actions', sortable: false }
       ],
       editedIndex: -1,

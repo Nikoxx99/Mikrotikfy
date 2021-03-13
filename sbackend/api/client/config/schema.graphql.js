@@ -79,6 +79,25 @@ module.exports = {
       operator: String
       comment: String
     }
+    input adminCreateFromRequestInput {
+      id: String
+      code: String
+      name: String
+      dni: String
+      address: String
+      neighborhood: String
+      city: String
+      phone: String
+      plan: String
+      wifi_ssid: String
+      wifi_password: String
+      technology: String
+      mac_address: String
+      nap_onu_address: String
+      opticalPower: String
+      operator: String
+      comment: String
+    }
     input adminDeleteInput {
       id: String
     }
@@ -95,6 +114,7 @@ module.exports = {
     editClientPlan(id: String, plan: String, isRx: Boolean, operator: String): Boolean
     dxClient(input: DxInfoInput): [dxResponse]
     adminCreate(input: adminCreateInput): Boolean
+    adminCreateFromRequest(input: adminCreateFromRequestInput): Boolean
     adminDelete(input: adminDeleteInput): Boolean
     setClientComment(clientid:ID, comment: String): Boolean
   `,
@@ -142,6 +162,10 @@ module.exports = {
       adminCreate: {
         description: 'Create client on admin approvation',
         resolver: 'application::client.client.adminCreate',
+      },
+      adminCreateFromRequest: {
+        description: 'Create client on admin approvation from request from technician',
+        resolver: 'application::client.client.adminCreateFromRequest',
       },
       adminDelete: {
         description: 'Delete client on admin unapprovation',

@@ -1,5 +1,6 @@
 <template>
   <div>
+    <ActivationRequestList />
     <Tickets />
     <ClientList />
   </div>
@@ -8,10 +9,12 @@
 <script>
 import ClientList from '../components/main/ClientList'
 import Tickets from '../components/main/Tickets'
+import ActivationRequestList from '../components/main/ActivationRequestList'
 export default {
   components: {
     ClientList,
-    Tickets
+    Tickets,
+    ActivationRequestList
   },
   data () {
     return {

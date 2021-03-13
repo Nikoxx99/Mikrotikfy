@@ -97,6 +97,10 @@
     },
     "opticalPower": {
       "type": "string"
+    },
+    "activationrequests": {
+      "via": "client",
+      "collection": "activationrequest"
     }
   }
 }

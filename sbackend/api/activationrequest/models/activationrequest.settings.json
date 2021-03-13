@@ -1,0 +1,41 @@
+{
+  "kind": "collectionType",
+  "collectionName": "activationrequests",
+  "info": {
+    "name": "activationrequest",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "operator": {
+      "plugin": "users-permissions",
+      "model": "user",
+      "via": "requests"
+    },
+    "active": {
+      "type": "boolean",
+      "default": false
+    },
+    "mac_address": {
+      "type": "string"
+    },
+    "client": {
+      "model": "client",
+      "via": "activationrequests"
+    },
+    "opticalPower": {
+      "type": "string"
+    },
+    "nap_onu_address": {
+      "type": "string"
+    },
+    "city": {
+      "model": "city",
+      "via": "activationrequests"
+    }
+  }
+}
