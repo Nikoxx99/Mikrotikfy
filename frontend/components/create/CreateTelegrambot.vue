@@ -104,7 +104,7 @@ import gql from 'graphql-tag'
 import EditTelegrambot from '../edit/EditTelegrambot'
 import ModalDeleteTelegrambot from '../delete/ModalDeleteTelegrambot'
 export default {
-  name: 'CreateCity',
+  name: 'CreateTelegrambot',
   components: {
     EditTelegrambot,
     ModalDeleteTelegrambot

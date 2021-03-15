@@ -77,7 +77,7 @@
                       v-bind="attrs"
                       text
                       v-on="on"
-                      @click="updateStatus(props.item.client.active, activationrequests.map(function(x) {return x.id; }).indexOf(props.item.id))"
+                      @click="updateStatus(props.item.client.active, activationRequestsList.map(function(x) {return x.id; }).indexOf(props.item.id))"
                     >
                       <v-icon>mdi-{{ props.item.client.active ? 'check' : 'close' }} {{ props.index }}</v-icon>
                     </v-btn>
