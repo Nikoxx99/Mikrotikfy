@@ -14,6 +14,11 @@
         <v-row>
           <v-container>
             <v-text-field
+              v-model="name"
+              label="Nombre"
+              required
+            />
+            <v-text-field
               v-model="token"
               label="Token"
               required
@@ -21,6 +26,10 @@
             <v-text-field
               v-model="chat"
               label="Chat ID"
+            />
+            <v-text-field
+              v-model="binnacle"
+              label="Bitacora ID"
             />
             <v-btn
               class="mr-4 blue darken-4"
@@ -101,8 +110,10 @@ export default {
     ModalDeleteTelegrambot
   },
   data: () => ({
+    name: '',
     token: '',
     chat: '',
+    binnacle: '',
     color: '',
     hint: 'ID del Chat de Telegram al que escribira el Bot',
     telegrambots: [],
@@ -111,6 +122,7 @@ export default {
     alertBoxColor: '',
     isSubmitting: false,
     headers: [
+      { text: 'Nombre', value: 'name' },
       { text: 'Token', value: 'token' },
       { text: 'Chat ID', value: 'chat' },
       { text: 'A.', value: 'actions' }
@@ -133,8 +145,10 @@ export default {
     this.$apollo.query({
       query: gql`query ($limit: Int){
         telegrambots(limit: $limit){
+          name
           token
           chat
+          binnacle
         }
       }`,
       variables: {
@@ -174,8 +188,10 @@ export default {
         variables: {
           input: {
             data: {
+              name: this.name,
               token: this.token,
-              chat: this.chat
+              chat: this.chat,
+              binnacle: this.binnacle
             }
           }
         }

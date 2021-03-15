@@ -24,6 +24,16 @@
         multiple
         chips
       />
+      <v-combobox
+        v-model="telegrambot"
+        label="Bots de Telegram"
+        item-value="id"
+        item-text="name"
+        :items="telegrambots"
+        dense
+        multiple
+        chips
+      />
       <v-color-picker
         v-model="cities.color"
         mode="hexa"
@@ -67,6 +77,10 @@ export default {
       color: {
         type: String,
         default: ''
+      },
+      telegrambot: {
+        type: String,
+        default: ''
       }
     }
   },
@@ -76,8 +90,30 @@ export default {
       alertBox: false,
       alertBoxColor: '',
       createdMessage: '',
-      isSubmitting: false
+      isSubmitting: false,
+      telegrambots: [],
+      telegrambot: []
     }
+  },
+  mounted () {
+    this.$apollo.query({
+      query: gql`query ($limit: Int){
+        telegrambots(limit: $limit){
+          id
+          name
+          token
+          chat
+        }
+      }`,
+      variables: {
+        limit: 1000
+      }
+    }).then((input) => {
+      this.telegrambots = input.data.telegrambots
+    }).catch((error) => {
+      // eslint-disable-next-line no-console
+      console.error(error)
+    })
   },
   methods: {
     updateCity () {
@@ -91,10 +127,14 @@ export default {
         }`,
         variables: {
           input: {
+            where: {
+              id: this.cities.id
+            },
             data: {
               name: this.cities.name,
               ip: this.cities.ip,
-              color: this.cities.color
+              color: this.cities.color,
+              telegrambot: this.telegrambot[0].id
             }
           }
         }

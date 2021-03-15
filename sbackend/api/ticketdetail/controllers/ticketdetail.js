@@ -18,7 +18,8 @@ module.exports = {
     const client = await strapi.services.client.findOne({ id: idclient });
     const tickettype = await strapi.services.tickettype.findOne({ id: idtickettype });
     const assiganted = res.operator.username
-    simpleTelegramCreateTicketAdvance(res, client, tickettype, assiganted)
+    const telegrambot = await strapi.services.telegrambot.find({city: entity.city.id})
+    simpleTelegramCreateTicketAdvance(res, client, tickettype, assiganted, telegrambot[0])
     console.log(res)
   }
 }

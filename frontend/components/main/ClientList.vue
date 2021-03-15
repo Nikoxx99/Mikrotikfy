@@ -1031,7 +1031,7 @@ export default {
           this.dataTable[index].loading = !this.dataTable[index].loading
           this.snack = true
           this.snackColor = 'info'
-          this.snackText = 'Cliente aprovado'
+          this.snackText = 'Cliente aprobado'
         }).catch((error) => {
           this.snack = true
           this.snackColor = 'red'

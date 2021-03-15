@@ -4,7 +4,7 @@
  * to customize this controller
  */
 const { sanitizeEntity } = require('strapi-utils');
-const { mkCreateClient, mkDeleteClient, mkSetClientPlanInformation, mkClientStatus, mkGetComment, mkSetComment, mkDxClient, simpleTelegramCreate, simpleTelegramDelete, simpleTelegramUpdate, simpleTelegramUpdatePlan, createComment } = require('../../../mikrotik/functions');
+const { mkCreateClient, mkDeleteClient, mkSetClientPlanInformation, mkClientStatus, mkGetComment, mkSetComment, mkDxClient, simpleTelegramCreate, simpleTelegramAdminCreate, simpleTelegramDelete, simpleTelegramUpdate, simpleTelegramUpdatePlan, createComment } = require('../../../mikrotik/functions');
 module.exports = {
   async create(ctx) {
     const sendToMikrotik = ctx.request.body.sendToMikrotik
@@ -18,7 +18,9 @@ module.exports = {
         return c
       })
       entity = await strapi.services.client.create(newClient[0]);
-      simpleTelegramCreate(entity)
+      const telegrambot = await strapi.services.telegrambot.find({city: entity.city.id})
+      console.log(telegrambot)
+      simpleTelegramCreate(entity, telegrambot[0])
       if (sendToMikrotik) {
         const searchCity = await strapi.services.city.find({ id: ctx.request.body.city })
         const searchPlan = await strapi.services.plan.find({ id: ctx.request.body.plan })
@@ -58,11 +60,13 @@ module.exports = {
   },
   async adminCreate(ctx) {
     const id = ctx.request.body.input.id
-    await strapi.services.client.update({ id }, { 'active': true })
+    const entity = await strapi.services.client.update({ id }, { 'active': true })
     const searchCity = await strapi.services.city.find({ id: ctx.request.body.input.city })
     const searchPlan = await strapi.services.plan.find({ id: ctx.request.body.input.plan })
     const searchNeighborhood = await strapi.services.neighborhood.find({ id: ctx.request.body.input.neighborhood })
     const searchTechnology = await strapi.services.technology.find({ id: ctx.request.body.input.technology })
+    const telegrambot = await strapi.services.telegrambot.find({city: ctx.request.body.input.city})
+    simpleTelegramAdminCreate(entity, telegrambot[0])
     if (searchCity[0].ip.length > 1) {
       for (let i = 0; i < searchCity[0].ip.length; i++) {
         const mikrotikHost = searchCity[0].ip[i]
@@ -95,12 +99,14 @@ module.exports = {
     const newMac_address = ctx.request.body.input.client.mac_address
     const newNap_onu_address = ctx.request.body.input.client.nap_onu_address
     const newOpticalPower = ctx.request.body.input.client.opticalPower
-    await strapi.services.client.update({ id: id_client }, { 'active': true, mac_address: newMac_address, nap_onu_address: newNap_onu_address, opticalPower: newOpticalPower})
+    const entity = await strapi.services.client.update({ id: id_client }, { 'active': true, mac_address: newMac_address, nap_onu_address: newNap_onu_address, opticalPower: newOpticalPower})
     await strapi.services.activationrequest.update({ id }, { 'active': false })
     const searchCity = await strapi.services.city.find({ id: ctx.request.body.input.client.city })
     const searchPlan = await strapi.services.plan.find({ id: ctx.request.body.input.client.plan })
     const searchNeighborhood = await strapi.services.neighborhood.find({ id: ctx.request.body.input.client.neighborhood })
     const searchTechnology = await strapi.services.technology.find({ id: ctx.request.body.input.client.technology })
+    const telegrambot = await strapi.services.telegrambot.find({city: ctx.request.body.input.client.city})
+    simpleTelegramAdminCreate(entity, telegrambot[0])
     if (searchCity[0].ip.length > 1) {
       for (let i = 0; i < searchCity[0].ip.length; i++) {
         const mikrotikHost = searchCity[0].ip[i]
@@ -131,7 +137,8 @@ module.exports = {
     const { id } = ctx.params;
     let entity, history;
     entity = await strapi.services.client.update({ id }, ctx.request.body)
-    simpleTelegramUpdate(entity)
+    const telegrambot = await strapi.services.telegrambot.find({city: entity.city.id})
+    simpleTelegramUpdate(entity, telegrambot[0])
     await strapi.services.history.create(ctx.request.body)
     const search = await strapi.services.client.find({ _id: id })
     const clientObj = search[0]
@@ -199,7 +206,9 @@ module.exports = {
       await mkDeleteClient(mikrotikHost, dni, code, model)
     }
     const entity = await strapi.services.client.delete({ id });
-    simpleTelegramDelete(entity)
+    await strapi.services.activationrequest.delete({ client: id });
+    const telegrambot = await strapi.services.telegrambot.find({city: entity.city.id})
+    simpleTelegramDelete(entity, telegrambot[0])
     return sanitizeEntity(entity, { model: strapi.models.client });
   },
   async adminDelete(ctx) {
@@ -342,7 +351,8 @@ module.exports = {
     const reqCityIpArray = clientObj.city.ip
     const successfulMikrotikResponses = []
     const entity = await strapi.services.client.update({ id }, { plan: newClientPlanSearch })
-    simpleTelegramUpdatePlan(entity, operator, isRx)
+    const telegrambot = await strapi.services.telegrambot.find({city: entity.city.id})
+    simpleTelegramUpdatePlan(entity, operator, isRx, telegrambot[0])
     // console.log(clientObj)
     // await strapi.services.history.create(clientObj);
     if (reqCityIpArray.length > 1) {

@@ -12,7 +12,8 @@ module.exports = {
     let entity;
     entity = await strapi.services.ticket.create(ctx.request.body);
     const neighborhood = await strapi.services.neighborhood.findOne({ id: entity.client.neighborhood })
-    simpleTelegramCreateTicket(entity, neighborhood.name)
+    const telegrambot = await strapi.services.telegrambot.find({city: entity.city.id})
+    simpleTelegramCreateTicket(entity, neighborhood.name, telegrambot[0])
     return sanitizeEntity(entity, { model: strapi.models.ticket });
   }
 }

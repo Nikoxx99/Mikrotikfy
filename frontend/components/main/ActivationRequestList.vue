@@ -408,7 +408,7 @@ export default {
           this.activationRequestsList[index].loading = !this.activationRequestsList[index].loading
           this.snack = true
           this.snackColor = 'info'
-          this.snackText = 'Cliente aprovado'
+          this.snackText = 'Cliente aprobado'
         }).catch((error) => {
           this.refreshActivationRequests()
           this.activationRequestsList[index].loading = !this.activationRequestsList[index].loading

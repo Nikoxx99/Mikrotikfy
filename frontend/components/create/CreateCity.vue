@@ -126,9 +126,9 @@ export default {
     alertBoxColor: '',
     isSubmitting: false,
     headers: [
-      { text: 'ID', value: 'id' },
       { text: 'Nombre', value: 'name' },
       { text: 'IP Mikrotik', value: 'ip' },
+      { text: 'Telegram', value: 'telegrambot.name' },
       { text: 'Color', value: 'color' },
       { text: 'A.', value: 'actions' }
     ],
@@ -138,7 +138,8 @@ export default {
         id: 0,
         name: '',
         ip: '',
-        color: ''
+        color: '',
+        telegrambot: ''
       }
     },
     dialogEdit: false
@@ -156,6 +157,9 @@ export default {
           name
           ip
           color
+          telegrambot{
+            name
+          }
         }
       }`,
       variables: {

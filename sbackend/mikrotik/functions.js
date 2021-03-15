@@ -426,13 +426,12 @@ module.exports.mkDxClient = async function (input) {
     console.log(error)
   }
 }
-module.exports.simpleTelegramCreate = async function (input) {
+module.exports.simpleTelegramCreate = async function (input, telegrambot) {
   const fetch = require('node-fetch');
   require('dotenv').config()
-  const bot = process.env.TELEGRAM_BOT
-  const chatid = process.env.CHAT_ID
+  const bot = telegrambot.token
+  const chatid = telegrambot.binnacle
   var message = `CREADO\n${input.code}\n${input.name}\n${input.dni}\n${input.address}\n${input.neighborhood.name}\n${input.phone}\n${input.city.name}\n${input.plan.name}\n${input.wifi_ssid}\n${input.wifi_password}\n${input.technology.name}\n${input.mac_address}\nNAP-ONU: ${input.nap_onu_address}\nPOTENCIA: ${input.opticalPower}\n${input.operator.username}\n${input.createdAt}`
-  var payload = message.replace('#', ' ')
   const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + sanitizeString(message)
   fetch(req).then(function (response) {
     return true
@@ -440,28 +439,51 @@ module.exports.simpleTelegramCreate = async function (input) {
     console.log(err);
   });
 }
-module.exports.simpleTelegramUpdate = async function (input) {
+module.exports.simpleTelegramCreateRequest = async function (input, telegrambot) {
   const fetch = require('node-fetch');
   require('dotenv').config()
-  const bot = process.env.TELEGRAM_BOT
-  const chatid = process.env.CHAT_ID
+  const bot = telegrambot.token
+  const chatid = telegrambot.binnacle
+  var message = `SOLICITUD DE ACTIVACION\n${input.client.code}\n${input.client.name}\n${input.client.dni}\n${input.client.address}\n${input.client.neighborhood.name}\n${input.client.phone}\n${input.city.name}\n${input.client.wifi_ssid}\n${input.client.wifi_password}\n${input.client.mac_address}\nNAP-ONU: ${input.client.nap_onu_address}\nPOTENCIA: ${input.client.opticalPower}\n${input.operator.username}\n${input.createdAt}`
+  const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + sanitizeString(message)
+  fetch(req).then(function (response) {
+    return true
+  }).catch(function (err) {
+    console.log(err);
+  });
+}
+module.exports.simpleTelegramAdminCreate = async function (input, telegrambot) {
+  const fetch = require('node-fetch');
+  require('dotenv').config()
+  const bot = telegrambot.token
+  const chatid = telegrambot.binnacle
+  var message = `APROBADO\n${input.code}\n${input.name}\n${input.dni}\n${input.address}\n${input.neighborhood.name}\n${input.phone}\n${input.city.name}\n${input.plan.name}\n${input.wifi_ssid}\n${input.wifi_password}\n${input.technology.name}\n${input.mac_address}\nNAP-ONU: ${input.nap_onu_address}\nPOTENCIA: ${input.opticalPower}\n${input.operator.username}\n${input.createdAt}`
+  const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + sanitizeString(message)
+  fetch(req).then(function (response) {
+    return true
+  }).catch(function (err) {
+    console.log(err);
+  });
+}
+module.exports.simpleTelegramUpdate = async function (input, telegrambot) {
+  const fetch = require('node-fetch');
+  require('dotenv').config()
+  const bot = telegrambot.token
+  const chatid = telegrambot.binnacle
   var message = `ACTUALIZADO\n${input.code}\n${input.name}\n${input.dni}\n${input.address}\n${input.neighborhood.name}\n${input.phone}\n${input.city.name}\n${input.plan.name}\n${input.wifi_ssid}\n${input.wifi_password}\n${input.technology.name}\n${input.mac_address}\nNAP-ONU: ${input.nap_onu_address}\nPOTENCIA: ${input.opticalPower}dBm\n${input.operator.username}\n${input.createdAt}`
   payload = message.replace('#', ' ')
   const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + sanitizeString(message)
   fetch(req).then(function (response) {
     return true
-  }).then(function (data) {
-    console.log(data);
   }).catch(function () {
     console.log("Booo");
   });
 }
-module.exports.simpleTelegramUpdatePlan = async function (input, operator, isRx) {
-  console.log(input)
+module.exports.simpleTelegramUpdatePlan = async function (input, operator, isRx, telegrambot) {
   const fetch = require('node-fetch');
   require('dotenv').config()
-  const bot = process.env.TELEGRAM_BOT
-  const chatid = process.env.CHAT_ID
+  const bot = telegrambot.token
+  const chatid = telegrambot.binnacle
   var line1 = ''
   if (isRx) {
     line1 = 'RECONEXIÓN'
@@ -476,17 +498,15 @@ module.exports.simpleTelegramUpdatePlan = async function (input, operator, isRx)
   const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + sanitizeString(message)
   fetch(req).then(function (response) {
     return true
-  }).then(function (data) {
-    console.log(data);
   }).catch(function () {
     console.log("Booo");
   });
 }
-module.exports.simpleTelegramDelete = async function (input) {
+module.exports.simpleTelegramDelete = async function (input, telegrambot) {
   const fetch = require('node-fetch');
   require('dotenv').config()
-  const bot = process.env.TELEGRAM_BOT
-  const chatid = process.env.CHAT_ID
+  const bot = telegrambot.token
+  const chatid = telegrambot.binnacle
   const line1 = 'BORRADO'
   const line2 = input.code
   const line3 = input.name
@@ -501,11 +521,11 @@ module.exports.simpleTelegramDelete = async function (input) {
     console.log("Booo");
   });
 }
-module.exports.simpleTelegramCreateTicket = async function (input, neighborhood) {
+module.exports.simpleTelegramCreateTicket = async function (input, neighborhood, telegrambot) {
   const fetch = require('node-fetch');
   require('dotenv').config()
-  const bot = process.env.TELEGRAM_BOT
-  const chatid = process.env.CHAT_ID2
+  const bot = telegrambot.token
+  const chatid = telegrambot.chat
   const line1 = 'TICKET'
   const line2 = input.client.code
   const line3 = input.client.name
@@ -521,17 +541,15 @@ module.exports.simpleTelegramCreateTicket = async function (input, neighborhood)
   fetch(req).then(function (response) {
     console.log(response)
     return true
-  }).then(function (data) {
-    console.log(data);
   }).catch(function (err) {
     console.log("Booo", err);
   });
 }
-module.exports.simpleTelegramCreateTicketAdvance = async function (input, client, tickettype, assiganted) {
+module.exports.simpleTelegramCreateTicketAdvance = async function (input, client, tickettype, assiganted, telegrambot) {
   const fetch = require('node-fetch');
   require('dotenv').config()
-  const bot = process.env.TELEGRAM_BOT
-  const chatid = process.env.CHAT_ID2
+  const bot = telegrambot.token
+  const chatid = telegrambot.chat
   let line1 = ''
   if (!input.ticket.active) {
     line1 = 'TICKET CERRADO'
@@ -557,14 +575,11 @@ module.exports.simpleTelegramCreateTicketAdvance = async function (input, client
   fetch(req).then(function (response) {
     console.log(response)
     return true
-  }).then(function (data) {
-    console.log(data);
   }).catch(function () {
     console.log("Booo");
   });
 }
 module.exports.createComment = async function (client) {
   const newComment = `${client.code} ${client.technology.name} ${client.neighborhood.name} ${client.address} ${client.name} ${client.dni} ${client.phone} ${client.plan.name} ${client.mac_address} NAP-ONU: ${client.nap_onu_address} POTENCIA: ${client.opticalPower} ${client.wifi_ssid} ${client.wifi_password}`
-  console.log(newComment)
   return newComment
 }
