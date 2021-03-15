@@ -30,7 +30,7 @@ import CreateCity from '../components/create/CreateCity'
 import CreateNeighborhood from '../components/create/CreateNeighborhood'
 import CreatePlan from '../components/create/CreatePlan'
 import CreateTechnology from '../components/create/CreateTechnology'
-import CreateTelegramBot from '../components/create/CreateTelegramBot'
+import CreateTelegramBot from '../components/create/CreateTelegrambot'
 export default {
   components: {
     CreateCity,
