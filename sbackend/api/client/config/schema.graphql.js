@@ -81,6 +81,10 @@ module.exports = {
     }
     input adminCreateFromRequestInput {
       id: String
+      client: ClientObjInput
+    }
+    input ClientObjInput {
+      id: String
       code: String
       name: String
       dni: String
@@ -98,8 +102,15 @@ module.exports = {
       operator: String
       comment: String
     }
+    input ClientDeleteObjInput {
+      id: String
+    }
     input adminDeleteInput {
       id: String
+    }
+    input adminDeleteFromRequestInput {
+      id: String
+      client: ClientDeleteObjInput
     }
   `,
   query: `
@@ -116,6 +127,7 @@ module.exports = {
     adminCreate(input: adminCreateInput): Boolean
     adminCreateFromRequest(input: adminCreateFromRequestInput): Boolean
     adminDelete(input: adminDeleteInput): Boolean
+    adminDeleteFromRequest(input: adminDeleteFromRequestInput): Boolean
     setClientComment(clientid:ID, comment: String): Boolean
   `,
   type: {
@@ -170,6 +182,10 @@ module.exports = {
       adminDelete: {
         description: 'Delete client on admin unapprovation',
         resolver: 'application::client.client.adminDelete',
+      },
+      adminDeleteFromRequest: {
+        description: 'Delete client on admin unapprovation',
+        resolver: 'application::client.client.adminDeleteFromRequest',
       },
       setClientComment: {
         description: 'Sets client comment on mikrotik',

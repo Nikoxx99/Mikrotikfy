@@ -14,7 +14,7 @@
           </v-icon>
         </v-btn>
       </template>
-      <span>Borrar Tecnologia</span>
+      <span>Borrar Telegrambot</span>
     </v-tooltip>
     <v-dialog
       v-model="modal"
@@ -22,7 +22,7 @@
     >
       <v-card>
         <v-card-title class="headline">
-          Borrar {{ name }}?
+          Borrar bot?
         </v-card-title>
 
         <v-card-text>
@@ -43,7 +43,7 @@
           <v-btn
             color="red darken-1"
             text
-            @click="deleteTechnology(technologyid)"
+            @click="deleteTelegrambot(telegrambotid)"
           >
             Borrar
           </v-btn>
@@ -57,11 +57,7 @@
 import gql from 'graphql-tag'
 export default {
   props: {
-    technologyid: {
-      type: String,
-      default: ''
-    },
-    name: {
+    telegrambotid: {
       type: String,
       default: ''
     }
@@ -70,19 +66,21 @@ export default {
     modal: false
   }),
   methods: {
-    deleteTechnology (technologyid) {
+    deleteTelegrambot (telegrambotid) {
       this.$apollo.mutate({
-        mutation: gql`mutation ($id: Int){
-          deleteTechnology(id: $id){
-            success
-            errors{
-              path
-              message
+        mutation: gql`mutation ($id: ID!){
+          deleteTelegrambot(input: {
+            where: {
+              id: $id
+            }
+          }){
+            telegrambot{
+              id
             }
           }
         }`,
         variables: {
-          id: this.technologyid
+          id: telegrambotid
         }
       }).then((input) => {
         window.location.reload(true)

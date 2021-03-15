@@ -17,6 +17,10 @@
         <h1>Crear Tecnologia</h1>
         <CreateTechnology />
       </v-col>
+      <v-col cols="6">
+        <h1>Crear Bot de Telegram</h1>
+        <CreateTelegramBot />
+      </v-col>
     </v-row>
   </v-container>
 </template>
@@ -26,12 +30,14 @@ import CreateCity from '../components/create/CreateCity'
 import CreateNeighborhood from '../components/create/CreateNeighborhood'
 import CreatePlan from '../components/create/CreatePlan'
 import CreateTechnology from '../components/create/CreateTechnology'
+import CreateTelegramBot from '../components/create/CreateTelegramBot'
 export default {
   components: {
     CreateCity,
     CreateNeighborhood,
     CreatePlan,
-    CreateTechnology
+    CreateTechnology,
+    CreateTelegramBot
   },
   middleware: 'authenticated'
 }

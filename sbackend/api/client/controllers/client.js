@@ -91,14 +91,16 @@ module.exports = {
   },
   async adminCreateFromRequest(ctx) {
     const id = ctx.request.body.input.id
-    const newMac_address = ctx.request.body.input.mac_address
-    const newNap_onu_address = ctx.request.body.input.nap_onu_address
-    const newOpticalPower = ctx.request.body.input.opticalPower
-    await strapi.services.client.update({ id }, { 'active': true, mac_address: newMac_address, nap_onu_address: newNap_onu_address, opticalPower: newOpticalPower})
-    const searchCity = await strapi.services.city.find({ id: ctx.request.body.input.city })
-    const searchPlan = await strapi.services.plan.find({ id: ctx.request.body.input.plan })
-    const searchNeighborhood = await strapi.services.neighborhood.find({ id: ctx.request.body.input.neighborhood })
-    const searchTechnology = await strapi.services.technology.find({ id: ctx.request.body.input.technology })
+    const id_client = ctx.request.body.input.client.id
+    const newMac_address = ctx.request.body.input.client.mac_address
+    const newNap_onu_address = ctx.request.body.input.client.nap_onu_address
+    const newOpticalPower = ctx.request.body.input.client.opticalPower
+    await strapi.services.client.update({ id: id_client }, { 'active': true, mac_address: newMac_address, nap_onu_address: newNap_onu_address, opticalPower: newOpticalPower})
+    await strapi.services.activationrequest.update({ id }, { 'active': false })
+    const searchCity = await strapi.services.city.find({ id: ctx.request.body.input.client.city })
+    const searchPlan = await strapi.services.plan.find({ id: ctx.request.body.input.client.plan })
+    const searchNeighborhood = await strapi.services.neighborhood.find({ id: ctx.request.body.input.client.neighborhood })
+    const searchTechnology = await strapi.services.technology.find({ id: ctx.request.body.input.client.technology })
     if (searchCity[0].ip.length > 1) {
       for (let i = 0; i < searchCity[0].ip.length; i++) {
         const mikrotikHost = searchCity[0].ip[i]
@@ -107,20 +109,20 @@ module.exports = {
         const cityName = searchCity[0].name
         const neighborhoodName = searchNeighborhood[0].name
         const technologyName = searchTechnology[0].name
-        mkCreateClient(mikrotikHost, plan, ctx.request.body.input, cityName, planName, neighborhoodName, technologyName)
+        mkCreateClient(mikrotikHost, plan, ctx.request.body.input.client, cityName, planName, neighborhoodName, technologyName)
       }
     } else {
-      const searchCity = await strapi.services.city.find({ id: ctx.request.body.input.city })
-      const searchPlan = await strapi.services.plan.find({ id: ctx.request.body.input.plan })
-      const searchNeighborhood = await strapi.services.neighborhood.find({ id: ctx.request.body.input.neighborhood })
-      const searchTechnology = await strapi.services.technology.find({ id: ctx.request.body.input.technology })
+      const searchCity = await strapi.services.city.find({ id: ctx.request.body.input.client.city })
+      const searchPlan = await strapi.services.plan.find({ id: ctx.request.body.input.client.plan })
+      const searchNeighborhood = await strapi.services.neighborhood.find({ id: ctx.request.body.input.client.neighborhood })
+      const searchTechnology = await strapi.services.technology.find({ id: ctx.request.body.input.client.technology })
       const mikrotikHost = searchCity[0].ip
       const plan = searchPlan[0].mikrotik_name
       const planName = searchPlan[0].name
       const cityName = searchCity[0].name
       const neighborhoodName = searchNeighborhood[0].name
       const technologyName = searchTechnology[0].name
-      mkCreateClient(mikrotikHost, plan, ctx.request.body.input, cityName, planName, neighborhoodName, technologyName)
+      mkCreateClient(mikrotikHost, plan, ctx.request.body.input.client, cityName, planName, neighborhoodName, technologyName)
       return true
     }
     return true
@@ -204,6 +206,31 @@ module.exports = {
     const { id } = ctx.request.body.input
     await strapi.services.client.update({ id }, { 'active': false });
     const search = await strapi.services.client.find({ _id: id })
+    const clientObj = search[0]
+    const dni = clientObj.dni
+    const code = clientObj.code
+    const model = clientObj.newModel
+    const reqCityIpArray = clientObj.city.ip
+    if (reqCityIpArray.length > 1) {
+      const successfulMikrotikResponses = []
+      for (let i = 0; i < reqCityIpArray.length; i++) {
+        const mikrotikHost = reqCityIpArray[i]
+        const res = await mkDeleteClient(mikrotikHost, dni, code, model)
+        successfulMikrotikResponses.push(res)
+      }
+    } else {
+      const mikrotikHost = reqCityIpArray[0]
+      await mkDeleteClient(mikrotikHost, dni, code, model)
+      return true
+    }
+    return true
+  },
+  async adminDeleteFromRequest(ctx) {
+    const { id } = ctx.request.body.input
+    const id_client = ctx.request.body.input.client.id
+    await strapi.services.client.update({ id: id_client }, { 'active': false });
+    await strapi.services.activationrequest.update({ id }, { 'active': true })
+    const search = await strapi.services.client.find({ _id: id_client })
     const clientObj = search[0]
     const dni = clientObj.dni
     const code = clientObj.code

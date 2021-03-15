@@ -1,0 +1,52 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/telegrambots",
+      "handler": "telegrambot.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/telegrambots/count",
+      "handler": "telegrambot.count",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/telegrambots/:id",
+      "handler": "telegrambot.findOne",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/telegrambots",
+      "handler": "telegrambot.create",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/telegrambots/:id",
+      "handler": "telegrambot.update",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/telegrambots/:id",
+      "handler": "telegrambot.delete",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}

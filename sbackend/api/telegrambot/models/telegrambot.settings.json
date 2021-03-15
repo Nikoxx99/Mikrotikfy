@@ -1,0 +1,24 @@
+{
+  "kind": "collectionType",
+  "collectionName": "telegrambots",
+  "info": {
+    "name": "telegrambot"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "token": {
+      "type": "string"
+    },
+    "chat": {
+      "type": "string"
+    },
+    "city": {
+      "model": "city",
+      "via": "telegrambot"
+    }
+  }
+}

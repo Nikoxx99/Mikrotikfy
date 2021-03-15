@@ -39,6 +39,10 @@
     "activationrequests": {
       "via": "city",
       "collection": "activationrequest"
+    },
+    "telegrambot": {
+      "via": "city",
+      "model": "telegrambot"
     }
   }
 }

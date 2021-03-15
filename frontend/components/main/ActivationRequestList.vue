@@ -32,14 +32,14 @@
                   <v-icon>mdi-reload</v-icon>
                 </v-btn>
               </template>
-              <span>Refrescar Tickets</span>
+              <span>Refrescar Peticiones de Activacion</span>
             </v-tooltip>
             <v-spacer />
             <v-text-field
               ref="searchTicket"
               v-model="search"
               prepend-icon="mdi-magnify"
-              label="Buscar Tickets"
+              label="Buscar Solicitudes"
               single-line
               hide-details
               outlined
@@ -220,6 +220,7 @@ export default {
       dialog: false,
       dialogEdit: false,
       initialLoading: false,
+      loading: false,
       showClosedValue: false,
       refreshLoading: false,
       headers: [
@@ -248,23 +249,12 @@ export default {
     this.populareRole()
     this.$apollo.queries.activationrequests.skip = false
     await this.$apollo.queries.activationrequests.fetchMore({
-      variables: {
-        city: this.$route.query.city
-      },
       updateQuery: (_, { fetchMoreResult }) => {
-        const newActivationRequests = fetchMoreResult.activationrequests
-        this.activationRequestsList = newActivationRequests
       }
     })
     await this.showClosed(false)
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'j' && (e.altKey)) {
-        this.$refs.searchTicket.focus()
-      }
-      if (e.key === 'Escape') {
-        this.search = ''
-      }
-    })
+    const newContent = await this.mapDatatable(this.activationRequestsList)
+    this.activationRequestsList = newContent
   },
   methods: {
     async refreshActivationRequests () {
@@ -355,19 +345,24 @@ export default {
     },
     updateStatus (status, index) {
       if (status === true) {
-        this.activationrequests[index].active = !this.activationrequests[index].active
-        this.activationrequests[index].loading = !this.activationrequests[index].loading
+        this.activationRequestsList[index].client.active = !this.activationRequestsList[index].client.active
+        this.activationRequestsList[index].loading = !this.activationRequestsList[index].loading
         this.$apollo.mutate({
-          mutation: gql`mutation ($input: adminDeleteInput){
-            adminDelete(input: $input)
+          mutation: gql`mutation ($input: adminDeleteFromRequestInput){
+            adminDeleteFromRequest(input: $input)
           }`,
           variables: {
             input: {
-              id: this.activationrequests[index].client.id
+              id: this.activationRequestsList[index].id,
+              client: {
+                id: this.activationRequestsList[index].client.id
+              }
             }
           }
-        }).then((input) => {
-          this.activationrequests[index].loading = !this.activationrequests[index].loading
+        }).then(() => {
+          this.refreshActivationRequests()
+          this.showClosedValue = false
+          this.activationRequestsList[index].loading = !this.activationRequestsList[index].loading
           this.snack = true
           this.snackColor = 'red'
           this.snackText = 'Cliente eliminado de la mikrotik'
@@ -375,49 +370,59 @@ export default {
           this.snack = true
           this.snackColor = 'red'
           this.snackText = error
-          this.activationrequests[index].loading = !this.activationrequests[index].loading
+          this.activationRequestsList[index].loading = !this.activationRequestsList[index].loading
         })
       } else {
-        this.activationrequests[index].active = !this.activationrequests[index].active
-        this.activationrequests[index].loading = !this.activationrequests[index].loading
-        const currentClientToCreate = this.activationrequests[index].client
+        this.activationRequestsList[index].client.active = !this.activationRequestsList[index].client.active
+        this.activationRequestsList[index].loading = !this.activationRequestsList[index].loading
+        const currentClientToCreate = this.activationRequestsList[index].client
         this.$apollo.mutate({
           mutation: gql`mutation ($input: adminCreateFromRequestInput){
             adminCreateFromRequest(input: $input)
           }`,
           variables: {
             input: {
-              id: currentClientToCreate.id,
-              code: currentClientToCreate.code,
-              name: currentClientToCreate.name,
-              dni: currentClientToCreate.dni,
-              address: currentClientToCreate.address,
-              neighborhood: currentClientToCreate.neighborhood.id,
-              city: currentClientToCreate.city.id,
-              phone: currentClientToCreate.phone,
-              plan: currentClientToCreate.plan.id,
-              wifi_ssid: currentClientToCreate.wifi_ssid,
-              wifi_password: currentClientToCreate.wifi_password,
-              technology: currentClientToCreate.technology.id,
-              mac_address: this.activationrequests[index].mac_address,
-              nap_onu_address: this.activationrequests[index].nap_onu_address,
-              opticalPower: this.activationrequests[index].opticalPower,
-              comment: currentClientToCreate.comment
+              id: this.activationRequestsList[index].id,
+              client: {
+                id: currentClientToCreate.id,
+                code: currentClientToCreate.code,
+                name: currentClientToCreate.name,
+                dni: currentClientToCreate.dni,
+                address: currentClientToCreate.address,
+                neighborhood: currentClientToCreate.neighborhood.id,
+                city: currentClientToCreate.city.id,
+                phone: currentClientToCreate.phone,
+                plan: currentClientToCreate.plan.id,
+                wifi_ssid: currentClientToCreate.wifi_ssid,
+                wifi_password: currentClientToCreate.wifi_password,
+                technology: currentClientToCreate.technology.id,
+                mac_address: this.activationrequests[index].mac_address,
+                nap_onu_address: this.activationrequests[index].nap_onu_address,
+                opticalPower: this.activationrequests[index].opticalPower,
+                comment: currentClientToCreate.comment
+              }
             }
           }
         }).then((input) => {
-          console.log(input)
-          this.activationrequests[index].loading = !this.activationrequests[index].loading
+          this.refreshActivationRequests()
+          this.activationRequestsList[index].loading = !this.activationRequestsList[index].loading
           this.snack = true
           this.snackColor = 'info'
           this.snackText = 'Cliente aprovado'
         }).catch((error) => {
-          this.activationrequests[index].loading = !this.activationrequests[index].loading
+          this.refreshActivationRequests()
+          this.activationRequestsList[index].loading = !this.activationRequestsList[index].loading
           this.snack = true
           this.snackColor = 'red'
           this.snackText = error
         })
       }
+    },
+    mapDatatable (items) {
+      for (let i = 0; i < items.length; i++) {
+        this.$set(items[i], 'loading', false)
+      }
+      return items
     },
     can (component) {
       // eslint-disable-next-line camelcase
