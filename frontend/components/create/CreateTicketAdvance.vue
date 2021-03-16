@@ -32,8 +32,9 @@
               class="mt-4"
               label="Detalles adicionales"
             />
-            <v-switch
+            <v-checkbox
               v-model="ticketAdvance.closeTicket"
+              color="red"
               label="Cerrar Ticket?"
             />
           </v-card-text>
