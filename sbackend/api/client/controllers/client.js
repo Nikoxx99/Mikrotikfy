@@ -19,7 +19,6 @@ module.exports = {
       })
       entity = await strapi.services.client.create(newClient[0]);
       const telegrambot = await strapi.services.telegrambot.find({city: entity.city.id})
-      console.log(telegrambot)
       simpleTelegramCreate(entity, telegrambot[0])
       if (sendToMikrotik) {
         const searchCity = await strapi.services.city.find({ id: ctx.request.body.city })
@@ -78,16 +77,13 @@ module.exports = {
         mkCreateClient(mikrotikHost, plan, ctx.request.body.input, cityName, planName, neighborhoodName, technologyName)
       }
     } else {
-      const searchCity = await strapi.services.city.find({ id: ctx.request.body.input.city })
-      const searchPlan = await strapi.services.plan.find({ id: ctx.request.body.input.plan })
-      const searchNeighborhood = await strapi.services.neighborhood.find({ id: ctx.request.body.input.neighborhood })
-      const searchTechnology = await strapi.services.technology.find({ id: ctx.request.body.input.technology })
-      const mikrotikHost = searchCity[0].ip
+      const mikrotikHost = searchCity[0].ip[0]
       const plan = searchPlan[0].mikrotik_name
       const planName = searchPlan[0].name
       const cityName = searchCity[0].name
       const neighborhoodName = searchNeighborhood[0].name
       const technologyName = searchTechnology[0].name
+      console.log('this')
       mkCreateClient(mikrotikHost, plan, ctx.request.body.input, cityName, planName, neighborhoodName, technologyName)
       return true
     }
@@ -118,11 +114,7 @@ module.exports = {
         mkCreateClient(mikrotikHost, plan, ctx.request.body.input.client, cityName, planName, neighborhoodName, technologyName)
       }
     } else {
-      const searchCity = await strapi.services.city.find({ id: ctx.request.body.input.client.city })
-      const searchPlan = await strapi.services.plan.find({ id: ctx.request.body.input.client.plan })
-      const searchNeighborhood = await strapi.services.neighborhood.find({ id: ctx.request.body.input.client.neighborhood })
-      const searchTechnology = await strapi.services.technology.find({ id: ctx.request.body.input.client.technology })
-      const mikrotikHost = searchCity[0].ip
+      const mikrotikHost = searchCity[0].ip[0]
       const plan = searchPlan[0].mikrotik_name
       const planName = searchPlan[0].name
       const cityName = searchCity[0].name
