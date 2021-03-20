@@ -233,7 +233,8 @@ export default {
     this.$apollo.queries.tickets.skip = false
     await this.$apollo.queries.tickets.fetchMore({
       variables: {
-        city: this.$route.query.city
+        city: this.$route.query.city,
+        limit: 50
       },
       updateQuery: (_, { fetchMoreResult }) => {
         const newTickets = fetchMoreResult.tickets

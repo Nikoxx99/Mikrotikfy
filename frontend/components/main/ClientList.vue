@@ -19,19 +19,36 @@
         <v-card>
           <v-card-title>
             Clientes {{ cityName }}
-            <v-spacer />
-            <v-text-field
-              ref="searchClient"
-              v-model="searchClientInput"
-              prepend-icon="mdi-magnify"
-              label="Buscar Cliente"
-              single-line
-              hide-details
-              outlined
-              dense
-              class="white--text"
-            />
           </v-card-title>
+          <v-card-text>
+            <v-row
+              class="mx-1"
+            >
+              <v-spacer class="d-none d-xs-none d-sm-block d-md-block d-lg-block d-lx-block" />
+              <v-btn
+                color="blue darken-4"
+                dark
+                :loading="loadingDataTable"
+                class="mr-2"
+                style="margin-top:2px;"
+                @click="getClientBySearch()"
+              >
+                Buscar
+              </v-btn>
+              <v-text-field
+                ref="searchClient"
+                v-model="searchClientInput"
+                label="Buscar Cliente"
+                single-line
+                hide-details
+                outlined
+                dense
+                class="white--text"
+                style="max-width: 1000px"
+                @keyup.enter="getClientBySearch()"
+              />
+            </v-row>
+          </v-card-text>
           <client-only>
             <div v-if="dataTable.length < 1 && initialLoad">
               <v-skeleton-loader
@@ -628,15 +645,6 @@ export default {
     }
   },
   watch: {
-    // eslint-disable-next-line object-shorthand
-    searchClientInput: function () {
-      if (this.searchClientInput.length > 3 || !this.searchClientInput) {
-        this.debouncedGetAnswer()
-        if (!this.searchClientInput) {
-          this.clientApiCall()
-        }
-      }
-    },
     params: {
       handler () {
         if (!this.initialLoad) {
@@ -647,9 +655,9 @@ export default {
     }
   },
   async mounted () {
-    // eslint-disable-next-line no-undef
+    //eslint-disable-next-line no-undef
     this.debouncedGetAnswer = _.debounce(this.getClientBySearch, 700)
-    // eslint-disable-next-line no-undef
+    //eslint-disable-next-line no-undef
     this.debouncedGetResult = _.debounce(this.getDataFromApi, 100)
     await this.activeClientInitialCall()
     await this.popularePlans()
@@ -786,13 +794,13 @@ export default {
     async getClientBySearch () {
       this.$apollo.queries.searchClient.skip = false
       const search = this.searchClientInput
-      if (search || search.length > 3) {
+      if (search) {
         await this.$apollo.queries.searchClient.fetchMore({
           variables: {
             search,
             city: this.$route.query.city
           },
-          updateQuery: async (previousResult, { fetchMoreResult }) => {
+          updateQuery: async (_, { fetchMoreResult }) => {
             const newClients = fetchMoreResult.searchClient
             this.itemsPerPage = newClients.length
             this.totalClients = newClients.length

@@ -249,6 +249,9 @@ export default {
     this.populareRole()
     this.$apollo.queries.activationrequests.skip = false
     await this.$apollo.queries.activationrequests.fetchMore({
+      variables: {
+        limit: 50
+      },
       updateQuery: (_, { fetchMoreResult }) => {
       }
     })
