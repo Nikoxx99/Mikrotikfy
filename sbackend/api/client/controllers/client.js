@@ -309,6 +309,25 @@ module.exports = {
           ]
         })
         const n = res.map(entity => sanitizeEntity(entity, { model: strapi.models.client }));
+        const cityQueryForActiveResult = await strapi.services.city.find({ _id: city})
+        const ipArray = cityQueryForActiveResult[0].ip
+        const active = await mkActiveClientCount(ipArray)
+        n.map((client) => {
+          const ac = active.find(c => c.name == client.code)
+          if (ac) {
+            client.status = 'green'
+            return client
+          } else {
+            const ac2 = active.find(c => c.name == client.dni)
+            if (ac2) {
+              client.status = 'green'
+              return client
+            } else {
+              client.status = 'red'
+              return client
+            }
+          }
+        })
         return n
       } else {
         const res = await strapi.services.client.find({
@@ -321,6 +340,25 @@ module.exports = {
           ]
         })
         const n = res.map(entity => sanitizeEntity(entity, { model: strapi.models.client }));
+        const cityQueryForActiveResult = await strapi.services.city.find({ _id: city})
+        const ipArray = cityQueryForActiveResult[0].ip
+        const active = await mkActiveClientCount(ipArray)
+        n.map((client) => {
+          const ac = active.find(c => c.name == client.code)
+          if (ac) {
+            client.status = 'green'
+            return client
+          } else {
+            const ac2 = active.find(c => c.name == client.dni)
+            if (ac2) {
+              client.status = 'green'
+              return client
+            } else {
+              client.status = 'red'
+              return client
+            }
+          }
+        })
         return n
       }
     } else {

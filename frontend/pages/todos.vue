@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title>
-      Clientes {{ cityName }}
+      Clientes
     </v-card-title>
     <v-card-text>
       <v-row
@@ -70,11 +70,6 @@ export default {
   name: 'Test',
   data () {
     return {
-      page: 1,
-      itemsPerPage: 5,
-      pageCount: 0,
-      loadingDataTable: false,
-      options: {},
       headers: [
         { text: 'Codigo', value: 'code', sortable: false },
         { text: 'Estado', sortable: false, value: 'status' },
@@ -89,6 +84,12 @@ export default {
         { text: 'Activo', value: 'active', sortable: false },
         { text: 'Aciones', value: 'actions', sortable: false }
       ],
+      itemsPerPage: 5,
+      loadingDataTable: false,
+      options: {},
+      page: 1,
+      pageCount: 0,
+      searchClientInput: '',
       totalClients: 1000
     }
   },
@@ -108,6 +109,17 @@ export default {
   mounted () {
     const city = this.$route.query.city
     this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: 5, city })
+  },
+  methods: {
+    getClientBySearch () {
+      const city = this.$route.query.city
+      const search = this.searchClientInput
+      if (search) {
+        this.$store.dispatch('client/getUsersFromDatabaseBySearch', { search, limit: 5, city })
+      } else {
+        this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: 5, city })
+      }
+    }
   }
 }
 </script>

@@ -34,6 +34,7 @@ module.exports = {
       opticalPower: String
       newModel: Int
       active: Boolean
+      status: String
     }
     type operator {
       id: String
