@@ -283,6 +283,40 @@ module.exports.mkClientStatus = async function (mikrotikHost, code, dni, model) 
     conn.close()
   }
 }
+module.exports.mkActiveClientCount = async function (cityIpArray) {
+  if (cityIpArray.length > 1) {
+    const cityActiveClients = []
+    for (let i = 0; i < cityIpArray.length; i++) {
+      const conn = new RouterOSAPI({
+        host: cityIpArray[i],
+        user: 'API_ARNOP',
+        password: strapi.config.get('server.admin.mikrotik.secret', 'null'),
+        port: 8087
+      })
+      await conn.connect()
+      const result = await conn.write('/ppp/active/print', [
+        '=.proplist=name',
+      ])
+      conn.close()
+      cityActiveClients.push(result)
+    }
+    return cityActiveClients[0].concat(cityActiveClients[1])
+  } else {
+    console.log('here')
+    const conn = new RouterOSAPI({
+      host: cityIpArray[0],
+      user: 'API_ARNOP',
+      password: strapi.config.get('server.admin.mikrotik.secret', 'null'),
+      port: 8087
+    })
+    await conn.connect()
+    const result2 = await conn.write('/ppp/active/print', [
+      '=.proplist=name',
+    ])
+    conn.close()
+    return result2
+  }
+}
 module.exports.mkGetComment = async function (mikrotikHost, dni, code, model) {
   try {
     const conn = new RouterOSAPI({

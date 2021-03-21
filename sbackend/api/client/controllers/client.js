@@ -4,7 +4,7 @@
  * to customize this controller
  */
 const { sanitizeEntity } = require('strapi-utils');
-const { mkCreateClient, mkDeleteClient, mkSetClientPlanInformation, mkClientStatus, mkGetComment, mkSetComment, mkDxClient, simpleTelegramCreate, simpleTelegramAdminCreate, simpleTelegramDelete, simpleTelegramUpdate, simpleTelegramUpdatePlan, createComment } = require('../../../mikrotik/functions');
+const { mkCreateClient, mkDeleteClient, mkSetClientPlanInformation, mkClientStatus, mkActiveClientCount, mkGetComment, mkSetComment, mkDxClient, simpleTelegramCreate, simpleTelegramAdminCreate, simpleTelegramDelete, simpleTelegramUpdate, simpleTelegramUpdatePlan, createComment } = require('../../../mikrotik/functions');
 module.exports = {
   async create(ctx) {
     const sendToMikrotik = ctx.request.body.sendToMikrotik
@@ -426,9 +426,28 @@ module.exports = {
     if (ctx.query._q) {
       entities = await strapi.services.client.search(ctx.query);
     } else {
+      const city = await strapi.services.city.find({ _id: ctx.query.city })
+      const ipArray = city[0].ip
+      const active = await mkActiveClientCount(ipArray)
       entities = await strapi.services.client.search(ctx.query);
+      entities.map((client) => {
+        const ac = active.find(c => c.name == client.code)
+        if (ac) {
+          client.status = 'green'
+          return client
+        } else {
+          const ac2 = active.find(c => c.name == client.dni)
+          if (ac2) {
+            client.status = 'green'
+            return client
+          } else {
+            client.status = 'red'
+            return client
+          }
+        }
+      })
+      return entities.map(entity => sanitizeEntity(entity, { model: strapi.models.client }));
     }
 
-    return entities.map(entity => sanitizeEntity(entity, { model: strapi.models.client }));
   },
 };

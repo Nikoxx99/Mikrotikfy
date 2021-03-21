@@ -24,8 +24,8 @@
       "type": "string"
     },
     "client": {
-      "model": "client",
-      "via": "activationrequests"
+      "via": "activationrequests",
+      "model": "client"
     },
     "opticalPower": {
       "type": "string"

@@ -99,8 +99,11 @@
       "type": "string"
     },
     "activationrequests": {
-      "via": "client",
-      "collection": "activationrequest"
+      "collection": "activationrequest",
+      "via": "client"
+    },
+    "status": {
+      "type": "string"
     }
   }
 }
