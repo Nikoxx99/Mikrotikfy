@@ -9,6 +9,20 @@ export const mutations = {
     } catch (error) {
       throw new Error(`MUTATE ${error}`)
     }
+  },
+  updateFromModal (state, client) {
+    try {
+      state.clients[client.index].plan = client.newPlan
+    } catch (error) {
+      throw new Error(`MUTATE ${error}`)
+    }
+  },
+  setPlanToStoreFromModal (state, planInfo) {
+    try {
+      state.clients[planInfo.index].plan = planInfo.newPLan
+    } catch (error) {
+      throw new Error(`PLAN MUTATE ${error}`)
+    }
   }
 }
 export const actions = {
@@ -133,6 +147,26 @@ export const actions = {
       })
     } catch (error) {
       throw new Error(`ACTION ${error}`)
+    }
+  },
+  setPlanFromModal ({ commit }, payload) {
+    const apollo = this.app.apolloProvider.defaultClient
+    try {
+      apollo.mutate({
+        mutation: gql`mutation ($id: String, $plan: String, $isRx: Boolean, $operator: String){
+          editClientPlan(id: $id, plan: $plan, isRx: $isRx, operator: $operator)
+        }`,
+        variables: {
+          id: payload.clientId,
+          plan: payload.newPlan.id,
+          isRx: payload.isRx,
+          operator: payload.operator
+        }
+      }).then((data) => {
+        commit('updateFromModal', payload)
+      })
+    } catch (error) {
+      throw new Error(`CLIENT ACTION ${error}`)
     }
   }
 }

@@ -49,6 +49,36 @@
           mobile-breakpoint="100"
           @page-count="pageCount = $event"
         >
+          <template v-slot:item.plan.name="props">
+            <v-edit-dialog
+              :return-value.sync="props.item.plan"
+              large
+              cancel-text="Cancelar"
+              save-text="Guardar"
+              @save="savePlanFromModal(props.item._id, props.item.plan, isRx, $store.state.auth.id)"
+            >
+              <v-chip small label outlined :color="getColor(props.item.plan.id)" class="white--text">
+                {{ props.item.plan.name }}
+              </v-chip>
+              <template v-slot:input>
+                <v-select
+                  :value="props.item.plan"
+                  item-text="name"
+                  item-value="id"
+                  :items="plans"
+                  return-object
+                  single-line
+                  label="Plan"
+                  dense
+                  @change="updateFromModal(props.item._id, $event, clients.map(function(x) {return x._id; }).indexOf(props.item._id))"
+                />
+                <v-switch
+                  v-model="isRx"
+                  label="Es reconexion?"
+                />
+              </template>
+            </v-edit-dialog>
+          </template>
           <template v-slot:item.status="{ item }">
             <svg height="13" width="20">
               <circle :id="item._id" cx="10" cy="8" r="5" :fill="item.status" />
@@ -84,6 +114,7 @@ export default {
         { text: 'Activo', value: 'active', sortable: false },
         { text: 'Aciones', value: 'actions', sortable: false }
       ],
+      isRx: true,
       itemsPerPage: 5,
       loadingDataTable: false,
       options: {},
@@ -96,6 +127,9 @@ export default {
   computed: {
     clients () {
       return this.$store.state.client.clients
+    },
+    plans () {
+      return this.$store.state.plan.plans
     }
   },
   watch: {
@@ -109,6 +143,7 @@ export default {
   mounted () {
     const city = this.$route.query.city
     this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: 5, city })
+    this.$store.dispatch('plan/getPlansFromDatabase')
   },
   methods: {
     getClientBySearch () {
@@ -118,6 +153,24 @@ export default {
         this.$store.dispatch('client/getUsersFromDatabaseBySearch', { search, limit: 5, city })
       } else {
         this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: 5, city })
+      }
+    },
+    async savePlanFromModal (clientId, newPlan, isRx, operator, index) {
+      await this.$store.dispatch('client/setPlanFromModal', { clientId, newPlan, isRx, operator, index })
+    },
+    updateFromModal (clientid, newPlan, index) {
+      console.log(clientid, newPlan, index)
+      this.$store.commit('client/updateFromModal', { clientid, newPlan, index })
+    },
+    getColor (plan) {
+      if (plan === '5f52a6fe2824f015ac8ceb58') {
+        return 'blue'
+      } else if (plan === '5f52a70a2824f015ac8ceb59') {
+        return 'green'
+      } else if (plan === '5f52a7572824f015ac8ceb5e') {
+        return 'red'
+      } else if (plan === '5f52a75f2824f015ac8ceb5f') {
+        return 'black'
       }
     }
   }

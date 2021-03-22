@@ -366,6 +366,7 @@ module.exports = {
     }
   },
   async editClientPlan(ctx) {
+    console.log(ctx.request.body)
     const id = ctx.request.body.id
     const newClientPlanSearch = ctx.request.body.plan
     const isRx = ctx.request.body.isRx
