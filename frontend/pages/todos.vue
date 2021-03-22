@@ -70,7 +70,7 @@
                   single-line
                   label="Plan"
                   dense
-                  @change="updateFromModal(props.item._id, $event, clients.map(function(x) {return x._id; }).indexOf(props.item._id))"
+                  @change="updatePlanFromModal(props.item._id, $event, clients.map(function(x) {return x._id; }).indexOf(props.item._id))"
                 />
                 <v-switch
                   v-model="isRx"
@@ -155,11 +155,10 @@ export default {
         this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: 5, city })
       }
     },
-    async savePlanFromModal (clientId, newPlan, isRx, operator, index) {
-      await this.$store.dispatch('client/setPlanFromModal', { clientId, newPlan, isRx, operator, index })
+    savePlanFromModal (clientId, newPlan, isRx, operator, index) {
+      this.$store.dispatch('client/setPlanFromModal', { clientId, newPlan, isRx, operator, index })
     },
-    updateFromModal (clientid, newPlan, index) {
-      console.log(clientid, newPlan, index)
+    updatePlanFromModal (clientid, newPlan, index) {
       this.$store.commit('client/updateFromModal', { clientid, newPlan, index })
     },
     getColor (plan) {
