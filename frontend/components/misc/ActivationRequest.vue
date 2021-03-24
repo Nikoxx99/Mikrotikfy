@@ -35,31 +35,6 @@
         <v-card-title class="headline">
           Solicitar Activación de {{ item.name }}
         </v-card-title>
-        <div v-if="!loading">
-          <v-card-text>
-            <v-text-field
-              :value="item.mac_address ? item.mac_address.toUpperCase() : ''"
-              label="MAC DEL EQUIPO"
-              outlined
-              :rules="validateLengh"
-              @input="item.mac_address = $event.toUpperCase()"
-            />
-            <v-text-field
-              :value="item.nap_onu_address ? item.nap_onu_address.toUpperCase() : ''"
-              label="Dirección NAP / ONU"
-              outlined
-              :rules="validateLengh"
-              @input="item.nap_onu_address = $event.toUpperCase()"
-            />
-            <v-text-field
-              v-model="item.opticalPower"
-              label="Potencia Optica (Solo numeros)"
-              type="number"
-              :rules="validateLengh"
-              outlined
-            />
-          </v-card-text>
-        </div>
         <v-card-actions>
           <v-btn
             color="blue darken-1"
@@ -145,11 +120,8 @@ export default {
               data: {
                 active: true,
                 operator: this.$store.state.auth.id,
-                mac_address: this.item.mac_address,
                 client: this.item._id,
-                city: this.$route.query.city,
-                opticalPower: this.item.opticalPower,
-                nap_onu_address: this.item.nap_onu_address
+                city: this.$route.query.city
               }
             }
           }

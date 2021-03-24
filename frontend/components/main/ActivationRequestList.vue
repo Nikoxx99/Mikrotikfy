@@ -231,9 +231,6 @@ export default {
         { text: 'Barrio', value: 'client.neighborhood.name', width: 100 },
         { text: 'Creado Cliente', value: 'client.createdAt' },
         { text: 'Operador', sortable: false, value: 'operator.username', width: 60 },
-        { text: 'Mac', value: 'mac_address', width: 150 },
-        { text: 'Dir. NAP/ONU', value: 'nap_onu_address', width: 200 },
-        { text: 'Potencia', value: 'opticalPower', width: 70 },
         { text: 'Creada Solicitud', value: 'createdAt' },
         { text: 'Acciones', value: 'actions' }
       ],
