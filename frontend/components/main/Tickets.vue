@@ -157,7 +157,7 @@
             <v-list-item two-line>
               <v-list-item-content>
                 <v-list-item-subtitle>Detalles</v-list-item-subtitle>
-                <v-list-item-title>{{ editModalData ? editModalData.details : '' }}</v-list-item-title>
+                <p>{{ editModalData ? editModalData.details : '' }}</p>
               </v-list-item-content>
             </v-list-item>
             <v-list-item two-line>
