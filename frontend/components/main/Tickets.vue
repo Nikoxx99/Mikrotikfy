@@ -131,6 +131,8 @@
                 <v-list-item-subtitle>Tipo</v-list-item-subtitle>
                 <v-list-item-title>{{ editModalData.tickettype ? editModalData.tickettype.name : '' }}</v-list-item-title>
               </v-list-item-content>
+            </v-list-item>
+            <v-list-item two-line>
               <v-list-item-content>
                 <v-list-item-subtitle>Codigo</v-list-item-subtitle>
                 <v-list-item-title>{{ editModalData.client ? editModalData.client.code : '' }}</v-list-item-title>
