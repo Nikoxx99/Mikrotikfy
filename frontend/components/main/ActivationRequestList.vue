@@ -247,7 +247,7 @@ export default {
     this.$apollo.queries.activationrequests.skip = false
     await this.$apollo.queries.activationrequests.fetchMore({
       variables: {
-        limit: 50
+        limit: 10
       },
       updateQuery: (_, { fetchMoreResult }) => {
       }
@@ -277,17 +277,19 @@ export default {
       }
     },
     showClosed (value) {
-      const newData = []
-      this.activationrequests.map((activationrequest) => {
-        if (value === false) {
-          if (activationrequest.active) {
+      if (this.activationrequests.length > 0) {
+        const newData = []
+        this.activationrequests.map((activationrequest) => {
+          if (value === false) {
+            if (activationrequest.active) {
+              newData.push(activationrequest)
+            }
+          } else {
             newData.push(activationrequest)
           }
-        } else {
-          newData.push(activationrequest)
-        }
-      })
-      this.activationRequestsList = newData
+        })
+        this.activationRequestsList = newData
+      }
     },
     getDate (date) {
       const dateObject = new Date(date)
