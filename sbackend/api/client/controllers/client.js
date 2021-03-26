@@ -91,6 +91,8 @@ module.exports = {
   },
   async adminCreateFromRequest(ctx) {
     const id = ctx.request.body.input.id
+    const id_client = ctx.request.body.input.client.id
+    const entity = await strapi.services.client.update({ id: id_client }, { 'active': true })
     await strapi.services.activationrequest.update({ id }, { 'active': false })
     const searchCity = await strapi.services.city.find({ id: ctx.request.body.input.client.city })
     const searchPlan = await strapi.services.plan.find({ id: ctx.request.body.input.client.plan })
