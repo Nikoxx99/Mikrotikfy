@@ -49,6 +49,118 @@
           mobile-breakpoint="100"
           @page-count="pageCount = $event"
         >
+          <template v-slot:top>
+            <v-toolbar flat>
+              <v-dialog v-model="createDialog" max-width="1150px" :retain-focus="false">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    v-if="can('CreateForm')"
+                    color="blue darken-4"
+                    dark
+                    class="mr-4"
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    <v-icon>mdi-plus</v-icon>
+                    Nuevo Cliente
+                  </v-btn>
+                  <v-text-field
+                    :value="options.itemsPerPage"
+                    label="Clientes por Pagina"
+                    type="number"
+                    min="5"
+                    max="50"
+                    width="80px"
+                    hide-details
+                    @input="options.itemsPerPage = parseInt($event, 10)"
+                  />
+                  <v-spacer />
+                  <v-chip
+                    color="white white--text"
+                    small
+                    outlined
+                    label
+                    class="mr-4"
+                  >
+                    En Linea: {{ activeClients }}
+                  </v-chip>
+                  <v-chip
+                    color="green darken-3 white--text"
+                    small
+                    label
+                    outlined
+                    class="mr-4 d-none d-md-flex d-lg-flex d-xl-flex"
+                  >
+                    Activos:
+                  </v-chip>
+                  <v-chip
+                    color="red lighten-1 white--text"
+                    small
+                    outlined
+                    label
+                    class="mr-4 d-none d-md-flex d-lg-flex d-xl-flex"
+                  >
+                    En Mora:
+                  </v-chip>
+                  <v-chip
+                    color="primary"
+                    small
+                    outlined
+                    label
+                    class="mr-4 d-none d-sm-flex d-md-flex d-lg-flex d-xl-flex"
+                  >
+                    Totales:
+                  </v-chip>
+                  <v-tooltip bottom>
+                    <!-- eslint-disable -->
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn
+                        v-bind="attrs"
+                        color="blue darken-4"
+                        dark
+                        class="mr-4"
+                        :disabled="refreshLoading"
+                        :loading="refreshLoading"
+                        v-on="on"
+                        @click="activeClients(true)"
+                      >
+                        <v-icon>mdi-reload</v-icon>
+                      </v-btn>
+                    </template>
+                    <span>Refrescar Estado</span>
+                  </v-tooltip>
+                </template>
+                <v-card>
+                  <v-card-title>
+                    <v-toolbar
+                      dark
+                    >
+                      <v-btn
+                        icon
+                        dark
+                        @click="createDialog = false"
+                      >
+                        <v-icon>mdi-close</v-icon>
+                      </v-btn>
+                      <v-toolbar-title><span class="headline">Crear Cliente en</span></v-toolbar-title>
+                    </v-toolbar>
+                  </v-card-title>
+                  <v-card-text>
+                    <v-container>
+                      <CreateForm
+                        v-if="createDialog"
+                        :citycolor="'blue'"
+                        :role="role.name"
+                        @createClient="createClient($event)"
+                        @createClientDialog="createClientDialog($event)"
+                        @createClientSnack="createClientSnack($event)"
+                      />
+                    </v-container>
+                  </v-card-text>
+                </v-card>
+              </v-dialog>
+            </v-toolbar>
+          </template>
           <template v-slot:item.plan.name="props">
             <v-edit-dialog
               :return-value.sync="props.item.plan"
@@ -84,22 +196,121 @@
               <circle :id="item._id" cx="10" cy="8" r="5" :fill="item.status" />
             </svg>
           </template>
+          <template v-slot:item.technology.name="{ item }">
+            <span :class="getTechnology(item.technology.id) + '--text'">
+              {{ item.technology.name }}
+            </span>
+          </template>
+          <template v-slot:item.newModel="{ item }">
+            <svg height="13" width="20">
+              <circle cx="10" cy="8" r="5" :fill="getModel(item.newModel)" />
+            </svg>
+          </template>
+          <template v-slot:item.active="props">
+            <v-tooltip v-if="can('CreateForm')" left>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  :color="props.item.active ? 'green darken-3' : 'red darken-3'"
+                  dark
+                  small
+                  :loading="props.item.loading"
+                  v-bind="attrs"
+                  text
+                  v-on="on"
+                  @click="updateStatus(props.item, clients.map(function(x) {return x._id; }).indexOf(props.item._id))"
+                >
+                  <v-icon>mdi-{{ props.item.active ? 'check' : 'close' }} {{ props.index }}</v-icon>
+                </v-btn>
+              </template>
+              <span>Activar Cliente</span>
+            </v-tooltip>
+            <ActivationRequest
+              :item="props.item"
+              :allowed-components="allowedComponents"
+            />
+          </template>
+          <template v-slot:item.actions="{ item }">
+            <div style="white-space:nowrap">
+              <CreateTicket
+                v-if="can('CreateTicket')"
+                :name="item.name"
+                :city="item.city.id"
+                :assignated="$store.state.auth.id"
+                :clientid="item._id"
+                :role="allowedComponents"
+              />
+              <TicketHistory
+                :clientid="item._id"
+                :name="item.name"
+              />
+              <ClientStatus
+                v-if="can('ClientStatus')"
+                :name="item.name"
+                :clientid="item._id"
+                :code="item.code"
+                :role="allowedComponents"
+              />
+              <EditForm
+                v-if="can('EditForm')"
+                :item="item"
+                :editIndex="clients.indexOf(item)"
+                :clients="clients"
+                :role="allowedComponents"
+                @updateComment="updateComment($event)"
+              />
+              <DeleteClient v-if="can('DeleteClient')" :name="item.name" :clientid="item._id" />
+            </div>
+          </template>
         </v-data-table>
       </client-only>
-      <v-pagination
-        v-model="page"
-        :length="pageCount"
-      />
+      <v-row>
+        <v-col cols="12" sm="8" md="10" lg="11" style="max-width:90%;margin:auto;">
+          <v-pagination
+            v-model="page"
+            :length="pageCount"
+          />
+        </v-col>
+      </v-row>
     </v-card-text>
+    <v-snackbar
+      v-model="snack"
+      :timeout="1000"
+      :color="snackColor"
+      bottom
+      vertical
+    >
+      {{ snackText }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn v-bind="attrs" text @click="snack = false">
+          Cerrar
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-card>
 </template>
 
 <script>
-
+import EditForm from '../components/edit/EditForm'
+import DeleteClient from '../components/delete/DeleteClient'
+import ClientStatus from '../components/main/ClientStatus'
+import CreateTicket from '../components/create/CreateTicket'
+import TicketHistory from '../components/misc/TicketHistory'
+import CreateForm from '../components/create/CreateForm'
 export default {
   name: 'Test',
+  components: {
+    CreateForm,
+    EditForm,
+    DeleteClient,
+    ClientStatus,
+    CreateTicket,
+    TicketHistory
+  },
   data () {
     return {
+      allowedComponents: [],
+      createDialog: false,
       headers: [
         { text: 'Codigo', value: 'code', sortable: false },
         { text: 'Estado', sortable: false, value: 'status' },
@@ -120,7 +331,11 @@ export default {
       options: {},
       page: 1,
       pageCount: 0,
+      refreshLoading: false,
       searchClientInput: '',
+      snack: false,
+      snackColor: '',
+      snackText: '',
       totalClients: 1000
     }
   },
@@ -130,6 +345,12 @@ export default {
     },
     plans () {
       return this.$store.state.plan.plans
+    },
+    role () {
+      return this.$store.state.role.roles
+    },
+    activeClients () {
+      return this.$store.state.count.clientCount[0]
     }
   },
   watch: {
@@ -142,17 +363,19 @@ export default {
   },
   mounted () {
     const city = this.$route.query.city
-    this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: 5, city })
+    this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: this.itemsPerPage, city })
     this.$store.dispatch('plan/getPlansFromDatabase')
+    this.$store.dispatch('role/getRolesFromDatabase', this.$store.state.auth.role)
+    this.$store.dispatch('count/activeClients', this.$route.query.city)
   },
   methods: {
     getClientBySearch () {
       const city = this.$route.query.city
       const search = this.searchClientInput
       if (search) {
-        this.$store.dispatch('client/getUsersFromDatabaseBySearch', { search, limit: 5, city })
+        this.$store.dispatch('client/getUsersFromDatabaseBySearch', { search, city })
       } else {
-        this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: 5, city })
+        this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: this.itemsPerPage, city })
       }
     },
     savePlanFromModal (clientId, newPlan, isRx, operator, index) {
@@ -170,6 +393,48 @@ export default {
         return 'red'
       } else if (plan === '5f52a75f2824f015ac8ceb5f') {
         return 'black'
+      }
+    },
+    getModel (model) {
+      if (model === 0) {
+        return 'grey'
+      } else if (model === 1) {
+        return 'cyan'
+      }
+    },
+    getTechnology (technology) {
+      if (technology === '5f832eadb0c43e2c64b3743b') {
+        return 'cyan'
+      } else if (technology === '5f832ea7b0c43e2c64b3743a') {
+        return 'green'
+      }
+    },
+    createClient (client) {
+      Object.assign(this.dataTable[0], client)
+    },
+    createClientDialog (value) {
+      this.createDialog = false
+    },
+    createClientSnack (value) {
+      this.snack = value
+      this.snackText = 'Cliente creado con éxito!'
+      this.snackColor = 'info'
+    },
+    can (component) {
+      if (this.role.allowed_components) {
+        const allowedComponents = this.role.allowed_components.map((c) => {
+          return c.name
+        })
+        const currentComponent = component
+        const res = allowedComponents.includes(currentComponent)
+        return res
+      }
+    },
+    updateStatus (client, index) {
+      if (client.active === true) {
+        this.$store.dispatch('client/adminDelete', { client, index })
+      } else {
+        this.$store.dispatch('client/adminCreate', { client, index })
       }
     }
   }

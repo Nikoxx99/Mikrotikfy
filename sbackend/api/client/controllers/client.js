@@ -83,7 +83,6 @@ module.exports = {
       const cityName = searchCity[0].name
       const neighborhoodName = searchNeighborhood[0].name
       const technologyName = searchTechnology[0].name
-      console.log('this')
       mkCreateClient(mikrotikHost, plan, ctx.request.body.input, cityName, planName, neighborhoodName, technologyName)
       return true
     }
@@ -484,6 +483,17 @@ module.exports = {
             return client
           }
         }
+        // for(let i = 0; i < active.length; i++){
+        //   if (client.code == active[i].name){
+        //     console.log('green1')
+        //     client.status = 'green'
+        //   } else if (client.dni == active[i].name) {
+        //     console.log('green2')
+        //     client.status = 'green'
+        //   } else {
+        //     client.status = 'red'
+        //   }
+        // }
       })
       return entities.map(entity => sanitizeEntity(entity, { model: strapi.models.client }));
     }

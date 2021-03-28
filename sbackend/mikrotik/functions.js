@@ -294,7 +294,7 @@ module.exports.mkActiveClientCount = async function (cityIpArray) {
         port: 8087
       })
       await conn.connect()
-      const result = await conn.write('/ppp/active/print', [
+      const result = await conn.write('/ppp/active/getall', [
         '=.proplist=name',
       ])
       conn.close()
@@ -302,14 +302,15 @@ module.exports.mkActiveClientCount = async function (cityIpArray) {
     }
     return cityActiveClients[0].concat(cityActiveClients[1])
   } else {
-    console.log('here')
     const conn = new RouterOSAPI({
       host: cityIpArray[0],
       user: 'API_ARNOP',
       password: strapi.config.get('server.admin.mikrotik.secret', 'null'),
       port: 8087
     })
+    console.time('mkfind')
     await conn.connect()
+    console.timeEnd('mkfind')
     const result2 = await conn.write('/ppp/active/print', [
       '=.proplist=name',
     ])

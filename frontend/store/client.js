@@ -23,6 +23,14 @@ export const mutations = {
     } catch (error) {
       throw new Error(`PLAN MUTATE ${error}`)
     }
+  },
+  adminToggle (state, { client, index }) {
+    try {
+      console.log(client)
+      state.clients[index].active = !client.active
+    } catch (error) {
+      throw new Error(`ADMINTOGGLE MUTATE ${error}`)
+    }
   }
 }
 export const actions = {
@@ -163,10 +171,61 @@ export const actions = {
           operator: payload.operator
         }
       }).then((data) => {
-        commit('updateFromModal', payload)
+        commit('updateFromModal', data)
       })
     } catch (error) {
       throw new Error(`CLIENT ACTION ${error}`)
+    }
+  },
+  adminCreate ({ commit }, { client, index }) {
+    const apollo = this.app.apolloProvider.defaultClient
+    try {
+      apollo.mutate({
+        mutation: gql`mutation ($input: adminCreateInput){
+          adminCreate(input: $input)
+        }`,
+        variables: {
+          input: {
+            id: client._id,
+            code: client.code,
+            name: client.name,
+            dni: client.dni,
+            address: client.address,
+            neighborhood: client.neighborhood.id,
+            city: client.city.id,
+            phone: client.phone,
+            plan: client.plan.id,
+            wifi_ssid: client.wifi_ssid,
+            wifi_password: client.wifi_password,
+            technology: client.technology.id,
+            mac_address: client.mac_address,
+            comment: client.comment
+          }
+        }
+      }).then((client) => {
+        commit('adminToggle', { client, index })
+      })
+    } catch (error) {
+      throw new Error(`ADMINCREATE ACTION ${error}`)
+    }
+  },
+  adminDelete ({ commit }, { client, index }) {
+    const apollo = this.app.apolloProvider.defaultClient
+    try {
+      apollo.mutate({
+        mutation: gql`mutation ($input: adminDeleteInput){
+          adminDelete(input: $input)
+        }`,
+        variables: {
+          input: {
+            id: client._id
+          }
+        }
+      }).then(() => {
+        commit('adminToggle', { client, index })
+      })
+    } catch (error) {
+      throw new Error(`ADMINDELETE ACTION ${error}`)
     }
   }
 }
