@@ -91,7 +91,7 @@
                     outlined
                     class="mr-4 d-none d-md-flex d-lg-flex d-xl-flex"
                   >
-                    Activos:
+                    Activos: {{ clientCountActive }}
                   </v-chip>
                   <v-chip
                     color="red lighten-1 white--text"
@@ -100,7 +100,7 @@
                     label
                     class="mr-4 d-none d-md-flex d-lg-flex d-xl-flex"
                   >
-                    En Mora:
+                    En Mora: {{ clientCountDisable }}
                   </v-chip>
                   <v-chip
                     color="primary"
@@ -109,7 +109,7 @@
                     label
                     class="mr-4 d-none d-sm-flex d-md-flex d-lg-flex d-xl-flex"
                   >
-                    Totales:
+                    Totales: {{ clientCount }}
                   </v-chip>
                   <v-tooltip bottom>
                     <!-- eslint-disable -->
@@ -350,7 +350,16 @@ export default {
       return this.$store.state.role.roles
     },
     activeClients () {
-      return this.$store.state.count.clientCount[0]
+      return this.$store.state.count.clientCount.active
+    },
+    clientCount () {
+      return this.$store.state.count.clientCount.clientCount
+    },
+    clientCountActive () {
+      return this.$store.state.count.clientCount.clientCountActive
+    },
+    clientCountDisable () {
+      return this.$store.state.count.clientCount.clientCountDisable
     }
   },
   watch: {
@@ -367,6 +376,9 @@ export default {
     this.$store.dispatch('plan/getPlansFromDatabase')
     this.$store.dispatch('role/getRolesFromDatabase', this.$store.state.auth.role)
     this.$store.dispatch('count/activeClients', this.$route.query.city)
+    this.$store.dispatch('count/clientCount', this.$route.query.city)
+    this.$store.dispatch('count/clientCountActive', this.$route.query.city)
+    this.$store.dispatch('count/clientCountDisable', this.$route.query.city)
   },
   methods: {
     getClientBySearch () {
