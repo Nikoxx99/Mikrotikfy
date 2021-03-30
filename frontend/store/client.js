@@ -35,63 +35,11 @@ export const mutations = {
 }
 export const actions = {
   async getUsersFromDatabase ({ commit }, payload) {
+    const { city, start, limit } = payload
     try {
-      const apollo = await this.app.apolloProvider.defaultClient
-      apollo.query({
-        query: gql`query ($limit: Int, $start: Int, $city: String){
-          clients (start: $start, limit: $limit, sort: "createdAt:desc", where: {city: $city}){
-            _id
-            code
-            name
-            dni
-            address
-            neighborhood{
-              id
-              name
-            }
-            city{
-              id
-              name
-              ip
-            }
-            phone
-            plan{
-              id
-              name
-            }
-            technology{
-              id
-              name
-            }
-            wifi_ssid
-            wifi_password
-            mac_address
-            comment
-            createdAt
-            updatedAt
-            operator {
-              id
-              username
-            }
-            hasRepeater
-            newModel
-            nap_onu_address
-            opticalPower
-            active
-            status
-          }
-        }`,
-        variables: {
-          city: payload.city,
-          start: payload.start,
-          limit: payload.limit
-        }
-      }).then((input) => {
-        commit('getUsersFromDatabase', input.data.clients)
-      }).catch((error) => {
-        // eslint-disable-next-line no-console
-        console.error(error)
-      })
+      const clients = await this.$axios.$get(`http://localhost:1337/clients?city=${city}&_limit=${limit}&_start=${start}`)
+      console.log(clients)
+      commit('getUsersFromDatabase', clients)
     } catch (error) {
       throw new Error(`ACTION ${error}`)
     }
