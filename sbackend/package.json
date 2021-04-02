@@ -13,14 +13,14 @@
   "dependencies": {
     "dotenv": "^8.2.0",
     "node-fetch": "^2.6.1",
-    "node-routeros": "^1.6.8",
-    "strapi": "3.2.3",
+    "node-routeros": "^1.6.9",
+    "strapi": "3.5.4",
     "strapi-admin": "3.2.3",
     "strapi-connector-mongoose": "3.2.3",
     "strapi-plugin-content-manager": "3.2.5",
     "strapi-plugin-content-type-builder": "3.2.5",
     "strapi-plugin-email": "3.2.3",
-    "strapi-plugin-graphql": "^3.2.3",
+    "strapi-plugin-graphql": "^3.5.4",
     "strapi-plugin-upload": "3.2.3",
     "strapi-plugin-users-permissions": "3.2.3",
     "strapi-utils": "3.2.3"
