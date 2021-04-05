@@ -63,8 +63,9 @@
               hide-default-footer
               mobile-breakpoint="100"
               @page-count="pageCount = $event"
+              @click:row="showTicketInfo"
             >
-              <template v-slot:item.actions="props">
+              <template v-if="isDesktop" v-slot:item.actions="props">
                 <ClientStatus
                     v-if="can('ClientStatus')"
                     :name="props.item.client.name"
@@ -101,6 +102,105 @@
         </v-card>
       </v-col>
     </v-row>
+    <v-dialog
+      v-if="!isDesktop"
+      v-model="infoModal"
+      fullscreen
+      hide-overlay
+      transition="dialog-bottom-transition"
+    >
+      <v-card>
+        <v-toolbar
+          dark
+        >
+          <v-btn
+            icon
+            dark
+            @click="infoModal = false"
+          >
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-toolbar>
+        <v-card-title>
+          Información de Ticket  
+        </v-card-title>
+        <v-card-text>
+          <v-list rounded>
+            <v-list-item two-line>
+              <v-list-item-content>
+                <v-list-item-subtitle>Tipo</v-list-item-subtitle>
+                <v-list-item-title>{{ editModalData.tickettype ? editModalData.tickettype.name : '' }}</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item two-line>
+              <v-list-item-content>
+                <v-list-item-subtitle>Codigo</v-list-item-subtitle>
+                <v-list-item-title>{{ editModalData.client ? editModalData.client.code : '' }}</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item two-line>
+              <v-list-item-content>
+                <v-list-item-subtitle>Cliente</v-list-item-subtitle>
+                <v-list-item-title>{{ editModalData.client ? editModalData.client.name : '' }}</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item two-line>
+              <v-list-item-content>
+                <v-list-item-subtitle>Direccion</v-list-item-subtitle>
+                <v-list-item-title>{{ editModalData.client ? editModalData.client.address : '' }}</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item two-line>
+              <v-list-item-content>
+                <v-list-item-subtitle>Barrio</v-list-item-subtitle>
+                <v-list-item-title>{{ editModalData.client ? editModalData.client.neighborhood.name : '' }}</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item two-line>
+              <v-list-item-content>
+                <v-list-item-subtitle>Detalles</v-list-item-subtitle>
+                <p>{{ editModalData ? editModalData.details : '' }}</p>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item two-line>
+              <v-list-item-content>
+                <v-list-item-subtitle>Reporto</v-list-item-subtitle>
+                <v-list-item-title>{{ editModalData.assiganted ? editModalData.assiganted.username : '' }}</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item two-line>
+              <v-list-item-content>
+                <v-list-item-subtitle>Creado en</v-list-item-subtitle>
+                <v-list-item-title>{{ editModalData ? editModalData.createdAt : '' }}</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-content v-if="editModalData.client !== undefined">
+                <div style="white-space:nowrap">
+                  <ClientStatus
+                      v-if="can('ClientStatus')"
+                      :name="editModalData.client.name"
+                      :clientid="editModalData.client.id"
+                      :code="editModalData.client.code"
+                      :role="allowed_components"
+                    />
+                  <CreateTicketAdvance
+                    :editindex="tickets ? tickets.indexOf(editModalData.id) : ''"
+                    :ticketid="editModalData.id"
+                    :name="editModalData.client.name"
+                    @updateTicketStatus="updateTicketStatus($event)"
+                  />
+                  <TicketAdvanceHistory
+                    :ticketid="editModalData.id"
+                    :name="editModalData.client.name3"
+                  />
+                </div>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
     <v-snackbar
       v-model="snack"
       :timeout="3000"
@@ -135,8 +235,8 @@ export default {
     tickets () {
       return {
         query: gql`
-        query($city: String){
-          tickets(where: {
+        query($city: String, $limit: Int){
+          tickets(limit: $limit, sort:"createdAt:desc",where: {
             city:$city
           }){
             id
@@ -163,7 +263,8 @@ export default {
         }
       `,
         variables: {
-          city: this.$route.query.city
+          city: this.$route.query.city,
+          limit: 30
         },
         skip () {
           return true
@@ -207,18 +308,21 @@ export default {
       initialLoading: false,
       showClosedValue: false,
       refreshLoading: false,
+      isDesktop: false,
+      editModalData: {},
+      infoModal: false,
       headers: [
         { text: 'Estado', sortable: true, value: 'active', width: '5%' },
-        { text: 'Codigo', sortable: true, value: 'client.code', width: 60 },
+        { text: 'Codigo', sortable: true, value: 'client.code', width: 60, align: ' d-none d-lg-table-cell' },
         { text: 'Cliente', sortable: true, value: 'client.name', width: 150 },
-        { text: 'Dirección', sortable: true, value: 'client.address', width: 200 },
-        { text: 'Barrio', sortable: true, value: 'client.neighborhood.name', width: 100 },
-        { text: 'Telefono', sortable: true, value: 'client.phone', width: 100 },
+        { text: 'Dirección', sortable: true, value: 'client.address', width: 200, align: ' d-none d-lg-table-cell' },
+        { text: 'Barrio', sortable: true, value: 'client.neighborhood.name', width: 100, align: ' d-none d-lg-table-cell' },
+        { text: 'Telefono', sortable: true, value: 'client.phone', width: 100, align: ' d-none d-lg-table-cell' },
         { text: 'Tipo', sortable: true, value: 'tickettype.name', width: 150 },
-        { text: 'Operador', sortable: false, value: 'assiganted.username', width: 60 },
-        { text: 'Detalles', sortable: true, value: 'details', width: 400 },
-        { text: 'Creado', sortable: true, value: 'createdAt' },
-        { text: 'Acciones', sortable: true, value: 'actions' }
+        { text: 'Operador', sortable: false, value: 'assiganted.username', width: 60, align: ' d-none d-lg-table-cell' },
+        { text: 'Detalles', sortable: true, value: 'details', width: 400, align: ' d-none d-lg-table-cell' },
+        { text: 'Creado', sortable: true, value: 'createdAt', align: ' d-none d-lg-table-cell' },
+        { text: 'Acciones', sortable: true, value: 'actions', align: ' d-none d-lg-table-cell' }
       ],
       States: [{ name: 'Abierto', value: true }, { name: 'Cerrado', value: false }],
       snack: false,
@@ -230,11 +334,12 @@ export default {
   },
   async mounted () {
     this.populareRole()
+    this.getResolution()
     this.$apollo.queries.tickets.skip = false
     await this.$apollo.queries.tickets.fetchMore({
       variables: {
         city: this.$route.query.city,
-        limit: 50
+        limit: 30
       },
       updateQuery: (_, { fetchMoreResult }) => {
         const newTickets = fetchMoreResult.tickets
@@ -256,7 +361,8 @@ export default {
       this.refreshLoading = true
       await this.$apollo.queries.tickets.fetchMore({
         variables: {
-          id: this.$route.query.city
+          id: this.$route.query.city,
+          limit: 30
         },
         updateQuery: (_, { fetchMoreResult }) => {
           const newTickets = fetchMoreResult.tickets
@@ -271,9 +377,9 @@ export default {
         this.tickets[value.editindex].active = !value.closeTicket
       }
     },
-    showClosed (value) {
+    async showClosed (value) {
       const newData = []
-      this.tickets.map((ticket) => {
+      await this.tickets.map((ticket) => {
         if (value === false) {
           if (ticket.active) {
             newData.push(ticket)
@@ -302,6 +408,20 @@ export default {
       } else {
         return 'Cerrado'
       }
+    },
+    getResolution () {
+      const res = window.innerWidth
+      if (res > 800) {
+        const clientRes = true
+        this.isDesktop = clientRes
+      } else {
+        const clientRes = false
+        this.isDesktop = clientRes
+      }
+    },
+    showTicketInfo (value) {
+      Object.assign(this.editModalData, value)
+      this.infoModal = true
     },
     async populareRole () {
       if (this.localStorageHandler('role', 'count')) {

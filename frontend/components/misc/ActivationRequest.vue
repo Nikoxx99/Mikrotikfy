@@ -35,31 +35,6 @@
         <v-card-title class="headline">
           Solicitar Activación de {{ item.name }}
         </v-card-title>
-        <div v-if="!loading">
-          <v-card-text>
-            <v-text-field
-              :value="item.mac_address ? item.mac_address.toUpperCase() : ''"
-              label="MAC DEL EQUIPO"
-              outlined
-              :rules="validateLengh"
-              @input="item.mac_address = $event.toUpperCase()"
-            />
-            <v-text-field
-              :value="item.nap_onu_address ? item.nap_onu_address.toUpperCase() : ''"
-              label="Dirección NAP / ONU"
-              outlined
-              :rules="validateLengh"
-              @input="item.nap_onu_address = $event.toUpperCase()"
-            />
-            <v-text-field
-              v-model="item.opticalPower"
-              label="Potencia Optica (Solo numeros)"
-              type="number"
-              :rules="validateLengh"
-              outlined
-            />
-          </v-card-text>
-        </div>
         <v-card-actions>
           <v-btn
             color="blue darken-1"
@@ -126,51 +101,43 @@ export default {
   },
   methods: {
     createActivationrequest () {
-      if (!this.item.mac_address || !this.item.opticalPower || !this.item.nap_onu_address) {
-        this.error = true
-        this.errorMessage = 'Debes llenar todos los campos'
-      } else {
-        this.$apollo.mutate({
-          mutation: gql`mutation ($input: createActivationrequestInput){
-            createActivationrequest(input: $input){
-              activationrequest{
-                client{
-                  _id
-                }
-              }
-            }
-          }`,
-          variables: {
-            input: {
-              data: {
-                active: true,
-                operator: this.$store.state.auth.id,
-                mac_address: this.item.mac_address,
-                client: this.item._id,
-                city: this.$route.query.city,
-                opticalPower: this.item.opticalPower,
-                nap_onu_address: this.item.nap_onu_address
+      this.$apollo.mutate({
+        mutation: gql`mutation ($input: createActivationrequestInput){
+          createActivationrequest(input: $input){
+            activationrequest{
+              client{
+                _id
               }
             }
           }
-        }).then((input) => {
-          if (input.data.createActivationrequest.activationrequest.client._id) {
-            this.modal = false
-            this.error = false
-            this.snack = true
-            this.snackText = 'Solicitud enviada correctamente!'
-            this.snackColor = 'cyan'
-          } else {
-            this.snack = true
-            this.snackText = 'Error desconocido, reporta esto a nico'
-            this.snackColor = 'red'
+        }`,
+        variables: {
+          input: {
+            data: {
+              active: true,
+              operator: this.$store.state.auth.id,
+              client: this.item._id,
+              city: this.$route.query.city
+            }
           }
-        }).catch((error) => {
+        }
+      }).then((input) => {
+        if (input.data.createActivationrequest.activationrequest.client._id) {
+          this.modal = false
+          this.error = false
           this.snack = true
-          this.snackText = 'Error de conexion, recarga la pagina o verifica que tienes internet' + error
+          this.snackText = 'Solicitud enviada correctamente!'
+          this.snackColor = 'cyan'
+        } else {
+          this.snack = true
+          this.snackText = 'Error desconocido, reporta esto a nico'
           this.snackColor = 'red'
-        })
-      }
+        }
+      }).catch((error) => {
+        this.snack = true
+        this.snackText = 'Error de conexion, recarga la pagina o verifica que tienes internet' + error
+        this.snackColor = 'red'
+      })
     },
     can (component) {
       const allowedComponents = this.allowedComponents
