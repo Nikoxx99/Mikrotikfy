@@ -1,12 +1,12 @@
 <template>
   <v-card>
-    <v-card-title>
-      Clientes
-    </v-card-title>
     <v-card-text>
       <v-row
         class="mx-1"
       >
+        <h2 class="white--text">
+          Clientes {{ currentCity ? currentCity.name : '' }}
+        </h2>
         <v-spacer class="d-none d-xs-none d-sm-block d-md-block d-lg-block d-lx-block" />
         <v-btn
           color="blue darken-4"
@@ -226,7 +226,7 @@
             </v-tooltip>
             <ActivationRequest
               :item="props.item"
-              :allowed-components="allowedComponents"
+              :allowed-components="role.allowed_components"
             />
           </template>
           <template v-slot:item.actions="{ item }">
@@ -347,6 +347,10 @@ export default {
     cities () {
       return this.$store.state.city.cities
     },
+    currentCity () {
+      // eslint-disable-next-line eqeqeq
+      return this.$store.state.city.cities.find(c => c.id == this.$route.query.city)
+    },
     plans () {
       return this.$store.state.plan.plans
     },
@@ -465,6 +469,34 @@ export default {
       } else {
         this.$store.dispatch('client/adminCreate', { client, index })
       }
+    }
+  },
+  head () {
+    return {
+      title: this.currentCity ? this.currentCity.name + ' API' : '' + 'ARNOP API',
+      meta: [
+        { hid: 'language', name: 'language', content: 'es' },
+        { hid: 'audience', name: 'audience', content: 'all' },
+        { hid: 'rating', name: 'rating', content: 'general' },
+        { hid: 'distribution', name: 'distribution', content: 'global' },
+        { hid: 'document-type', name: 'document-type', content: 'Public' },
+        { hid: 'MSSmartTagsPreventParsing', name: 'MSSmartTagsPreventParsing', content: 'true' },
+        { hid: 'robots', name: 'robots', content: 'all' },
+        { hid: 'robots', name: 'robots', content: 'all, index, follow' },
+        { hid: 'googlebot', name: 'googlebot', content: 'all, index, follow' },
+        { hid: 'yahoo-slurp', name: 'yahoo-slurp', content: 'all, index, follow' },
+        { hid: 'msnbot', name: 'msnbot', content: 'index, follow' },
+        { hid: 'googlebot-image', name: 'googlebot-image', content: 'all' },
+        { hid: 'title', name: 'title', content: this.title },
+        { hid: 'og:title', property: 'og:title', content: this.title },
+        { hid: 'og:description', property: 'og:description', content: 'ARNOProducciones - Base de datos interactiva' },
+        { hid: 'author', name: 'author', content: 'Nicolas Echeverry' }
+      ],
+      script: [
+        {
+          src: 'https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js'
+        }
+      ]
     }
   }
 }
