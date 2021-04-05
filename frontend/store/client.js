@@ -26,10 +26,16 @@ export const mutations = {
   },
   adminToggle (state, { client, index }) {
     try {
-      console.log(client)
       state.clients[index].active = !client.active
     } catch (error) {
       throw new Error(`ADMINTOGGLE MUTATE ${error}`)
+    }
+  },
+  updateClient (state, { client, index }) {
+    try {
+      state.clients[index] = client
+    } catch (error) {
+      throw new Error(`UPDATE CLIENT MUTATE ${error}`)
     }
   }
 }
@@ -226,6 +232,49 @@ export const actions = {
       })
     } catch (error) {
       throw new Error(`ADMINDELETE ACTION ${error}`)
+    }
+  },
+  updateClient ({ commit }, { client, index }) {
+    const apollo = this.app.apolloProvider.defaultClient
+    try {
+      apollo.mutate({
+        mutation: gql`mutation ($input: updateClientInput){
+          updateClient(input: $input){
+            client{
+              id
+            }
+          }
+        }`,
+        variables: {
+          input: {
+            where: {
+              id: client._id
+            },
+            data: {
+              code: client.code,
+              name: client.name,
+              dni: client.dni,
+              address: client.address,
+              neighborhood: client.neighborhood.id,
+              phone: client.phone,
+              plan: client.plan.id,
+              technology: client.technology.id,
+              wifi_ssid: client.wifi_ssid,
+              wifi_password: client.wifi_password,
+              mac_address: client.mac_address,
+              comment: client.comment,
+              hasRepeater: client.hasRepeater,
+              nap_onu_address: client.nap_onu_address,
+              opticalPower: client.opticalPower,
+              newModel: client.newModel
+            }
+          }
+        }
+      }).then((_) => {
+        commit('updateClient', { client, index })
+      })
+    } catch (error) {
+      throw new Error(`UPDATE USER ACTION ${error}`)
     }
   }
 }

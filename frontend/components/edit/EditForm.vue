@@ -40,11 +40,11 @@
             >
               {{ createdMessage }}
             </v-alert>
-            <v-form v-model="valid">
+            <v-form ref="editForm" v-model="valid">
               <v-row>
                 <v-col>
                   <v-text-field
-                    v-model="item.code"
+                    v-model="editClient.code"
                     :disabled="!can('EditFormCode')"
                     type="number"
                     label="Codigo"
@@ -56,7 +56,7 @@
                 </v-col>
                 <v-col>
                   <v-text-field
-                    v-model="item.dni"
+                    :value="editClient.dni"
                     :disabled="!can('EditFormDni')"
                     type="number"
                     label="Cedula"
@@ -68,7 +68,7 @@
                 </v-col>
               </v-row>
               <v-text-field
-                :value="item.name ? item.name.toUpperCase() : ''"
+                :value="editClient.name ? editClient.name.toUpperCase() : ''"
                 :disabled="!can('EditFormName')"
                 label="Nombre Completo"
                 required
@@ -76,22 +76,23 @@
                 dense
                 hide-details
                 class="pb-3"
-                @input="item.name = $event.toUpperCase()"
+                @input="editClient.name = $event.toUpperCase()"
               />
               <v-row>
                 <v-col cols="6" lg="3" md="3">
                   <v-text-field
-                    v-model="item.address"
+                    :value="editClient.address ? editClient.address.toUpperCase() : ''"
                     :disabled="!can('EditFormAddress')"
                     label="Direccion"
                     outlined
                     dense
                     hide-details
+                    @input="editClient.address = $event.toUpperCase()"
                   />
                 </v-col>
                 <v-col cols="6" lg="3" md="3">
                   <v-autocomplete
-                    v-model="item.neighborhood"
+                    :value="editClient.neighborhood"
                     :disabled="!can('EditFormNeighborhood')"
                     item-text="name"
                     item-value="id"
@@ -105,7 +106,7 @@
                 </v-col>
                 <v-col cols="6" lg="3" md="3">
                   <v-select
-                    v-model="item.city"
+                    :value="editClient.city"
                     item-text="name"
                     item-value="id"
                     :items="cities"
@@ -119,7 +120,7 @@
                 </v-col>
                 <v-col cols="6" lg="3" md="3">
                   <v-text-field
-                    v-model="item.phone"
+                    :value="editClient.phone"
                     :disabled="!can('EditFormPhone')"
                     label="Telefono"
                     required
@@ -132,7 +133,7 @@
               <v-row>
                 <v-col cols="12" lg="4" md="4">
                   <v-select
-                    v-model="item.plan"
+                    :value="editClient.plan"
                     :disabled="!can('EditFormPlan')"
                     item-text="name"
                     item-value="id"
@@ -146,7 +147,7 @@
                 </v-col>
                 <v-col cols="6" lg="4" md="4">
                   <v-text-field
-                    v-model="item.wifi_ssid"
+                    :value="editClient.wifi_ssid"
                     :disabled="!can('EditFormWifiSsid')"
                     label="Nombre de Red"
                     required
@@ -157,7 +158,7 @@
                 </v-col>
                 <v-col cols="6" lg="4" md="4">
                   <v-text-field
-                    v-model="item.wifi_password"
+                    :value="editClient.wifi_password"
                     :disabled="!can('EditFormWifiPassword')"
                     :type="!can('EditFormWifiPasswordVisibility') ? 'password' : 'text'"
                     label="Clave de Red"
@@ -171,7 +172,7 @@
               <v-row>
                 <v-col>
                   <v-select
-                    v-model="item.technology"
+                    :value="editClient.technology"
                     :disabled="!can('EditFormTechnology')"
                     item-text="name"
                     item-value="id"
@@ -185,7 +186,7 @@
                 </v-col>
                 <v-col>
                   <v-text-field
-                    v-model="item.mac_address"
+                    :value="editClient.mac_address"
                     :disabled="!can('EditFormMacAddress')"
                     label="Mac Equipo"
                     required
@@ -198,7 +199,7 @@
               <v-row>
                 <v-col>
                   <v-select
-                    v-model="item.newModel"
+                    :value="editClient.newModel"
                     :disabled="!can('EditFormNewModel')"
                     :items="idwith"
                     item-text="name"
@@ -214,30 +215,29 @@
               <v-row>
                 <v-col>
                   <v-text-field
-                    :value="item.nap_onu_address ? item.nap_onu_address.toUpperCase() : ''"
+                    :value="editClient.nap_onu_address ? editClient.nap_onu_address.toUpperCase() : ''"
                     label="Direccion NAP/ONU"
                     outlined
                     dense
                     hide-details
-                    @input="item.nap_onu_address = $event.toUpperCase()"
+                    @input="editClient.nap_onu_address = $event.toUpperCase()"
                   />
                 </v-col>
                 <v-col>
                   <v-text-field
-                    :value="item.opticalPower ? item.opticalPower.toUpperCase() : ''"
+                    :value="editClient.opticalPower ? editClient.opticalPower.toUpperCase() : ''"
                     label="Potencia Óptica (Solo numeros)"
                     outlined
                     dense
                     type="number"
                     hide-details
-                    @input="item.opticalPower = $event.toUpperCase()"
                   />
                 </v-col>
               </v-row>
               <v-row>
                 <v-col>
                   <v-text-field
-                    :value="getDate(item.createdAt)"
+                    :value="getDate(editClient.createdAt)"
                     label="Fecha de Creación"
                     required
                     outlined
@@ -249,7 +249,7 @@
                 </v-col>
                 <v-col>
                   <v-text-field
-                    :value="getDate(item.updatedAt)"
+                    :value="getDate(editClient.updatedAt)"
                     label="Última actualización"
                     required
                     outlined
@@ -274,7 +274,7 @@
               </v-row>
               <div v-if="can('EditFormComment')">
                 <v-textarea
-                  v-model="item.comment"
+                  :value="editClient.comment"
                   auto-grow
                   persistent-hint
                   outlined
@@ -284,7 +284,7 @@
                   disabled
                 />
               </div>
-              <v-switch v-model="item.hasRepeater" hide-details input-value="false" label="Tiene repetidor?" />
+              <v-checkbox :value="editClient.hasRepeater" hide-details input-value="false" label="Tiene repetidor?" />
             </v-form>
           </v-container>
         </v-card-text>
@@ -294,7 +294,7 @@
             color="info"
             :loading="isSubmitting"
             :disabled="isSubmitting"
-            @click="updateClient()"
+            @click="updateClient(editClient, index)"
           >
             Confirmar
           </v-btn>
@@ -306,69 +306,14 @@
 
 <script>
 /* eslint-disable vue/prop-name-casing */
-import gql from 'graphql-tag'
 export default {
   name: 'EditForm',
-  apollo: {
-    cities () {
-      return {
-        query: gql`
-        query{
-          cities{
-            id
-            name
-          }
-        }
-      `
-      }
-    },
-    neighborhoods () {
-      return {
-        query: gql`
-        query{
-          neighborhoods{
-            id
-            name
-          }
-        }
-      `
-      }
-    },
-    plans () {
-      return {
-        query: gql`
-        query{
-          plans{
-            id
-            name
-          }
-        }
-      `
-      }
-    },
-    technologies () {
-      return {
-        query: gql`
-        query{
-          technologies{
-            id
-            name
-          }
-        }
-      `
-      }
-    }
-  },
   props: {
-    item: {
+    client: {
       type: Object,
       default: () => {}
     },
-    dataTable: {
-      type: Array,
-      default: () => []
-    },
-    editIdex: {
+    index: {
       type: Number,
       default: 0
     },
@@ -380,6 +325,7 @@ export default {
   data: () => {
     return {
       valid: false,
+      editClient: {},
       dir1: '',
       dir2: '',
       dir3: '',
@@ -418,62 +364,33 @@ export default {
       // }
     }
   },
+  computed: {
+    cities () {
+      return this.$store.state.city.cities
+    },
+    plans () {
+      return this.$store.state.plan.plans
+    },
+    neighborhoods () {
+      return this.$store.state.neighborhood.neighborhoods
+    },
+    technologies () {
+      return this.$store.state.technology.technologies
+    }
+  },
+  watch: {
+    client () {
+      Object.assign(this.editClient, this.client)
+    }
+  },
+  mounted () {
+    Object.assign(this.editClient, this.client)
+  },
   methods: {
-    updateClient () {
+    updateClient (client, index) {
       this.isSubmitting = true
-      this.$apollo.mutate({
-        mutation: gql`mutation ($input: updateClientInput){
-          updateClient(input: $input){
-            client{
-              id
-            }
-          }
-        }`,
-        variables: {
-          input: {
-            where: {
-              id: this.item._id
-            },
-            data: {
-              code: this.item.code,
-              name: this.item.name,
-              dni: this.item.dni,
-              address: this.item.address,
-              neighborhood: this.item.neighborhood.id,
-              phone: this.item.phone,
-              plan: this.item.plan.id,
-              technology: this.item.technology.id,
-              wifi_ssid: this.item.wifi_ssid,
-              wifi_password: this.item.wifi_password,
-              mac_address: this.item.mac_address,
-              comment: this.item.comment,
-              operator: this.$store.state.auth.id,
-              hasRepeater: this.item.hasRepeater,
-              nap_onu_address: this.item.nap_onu_address,
-              opticalPower: this.item.opticalPower,
-              newModel: this.item.newModel
-            }
-          }
-        }
-      }).then((input) => {
-        if (input.data.updateClient.client.id) {
-          // this.$emit('updateClient', this.item, this.editIndex)
-          this.dialogEdit = false
-          this.isSubmitting = false
-          this.dialogEdit = false
-          // window.location.reload(true)
-        } else {
-          this.alertBox = true
-          this.alertBoxColor = 'red darken-4'
-          this.createdMessage = input.data.updateClient.errors[0].message
-          this.isSubmitting = false
-        }
-      }).catch((error) => {
-        this.alertBox = true
-        this.alertBoxColor = 'red darken-4'
-        this.createdMessage = error
-        this.isSubmitting = false
-      })
+      this.$store.dispatch('client/updateClient', { client, index })
+      this.dialogEdit = false
     },
     genAddress () {
       this.Client.address = `${this.dir1} ${this.dir2} ${this.dir3} ${this.dir4}`
@@ -494,11 +411,12 @@ export default {
       }
     },
     can (component) {
-      // eslint-disable-next-line camelcase
-      const allowed_components = this.role
+      const allowedComponents = this.role.map((c) => {
+        return c.name
+      })
       // eslint-disable-next-line camelcase
       const current_component = component
-      return allowed_components.includes(current_component)
+      return allowedComponents.includes(current_component)
     }
   }
 }
