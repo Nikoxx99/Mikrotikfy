@@ -226,7 +226,7 @@
             </v-tooltip>
             <ActivationRequest
               :item="props.item"
-              :allowed-components="role.allowed_components"
+              :allowedcomponents="role.allowed_components"
             />
           </template>
           <template v-slot:item.actions="{ item }">

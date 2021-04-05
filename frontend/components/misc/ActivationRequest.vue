@@ -80,7 +80,7 @@ export default {
       type: Object,
       default: () => {}
     },
-    allowedComponents: {
+    allowedcomponents: {
       type: Array,
       default: () => []
     }
@@ -140,9 +140,13 @@ export default {
       })
     },
     can (component) {
-      const allowedComponents = this.allowedComponents
-      const currentComponent = component
-      return allowedComponents.includes(currentComponent)
+      const allowedComponents = this.allowedcomponents.map((c) => {
+        return c.name
+      })
+      console.log(allowedComponents, component)
+      // eslint-disable-next-line camelcase
+      const current_component = component
+      return allowedComponents.includes(current_component)
     }
   }
 }
