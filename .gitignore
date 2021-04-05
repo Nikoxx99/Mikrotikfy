@@ -6,3 +6,9 @@ sbackend/node_modules/
 sbackend/.cache/
 
 frontend/page.vue
+
+backend/
+
+sbackend/config/
+
+sbackend/.strapi-updater.json
