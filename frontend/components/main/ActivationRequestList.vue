@@ -277,7 +277,7 @@ export default {
       }
     },
     showClosed (value) {
-      if (this.activationrequests.length > 0) {
+      if (this.activationrequests) {
         const newData = []
         this.activationrequests.map((activationrequest) => {
           if (value === false) {

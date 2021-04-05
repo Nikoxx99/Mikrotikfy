@@ -284,7 +284,7 @@
                   disabled
                 />
               </div>
-              <v-checkbox :value="editClient.hasRepeater" hide-details input-value="false" label="Tiene repetidor?" />
+              <v-checkbox :input-value="editClient.hasRepeater" hide-details label="Tiene repetidor?" />
             </v-form>
           </v-container>
         </v-card-text>
@@ -292,8 +292,6 @@
           <v-btn
             class="mr-4"
             color="info"
-            :loading="isSubmitting"
-            :disabled="isSubmitting"
             @click="updateClient(editClient, index)"
           >
             Confirmar
@@ -346,7 +344,6 @@ export default {
       alertBox: false,
       alertBoxColor: '',
       createdMessage: '',
-      isSubmitting: false,
       idwith: [
         { id: 0, name: 'Cedula' },
         { id: 1, name: 'Codigo' }
@@ -388,7 +385,6 @@ export default {
   },
   methods: {
     updateClient (client, index) {
-      this.isSubmitting = true
       this.$store.dispatch('client/updateClient', { client, index })
       this.dialogEdit = false
     },
@@ -411,12 +407,12 @@ export default {
       }
     },
     can (component) {
-      const allowedComponents = this.role.map((c) => {
-        return c.name
-      })
-      // eslint-disable-next-line camelcase
-      const current_component = component
-      return allowedComponents.includes(current_component)
+      if (this.allowedcomponents) {
+        const allowedcomponents = this.allowedcomponents
+        const currentComponent = component
+        const res = allowedcomponents.includes(currentComponent)
+        return res
+      }
     }
   }
 }

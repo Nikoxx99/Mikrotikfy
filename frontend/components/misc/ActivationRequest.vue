@@ -140,10 +140,7 @@ export default {
       })
     },
     can (component) {
-      const allowedComponents = this.allowedcomponents.map((c) => {
-        return c.name
-      })
-      console.log(allowedComponents, component)
+      const allowedComponents = this.allowedcomponents
       // eslint-disable-next-line camelcase
       const current_component = component
       return allowedComponents.includes(current_component)

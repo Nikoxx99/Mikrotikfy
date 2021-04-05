@@ -51,114 +51,73 @@
         >
           <template v-slot:top>
             <v-toolbar flat>
-              <v-dialog v-model="createDialog" max-width="1150px" :retain-focus="false">
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    v-if="can('CreateForm')"
-                    color="blue darken-4"
-                    dark
-                    class="mr-4"
-                    v-bind="attrs"
-                    v-on="on"
-                  >
-                    <v-icon>mdi-plus</v-icon>
-                    Nuevo Cliente
-                  </v-btn>
-                  <v-text-field
-                    :value="options.itemsPerPage"
-                    label="Clientes por Pagina"
-                    type="number"
-                    min="5"
-                    max="50"
-                    width="80px"
-                    hide-details
-                    @input="options.itemsPerPage = parseInt($event, 10)"
-                  />
-                  <v-spacer />
-                  <v-chip
-                    color="white white--text"
-                    small
-                    outlined
-                    label
-                    class="mr-4"
-                  >
-                    En Linea: {{ activeClients }}
-                  </v-chip>
-                  <v-chip
-                    color="green darken-3 white--text"
-                    small
-                    label
-                    outlined
-                    class="mr-4 d-none d-md-flex d-lg-flex d-xl-flex"
-                  >
-                    Activos: {{ clientCountActive }}
-                  </v-chip>
-                  <v-chip
-                    color="red lighten-1 white--text"
-                    small
-                    outlined
-                    label
-                    class="mr-4 d-none d-md-flex d-lg-flex d-xl-flex"
-                  >
-                    En Mora: {{ clientCountDisable }}
-                  </v-chip>
-                  <v-chip
-                    color="primary"
-                    small
-                    outlined
-                    label
-                    class="mr-4 d-none d-sm-flex d-md-flex d-lg-flex d-xl-flex"
-                  >
-                    Totales: {{ clientCount }}
-                  </v-chip>
-                  <v-tooltip bottom>
-                    <!-- eslint-disable -->
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-btn
-                        v-bind="attrs"
-                        color="blue darken-4"
-                        dark
-                        class="mr-4"
-                        :disabled="refreshLoading"
-                        :loading="refreshLoading"
-                        v-on="on"
-                        @click="activeClients(true)"
-                      >
-                        <v-icon>mdi-reload</v-icon>
-                      </v-btn>
-                    </template>
-                    <span>Refrescar Estado</span>
-                  </v-tooltip>
-                </template>
-                <v-card>
-                  <v-card-title>
-                    <v-toolbar
-                      dark
-                    >
-                      <v-btn
-                        icon
-                        dark
-                        @click="createDialog = false"
-                      >
-                        <v-icon>mdi-close</v-icon>
-                      </v-btn>
-                      <v-toolbar-title><span class="headline">Crear Cliente en</span></v-toolbar-title>
-                    </v-toolbar>
-                  </v-card-title>
-                  <v-card-text>
-                    <v-container>
-                      <CreateForm
-                        v-if="createDialog"
-                        :citycolor="'blue'"
-                        :role="role.name"
-                        @createClient="createClient($event)"
-                        @createClientDialog="createClientDialog($event)"
-                        @createClientSnack="createClientSnack($event)"
-                      />
-                    </v-container>
-                  </v-card-text>
-                </v-card>
-              </v-dialog>
+              <v-btn
+                v-if="can('CreateForm')"
+                color="blue darken-4"
+                dark
+                class="mr-4"
+                @click="createDialog = true"
+              >
+                <v-icon>mdi-plus</v-icon>
+                Nuevo Cliente
+              </v-btn>
+              <v-btn
+                color="blue darken-4"
+                dark
+                class="mr-4"
+                :disabled="refreshLoading"
+                :loading="refreshLoading"
+                @click="activeClients(true)"
+              >
+                <v-icon>mdi-reload</v-icon>
+              </v-btn>
+              <v-chip
+                color="white white--text"
+                small
+                outlined
+                label
+                class="mr-4"
+              >
+                En Linea: {{ activeClients }}
+              </v-chip>
+              <v-chip
+                color="green darken-3 white--text"
+                small
+                label
+                outlined
+                class="mr-4 d-none d-md-flex d-lg-flex d-xl-flex"
+              >
+                Activos: {{ clientCountActive }}
+              </v-chip>
+              <v-chip
+                color="red lighten-1 white--text"
+                small
+                outlined
+                label
+                class="mr-4 d-none d-md-flex d-lg-flex d-xl-flex"
+              >
+                En Mora: {{ clientCountDisable }}
+              </v-chip>
+              <v-chip
+                color="primary"
+                small
+                outlined
+                label
+                class="mr-4 d-none d-sm-flex d-md-flex d-lg-flex d-xl-flex"
+              >
+                Totales: {{ clientCount }}
+              </v-chip>
+              <v-spacer />
+              <v-text-field
+                :value="options.itemsPerPage"
+                label="Clientes por Pagina"
+                type="number"
+                min="5"
+                max="50"
+                width="80px"
+                hide-details
+                @input="options.itemsPerPage = parseInt($event, 10)"
+              />
             </v-toolbar>
           </template>
           <template v-slot:item.plan.name="props">
@@ -226,7 +185,7 @@
             </v-tooltip>
             <ActivationRequest
               :item="props.item"
-              :allowedcomponents="role.allowed_components"
+              :allowedcomponents="allowedcomponents"
             />
           </template>
           <template v-slot:item.actions="{ item }">
@@ -237,7 +196,7 @@
                 :city="item.city.id"
                 :assignated="$store.state.auth.id"
                 :clientid="item._id"
-                :role="role.allowed_components"
+                :role="allowedcomponents"
               />
               <TicketHistory
                 :clientid="item._id"
@@ -248,13 +207,13 @@
                 :name="item.name"
                 :clientid="item._id"
                 :code="item.code"
-                :role="role.allowed_components"
+                :role="allowedcomponents"
               />
               <EditForm
                 v-if="can('EditForm')"
                 :client="item"
                 :index="clients.indexOf(item)"
-                :role="role.allowed_components"
+                :role="allowedcomponents"
                 @updateComment="updateComment($event)"
               />
               <DeleteClient v-if="can('DeleteClient')" :name="item.name" :clientid="item._id" />
@@ -286,10 +245,41 @@
         </v-btn>
       </template>
     </v-snackbar>
+    <v-dialog v-model="createDialog" max-width="1150px" :retain-focus="false">
+      <v-card>
+        <v-card-title>
+          <v-toolbar
+            dark
+          >
+            <v-btn
+              icon
+              dark
+              @click="createDialog = false"
+            >
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+            <v-toolbar-title><span class="headline">Crear Cliente en</span></v-toolbar-title>
+          </v-toolbar>
+        </v-card-title>
+        <v-card-text>
+          <v-container>
+            <CreateForm
+              v-if="createDialog"
+              :citycolor="'blue'"
+              :role="role.name"
+              @createClient="createClient($event)"
+              @createClientDialog="createClientDialog($event)"
+              @createClientSnack="createClientSnack($event)"
+            />
+          </v-container>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
 <script>
+import gql from 'graphql-tag'
 import EditForm from '../edit/EditForm'
 import DeleteClient from '../delete/DeleteClient'
 import ClientStatus from '../main/ClientStatus'
@@ -299,6 +289,28 @@ import CreateForm from '../create/CreateForm'
 import ActivationRequest from '../misc/ActivationRequest'
 export default {
   name: 'Test',
+  apollo: {
+    role () {
+      return {
+        query: gql`
+        query($id: ID!){
+          role(id: $id){
+            name
+            allowed_components{
+              name
+            }
+          }
+        }
+      `,
+        variables: {
+          id: this.$store.state.auth.role
+        },
+        skip () {
+          return true
+        }
+      }
+    }
+  },
   components: {
     CreateForm,
     EditForm,
@@ -310,7 +322,7 @@ export default {
   },
   data () {
     return {
-      allowedComponents: [],
+      allowedcomponents: [],
       createDialog: false,
       headers: [
         { text: 'Codigo', value: 'code', sortable: false },
@@ -360,9 +372,6 @@ export default {
     technologies () {
       return this.$store.state.technology.technologies
     },
-    role () {
-      return this.$store.state.role.roles
-    },
     activeClients () {
       return this.$store.state.count.clientCount.active
     },
@@ -388,14 +397,14 @@ export default {
       this.$store.dispatch('client/getUsersFromDatabase', { start, limit, city })
     }
   },
-  mounted () {
+  async mounted () {
     const city = this.$route.query.city
+    await this.populareRole()
     this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: this.itemsPerPage, city })
     this.$store.dispatch('plan/getPlansFromDatabase')
     this.$store.dispatch('city/getCitiesFromDatabase')
     this.$store.dispatch('neighborhood/getNeighborhoodsFromDatabase')
     this.$store.dispatch('technology/getTechnologiesFromDatabase')
-    this.$store.dispatch('role/getRolesFromDatabase', this.$store.state.auth.role)
     this.$store.dispatch('count/activeClients', this.$route.query.city)
     this.$store.dispatch('count/clientCount', this.$route.query.city)
     this.$store.dispatch('count/clientCountActive', this.$route.query.city)
@@ -443,7 +452,7 @@ export default {
       }
     },
     createClient (client) {
-      Object.assign(this.dataTable[0], client)
+      this.$store.commit('client/insertClient', client)
     },
     createClientDialog (value) {
       this.createDialog = false
@@ -454,20 +463,52 @@ export default {
       this.snackColor = 'info'
     },
     can (component) {
-      if (this.role.allowed_components) {
-        const allowedComponents = this.role.allowed_components.map((c) => {
-          return c.name
-        })
-        const currentComponent = component
-        const res = allowedComponents.includes(currentComponent)
-        return res
-      }
+      console.log(component)
+      const allowedcomponents = this.allowedcomponents
+      const currentComponent = component
+      const res = allowedcomponents.includes(currentComponent)
+      return res
     },
     updateStatus (client, index) {
       if (client.active === true) {
         this.$store.dispatch('client/adminDelete', { client, index })
       } else {
         this.$store.dispatch('client/adminCreate', { client, index })
+      }
+    },
+    async populareRole () {
+      if (this.localStorageHandler('role', 'count')) {
+        this.role = this.localStorageHandler('role', 'get')
+        this.allowedcomponents = this.role.allowed_components.map((c) => {
+          return c.name
+        })
+      } else {
+        this.$apollo.queries.role.skip = false
+        await this.$apollo.queries.role.fetchMore({
+          updateQuery: (_, { fetchMoreResult }) => {
+            const newRoleInfo = fetchMoreResult.role
+            this.localStorageHandler('role', 'set', newRoleInfo)
+            this.role = newRoleInfo
+          }
+        })
+        this.allowedcomponents = this.role.allowed_components.map((c) => {
+          return c.name
+        })
+      }
+    },
+    localStorageHandler (storage, action, payload) {
+      if (action === 'get') {
+        return JSON.parse(localStorage.getItem(storage))
+      }
+      if (action === 'set') {
+        localStorage.setItem(storage, JSON.stringify(payload))
+      }
+      if (action === 'count') {
+        if (localStorage.getItem(storage)) {
+          return true
+        } else {
+          return false
+        }
       }
     }
   },

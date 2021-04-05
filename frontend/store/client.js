@@ -37,6 +37,13 @@ export const mutations = {
     } catch (error) {
       throw new Error(`UPDATE CLIENT MUTATE ${error}`)
     }
+  },
+  insertClient (state, client) {
+    try {
+      Object.assign(state.clients[0], client)
+    } catch (error) {
+      throw new Error(`INSERT CLIENT MUTATE ${error}`)
+    }
   }
 }
 export const actions = {
