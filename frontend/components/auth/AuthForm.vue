@@ -116,28 +116,50 @@ export default {
             provider: 'local'
           }
         }
-      }).then((input) => {
-        if (!input.errors) {
-          const auth = {
-            accessToken: input.data.login.jwt,
-            id: input.data.login.user.id,
-            username: input.data.login.user.username,
-            role: input.data.login.user.role.id
+      }).then((first) => {
+        this.$apollo.query({
+          query: gql`query ($id: ID!){
+            role(id: $id){
+              allowed_components{
+                name
+              }
+            }
+          }`,
+          variables: {
+            id: first.data.login.user.role.id
           }
-          this.$store.commit('setAuth', auth)
-          Cookie.set('auth', auth, { expires: 7 })
-          Cookie.set('authToken', auth.accessToken, { expires: 7 })
-          if (this.username === 'nohora') {
-            window.location.href = '/lista?city=5fc3f0408e3de73d204cd430'
-          } else if (this.username === 'natalia') {
-            window.location.href = '/lista?city=5fc3f0408e3de73d204cd430'
+        }).then(async (second) => {
+          if (!first.errors) {
+            const ac = await second.data.role.allowed_components.map((c) => {
+              return c.name
+            })
+            const auth = {
+              accessToken: first.data.login.jwt,
+              id: first.data.login.user.id,
+              username: first.data.login.user.username,
+              role: first.data.login.user.role.id,
+              allowed_components: ac
+            }
+            this.$store.commit('setAuth', auth)
+            Cookie.set('auth', auth, { expires: 7 })
+            Cookie.set('authToken', auth.accessToken, { expires: 7 })
+            if (this.username === 'Nohora' || this.username === 'edinson' || this.username === 'brayan' || this.username === 'jannes' || this.username === 'andresruiz') {
+              window.location.href = '/lista?city=5fc3f0408e3de73d204cd430'
+            } else if (this.username === 'natalia') {
+              window.location.href = '/lista?city=5fc3f0408e3de73d204cd430'
+            } else {
+              window.location.href = '/lista?city=5f832e8fb0c43e2c64b37437'
+            }
           } else {
-            window.location.href = '/lista?city=5f832e8fb0c43e2c64b37437'
+            this.loginFailed = true
+            this.isLoading = false
           }
-        } else {
+        }).catch((error) => {
+          // eslint-disable-next-line no-console
+          this.errorMessages = error.message
           this.loginFailed = true
           this.isLoading = false
-        }
+        })
       }).catch((error) => {
         // eslint-disable-next-line no-console
         this.errorMessages = error.message

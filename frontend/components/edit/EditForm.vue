@@ -407,8 +407,8 @@ export default {
       }
     },
     can (component) {
-      if (this.allowedcomponents) {
-        const allowedcomponents = this.allowedcomponents
+      if (this.role) {
+        const allowedcomponents = this.role
         const currentComponent = component
         const res = allowedcomponents.includes(currentComponent)
         return res

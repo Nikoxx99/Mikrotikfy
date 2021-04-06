@@ -158,6 +158,18 @@
             </v-list-item>
             <v-list-item two-line>
               <v-list-item-content>
+                <v-list-item-subtitle>Telefono</v-list-item-subtitle>
+                <v-list-item-title>{{ editModalData.client ? editModalData.client.phone : '' }}</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item two-line>
+              <v-list-item-content>
+                <v-list-item-subtitle>Tecnología</v-list-item-subtitle>
+                <v-list-item-title>{{ editModalData.client ? editModalData.client.technology.name : '' }}</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item two-line>
+              <v-list-item-content>
                 <v-list-item-subtitle>Detalles</v-list-item-subtitle>
                 <p>{{ editModalData ? editModalData.details : '' }}</p>
               </v-list-item-content>
@@ -250,6 +262,9 @@ export default {
                 name
               }
               phone
+              technology{
+                name
+              }
             }
             tickettype{
               name

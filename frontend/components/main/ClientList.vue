@@ -185,7 +185,7 @@
             </v-tooltip>
             <ActivationRequest
               :item="props.item"
-              :allowedcomponents="allowedcomponents"
+              :allowedcomponents="$store.state.auth.allowed_components"
             />
           </template>
           <template v-slot:item.actions="{ item }">
@@ -196,7 +196,7 @@
                 :city="item.city.id"
                 :assignated="$store.state.auth.id"
                 :clientid="item._id"
-                :role="allowedcomponents"
+                :role="$store.state.auth.allowed_components"
               />
               <TicketHistory
                 :clientid="item._id"
@@ -207,13 +207,13 @@
                 :name="item.name"
                 :clientid="item._id"
                 :code="item.code"
-                :role="allowedcomponents"
+                :role="$store.state.auth.allowed_components"
               />
               <EditForm
                 v-if="can('EditForm')"
                 :client="item"
                 :index="clients.indexOf(item)"
-                :role="allowedcomponents"
+                :role="$store.state.auth.allowed_components"
                 @updateComment="updateComment($event)"
               />
               <DeleteClient v-if="can('DeleteClient')" :name="item.name" :clientid="item._id" />
@@ -279,7 +279,6 @@
 </template>
 
 <script>
-import gql from 'graphql-tag'
 import EditForm from '../edit/EditForm'
 import DeleteClient from '../delete/DeleteClient'
 import ClientStatus from '../main/ClientStatus'
@@ -288,29 +287,7 @@ import TicketHistory from '../misc/TicketHistory'
 import CreateForm from '../create/CreateForm'
 import ActivationRequest from '../misc/ActivationRequest'
 export default {
-  name: 'Test',
-  apollo: {
-    role () {
-      return {
-        query: gql`
-        query($id: ID!){
-          role(id: $id){
-            name
-            allowed_components{
-              name
-            }
-          }
-        }
-      `,
-        variables: {
-          id: this.$store.state.auth.role
-        },
-        skip () {
-          return true
-        }
-      }
-    }
-  },
+  name: 'ClientList',
   components: {
     CreateForm,
     EditForm,
@@ -397,9 +374,8 @@ export default {
       this.$store.dispatch('client/getUsersFromDatabase', { start, limit, city })
     }
   },
-  async mounted () {
+  mounted () {
     const city = this.$route.query.city
-    await this.populareRole()
     this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: this.itemsPerPage, city })
     this.$store.dispatch('plan/getPlansFromDatabase')
     this.$store.dispatch('city/getCitiesFromDatabase')
@@ -463,8 +439,7 @@ export default {
       this.snackColor = 'info'
     },
     can (component) {
-      console.log(component)
-      const allowedcomponents = this.allowedcomponents
+      const allowedcomponents = this.$store.state.auth.allowed_components
       const currentComponent = component
       const res = allowedcomponents.includes(currentComponent)
       return res
@@ -474,41 +449,6 @@ export default {
         this.$store.dispatch('client/adminDelete', { client, index })
       } else {
         this.$store.dispatch('client/adminCreate', { client, index })
-      }
-    },
-    async populareRole () {
-      if (this.localStorageHandler('role', 'count')) {
-        this.role = this.localStorageHandler('role', 'get')
-        this.allowedcomponents = this.role.allowed_components.map((c) => {
-          return c.name
-        })
-      } else {
-        this.$apollo.queries.role.skip = false
-        await this.$apollo.queries.role.fetchMore({
-          updateQuery: (_, { fetchMoreResult }) => {
-            const newRoleInfo = fetchMoreResult.role
-            this.localStorageHandler('role', 'set', newRoleInfo)
-            this.role = newRoleInfo
-          }
-        })
-        this.allowedcomponents = this.role.allowed_components.map((c) => {
-          return c.name
-        })
-      }
-    },
-    localStorageHandler (storage, action, payload) {
-      if (action === 'get') {
-        return JSON.parse(localStorage.getItem(storage))
-      }
-      if (action === 'set') {
-        localStorage.setItem(storage, JSON.stringify(payload))
-      }
-      if (action === 'count') {
-        if (localStorage.getItem(storage)) {
-          return true
-        } else {
-          return false
-        }
       }
     }
   },
