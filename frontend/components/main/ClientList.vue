@@ -126,7 +126,7 @@
               large
               cancel-text="Cancelar"
               save-text="Guardar"
-              @save="savePlanFromModal(props.item._id, props.item.plan, isRx, $store.state.auth.id)"
+              @save="savePlanFromModal(props.item._id, props.item.plan, isRx, $store.state.auth.username)"
             >
               <v-chip small label outlined :color="getColor(props.item.plan.id)" class="white--text">
                 {{ props.item.plan.name }}
