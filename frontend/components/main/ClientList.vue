@@ -266,7 +266,7 @@
             <CreateForm
               v-if="createDialog"
               :citycolor="'blue'"
-              :role="role.name"
+              :role="$store.state.auth.rolename"
               @createClient="createClient($event)"
               @createClientDialog="createClientDialog($event)"
               @createClientSnack="createClientSnack($event)"

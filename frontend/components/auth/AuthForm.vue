@@ -105,6 +105,7 @@ export default {
               username
               role{
                 id
+                name
               }
             }
           }
@@ -138,6 +139,7 @@ export default {
               id: first.data.login.user.id,
               username: first.data.login.user.username,
               role: first.data.login.user.role.id,
+              rolename: first.data.login.user.role.name,
               allowed_components: ac
             }
             this.$store.commit('setAuth', auth)
