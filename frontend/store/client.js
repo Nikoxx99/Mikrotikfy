@@ -33,7 +33,7 @@ export const mutations = {
   },
   updateClient (state, { client, index }) {
     try {
-      state.clients[index] = client
+      Object.assign(state.clients[index], client)
     } catch (error) {
       throw new Error(`UPDATE CLIENT MUTATE ${error}`)
     }
@@ -241,7 +241,7 @@ export const actions = {
       throw new Error(`ADMINDELETE ACTION ${error}`)
     }
   },
-  updateClient ({ commit }, { client, index }) {
+  updateClient ({ commit }, { client, index, operator }) {
     const apollo = this.app.apolloProvider.defaultClient
     try {
       apollo.mutate({
@@ -273,6 +273,7 @@ export const actions = {
               hasRepeater: client.hasRepeater,
               nap_onu_address: client.nap_onu_address,
               opticalPower: client.opticalPower,
+              operator,
               newModel: client.newModel
             }
           }

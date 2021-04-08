@@ -385,7 +385,8 @@ export default {
   },
   methods: {
     updateClient (client, index) {
-      this.$store.dispatch('client/updateClient', { client, index })
+      const operator = this.$store.state.auth.id
+      this.$store.dispatch('client/updateClient', { client, index, operator })
       this.dialogEdit = false
     },
     genAddress () {
