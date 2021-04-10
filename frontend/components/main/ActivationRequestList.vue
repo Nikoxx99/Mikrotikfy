@@ -401,6 +401,7 @@ export default {
                 mac_address: this.activationrequests[index].mac_address,
                 nap_onu_address: this.activationrequests[index].nap_onu_address,
                 opticalPower: this.activationrequests[index].opticalPower,
+                operator: this.$store.state.auth.username,
                 comment: currentClientToCreate.comment
               }
             }

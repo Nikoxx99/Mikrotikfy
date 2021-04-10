@@ -92,13 +92,14 @@ module.exports = {
     const id = ctx.request.body.input.id
     const id_client = ctx.request.body.input.client.id
     const entity = await strapi.services.client.update({ id: id_client }, { 'active': true })
+    const approvedBy = ctx.request.body.input.client.operator
     await strapi.services.activationrequest.update({ id }, { 'active': false })
     const searchCity = await strapi.services.city.find({ id: ctx.request.body.input.client.city })
     const searchPlan = await strapi.services.plan.find({ id: ctx.request.body.input.client.plan })
     const searchNeighborhood = await strapi.services.neighborhood.find({ id: ctx.request.body.input.client.neighborhood })
     const searchTechnology = await strapi.services.technology.find({ id: ctx.request.body.input.client.technology })
     const telegrambot = await strapi.services.telegrambot.find({city: ctx.request.body.input.client.city})
-    simpleTelegramAdminCreate(entity, telegrambot[0])
+    simpleTelegramAdminCreate(entity, telegrambot[0], approvedBy)
     if (searchCity[0].ip.length > 1) {
       for (let i = 0; i < searchCity[0].ip.length; i++) {
         const mikrotikHost = searchCity[0].ip[i]

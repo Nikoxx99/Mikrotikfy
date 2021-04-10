@@ -56,7 +56,7 @@
                 </v-col>
                 <v-col>
                   <v-text-field
-                    :value="editClient.dni"
+                    v-model="editClient.dni"
                     :disabled="!can('EditFormDni')"
                     type="number"
                     label="Cedula"
@@ -92,7 +92,7 @@
                 </v-col>
                 <v-col cols="6" lg="3" md="3">
                   <v-autocomplete
-                    :value="editClient.neighborhood"
+                    v-model="editClient.neighborhood"
                     :disabled="!can('EditFormNeighborhood')"
                     item-text="name"
                     item-value="id"
@@ -106,7 +106,7 @@
                 </v-col>
                 <v-col cols="6" lg="3" md="3">
                   <v-select
-                    :value="editClient.city"
+                    v-model="editClient.city"
                     item-text="name"
                     item-value="id"
                     :items="cities"
@@ -120,7 +120,7 @@
                 </v-col>
                 <v-col cols="6" lg="3" md="3">
                   <v-text-field
-                    :value="editClient.phone"
+                    v-model="editClient.phone"
                     :disabled="!can('EditFormPhone')"
                     label="Telefono"
                     required
@@ -133,7 +133,7 @@
               <v-row>
                 <v-col cols="12" lg="4" md="4">
                   <v-select
-                    :value="editClient.plan"
+                    v-model="editClient.plan"
                     :disabled="!can('EditFormPlan')"
                     item-text="name"
                     item-value="id"
@@ -147,7 +147,7 @@
                 </v-col>
                 <v-col cols="6" lg="4" md="4">
                   <v-text-field
-                    :value="editClient.wifi_ssid"
+                    v-model="editClient.wifi_ssid"
                     :disabled="!can('EditFormWifiSsid')"
                     label="Nombre de Red"
                     required
@@ -158,7 +158,7 @@
                 </v-col>
                 <v-col cols="6" lg="4" md="4">
                   <v-text-field
-                    :value="editClient.wifi_password"
+                    v-model="editClient.wifi_password"
                     :disabled="!can('EditFormWifiPassword')"
                     :type="!can('EditFormWifiPasswordVisibility') ? 'password' : 'text'"
                     label="Clave de Red"
@@ -172,7 +172,7 @@
               <v-row>
                 <v-col>
                   <v-select
-                    :value="editClient.technology"
+                    v-model="editClient.technology"
                     :disabled="!can('EditFormTechnology')"
                     item-text="name"
                     item-value="id"
@@ -186,7 +186,7 @@
                 </v-col>
                 <v-col>
                   <v-text-field
-                    :value="editClient.mac_address"
+                    v-model="editClient.mac_address"
                     :disabled="!can('EditFormMacAddress')"
                     label="Mac Equipo"
                     required
@@ -199,7 +199,7 @@
               <v-row>
                 <v-col>
                   <v-select
-                    :value="editClient.newModel"
+                    v-model="editClient.newModel"
                     :disabled="!can('EditFormNewModel')"
                     :items="idwith"
                     item-text="name"
@@ -225,7 +225,7 @@
                 </v-col>
                 <v-col>
                   <v-text-field
-                    :value="editClient.opticalPower ? editClient.opticalPower.toUpperCase() : ''"
+                    v-model="editClient.opticalPower"
                     label="Potencia Óptica (Solo numeros)"
                     outlined
                     dense
@@ -284,7 +284,7 @@
                   disabled
                 />
               </div>
-              <v-checkbox :input-value="editClient.hasRepeater" hide-details label="Tiene repetidor?" />
+              <v-checkbox v-model="editClient.hasRepeater" hide-details label="Tiene repetidor?" />
             </v-form>
           </v-container>
         </v-card-text>
@@ -385,8 +385,7 @@ export default {
   },
   methods: {
     updateClient (client, index) {
-      const operator = this.$store.state.auth.id
-      this.$store.dispatch('client/updateClient', { client, index, operator })
+      this.$store.dispatch('client/updateClient', { client, index })
       this.dialogEdit = false
     },
     genAddress () {

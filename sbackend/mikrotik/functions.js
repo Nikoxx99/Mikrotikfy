@@ -487,12 +487,12 @@ module.exports.simpleTelegramCreateRequest = async function (input, telegrambot)
     console.log(err);
   });
 }
-module.exports.simpleTelegramAdminCreate = async function (input, telegrambot) {
+module.exports.simpleTelegramAdminCreate = async function (input, telegrambot, approvedBy) {
   const fetch = require('node-fetch');
   require('dotenv').config()
   const bot = telegrambot.token
   const chatid = telegrambot.binnacle
-  var message = `APROBADO\n${input.code}\n${input.name}\n${input.dni}\n${input.address}\n${input.neighborhood.name}\n${input.phone}\n${input.city.name}\n${input.plan.name}\n${input.wifi_ssid}\n${input.wifi_password}\n${input.technology.name}\n${input.mac_address}\nNAP-ONU: ${input.nap_onu_address}\nPOTENCIA: ${input.opticalPower}\n${input.operator.username}\n${input.createdAt}`
+  var message = `APROBADO\n${input.code}\n${input.name}\n${input.dni}\n${input.address}\n${input.neighborhood.name}\n${input.phone}\n${input.city.name}\n${input.plan.name}\n${input.wifi_ssid}\n${input.wifi_password}\n${input.technology.name}\n${input.mac_address}\nNAP-ONU: ${input.nap_onu_address}\nPOTENCIA: ${input.opticalPower}\n${approvedBy}\n${input.createdAt}`
   const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + sanitizeString(message)
   fetch(req).then(function (response) {
     return true
