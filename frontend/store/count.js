@@ -38,10 +38,10 @@ export const mutations = {
   }
 }
 export const actions = {
-  activeClients ({ commit }, city) {
+  async activeClients ({ commit }, city) {
     const apollo = this.app.apolloProvider.defaultClient
     try {
-      apollo.query({
+      await apollo.query({
         query: gql`query ($city: String){
           ActiveClients(city: $city){
             name
@@ -52,16 +52,17 @@ export const actions = {
           city
         }
       }).then((res) => {
+        localStorage.setItem('activeClients', res.data.ActiveClients.length)
         commit('activeClients', res)
       })
     } catch (error) {
       throw new Error(`ACTIVECOUNT ACTION ${error}`)
     }
   },
-  clientCount ({ commit }, city) {
+  async clientCount ({ commit }, city) {
     const apollo = this.app.apolloProvider.defaultClient
     try {
-      apollo.query({
+      await apollo.query({
         query: gql`query ($city: String){
           clientCount(city: $city)
         }
@@ -70,16 +71,17 @@ export const actions = {
           city
         }
       }).then((res) => {
+        localStorage.setItem('clientCount', res.data.clientCount)
         commit('clientCount', res)
       })
     } catch (error) {
       throw new Error(`CLIENTCOUNT ACTION ${error}`)
     }
   },
-  clientCountActive ({ commit }, city) {
+  async clientCountActive ({ commit }, city) {
     const apollo = this.app.apolloProvider.defaultClient
     try {
-      apollo.query({
+      await apollo.query({
         query: gql`query ($city: String){
           clientCountActive(city: $city)
         }
@@ -88,16 +90,17 @@ export const actions = {
           city
         }
       }).then((res) => {
+        localStorage.setItem('clientCountActive', res.data.clientCountActive)
         commit('clientCountActive', res)
       })
     } catch (error) {
       throw new Error(`CLIENTCOUNTACTIVE ACTION ${error}`)
     }
   },
-  clientCountDisable ({ commit }, city) {
+  async clientCountDisable ({ commit }, city) {
     const apollo = this.app.apolloProvider.defaultClient
     try {
-      apollo.query({
+      await apollo.query({
         query: gql`query ($city: String){
           clientCountDisable(city: $city)
         }
@@ -106,6 +109,7 @@ export const actions = {
           city
         }
       }).then((res) => {
+        localStorage.setItem('clientCountDisable', res.data.clientCountDisable)
         commit('clientCountDisable', res)
       })
     } catch (error) {

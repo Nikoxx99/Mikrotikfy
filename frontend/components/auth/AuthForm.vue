@@ -143,6 +143,14 @@ export default {
               allowed_components: ac
             }
             this.$store.commit('setAuth', auth)
+            await this.$store.dispatch('plan/getPlansFromDatabase')
+            await this.$store.dispatch('technology/getTechnologiesFromDatabase')
+            await this.$store.dispatch('city/getCitiesFromDatabase')
+            await this.$store.dispatch('neighborhood/getNeighborhoodsFromDatabase')
+            await this.$store.dispatch('count/activeClients', this.$route.query.city)
+            await this.$store.dispatch('count/clientCount', this.$route.query.city)
+            await this.$store.dispatch('count/clientCountActive', this.$route.query.city)
+            await this.$store.dispatch('count/clientCountDisable', this.$route.query.city)
             Cookie.set('auth', auth, { expires: 7 })
             Cookie.set('authToken', auth.accessToken, { expires: 7 })
             if (this.username === 'Nohora' || this.username === 'edinson' || this.username === 'brayan' || this.username === 'jannes' || this.username === 'andresruiz') {

@@ -334,32 +334,32 @@ export default {
       return this.$store.state.client.clients
     },
     cities () {
-      return this.$store.state.city.cities
+      return this.$store.state.cities
     },
     currentCity () {
       // eslint-disable-next-line eqeqeq
-      return this.$store.state.city.cities.find(c => c.id == this.$route.query.city)
+      return this.$store.state.cities ? this.$store.state.cities.find(c => c.id == this.$route.query.city) : ''
     },
     plans () {
-      return this.$store.state.plan.plans
+      return this.$store.state.plans
     },
     neighborhoods () {
-      return this.$store.state.neighborhood.neighborhoods
+      return this.$store.state.neighborhoods
     },
     technologies () {
-      return this.$store.state.technology.technologies
+      return this.$store.state.technologies
     },
     activeClients () {
-      return this.$store.state.count.clientCount.active
+      return this.$store.state.activeClients
     },
     clientCount () {
-      return this.$store.state.count.clientCount.clientCount
+      return this.$store.state.clientCount
     },
     clientCountActive () {
-      return this.$store.state.count.clientCount.clientCountActive
+      return this.$store.state.clientCountActive
     },
     clientCountDisable () {
-      return this.$store.state.count.clientCount.clientCountDisable
+      return this.$store.state.clientCountDisable
     }
   },
   watch: {
@@ -376,15 +376,8 @@ export default {
   },
   mounted () {
     const city = this.$route.query.city
+    this.$store.dispatch('loadLocalStorage')
     this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: this.itemsPerPage, city })
-    this.$store.dispatch('plan/getPlansFromDatabase')
-    this.$store.dispatch('city/getCitiesFromDatabase')
-    this.$store.dispatch('neighborhood/getNeighborhoodsFromDatabase')
-    this.$store.dispatch('technology/getTechnologiesFromDatabase')
-    this.$store.dispatch('count/activeClients', this.$route.query.city)
-    this.$store.dispatch('count/clientCount', this.$route.query.city)
-    this.$store.dispatch('count/clientCountActive', this.$route.query.city)
-    this.$store.dispatch('count/clientCountDisable', this.$route.query.city)
   },
   methods: {
     getClientBySearch () {

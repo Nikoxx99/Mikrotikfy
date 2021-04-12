@@ -363,16 +363,16 @@ export default {
   },
   computed: {
     cities () {
-      return this.$store.state.city.cities
+      return this.$store.state.cities
     },
     plans () {
-      return this.$store.state.plan.plans
+      return this.$store.state.plans
     },
     neighborhoods () {
-      return this.$store.state.neighborhood.neighborhoods
+      return this.$store.state.neighborhoods
     },
     technologies () {
-      return this.$store.state.technology.technologies
+      return this.$store.state.technologies
     }
   },
   watch: {

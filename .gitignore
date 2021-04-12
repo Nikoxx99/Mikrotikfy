@@ -12,3 +12,5 @@ backend/
 sbackend/config/
 
 sbackend/.strapi-updater.json
+
+laravel/

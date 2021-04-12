@@ -14,8 +14,8 @@ export const mutations = {
 export const actions = {
   async getPlansFromDatabase ({ commit }) {
     try {
-      const apollo = await this.app.apolloProvider.defaultClient
-      apollo.query({
+      const apollo = this.app.apolloProvider.defaultClient
+      await apollo.query({
         query: gql`query{
           plans{
             id
@@ -23,6 +23,7 @@ export const actions = {
           }
         }`
       }).then((input) => {
+        localStorage.setItem('plans', JSON.stringify(input.data.plans))
         commit('getPlansFromDatabase', input.data.plans)
       })
     } catch (error) {

@@ -46,7 +46,7 @@
       <div v-if="$store.state.auth">
         <span class="mr-4">{{ $store.state.auth.username.charAt(0).toUpperCase() + $store.state.auth.username.slice(1) }}</span>
         <v-btn
-          v-for="city in cities"
+          v-for="city in $store.state.cities"
           :key="city.id"
           class="mr-4"
           small
@@ -90,24 +90,6 @@ import gql from 'graphql-tag'
 import Cookie from 'js-cookie'
 export default {
   middleware: ['defaultCity', 'authenticated'],
-  apollo: {
-    cities () {
-      return {
-        query: gql`
-        query{
-          cities{
-            id
-            name
-            color
-          }
-        }
-      `,
-        skip () {
-          return true
-        }
-      }
-    }
-  },
   data () {
     return {
       hasPendingChanges: false,
@@ -150,7 +132,6 @@ export default {
     }
   },
   mounted () {
-    this.populareCities()
     const date = new Date()
     const month = date.getMonth()
     if (month === 11) {
@@ -179,35 +160,6 @@ export default {
     })
   },
   methods: {
-    localStorageHandler (storage, action, payload) {
-      if (action === 'get') {
-        return JSON.parse(localStorage.getItem(storage))
-      }
-      if (action === 'set') {
-        localStorage.setItem(storage, JSON.stringify(payload))
-      }
-      if (action === 'count') {
-        if (localStorage.getItem(storage)) {
-          return true
-        } else {
-          return false
-        }
-      }
-    },
-    async populareCities () {
-      if (this.localStorageHandler('cities', 'count')) {
-        this.cities = this.localStorageHandler('cities', 'get')
-      } else {
-        this.$apollo.queries.cities.skip = false
-        await this.$apollo.queries.cities.fetchMore({
-          updateQuery: (_, { fetchMoreResult }) => {
-            const newCitiesInfo = fetchMoreResult.cities
-            this.cities = newCitiesInfo
-            this.localStorageHandler('cities', 'set', newCitiesInfo)
-          }
-        })
-      }
-    },
     logout () {
       Cookie.remove('auth')
       Cookie.remove('authToken')
