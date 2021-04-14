@@ -9,7 +9,7 @@
             :style="`color:${cityColor};`"
           >
             <span class="mr-4">Tickets</span>
-            <v-switch
+            <v-checkbox
               v-model="showClosedValue"
               class="mr-4"
               label="Mostrar cerrados"
@@ -71,7 +71,7 @@
                     :name="props.item.client.name"
                     :clientid="props.item.client.id"
                     :code="props.item.client.code"
-                    :role="allowed_components"
+                    :role="$store.state.auth.allowed_components"
                   />
                 <CreateTicketAdvance
                   :editindex="tickets.indexOf(props.item)"
@@ -204,7 +204,7 @@
                   />
                   <TicketAdvanceHistory
                     :ticketid="editModalData.id"
-                    :name="editModalData.client.name3"
+                    :name="editModalData.client.name"
                   />
                 </div>
               </v-list-item-content>
@@ -232,7 +232,6 @@
 </template>
 
 <script>
-import gql from 'graphql-tag'
 import CreateTicketAdvance from '../create/CreateTicketAdvance'
 import TicketAdvanceHistory from '../misc/TicketAdvanceHistory'
 import ClientStatus from '../main/ClientStatus'
@@ -242,70 +241,6 @@ export default {
     CreateTicketAdvance,
     TicketAdvanceHistory,
     ClientStatus
-  },
-  apollo: {
-    tickets () {
-      return {
-        query: gql`
-        query($city: String, $limit: Int){
-          tickets(limit: $limit, sort:"createdAt:desc",where: {
-            city:$city
-          }){
-            id
-            active
-            client{
-              id
-              code
-              name
-              address
-              neighborhood{
-                name
-              }
-              phone
-              technology{
-                name
-              }
-            }
-            tickettype{
-              name
-            }
-            assiganted{
-              username
-            }
-            details
-            createdAt
-          }
-        }
-      `,
-        variables: {
-          city: this.$route.query.city,
-          limit: 30
-        },
-        skip () {
-          return true
-        }
-      }
-    },
-    role () {
-      return {
-        query: gql`
-        query($id: ID!){
-          role(id: $id){
-            name
-            allowed_components{
-              name
-            }
-          }
-        }
-      `,
-        variables: {
-          id: this.$store.state.auth.role
-        },
-        skip () {
-          return true
-        }
-      }
-    }
   },
   data () {
     return {
@@ -347,45 +282,20 @@ export default {
       allowed_components: []
     }
   },
+  computed: {
+    tickets () {
+      return this.$store.state.tickets
+    }
+  },
   async mounted () {
-    this.populareRole()
     this.getResolution()
-    this.$apollo.queries.tickets.skip = false
-    await this.$apollo.queries.tickets.fetchMore({
-      variables: {
-        city: this.$route.query.city,
-        limit: 30
-      },
-      updateQuery: (_, { fetchMoreResult }) => {
-        const newTickets = fetchMoreResult.tickets
-        this.ticketList = newTickets
-      }
-    })
+    await this.$store.dispatch('getTicketsFromLocalStorage')
     await this.showClosed(false)
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'j' && (e.altKey)) {
-        this.$refs.searchTicket.focus()
-      }
-      if (e.key === 'Escape') {
-        this.search = ''
-      }
-    })
   },
   methods: {
     async refreshTickets () {
-      this.refreshLoading = true
-      await this.$apollo.queries.tickets.fetchMore({
-        variables: {
-          id: this.$route.query.city,
-          limit: 30
-        },
-        updateQuery: (_, { fetchMoreResult }) => {
-          const newTickets = fetchMoreResult.tickets
-          this.tickets = newTickets
-          this.showClosed(this.showClosedValue)
-          this.refreshLoading = false
-        }
-      })
+      await this.$store.dispatch('refreshTickets', { limit: 50, city: this.$route.query.city })
+      await this.showClosed(false)
     },
     updateTicketStatus (value) {
       if (value.editindex > -1) {
@@ -474,11 +384,10 @@ export default {
       }
     },
     can (component) {
-      // eslint-disable-next-line camelcase
-      const allowed_components = this.allowed_components
-      // eslint-disable-next-line camelcase
-      const current_component = component
-      return allowed_components.includes(current_component)
+      const allowedcomponents = this.$store.state.auth.allowed_components
+      const currentComponent = component
+      const res = allowedcomponents.includes(currentComponent)
+      return res
     }
   }
 }

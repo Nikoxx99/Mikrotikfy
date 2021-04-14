@@ -1,9 +1,17 @@
-const cookieparser = process.server ? require('cookieparser') : undefined
 
+const cookieparser = process.server ? require('cookieparser') : undefined
 export const state = () => {
   return {
     auth: null,
-    cities: null
+    tickets: null,
+    cities: null,
+    plans: null,
+    technologies: null,
+    neighborhoods: null,
+    activeClients: null,
+    clientCount: null,
+    clientCountActive: null,
+    clientCountDisable: null
   }
 }
 export const mutations = {
@@ -19,6 +27,23 @@ export const mutations = {
     state.clientCount = JSON.parse(clientCount)
     state.clientCountActive = JSON.parse(clientCountActive)
     state.clientCountDisable = JSON.parse(clientCountDisable)
+  },
+  setTicketsFromLocalStorage (state, tickets) {
+    state.tickets = JSON.parse(tickets)
+  },
+  refreshActiveClients (state, res) {
+    try {
+      state.activeClients = res
+    } catch (error) {
+      throw new Error(`REFRESHACTIVECOUNT MUTATE ${error}`)
+    }
+  },
+  refreshTickets (state, ticketList) {
+    try {
+      state.tickets = ticketList
+    } catch (error) {
+      throw new Error(`TICKET MUTATE ${error}`)
+    }
   }
 }
 export const actions = {
@@ -44,5 +69,27 @@ export const actions = {
     const clientCountActive = localStorage.getItem('clientCountActive')
     const clientCountDisable = localStorage.getItem('clientCountDisable')
     commit('setLocalStorage', { cities, plans, technologies, neighborhoods, activeClients, clientCount, clientCountActive, clientCountDisable })
+  },
+  getTicketsFromLocalStorage ({ commit }) {
+    const tickets = localStorage.getItem('tickets')
+    commit('setTicketsFromLocalStorage', tickets)
+  },
+  async refreshActiveClients ({ commit }, city) {
+    try {
+      const res = await this.$axios.$get(`/getactiveclients/${city}`)
+      localStorage.setItem('activeClients', res.length)
+      commit('refreshActiveClients', res.length)
+    } catch (error) {
+      throw new Error(`ACTIVECOUNT ACTION ${error}`)
+    }
+  },
+  async refreshTickets ({ commit }, { city, limit }) {
+    try {
+      const res = await this.$axios.$get(`/tickets?city=${city}&_limit=${limit}&_sort=createdAt:desc`)
+      localStorage.setItem('tickets', JSON.stringify(res))
+      commit('refreshTickets', res)
+    } catch (error) {
+      throw new Error(`TICKET ACTION ${error}`)
+    }
   }
 }

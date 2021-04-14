@@ -10,7 +10,7 @@ export const state = () => ({
 export const mutations = {
   activeClients (state, res) {
     try {
-      state.clientCount.active = res.data.ActiveClients.length
+      state.activeClients = res.data.ActiveClients.length
     } catch (error) {
       throw new Error(`ACTIVECOUNT MUTATE ${error}`)
     }

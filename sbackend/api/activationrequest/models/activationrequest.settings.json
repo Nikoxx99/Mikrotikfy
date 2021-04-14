@@ -12,9 +12,9 @@
   },
   "attributes": {
     "operator": {
+      "via": "requests",
       "plugin": "users-permissions",
-      "model": "user",
-      "via": "requests"
+      "model": "user"
     },
     "active": {
       "type": "boolean",

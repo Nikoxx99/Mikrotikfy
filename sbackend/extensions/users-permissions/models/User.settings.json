@@ -55,20 +55,24 @@
       "configurable": false
     },
     "clients": {
-      "via": "operator",
-      "collection": "client"
+      "collection": "client",
+      "via": "operator"
     },
     "tickets": {
-      "via": "assiganted",
-      "collection": "ticket"
+      "collection": "ticket",
+      "via": "assiganted"
     },
     "ticketdetails": {
-      "via": "operator",
-      "collection": "ticketdetail"
+      "collection": "ticketdetail",
+      "via": "operator"
     },
     "requests": {
-      "via": "operator",
-      "collection": "activationrequest"
+      "collection": "activationrequest",
+      "via": "operator"
+    },
+    "resetSession": {
+      "type": "boolean",
+      "default": false
     }
   }
 }

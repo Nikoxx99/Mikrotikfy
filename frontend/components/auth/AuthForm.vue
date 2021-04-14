@@ -153,11 +153,11 @@ export default {
             await this.$store.dispatch('count/clientCountDisable', this.$route.query.city)
             Cookie.set('auth', auth, { expires: 7 })
             Cookie.set('authToken', auth.accessToken, { expires: 7 })
-            if (this.username === 'Nohora' || this.username === 'edinson' || this.username === 'brayan' || this.username === 'jannes' || this.username === 'andresruiz') {
-              window.location.href = '/lista?city=5fc3f0408e3de73d204cd430'
-            } else if (this.username === 'natalia') {
+            if (this.username === 'Nohora' || this.username === 'edinson' || this.username === 'natalia' || this.username === 'brayan' || this.username === 'jannes' || this.username === 'andresruiz') {
+              await this.$store.dispatch('ticket/getTicketsFromDatabase', { limit: 50, city: '5fc3f0408e3de73d204cd430' })
               window.location.href = '/lista?city=5fc3f0408e3de73d204cd430'
             } else {
+              await this.$store.dispatch('ticket/getTicketsFromDatabase', { limit: 50, city: '5f832e8fb0c43e2c64b37437' })
               window.location.href = '/lista?city=5f832e8fb0c43e2c64b37437'
             }
           } else {

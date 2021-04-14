@@ -67,7 +67,7 @@
                 class="mr-4"
                 :disabled="refreshLoading"
                 :loading="refreshLoading"
-                @click="activeClients(true)"
+                @click="refreshActiveClients"
               >
                 <v-icon>mdi-reload</v-icon>
               </v-btn>
@@ -374,12 +374,21 @@ export default {
       this.$store.dispatch('client/getUsersFromDatabase', { start, limit, city })
     }
   },
-  mounted () {
+  async mounted () {
     const city = this.$route.query.city
+    await this.comprobeCity()
+    localStorage.setItem('currentCity', this.$route.query.city)
     this.$store.dispatch('loadLocalStorage')
     this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: this.itemsPerPage, city })
   },
   methods: {
+    refreshActiveClients () {
+      this.refreshLoading = true
+      setTimeout(() => {
+        this.refreshLoading = false
+      }, 1000)
+      this.$store.dispatch('refreshActiveClients', this.$route.query.city)
+    },
     getClientBySearch () {
       const city = this.$route.query.city
       const search = this.searchClientInput
@@ -442,6 +451,13 @@ export default {
         this.$store.dispatch('client/adminDelete', { client, index })
       } else {
         this.$store.dispatch('client/adminCreate', { client, index })
+      }
+    },
+    comprobeCity () {
+      const recordedCity = localStorage.getItem('currentCity')
+      const currentCity = this.$route.query.city
+      if (currentCity !== recordedCity) {
+        this.$store.dispatch('refreshActiveClients', this.$route.query.city)
       }
     }
   },

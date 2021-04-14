@@ -23,7 +23,7 @@ module.exports = {
     return result2
   },
   async getActiveClients(ctx) {
-    const cityQuery = await strapi.services.city.findOne({ _id: ctx.query._city });
+    const cityQuery = await strapi.services.city.findOne({ _id: ctx.params.city });
     const cityIpArray = cityQuery.ip
     if (cityIpArray.length > 1) {
       const cityActiveClients = []

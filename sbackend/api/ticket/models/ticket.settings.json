@@ -26,9 +26,9 @@
       "model": "tickettype"
     },
     "assiganted": {
+      "via": "tickets",
       "plugin": "users-permissions",
-      "model": "user",
-      "via": "tickets"
+      "model": "user"
     },
     "details": {
       "type": "string"

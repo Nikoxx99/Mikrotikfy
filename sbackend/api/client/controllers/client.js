@@ -9,7 +9,7 @@ module.exports = {
   async create(ctx) {
     const sendToMikrotik = ctx.request.body.sendToMikrotik
     const operator_role = ctx.request.body.operator_role
-    if (operator_role === 'admin' || operator_role === 'superadmin') {
+    if (operator_role === 'superadmin') {
       let entity;
       let request = []
       request[0] = ctx.request.body

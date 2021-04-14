@@ -32,6 +32,7 @@ export default {
   ** https://nuxtjs.org/guide/plugins
   */
   plugins: [
+    '~/plugins/axios'
   ],
   /*
   ** Auto import components
@@ -65,7 +66,11 @@ export default {
   ** Nuxt.js modules
   */
   modules: [
+    '@nuxtjs/axios'
   ],
+  axios: {
+    baseURL: process.env.API_AXIOS_ENDPOINT
+  },
   /*
   ** vuetify module configuration
   ** https://github.com/nuxt-community/vuetify-module

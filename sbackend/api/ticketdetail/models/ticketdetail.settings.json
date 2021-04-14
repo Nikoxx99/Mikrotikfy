@@ -19,9 +19,9 @@
       "type": "string"
     },
     "operator": {
+      "via": "ticketdetails",
       "plugin": "users-permissions",
-      "model": "user",
-      "via": "ticketdetails"
+      "model": "user"
     }
   }
 }

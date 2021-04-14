@@ -2,56 +2,48 @@
   "routes": [
     {
       "method": "GET",
-      "path": "/cities",
-      "handler": "city.find",
+      "path": "/appcfgs",
+      "handler": "appcfg.find",
       "config": {
         "policies": []
       }
     },
     {
       "method": "GET",
-      "path": "/cities/count",
-      "handler": "city.count",
+      "path": "/appcfgs/count",
+      "handler": "appcfg.count",
       "config": {
         "policies": []
       }
     },
     {
       "method": "GET",
-      "path": "/cities/:id",
-      "handler": "city.findOne",
+      "path": "/appcfgs/:id",
+      "handler": "appcfg.findOne",
       "config": {
         "policies": []
       }
     },
     {
       "method": "POST",
-      "path": "/cities",
-      "handler": "city.create",
+      "path": "/appcfgs",
+      "handler": "appcfg.create",
       "config": {
         "policies": []
       }
     },
     {
       "method": "PUT",
-      "path": "/cities/:id",
-      "handler": "city.update",
+      "path": "/appcfgs/:id",
+      "handler": "appcfg.update",
       "config": {
         "policies": []
       }
     },
     {
       "method": "DELETE",
-      "path": "/cities/:id",
-      "handler": "city.delete",
-      "config": {
-        "policies": []
-      }
-    },
-    {
-      "method": "GET",
-      "path": "/getactiveclients/:city",
-      "handler": "city.getActiveClients",
+      "path": "/appcfgs/:id",
+      "handler": "appcfg.delete",
       "config": {
         "policies": []
       }
