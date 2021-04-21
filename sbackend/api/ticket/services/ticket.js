@@ -5,4 +5,15 @@
  * to customize this service
  */
 
-module.exports = {};
+module.exports = {
+  find (params) {
+    console.log('service', params)
+    return strapi.query('ticket').model.find(params)
+    .populate({
+      path: 'client tickettype assiganted',
+      populate: {
+        path: 'neighborhood technology'
+      }
+    })
+  },
+};

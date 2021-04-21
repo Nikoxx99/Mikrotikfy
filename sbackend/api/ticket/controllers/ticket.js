@@ -15,5 +15,12 @@ module.exports = {
     const telegrambot = await strapi.services.telegrambot.find({city: entity.city.id})
     simpleTelegramCreateTicket(entity, neighborhood.name, telegrambot[0])
     return sanitizeEntity(entity, { model: strapi.models.ticket });
-  }
+  },
+  async find(ctx) {
+    let entities;
+    let city = ctx.query.city
+    entities = await strapi.services.ticket.find({'city':city});
+
+    return entities.map(entity => sanitizeEntity(entity, { model: strapi.models.ticket }));
+  },
 }
