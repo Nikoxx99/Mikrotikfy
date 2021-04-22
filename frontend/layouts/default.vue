@@ -4,7 +4,6 @@
   >
     <v-navigation-drawer
       v-model="drawer"
-      src="nav-bg.jpg"
       absolute
       temporary
       app
@@ -34,7 +33,14 @@
     <v-app-bar
       app
       :src="bg"
+      shrink-on-scroll
     >
+      <template v-slot:img="{ props }">
+        <v-img
+          v-bind="props"
+          gradient="to top right, rgba(0,0,0,.5), rgba(0,0,0,.8)"
+        />
+      </template>
       <div v-if="hasPendingChanges">
         <svg height="13" width="20" style="position:absolute;top:12px;left:43px;">
           <circle cx="10" cy="8" r="5" fill="red" />
@@ -44,12 +50,14 @@
       <v-toolbar-title class="d-none d-md-flex d-lg-flex d-xl-flex" v-text="title" />
       <v-spacer />
       <div v-if="$store.state.auth">
+        <v-icon class="mr-2 green--text darken-4">mdi-account</v-icon>
         <span class="mr-4">{{ $store.state.auth.username.charAt(0).toUpperCase() + $store.state.auth.username.slice(1) }}</span>
         <v-btn
           v-for="city in $store.state.cities"
           :key="city.id"
           class="mr-4"
           small
+          outlined
           :color="city.color"
           :href="`/lista?city=${city.id}`"
         >
@@ -126,8 +134,8 @@ export default {
       miniVariant: false,
       right: true,
       rightDrawer: false,
-      title: 'ARNOProducciones SAS',
-      bg: '',
+      title: 'Aplicación de Gestión Dinámica ARNOP',
+      bg: 'https://picsum.photos/1920/1080?random',
       cities: {}
     }
   },

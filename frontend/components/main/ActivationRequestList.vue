@@ -8,45 +8,38 @@
       >
         <v-card>
           <v-card-title
-            :style="`color:${cityColor};`"
+            :style="`background-color:${currentCity ? currentCity.color : ''};`"
           >
             <span class="mr-4">Peticiones de Activación</span>
-            <v-switch
-              v-model="showClosedValue"
-              class="mr-4"
-              label="Mostrar cerrados"
-              @change="showClosed(showClosedValue)"
-            />
-            <v-tooltip top>
-              <!-- eslint-disable -->
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  v-bind="attrs"
-                  color="blue darken-4"
-                  dark
-                  :disabled="refreshLoading"
-                  :loading="refreshLoading"
-                  v-on="on"
-                  @click="refreshActivationRequests()"
-                >
-                  <v-icon>mdi-reload</v-icon>
-                </v-btn>
-              </template>
-              <span>Refrescar Peticiones de Activacion</span>
-            </v-tooltip>
-            <v-spacer />
-            <v-text-field
-              ref="searchTicket"
-              v-model="search"
-              prepend-icon="mdi-magnify"
-              label="Buscar Solicitudes"
-              single-line
-              hide-details
-              outlined
-              dense
-              class="white--text"
-            />
           </v-card-title>
+          <v-card-text>
+            <v-row>
+              <v-tooltip top>
+                <!-- eslint-disable -->
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    v-bind="attrs"
+                    color="white black--text"
+                    class="mt-4 mx-4"
+                    dark
+                    :disabled="refreshLoading"
+                    :loading="refreshLoading"
+                    v-on="on"
+                    @click="refreshActivationRequests()"
+                  >
+                    <v-icon>mdi-reload</v-icon>
+                  </v-btn>
+                </template>
+                <span>Refrescar Peticiones de Activacion</span>
+              </v-tooltip>
+              <v-checkbox
+                v-model="showClosedValue"
+                class="mr-4"
+                label="Mostrar cerrados"
+                @change="showClosed(showClosedValue)"
+              />
+            </v-row>
+          </v-card-text>
           <client-only>
             <v-data-table
               :key="key"
@@ -66,6 +59,25 @@
               mobile-breakpoint="100"
               @page-count="pageCount = $event"
             >
+              <template v-slot:top>
+                <v-row
+                  class="mx-1"
+                >
+                  <v-spacer class="d-none d-xs-none d-sm-block d-md-block d-lg-block d-lx-block" />
+                  <v-text-field
+                    ref="searchTicket"
+                    v-model="search"
+                    prepend-icon="mdi-magnify"
+                    label="Buscar Solicitudes"
+                    single-line
+                    hide-details
+                    outlined
+                    dense
+                    style="max-width: 1000px"
+                    class="white--text"
+                  />
+                </v-row>
+              </template>
               <template v-slot:item.actions="props">
                 <v-tooltip left>
                   <template v-slot:activator="{ on, attrs }">
@@ -178,27 +190,8 @@ export default {
         }
       `,
         variables: {
-          city: this.$route.query.city
-        },
-        skip () {
-          return true
-        }
-      }
-    },
-    role () {
-      return {
-        query: gql`
-        query($id: ID!){
-          role(id: $id){
-            name
-            allowed_components{
-              name
-            }
-          }
-        }
-      `,
-        variables: {
-          id: this.$store.state.auth.role
+          city: this.$route.query.city,
+          limit: 10
         },
         skip () {
           return true
@@ -213,7 +206,6 @@ export default {
       pageCount: 0,
       itemsPerPage: 5,
       search: '',
-      currentCity: 'Mariquita',
       cityName: '',
       cityColor: '',
       alertBox: false,
@@ -242,8 +234,16 @@ export default {
       allowed_components: []
     }
   },
+  computed: {
+    role () {
+      return this.$store.state.auth.allowed_components
+    },
+    currentCity () {
+      // eslint-disable-next-line eqeqeq
+      return this.$store.state.cities ? this.$store.state.cities.find(c => c.id == this.$route.query.city) : ''
+    }
+  },
   async mounted () {
-    this.populareRole()
     this.$apollo.queries.activationrequests.skip = false
     await this.$apollo.queries.activationrequests.fetchMore({
       variables: {
@@ -308,41 +308,6 @@ export default {
         return 'Abierto'
       } else {
         return 'Cerrado'
-      }
-    },
-    async populareRole () {
-      if (this.localStorageHandler('role', 'count')) {
-        this.role = this.localStorageHandler('role', 'get')
-        this.allowed_components = this.role.allowed_components.map((c) => {
-          return c.name
-        })
-      } else {
-        this.$apollo.queries.role.skip = false
-        await this.$apollo.queries.role.fetchMore({
-          updateQuery: (_, { fetchMoreResult }) => {
-            const newRoleInfo = fetchMoreResult.role
-            this.localStorageHandler('role', 'set', newRoleInfo)
-            this.role = newRoleInfo
-          }
-        })
-        this.allowed_components = this.role.allowed_components.map((c) => {
-          return c.name
-        })
-      }
-    },
-    localStorageHandler (storage, action, payload) {
-      if (action === 'get') {
-        return JSON.parse(localStorage.getItem(storage))
-      }
-      if (action === 'set') {
-        localStorage.setItem(storage, JSON.stringify(payload))
-      }
-      if (action === 'count') {
-        if (localStorage.getItem(storage)) {
-          return true
-        } else {
-          return false
-        }
       }
     },
     updateStatus (status, index) {
@@ -429,7 +394,7 @@ export default {
     },
     can (component) {
       // eslint-disable-next-line camelcase
-      const allowed_components = this.allowed_components
+      const allowed_components = this.role
       // eslint-disable-next-line camelcase
       const current_component = component
       return allowed_components.includes(current_component)

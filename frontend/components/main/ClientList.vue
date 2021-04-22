@@ -1,15 +1,17 @@
 <template>
   <v-card>
+    <v-card-title
+      :style="`background-color:${currentCity ? currentCity.color : ''};`"
+    >
+      Clientes {{ currentCity ? currentCity.name : '' }}
+    </v-card-title>
     <v-card-text>
       <v-row
-        class="mx-1"
+        class="mx-1 mt-4"
       >
-        <h2 class="white--text">
-          Clientes {{ currentCity ? currentCity.name : '' }}
-        </h2>
         <v-spacer class="d-none d-xs-none d-sm-block d-md-block d-lg-block d-lx-block" />
         <v-btn
-          color="blue darken-4"
+          color="white black--text"
           dark
           :loading="loadingDataTable"
           class="mr-2"
@@ -53,7 +55,7 @@
             <v-toolbar flat>
               <v-btn
                 v-if="can('CreateForm')"
-                color="blue darken-4"
+                color="white black--text"
                 dark
                 class="mr-4"
                 @click="createDialog = true"
@@ -62,7 +64,7 @@
                 Nuevo Cliente
               </v-btn>
               <v-btn
-                color="blue darken-4"
+                color="white black--text"
                 dark
                 class="mr-4"
                 :disabled="refreshLoading"
@@ -108,7 +110,7 @@
                 Totales: {{ clientCount }}
               </v-chip>
               <v-spacer />
-              <v-text-field
+              <!-- <v-text-field
                 :value="options.itemsPerPage"
                 label="Clientes por Pagina"
                 type="number"
@@ -117,7 +119,7 @@
                 width="80px"
                 hide-details
                 @input="options.itemsPerPage = parseInt($event, 10)"
-              />
+              /> -->
             </v-toolbar>
           </template>
           <template v-slot:item.plan.name="props">
@@ -383,11 +385,11 @@ export default {
   },
   methods: {
     refreshActiveClients () {
+      this.$store.dispatch('refreshActiveClients', this.$route.query.city)
       this.refreshLoading = true
       setTimeout(() => {
         this.refreshLoading = false
       }, 1000)
-      this.$store.dispatch('refreshActiveClients', this.$route.query.city)
     },
     getClientBySearch () {
       const city = this.$route.query.city
@@ -457,7 +459,7 @@ export default {
       const recordedCity = localStorage.getItem('currentCity')
       const currentCity = this.$route.query.city
       if (currentCity !== recordedCity) {
-        this.$store.dispatch('refreshActiveClients', this.$route.query.city)
+        this.$store.dispatch('refreshActiveClients', currentCity)
       }
     }
   },

@@ -44,6 +44,10 @@ export const mutations = {
     } catch (error) {
       throw new Error(`TICKET MUTATE ${error}`)
     }
+  },
+  updateTicketState (state, { editindex, closeTicket }) {
+    console.log(state.tickets, editindex)
+    state.tickets[editindex].active = !closeTicket
   }
 }
 export const actions = {

@@ -6,45 +6,38 @@
       >
         <v-card>
           <v-card-title
-            :style="`color:${cityColor};`"
+            :style="`background-color:${currentCity ? currentCity.color : ''};`"
           >
-            <span class="mr-4">Tickets</span>
+            <span class="mr-4">Tickets {{ currentCity ? currentCity.name : '' }}</span>
+          </v-card-title>
+          <v-card-text>
+            <v-row>
+              <v-tooltip top>
+                <!-- eslint-disable -->
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    v-bind="attrs"
+                    class="mt-4 mx-4"
+                    color="white black--text"
+                    dark
+                    :disabled="initialLoading"
+                    :loading="initialLoading"
+                    v-on="on"
+                    @click="refreshTickets()"
+                  >
+                  <v-icon>mdi-reload</v-icon>
+                  </v-btn>
+                </template>
+              <span>Refrescar Tickets</span>
+            </v-tooltip>
             <v-checkbox
               v-model="showClosedValue"
               class="mr-4"
               label="Mostrar cerrados"
               @change="showClosed(showClosedValue)"
             />
-            <v-tooltip top>
-              <!-- eslint-disable -->
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  v-bind="attrs"
-                  color="blue darken-4"
-                  dark
-                  :disabled="refreshLoading"
-                  :loading="refreshLoading"
-                  v-on="on"
-                  @click="refreshTickets()"
-                >
-                  <v-icon>mdi-reload</v-icon>
-                </v-btn>
-              </template>
-              <span>Refrescar Tickets</span>
-            </v-tooltip>
-            <v-spacer />
-            <v-text-field
-              ref="searchTicket"
-              v-model="search"
-              prepend-icon="mdi-magnify"
-              label="Buscar Tickets"
-              single-line
-              hide-details
-              outlined
-              dense
-              class="white--text"
-            />
-          </v-card-title>
+            </v-row>
+          </v-card-text>
           <client-only>
             <v-data-table
               :key="key"
@@ -65,6 +58,23 @@
               @page-count="pageCount = $event"
               @click:row="showTicketInfo"
             >
+              <template v-slot:top>
+                <v-row class="mx-1">
+                  <v-spacer class="d-none d-xs-none d-sm-block d-md-block d-lg-block d-lx-block" />
+                  <v-text-field
+                    ref="searchTicket"
+                    v-model="search"
+                    prepend-icon="mdi-magnify"
+                    label="Buscar Tickets"
+                    single-line
+                    hide-details
+                    outlined
+                    dense
+                    style="max-width: 1000px"
+                    class="white--text"
+                  />
+                </v-row>
+              </template>
               <template v-if="isDesktop" v-slot:item.actions="props">
                 <ClientStatus
                     v-if="can('ClientStatus')"
@@ -249,7 +259,6 @@ export default {
       pageCount: 0,
       itemsPerPage: 5,
       search: '',
-      currentCity: 'Mariquita',
       cityName: '',
       cityColor: '',
       alertBox: false,
@@ -285,35 +294,50 @@ export default {
   computed: {
     tickets () {
       return this.$store.state.tickets
+    },
+    currentCity () {
+      // eslint-disable-next-line eqeqeq
+      return this.$store.state.cities ? this.$store.state.cities.find(c => c.id == this.$route.query.city) : ''
     }
   },
   async mounted () {
     this.getResolution()
-    await this.$store.dispatch('getTicketsFromLocalStorage')
-    await this.showClosed(false)
+    const recordedCity = localStorage.getItem('currentCity')
+    const currentCity = this.$route.query.city
+    if (currentCity !== recordedCity) {
+      await this.$store.dispatch('refreshTickets', { city: currentCity, limit: 50 })
+      await this.showClosed(false)
+    } else {
+      await this.$store.dispatch('getTicketsFromLocalStorage')
+      await this.showClosed(false)
+    }
   },
   methods: {
     async refreshTickets () {
+      this.initialLoading = true
       await this.$store.dispatch('refreshTickets', { limit: 50, city: this.$route.query.city })
       await this.showClosed(false)
+      this.initialLoading = false
     },
     updateTicketStatus (value) {
       if (value.editindex > -1) {
-        this.tickets[value.editindex].active = !value.closeTicket
+        this.$store.commit('updateTicketState', value)
       }
     },
     async showClosed (value) {
-      const newData = []
-      await this.tickets.map((ticket) => {
-        if (value === false) {
-          if (ticket.active) {
+      if (this.tickets) {
+        const newData = []
+        await this.tickets.map((ticket) => {
+          if (value === false) {
+            if (ticket.active) {
+              newData.push(ticket)
+            }
+          } else {
             newData.push(ticket)
           }
-        } else {
-          newData.push(ticket)
-        }
-      })
-      this.ticketList = newData
+        })
+        this.ticketList = newData
+      }
     },
     getDate (date) {
       const dateObject = new Date(date)
@@ -348,46 +372,19 @@ export default {
       Object.assign(this.editModalData, value)
       this.infoModal = true
     },
-    async populareRole () {
-      if (this.localStorageHandler('role', 'count')) {
-        this.role = this.localStorageHandler('role', 'get')
-        this.allowed_components = this.role.allowed_components.map((c) => {
-          return c.name
-        })
-      } else {
-        this.$apollo.queries.role.skip = false
-        await this.$apollo.queries.role.fetchMore({
-          updateQuery: (_, { fetchMoreResult }) => {
-            const newRoleInfo = fetchMoreResult.role
-            this.localStorageHandler('role', 'set', newRoleInfo)
-            this.role = newRoleInfo
-          }
-        })
-        this.allowed_components = this.role.allowed_components.map((c) => {
-          return c.name
-        })
-      }
-    },
-    localStorageHandler (storage, action, payload) {
-      if (action === 'get') {
-        return JSON.parse(localStorage.getItem(storage))
-      }
-      if (action === 'set') {
-        localStorage.setItem(storage, JSON.stringify(payload))
-      }
-      if (action === 'count') {
-        if (localStorage.getItem(storage)) {
-          return true
-        } else {
-          return false
-        }
-      }
-    },
     can (component) {
       const allowedcomponents = this.$store.state.auth.allowed_components
       const currentComponent = component
       const res = allowedcomponents.includes(currentComponent)
       return res
+    },
+    comprobeCity () {
+      const recordedCity = localStorage.getItem('currentCity')
+      const currentCity = this.$route.query.city
+      if (currentCity !== recordedCity) {
+        this.$store.dispatch('refreshActiveClients', currentCity)
+        this.$store.dispatch('refreshTickets', { city: currentCity, limit: 50 })
+      }
     }
   }
 }
