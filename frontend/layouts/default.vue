@@ -33,7 +33,6 @@
     <v-app-bar
       app
       :src="bg"
-      shrink-on-scroll
     >
       <template v-slot:img="{ props }">
         <v-img
@@ -50,8 +49,19 @@
       <v-toolbar-title class="d-none d-md-flex d-lg-flex d-xl-flex" v-text="title" />
       <v-spacer />
       <div v-if="$store.state.auth">
-        <v-icon class="mr-2 green--text darken-4">mdi-account</v-icon>
-        <span class="mr-4">{{ $store.state.auth.username.charAt(0).toUpperCase() + $store.state.auth.username.slice(1) }}</span>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon
+              class="mr-1 green--text darken-4"
+              v-bind="attrs"
+              v-on="on"
+            >
+              mdi-account
+            </v-icon>
+          </template>
+          <span>{{ $store.state.auth.username.charAt(0).toUpperCase() + $store.state.auth.username.slice(1) }}</span>
+        </v-tooltip>
+        <span class="mr-1 d-none d-xs-none d-sm-none d-md-inline d-lg-inline" style="font-size:0.7rem">{{ $store.state.auth.username.charAt(0).toUpperCase() + $store.state.auth.username.slice(1) }}</span>
         <v-btn
           v-for="city in $store.state.cities"
           :key="city.id"
