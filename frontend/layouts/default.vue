@@ -107,7 +107,7 @@
 import gql from 'graphql-tag'
 import Cookie from 'js-cookie'
 export default {
-  middleware: ['defaultCity', 'authenticated'],
+  middleware: ['defaultCity', 'authenticated', 'session'],
   data () {
     return {
       hasPendingChanges: false,
@@ -139,6 +139,16 @@ export default {
           icon: 'mdi-close-network',
           title: 'Suspencion por Mora',
           to: '/cortes'
+        },
+        {
+          icon: 'mdi-comment',
+          title: 'Comentarios Mikrotik',
+          to: '/comments'
+        },
+        {
+          icon: 'mdi-routes',
+          title: 'Rutas OLT',
+          to: '/olt'
         }
       ],
       miniVariant: false,

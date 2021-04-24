@@ -318,6 +318,26 @@ module.exports.mkActiveClientCount = async function (cityIpArray) {
     return result2
   }
 }
+module.exports.mkGetSecrets = async function (mikrotikHost) {
+  try {
+    const conn = new RouterOSAPI({
+      host: mikrotikHost,
+      user: 'API_ARNOP',
+      password: strapi.config.get('server.admin.mikrotik.secret', 'null'),
+      port: 8087
+    })
+    await conn.connect()
+    // eslint-disable-next-line no-unused-vars
+    var com1 = await conn.write('/ppp/secret/getall', [
+      '=.proplist=last-caller-id,name'
+    ])
+    conn.close()
+    return com1
+  } catch (error) {
+    conn.close()
+    return error
+  }
+}
 module.exports.mkGetComment = async function (mikrotikHost, dni, code, model) {
   try {
     const conn = new RouterOSAPI({

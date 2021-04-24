@@ -113,6 +113,10 @@ module.exports = {
       id: String
       client: ClientDeleteObjInput
     }
+    type clientSecretItem {
+      name: String
+      mac_address: String
+    }
   `,
   query: `
     ClientStatus(id: ID): ClientStatus
@@ -121,6 +125,7 @@ module.exports = {
     clientCountDisable(city: String): Int
     searchClient(search: String, limit: Int, city: String): [SearchClient]
     getClientComment(id: ID): ClientComment
+    getClientSecrets(city: String): [clientSecretItem]
     `,
   mutation: `
     editClientPlan(id: String, plan: String, isRx: Boolean, operator: String): Boolean
@@ -161,6 +166,10 @@ module.exports = {
       getClientComment: {
         description: 'Gets Client comment',
         resolver: 'application::client.client.getClientComment'
+      },
+      getClientSecrets: {
+        description: 'Gets Client Secrets from Mikrotik',
+        resolver: 'application::client.client.getClientSecrets'
       }
     },
     Mutation: {

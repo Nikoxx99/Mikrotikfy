@@ -4,7 +4,7 @@
  * to customize this controller
  */
 const { sanitizeEntity } = require('strapi-utils');
-const { mkCreateClient, mkDeleteClient, mkSetClientPlanInformation, mkClientStatus, mkActiveClientCount, mkGetComment, mkSetComment, mkDxClient, simpleTelegramCreate, simpleTelegramAdminCreate, simpleTelegramDelete, simpleTelegramUpdate, simpleTelegramUpdatePlan, createComment } = require('../../../mikrotik/functions');
+const { mkCreateClient, mkDeleteClient, mkSetClientPlanInformation, mkClientStatus, mkActiveClientCount, mkGetComment, mkSetComment, mkDxClient, simpleTelegramCreate, simpleTelegramAdminCreate, mkGetSecrets, simpleTelegramDelete, simpleTelegramUpdate, simpleTelegramUpdatePlan, createComment } = require('../../../mikrotik/functions');
 module.exports = {
   async create(ctx) {
     const sendToMikrotik = ctx.request.body.sendToMikrotik
@@ -286,6 +286,33 @@ module.exports = {
     } else {
       const mikrotikHost = reqCityIpArray[0]
       const res = await mkGetComment(mikrotikHost, dni, code, model)
+      return res
+    }
+  },
+  async getClientSecrets(ctx) {
+    const city = ctx.query.city
+    const search = await strapi.services.city.find({ _id: city })
+    const cityObj = search[0]
+
+    const reqCityIpArray = cityObj.ip
+    if (reqCityIpArray.length > 1) {
+      const successfulMikrotikResponses = []
+      for (let i = 0; i < reqCityIpArray.length; i++) {
+        const mikrotikHost = reqCityIpArray[i]
+        const res = await mkGetSecrets(mikrotikHost)
+        successfulMikrotikResponses.push(res)
+      }
+      let secretArray = []
+      await successfulMikrotikResponses[0].map((s) => {
+        if (s['last-caller-id']){
+          s.mac_address = s['last-caller-id']
+          secretArray.push(s)
+        }
+      })
+      return secretArray
+    } else {
+      const mikrotikHost = reqCityIpArray[0]
+      const res = await mkGetSecrets(mikrotikHost)
       return res
     }
   },

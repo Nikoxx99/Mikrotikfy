@@ -7,7 +7,6 @@
 
 module.exports = {
   find (params) {
-    console.log('service', params)
     return strapi.query('ticket').model.find(params)
     .populate({
       path: 'client tickettype assiganted',
