@@ -290,7 +290,8 @@ module.exports = {
     }
   },
   async getClientSecrets(ctx) {
-    const city = ctx.query.city
+    const city = ctx.query._city
+    console.log('city', city)
     const search = await strapi.services.city.find({ _id: city })
     const cityObj = search[0]
 
@@ -311,9 +312,16 @@ module.exports = {
       })
       return secretArray
     } else {
+      let secretArray = []
       const mikrotikHost = reqCityIpArray[0]
       const res = await mkGetSecrets(mikrotikHost)
-      return res
+      await res.map((s) => {
+        if (s['last-caller-id']){
+          s.mac_address = s['last-caller-id']
+          secretArray.push(s)
+        }
+      })
+      return secretArray
     }
   },
   async searchClient(ctx) {
