@@ -303,6 +303,7 @@ export default {
   },
   async mounted () {
     this.getResolution()
+    this.refreshTickets()
     const recordedCity = localStorage.getItem('currentCity')
     const currentCity = this.$route.query.city
     if (currentCity !== recordedCity) {
