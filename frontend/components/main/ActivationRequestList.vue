@@ -7,11 +7,6 @@
         cols="12"
       >
         <v-card>
-          <v-card-title
-            :style="`background-color:${currentCity ? currentCity.color : ''};`"
-          >
-            <span class="mr-4">Peticiones de Activación</span>
-          </v-card-title>
           <v-card-text>
             <v-row>
               <v-tooltip top>

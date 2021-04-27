@@ -1,283 +1,288 @@
 <template>
-  <v-card>
-    <v-card-title
-      :style="`background-color:${currentCity ? currentCity.color : ''};`"
-    >
-      Clientes {{ currentCity ? currentCity.name : '' }}
-    </v-card-title>
-    <v-card-text>
-      <v-row
-        class="mx-1 mt-4"
-      >
-        <v-spacer class="d-none d-xs-none d-sm-block d-md-block d-lg-block d-lx-block" />
-        <v-btn
-          color="white black--text"
-          dark
-          :loading="loadingDataTable"
-          class="mr-2"
-          style="margin-top:2px;"
-          @click="getClientBySearch()"
-        >
-          Buscar
-        </v-btn>
-        <v-text-field
-          ref="searchClient"
-          v-model="searchClientInput"
-          label="Buscar Cliente"
-          single-line
-          hide-details
-          outlined
-          dense
-          class="white--text"
-          style="max-width: 1000px"
-          @keyup.enter="getClientBySearch()"
-        />
-      </v-row>
-    </v-card-text>
-    <v-card-text>
-      <client-only>
-        <v-data-table
-          :headers="headers"
-          :items.sync="clients"
-          :server-items-length="totalClients"
-          :items-per-page.sync="itemsPerPage"
-          :page.sync="page"
-          :options.sync="options"
-          :loading="loadingDataTable"
-          no-data-text="No hay resultados a la busqueda..."
-          loading-text="Cargando información de clientes..."
-          dense
-          hide-default-footer
-          mobile-breakpoint="100"
-          @page-count="pageCount = $event"
-        >
-          <template v-slot:top>
-            <v-toolbar flat>
-              <v-btn
-                v-if="can('CreateForm')"
-                color="white black--text"
-                dark
-                class="mr-4"
-                @click="createDialog = true"
-              >
-                <v-icon>mdi-plus</v-icon>
-                Nuevo Cliente
-              </v-btn>
-              <v-btn
-                color="white black--text"
-                dark
-                class="mr-4"
-                :disabled="refreshLoading"
-                :loading="refreshLoading"
-                @click="refreshActiveClients"
-              >
-                <v-icon>mdi-reload</v-icon>
-              </v-btn>
-              <v-chip
-                color="white white--text"
-                small
-                outlined
-                label
-                class="mr-4"
-              >
-                En Linea: {{ activeClients }}
-              </v-chip>
-              <v-chip
-                color="green darken-3 white--text"
-                small
-                label
-                outlined
-                class="mr-4 d-none d-md-flex d-lg-flex d-xl-flex"
-              >
-                Activos: {{ clientCountActive }}
-              </v-chip>
-              <v-chip
-                color="red lighten-1 white--text"
-                small
-                outlined
-                label
-                class="mr-4 d-none d-md-flex d-lg-flex d-xl-flex"
-              >
-                En Mora: {{ clientCountDisable }}
-              </v-chip>
-              <v-chip
-                color="primary"
-                small
-                outlined
-                label
-                class="mr-4 d-none d-sm-flex d-md-flex d-lg-flex d-xl-flex"
-              >
-                Totales: {{ clientCount }}
-              </v-chip>
-              <v-spacer />
-              <!-- <v-text-field
-                :value="options.itemsPerPage"
-                label="Clientes por Pagina"
-                type="number"
-                min="5"
-                max="50"
-                width="80px"
-                hide-details
-                @input="options.itemsPerPage = parseInt($event, 10)"
-              /> -->
-            </v-toolbar>
-          </template>
-          <template v-slot:item.plan.name="props">
-            <v-edit-dialog
-              :return-value.sync="props.item.plan"
-              large
-              cancel-text="Cancelar"
-              save-text="Guardar"
-              @save="savePlanFromModal(props.item._id, props.item.plan, isRx, $store.state.auth.username)"
-            >
-              <v-chip small label outlined :color="getColor(props.item.plan.id)" class="white--text">
-                {{ props.item.plan.name }}
-              </v-chip>
-              <template v-slot:input>
-                <v-select
-                  :value="props.item.plan"
-                  item-text="name"
-                  item-value="id"
-                  :items="plans"
-                  return-object
-                  single-line
-                  label="Plan"
-                  dense
-                  @change="updatePlanFromModal(props.item._id, $event, clients.map(function(x) {return x._id; }).indexOf(props.item._id))"
-                />
-                <v-switch
-                  v-model="isRx"
-                  label="Es reconexion?"
-                />
-              </template>
-            </v-edit-dialog>
-          </template>
-          <template v-slot:item.status="{ item }">
-            <svg height="13" width="20">
-              <circle :id="item._id" cx="10" cy="8" r="5" :fill="item.status" />
-            </svg>
-          </template>
-          <template v-slot:item.technology.name="{ item }">
-            <span :class="getTechnology(item.technology.id) + '--text'">
-              {{ item.technology.name }}
-            </span>
-          </template>
-          <template v-slot:item.newModel="{ item }">
-            <svg height="13" width="20">
-              <circle cx="10" cy="8" r="5" :fill="getModel(item.newModel)" />
-            </svg>
-          </template>
-          <template v-slot:item.active="props">
-            <v-tooltip v-if="can('CreateForm')" left>
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  :color="props.item.active ? 'green darken-3' : 'red darken-3'"
-                  dark
-                  small
-                  :loading="props.item.loading"
-                  v-bind="attrs"
-                  text
-                  v-on="on"
-                  @click="updateStatus(props.item, clients.map(function(x) {return x._id; }).indexOf(props.item._id))"
-                >
-                  <v-icon>mdi-{{ props.item.active ? 'check' : 'close' }} {{ props.index }}</v-icon>
-                </v-btn>
-              </template>
-              <span>Activar Cliente</span>
-            </v-tooltip>
-            <ActivationRequest
-              :item="props.item"
-              :allowedcomponents="$store.state.auth.allowed_components"
-            />
-          </template>
-          <template v-slot:item.actions="{ item }">
-            <div style="white-space:nowrap">
-              <CreateTicket
-                v-if="can('CreateTicket')"
-                :name="item.name"
-                :city="item.city.id"
-                :assignated="$store.state.auth.id"
-                :clientid="item._id"
-                :role="$store.state.auth.allowed_components"
-              />
-              <TicketHistory
-                :clientid="item._id"
-                :name="item.name"
-              />
-              <ClientStatus
-                v-if="can('ClientStatus')"
-                :name="item.name"
-                :clientid="item._id"
-                :code="item.code"
-                :role="$store.state.auth.allowed_components"
-              />
-              <EditForm
-                v-if="can('EditForm')"
-                :client="item"
-                :index="clients.indexOf(item)"
-                :role="$store.state.auth.allowed_components"
-                @updateComment="updateComment($event)"
-              />
-              <DeleteClient v-if="can('DeleteClient')" :name="item.name" :clientid="item._id" />
-            </div>
-          </template>
-        </v-data-table>
-      </client-only>
-      <v-row>
-        <v-col cols="12" sm="8" md="10" lg="11" style="max-width:90%;margin:auto;">
-          <v-pagination
-            v-model="page"
-            :length="pageCount"
-          />
-        </v-col>
-      </v-row>
-    </v-card-text>
-    <v-snackbar
-      v-model="snack"
-      :timeout="1000"
-      :color="snackColor"
-      bottom
-      vertical
-    >
-      {{ snackText }}
-
-      <template v-slot:action="{ attrs }">
-        <v-btn v-bind="attrs" text @click="snack = false">
-          Cerrar
-        </v-btn>
-      </template>
-    </v-snackbar>
-    <v-dialog v-model="createDialog" max-width="1150px" :retain-focus="false">
+  <v-row>
+    <v-col cols="12">
       <v-card>
-        <v-card-title>
-          <v-toolbar
-            dark
-          >
-            <v-btn
-              icon
-              dark
-              @click="createDialog = false"
-            >
-              <v-icon>mdi-close</v-icon>
-            </v-btn>
-            <v-toolbar-title><span class="headline">Crear Cliente en</span></v-toolbar-title>
-          </v-toolbar>
+        <v-card-title
+          outline
+          :style="`color:${currentCity ? currentCity.color : ''};border-bottom:solid 1px ${currentCity ? currentCity.color : ''}`"
+        >
+          Clientes {{ currentCity ? currentCity.name : '' }}
         </v-card-title>
         <v-card-text>
-          <v-container>
-            <CreateForm
-              v-if="createDialog"
-              :citycolor="'blue'"
-              :role="$store.state.auth.rolename"
-              @createClient="createClient($event)"
-              @createClientDialog="createClientDialog($event)"
-              @createClientSnack="createClientSnack($event)"
+          <v-row
+            class="mx-1 mt-4"
+          >
+            <v-spacer class="d-none d-xs-none d-sm-block d-md-block d-lg-block d-lx-block" />
+            <v-btn
+              color="white black--text"
+              dark
+              :loading="loadingDataTable"
+              class="mr-2"
+              style="margin-top:2px;"
+              @click="getClientBySearch()"
+            >
+              Buscar
+            </v-btn>
+            <v-text-field
+              ref="searchClient"
+              v-model="searchClientInput"
+              label="Buscar Cliente"
+              single-line
+              hide-details
+              outlined
+              dense
+              class="white--text"
+              style="max-width: 1000px"
+              @keyup.enter="getClientBySearch()"
             />
-          </v-container>
+          </v-row>
         </v-card-text>
+        <v-card-text>
+          <client-only>
+            <v-data-table
+              :headers="headers"
+              :items.sync="clients"
+              :server-items-length="totalClients"
+              :items-per-page.sync="itemsPerPage"
+              :page.sync="page"
+              :options.sync="options"
+              :loading="loadingDataTable"
+              no-data-text="No hay resultados a la busqueda..."
+              loading-text="Cargando información de clientes..."
+              dense
+              hide-default-footer
+              mobile-breakpoint="100"
+              @page-count="pageCount = $event"
+            >
+              <template v-slot:top>
+                <v-toolbar flat>
+                  <v-btn
+                    v-if="can('CreateForm')"
+                    color="white black--text"
+                    dark
+                    class="mr-4"
+                    @click="createDialog = true"
+                  >
+                    <v-icon>mdi-plus</v-icon>
+                    Nuevo Cliente
+                  </v-btn>
+                  <v-btn
+                    color="white black--text"
+                    dark
+                    class="mr-4"
+                    :disabled="refreshLoading"
+                    :loading="refreshLoading"
+                    @click="refreshActiveClients"
+                  >
+                    <v-icon>mdi-reload</v-icon>
+                  </v-btn>
+                  <v-chip
+                    color="white white--text"
+                    small
+                    outlined
+                    label
+                    class="mr-4"
+                  >
+                    En Linea: {{ activeClients }}
+                  </v-chip>
+                  <v-chip
+                    color="green darken-3 white--text"
+                    small
+                    label
+                    outlined
+                    class="mr-4 d-none d-md-flex d-lg-flex d-xl-flex"
+                  >
+                    Activos: {{ clientCountActive }}
+                  </v-chip>
+                  <v-chip
+                    color="red lighten-1 white--text"
+                    small
+                    outlined
+                    label
+                    class="mr-4 d-none d-md-flex d-lg-flex d-xl-flex"
+                  >
+                    En Mora: {{ clientCountDisable }}
+                  </v-chip>
+                  <v-chip
+                    color="primary"
+                    small
+                    outlined
+                    label
+                    class="mr-4 d-none d-sm-flex d-md-flex d-lg-flex d-xl-flex"
+                  >
+                    Totales: {{ clientCount }}
+                  </v-chip>
+                  <v-spacer />
+                  <!-- <v-text-field
+                    :value="options.itemsPerPage"
+                    label="Clientes por Pagina"
+                    type="number"
+                    min="5"
+                    max="50"
+                    width="80px"
+                    hide-details
+                    @input="options.itemsPerPage = parseInt($event, 10)"
+                  /> -->
+                </v-toolbar>
+              </template>
+              <template v-slot:item.plan.name="props">
+                <v-edit-dialog
+                  :return-value.sync="props.item.plan"
+                  large
+                  cancel-text="Cancelar"
+                  save-text="Guardar"
+                  @save="savePlanFromModal(props.item._id, props.item.plan, isRx, $store.state.auth.username)"
+                >
+                  <v-chip small label outlined :color="getColor(props.item.plan.id)" class="white--text">
+                    {{ props.item.plan.name }}
+                  </v-chip>
+                  <template v-slot:input>
+                    <v-select
+                      :value="props.item.plan"
+                      item-text="name"
+                      item-value="id"
+                      :items="plans"
+                      return-object
+                      single-line
+                      label="Plan"
+                      dense
+                      @change="updatePlanFromModal(props.item._id, $event, clients.map(function(x) {return x._id; }).indexOf(props.item._id))"
+                    />
+                    <v-switch
+                      v-model="isRx"
+                      label="Es reconexion?"
+                    />
+                  </template>
+                </v-edit-dialog>
+              </template>
+              <template v-slot:item.status="{ item }">
+                <svg height="13" width="20">
+                  <circle :id="item._id" cx="10" cy="8" r="5" :fill="item.status" />
+                </svg>
+              </template>
+              <template v-slot:item.technology.name="{ item }">
+                <span :class="getTechnology(item.technology.id) + '--text'">
+                  {{ item.technology.name }}
+                </span>
+              </template>
+              <template v-slot:item.newModel="{ item }">
+                <svg height="13" width="20">
+                  <circle cx="10" cy="8" r="5" :fill="getModel(item.newModel)" />
+                </svg>
+              </template>
+              <template v-slot:item.active="props">
+                <v-tooltip v-if="can('CreateForm')" left>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                      :color="props.item.active ? 'green darken-3' : 'red darken-3'"
+                      dark
+                      small
+                      :loading="props.item.loading"
+                      v-bind="attrs"
+                      text
+                      v-on="on"
+                      @click="updateStatus(props.item, clients.map(function(x) {return x._id; }).indexOf(props.item._id))"
+                    >
+                      <v-icon>mdi-{{ props.item.active ? 'check' : 'close' }} {{ props.index }}</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Activar Cliente</span>
+                </v-tooltip>
+                <ActivationRequest
+                  :item="props.item"
+                  :allowedcomponents="$store.state.auth.allowed_components"
+                />
+              </template>
+              <template v-slot:item.actions="{ item }">
+                <div style="white-space:nowrap">
+                  <CreateTicket
+                    v-if="can('CreateTicket')"
+                    :name="item.name"
+                    :city="item.city.id"
+                    :assignated="$store.state.auth.id"
+                    :clientid="item._id"
+                    :role="$store.state.auth.allowed_components"
+                  />
+                  <TicketHistory
+                    :clientid="item._id"
+                    :name="item.name"
+                  />
+                  <ClientStatus
+                    v-if="can('ClientStatus')"
+                    :name="item.name"
+                    :clientid="item._id"
+                    :code="item.code"
+                    :role="$store.state.auth.allowed_components"
+                  />
+                  <EditForm
+                    v-if="can('EditForm')"
+                    :client="item"
+                    :index="clients.indexOf(item)"
+                    :role="$store.state.auth.allowed_components"
+                    @updateComment="updateComment($event)"
+                  />
+                  <DeleteClient v-if="can('DeleteClient')" :name="item.name" :clientid="item._id" />
+                </div>
+              </template>
+            </v-data-table>
+          </client-only>
+          <v-row>
+            <v-col cols="12" sm="8" md="10" lg="11" style="max-width:90%;margin:auto;">
+              <v-pagination
+                v-model="page"
+                :length="pageCount"
+              />
+            </v-col>
+          </v-row>
+        </v-card-text>
+        <v-snackbar
+          v-model="snack"
+          :timeout="1000"
+          :color="snackColor"
+          bottom
+          vertical
+        >
+          {{ snackText }}
+
+          <template v-slot:action="{ attrs }">
+            <v-btn v-bind="attrs" text @click="snack = false">
+              Cerrar
+            </v-btn>
+          </template>
+        </v-snackbar>
+        <v-dialog v-model="createDialog" max-width="1150px" :retain-focus="false">
+          <v-card>
+            <v-card-title>
+              <v-toolbar
+                dark
+              >
+                <v-btn
+                  icon
+                  dark
+                  @click="createDialog = false"
+                >
+                  <v-icon>mdi-close</v-icon>
+                </v-btn>
+                <v-toolbar-title><span class="headline">Crear Cliente en</span></v-toolbar-title>
+              </v-toolbar>
+            </v-card-title>
+            <v-card-text>
+              <v-container>
+                <CreateForm
+                  v-if="createDialog"
+                  :citycolor="'blue'"
+                  :role="$store.state.auth.rolename"
+                  @createClient="createClient($event)"
+                  @createClientDialog="createClientDialog($event)"
+                  @createClientSnack="createClientSnack($event)"
+                />
+              </v-container>
+            </v-card-text>
+          </v-card>
+        </v-dialog>
       </v-card>
-    </v-dialog>
-  </v-card>
+    </v-col>
+  </v-row>
 </template>
 
 <script>
@@ -335,9 +340,6 @@ export default {
     clients () {
       return this.$store.state.client.clients
     },
-    cities () {
-      return this.$store.state.cities
-    },
     currentCity () {
       // eslint-disable-next-line eqeqeq
       return this.$store.state.cities ? this.$store.state.cities.find(c => c.id == this.$route.query.city) : ''
@@ -376,11 +378,8 @@ export default {
       this.$store.dispatch('client/getUsersFromDatabase', { start, limit, city })
     }
   },
-  async mounted () {
+  mounted () {
     const city = this.$route.query.city
-    await this.comprobeCity()
-    localStorage.setItem('currentCity', this.$route.query.city)
-    this.$store.dispatch('loadLocalStorage')
     this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: this.itemsPerPage, city })
   },
   methods: {
@@ -454,41 +453,6 @@ export default {
       } else {
         this.$store.dispatch('client/adminCreate', { client, index })
       }
-    },
-    comprobeCity () {
-      const recordedCity = localStorage.getItem('currentCity')
-      const currentCity = this.$route.query.city
-      if (currentCity !== recordedCity) {
-        this.$store.dispatch('refreshActiveClients', currentCity)
-      }
-    }
-  },
-  head () {
-    return {
-      title: this.currentCity ? this.currentCity.name + ' API' : '' + 'ARNOP API',
-      meta: [
-        { hid: 'language', name: 'language', content: 'es' },
-        { hid: 'audience', name: 'audience', content: 'all' },
-        { hid: 'rating', name: 'rating', content: 'general' },
-        { hid: 'distribution', name: 'distribution', content: 'global' },
-        { hid: 'document-type', name: 'document-type', content: 'Public' },
-        { hid: 'MSSmartTagsPreventParsing', name: 'MSSmartTagsPreventParsing', content: 'true' },
-        { hid: 'robots', name: 'robots', content: 'all' },
-        { hid: 'robots', name: 'robots', content: 'all, index, follow' },
-        { hid: 'googlebot', name: 'googlebot', content: 'all, index, follow' },
-        { hid: 'yahoo-slurp', name: 'yahoo-slurp', content: 'all, index, follow' },
-        { hid: 'msnbot', name: 'msnbot', content: 'index, follow' },
-        { hid: 'googlebot-image', name: 'googlebot-image', content: 'all' },
-        { hid: 'title', name: 'title', content: this.title },
-        { hid: 'og:title', property: 'og:title', content: this.title },
-        { hid: 'og:description', property: 'og:description', content: 'ARNOProducciones - Base de datos interactiva' },
-        { hid: 'author', name: 'author', content: 'Nicolas Echeverry' }
-      ],
-      script: [
-        {
-          src: 'https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js'
-        }
-      ]
     }
   }
 }

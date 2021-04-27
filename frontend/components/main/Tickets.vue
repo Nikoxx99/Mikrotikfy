@@ -6,9 +6,10 @@
       >
         <v-card>
           <v-card-title
-            :style="`background-color:${currentCity ? currentCity.color : ''};`"
+            outline
+            :style="`color:${currentCity ? currentCity.color : ''};border-bottom:solid 1px ${currentCity ? currentCity.color : ''}`"
           >
-            <span class="mr-4">Tickets {{ currentCity ? currentCity.name : '' }}</span>
+            Tickets {{ currentCity ? currentCity.name : '' }}
           </v-card-title>
           <v-card-text>
             <v-row>

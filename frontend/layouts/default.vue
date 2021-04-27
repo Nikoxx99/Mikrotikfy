@@ -155,8 +155,12 @@ export default {
       right: true,
       rightDrawer: false,
       title: 'Aplicación de Gestión Dinámica ARNOP',
-      bg: 'https://picsum.photos/1920/1080?random',
-      cities: {}
+      bg: 'https://picsum.photos/1920/1080?random'
+    }
+  },
+  computed: {
+    cities () {
+      return this.$store.state.cities
     }
   },
   mounted () {
