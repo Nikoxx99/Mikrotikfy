@@ -323,7 +323,7 @@ export default {
         { text: 'Aciones', value: 'actions', sortable: false }
       ],
       isRx: true,
-      itemsPerPage: 5,
+      itemsPerPage: 15,
       loadingDataTable: false,
       options: {},
       page: 1,

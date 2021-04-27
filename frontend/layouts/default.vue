@@ -37,7 +37,7 @@
       <template v-slot:img="{ props }">
         <v-img
           v-bind="props"
-          gradient="to top right, rgba(0,0,0,.5), rgba(0,0,0,.8)"
+          gradient="to top right, rgba(0,0,0,.8), rgba(0,0,0,.9)"
         />
       </template>
       <div v-if="hasPendingChanges">
