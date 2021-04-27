@@ -22,7 +22,7 @@
         Clientes
       </v-tab>
     </v-tabs>
-    <v-tabs-items v-model="tab">
+    <v-tabs-items v-model="tab" touchless>
       <v-tab-item
         v-if="can('ActivationRequestsList')"
         :key="1"
