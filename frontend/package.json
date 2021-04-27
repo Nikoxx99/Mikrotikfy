@@ -1,5 +1,5 @@
 {
-  "name": "frontend",
+  "name": "mikrotikfy",
   "version": "1.21.04",
   "private": true,
   "scripts": {
@@ -25,6 +25,7 @@
   "devDependencies": {
     "@nuxtjs/eslint-config": "^3.1.0",
     "@nuxtjs/eslint-module": "^2.0.0",
+    "@nuxtjs/pwa": "^3.3.5",
     "@nuxtjs/vuetify": "^1.11.2",
     "babel-eslint": "^10.1.0",
     "eslint": "^7.14.0",

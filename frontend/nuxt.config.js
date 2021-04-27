@@ -47,6 +47,7 @@ export default {
     '@nuxtjs/eslint-module',
     '@nuxtjs/apollo',
     '@nuxtjs/vuetify',
+    '@nuxtjs/pwa',
     'nuxt-build-optimisations'
   ],
   buildOptimisations: {
