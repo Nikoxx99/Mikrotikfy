@@ -58,7 +58,7 @@ export default {
   },
   data () {
     return {
-      tab: null
+      tab: 'tab-2'
     }
   },
   computed: {

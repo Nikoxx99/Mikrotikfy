@@ -41,10 +41,10 @@
         </div>
         <v-card-actions>
           <v-btn
-            color="blue darken-4"
+            :color="ticketAdvance.closeTicket ? 'red darken-4' : 'blue darken-4'"
             @click="CreateTicketAdvance()"
           >
-            Crear Avance
+            {{ ticketAdvance.closeTicket ? 'Cerrar Ticket' : 'Crear Avance' }}
           </v-btn>
           <v-spacer />
           <v-btn

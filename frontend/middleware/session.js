@@ -6,7 +6,6 @@ export default async function ({ store, req }) {
   try {
     const auth = JSON.parse(parsed.auth)
     const res = await axios.$get(`/users?id=${auth.id}`)
-    console.log('Axios', res)
     if (res.resetSession) {
       await axios.$put(`/users/${auth.id}`, { resetSession: false })
       Cookie.remove('auth')

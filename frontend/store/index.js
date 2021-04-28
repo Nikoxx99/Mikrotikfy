@@ -46,7 +46,6 @@ export const mutations = {
     }
   },
   updateTicketState (state, { editindex, closeTicket }) {
-    console.log(state.tickets, editindex)
     state.tickets[editindex].active = !closeTicket
   }
 }
