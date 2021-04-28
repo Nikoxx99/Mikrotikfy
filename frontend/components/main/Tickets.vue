@@ -258,7 +258,7 @@ export default {
       key: 0,
       page: 1,
       pageCount: 0,
-      itemsPerPage: 5,
+      itemsPerPage: 10,
       search: '',
       cityName: '',
       cityColor: '',
