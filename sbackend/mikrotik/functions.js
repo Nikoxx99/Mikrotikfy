@@ -614,18 +614,19 @@ module.exports.simpleTelegramCreateTicketAdvance = async function (input, client
   const line2 = client.code
   const line3 = client.name
   const line4 = client.address
-  const line5 = client.phone
-  const line6 = tickettype.name
-  const line7 = input.details
-  let line8 = ''
+  const line5 = client.neighborhood.name
+  const line6 = client.phone
+  const line7 = tickettype.name
+  const line8 = input.details
+  let line9 = ''
   if (!input.ticket.active) {
-    line8 = 'TICKET CERRADO'
+    line9 = 'TICKET CERRADO'
   } else {
-    line8 = 'TICKET ACTIVO'
+    line9 = 'TICKET ACTIVO'
   }
-  const line9 = assiganted
-  const line10 = input.createdAt
-  const message = `${line1}\n${line2}\n${line3}\n${line4}\n${line5}\n${line6}\n\n${line7}\n${line8}\n\n${line9}\n${line10}`
+  const line10 = assiganted
+  const line11 = input.createdAt
+  const message = `${line1}\n${line2}\n${line3}\n${line4}\n${line5}\n${line6}\n${line7}\n${line8}\n${line9}\n\n${line10}\n${line11}`
   const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + sanitizeString(message)
   fetch(req).then(function (response) {
     console.log(response)

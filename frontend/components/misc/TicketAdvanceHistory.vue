@@ -37,7 +37,11 @@
                 hide-default-footer
                 mobile-breakpoint="100"
                 @page-count="pageCount = $event"
-              />
+              >
+                <template v-slot:item.createdAt="{ item }">
+                  <span>{{ getDate(item.createdAt) }}</span>
+                </template>
+              </v-data-table>
             </client-only>
             <div class="text-center pt-2">
               <v-pagination v-model="page" :length="pageCount" />
@@ -83,6 +87,7 @@ export default {
                 username
               }
               details
+              createdAt
             }
           }
         `,
@@ -118,9 +123,9 @@ export default {
     headers: [
       { text: 'Cliente', sortable: true, value: 'ticket.client.name' },
       { text: 'Tipo', sortable: true, value: 'ticket.tickettype.name' },
-      { text: 'Operador', sortable: false, value: 'operator.username' },
+      { text: 'Creado por', sortable: false, value: 'operator.username' },
       { text: 'Detalles', sortable: true, value: 'details' },
-      { text: 'Creado', sortable: true, value: 'ticket.createdAt' }
+      { text: 'Avance creado el', sortable: true, value: 'createdAt' }
     ]
   }),
   methods: {
@@ -144,6 +149,11 @@ export default {
       // eslint-disable-next-line camelcase
       const current_component = component
       return allowed_components.includes(current_component)
+    },
+    getDate (date) {
+      const dateObject = new Date(date)
+      const humanDateFormat = dateObject.toLocaleString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric' })
+      return humanDateFormat
     }
   }
 }
