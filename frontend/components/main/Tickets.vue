@@ -85,6 +85,14 @@
                     :role="$store.state.auth.allowed_components"
                   />
                 <CreateTicketAdvance
+                  v-if="props.item.tickettype.name !== 'TRASLADO'"
+                  :editindex="tickets.indexOf(props.item)"
+                  :ticketid="props.item.id"
+                  :name="props.item.client.name"
+                  @updateTicketStatus="updateTicketStatus($event)"
+                />
+                <CreateTicketAdvanceTraslate
+                  v-else
                   :editindex="tickets.indexOf(props.item)"
                   :ticketid="props.item.id"
                   :name="props.item.client.name"
@@ -246,12 +254,14 @@
 import CreateTicketAdvance from '../create/CreateTicketAdvance'
 import TicketAdvanceHistory from '../misc/TicketAdvanceHistory'
 import ClientStatus from '../main/ClientStatus'
+import CreateTicketAdvanceTraslate from '../create/CreateTicketAdvanceTraslate.vue'
 export default {
   name: 'TicketChanges',
   components: {
     CreateTicketAdvance,
     TicketAdvanceHistory,
-    ClientStatus
+    ClientStatus,
+    CreateTicketAdvanceTraslate
   },
   data () {
     return {
@@ -301,23 +311,14 @@ export default {
       return this.$store.state.cities ? this.$store.state.cities.find(c => c.id == this.$route.query.city) : ''
     }
   },
-  async mounted () {
+  mounted () {
     this.getResolution()
     this.refreshTickets()
-    const recordedCity = localStorage.getItem('currentCity')
-    const currentCity = this.$route.query.city
-    if (currentCity !== recordedCity) {
-      await this.$store.dispatch('refreshTickets', { city: currentCity, limit: 50 })
-      await this.showClosed(false)
-    } else {
-      await this.$store.dispatch('getTicketsFromLocalStorage')
-      await this.showClosed(false)
-    }
   },
   methods: {
     async refreshTickets () {
       this.initialLoading = true
-      await this.$store.dispatch('refreshTickets', { limit: 50, city: this.$route.query.city })
+      await this.$store.dispatch('refreshTickets', { limit: 30, city: this.$route.query.city })
       await this.showClosed(false)
       this.initialLoading = false
     },
@@ -384,7 +385,6 @@ export default {
       const recordedCity = localStorage.getItem('currentCity')
       const currentCity = this.$route.query.city
       if (currentCity !== recordedCity) {
-        this.$store.dispatch('refreshActiveClients', currentCity)
         this.$store.dispatch('refreshTickets', { city: currentCity, limit: 50 })
       }
     }

@@ -104,7 +104,7 @@
 </template>
 
 <script>
-import gql from 'graphql-tag'
+// import gql from 'graphql-tag'
 import Cookie from 'js-cookie'
 export default {
   middleware: ['defaultCity', 'authenticated', 'session'],
@@ -169,27 +169,27 @@ export default {
     if (month === 11) {
       this.bg = 'cbg.jpg'
     }
-    this.$apollo.query({
-      query: gql`
-      query {
-        passwordchanges{
-          closed
-        }
-      }
-      `
-    }).then((input) => {
-      for (let i = 0; i < input.data.passwordchanges.length; i++) {
-        if (input.data.passwordchanges[i].closed.value === false) {
-          this.items[2].info++
-        }
-      }
-      if (this.items[2].info > 0) {
-        this.hasPendingChanges = true
-      }
-    }).catch((error) => {
-      // eslint-disable-next-line no-console
-      console.error(error)
-    })
+    // this.$apollo.query({
+    //   query: gql`
+    //   query {
+    //     passwordchanges{
+    //       closed
+    //     }
+    //   }
+    //   `
+    // }).then((input) => {
+    //   for (let i = 0; i < input.data.passwordchanges.length; i++) {
+    //     if (input.data.passwordchanges[i].closed.value === false) {
+    //       this.items[2].info++
+    //     }
+    //   }
+    //   if (this.items[2].info > 0) {
+    //     this.hasPendingChanges = true
+    //   }
+    // }).catch((error) => {
+    //   // eslint-disable-next-line no-console
+    //   console.error(error)
+    // })
   },
   methods: {
     logout () {
