@@ -26,11 +26,13 @@
             <v-text-field
               ref="searchClient"
               v-model="searchClientInput"
-              label="Buscar Cliente"
+              :label="loadingDataTable ? 'Cargando... Por favor espere.' : 'Buscar Cliente'"
               single-line
               hide-details
               outlined
               dense
+              :loading="loadingDataTable"
+              :disabled="loadingDataTable"
               class="white--text"
               style="max-width: 1000px"
               @keyup.enter="getClientBySearch()"
@@ -324,7 +326,7 @@ export default {
       ],
       isRx: true,
       itemsPerPage: 15,
-      loadingDataTable: false,
+      loadingDataTable: true,
       options: {},
       page: 1,
       pageCount: 0,
@@ -378,9 +380,10 @@ export default {
       this.$store.dispatch('client/getUsersFromDatabase', { start, limit, city })
     }
   },
-  mounted () {
+  async mounted () {
     const city = this.$route.query.city
-    this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: this.itemsPerPage, city })
+    await this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: this.itemsPerPage, city })
+    this.loadingDataTable = false
   },
   methods: {
     refreshActiveClients () {

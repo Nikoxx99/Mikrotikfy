@@ -49,8 +49,8 @@ export const mutations = {
 export const actions = {
   async getUsersFromDatabase ({ commit }, payload) {
     try {
-      const apollo = await this.app.apolloProvider.defaultClient
-      apollo.query({
+      const apollo = this.app.apolloProvider.defaultClient
+      await apollo.query({
         query: gql`query ($limit: Int, $start: Int, $city: String){
           clients (start: $start, limit: $limit, sort: "createdAt:desc", where: {city: $city}){
             _id
