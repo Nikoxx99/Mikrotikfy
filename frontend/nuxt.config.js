@@ -98,6 +98,11 @@ export default {
   ** See https://nuxtjs.org/api/configuration-build/
   */
   build: {
-    optimizeCSS: true
+    optimizeCSS: true,
+    babel: {
+      plugins: [
+        ['@babel/plugin-proposal-private-methods', { loose: true }]
+      ]
+    }
   }
 }
