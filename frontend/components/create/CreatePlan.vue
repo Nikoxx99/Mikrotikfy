@@ -100,7 +100,7 @@
 </template>
 
 <script>
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 import EditPlan from '../edit/EditPlan'
 import ModalDeletePlan from '../delete/ModalDeletePlan'
 export default {
@@ -142,7 +142,7 @@ export default {
       this.createdMessage = 'Plan creado correctamente.'
     }
     this.$apollo.query({
-      query: gql`query ($limit: Int){
+      query: gqlt`query ($limit: Int){
         plans(limit: $limit){
           id
           name
@@ -176,7 +176,7 @@ export default {
     createPlan () {
       this.isSubmitting = !this.isSubmitting
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: PlanInput){
+        mutation: gqlt`mutation ($input: PlanInput){
           createPlan(input: $input){
             success
             errors{

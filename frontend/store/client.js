@@ -1,4 +1,4 @@
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 export const state = () => ({
   clients: []
 })
@@ -51,7 +51,7 @@ export const actions = {
     try {
       const apollo = this.app.apolloProvider.defaultClient
       await apollo.query({
-        query: gql`query ($limit: Int, $start: Int, $city: String){
+        query: gqlt`query ($limit: Int, $start: Int, $city: String){
           clients (start: $start, limit: $limit, sort: "createdAt:desc", where: {city: $city}){
             _id
             code
@@ -113,7 +113,7 @@ export const actions = {
     try {
       const apollo = await this.app.apolloProvider.defaultClient
       apollo.query({
-        query: gql`query ($search: String, $limit: Int, $city: String){
+        query: gqlt`query ($search: String, $limit: Int, $city: String){
           searchClient (search: $search, limit: $limit city: $city){
             _id
             code
@@ -174,7 +174,7 @@ export const actions = {
     const apollo = this.app.apolloProvider.defaultClient
     try {
       apollo.mutate({
-        mutation: gql`mutation ($id: String, $plan: String, $isRx: Boolean, $operator: String){
+        mutation: gqlt`mutation ($id: String, $plan: String, $isRx: Boolean, $operator: String){
           editClientPlan(id: $id, plan: $plan, isRx: $isRx, operator: $operator)
         }`,
         variables: {
@@ -194,7 +194,7 @@ export const actions = {
     const apollo = this.app.apolloProvider.defaultClient
     try {
       apollo.mutate({
-        mutation: gql`mutation ($input: adminCreateInput){
+        mutation: gqlt`mutation ($input: adminCreateInput){
           adminCreate(input: $input)
         }`,
         variables: {
@@ -226,7 +226,7 @@ export const actions = {
     const apollo = this.app.apolloProvider.defaultClient
     try {
       apollo.mutate({
-        mutation: gql`mutation ($input: adminDeleteInput){
+        mutation: gqlt`mutation ($input: adminDeleteInput){
           adminDelete(input: $input)
         }`,
         variables: {
@@ -245,7 +245,7 @@ export const actions = {
     const apollo = this.app.apolloProvider.defaultClient
     try {
       apollo.mutate({
-        mutation: gql`mutation ($input: updateClientInput){
+        mutation: gqlt`mutation ($input: updateClientInput){
           updateClient(input: $input){
             client{
               id

@@ -1,4 +1,4 @@
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 export const state = () => ({
   tickets: []
 })
@@ -16,7 +16,7 @@ export const actions = {
     try {
       const apollo = this.app.apolloProvider.defaultClient
       await apollo.query({
-        query: gql`query($limit: Int, $city: String){
+        query: gqlt`query($limit: Int, $city: String){
           tickets(limit: $limit, sort:"createdAt:desc",where: {
             city:$city
           }){

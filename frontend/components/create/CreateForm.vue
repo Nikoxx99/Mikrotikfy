@@ -240,7 +240,7 @@
 </template>
 
 <script>
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 export default {
   name: 'CreateForm',
   props: {
@@ -256,7 +256,7 @@ export default {
   apollo: {
     cities () {
       return {
-        query: gql`
+        query: gqlt`
         query{
           cities{
             id
@@ -268,7 +268,7 @@ export default {
     },
     neighborhoods () {
       return {
-        query: gql`
+        query: gqlt`
         query{
           neighborhoods{
             id
@@ -280,7 +280,7 @@ export default {
     },
     plans () {
       return {
-        query: gql`
+        query: gqlt`
         query{
           plans{
             id
@@ -292,7 +292,7 @@ export default {
     },
     technologies () {
       return {
-        query: gql`
+        query: gqlt`
         query{
           technologies{
             id
@@ -371,7 +371,7 @@ export default {
     createClient () {
       this.isSubmitting = !this.isSubmitting
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: createClientInput){
+        mutation: gqlt`mutation ($input: createClientInput){
           createClient(input: $input){
             client {
               code

@@ -75,7 +75,7 @@
 </template>
 
 <script>
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 export default {
   name: 'CreateTicketAdvance',
   props: {
@@ -113,7 +113,7 @@ export default {
     },
     CreateTicketAdvance () {
       this.$apollo.mutate({
-        mutation: gql`mutation ($id: ID!, $status: Boolean){
+        mutation: gqlt`mutation ($id: ID!, $status: Boolean){
           updateTicket(input: {
           where: {
             id: $id
@@ -133,7 +133,7 @@ export default {
         }
       }).then(() => {
         this.$apollo.mutate({
-          mutation: gql`mutation ($id: ID!, $details: String, $operator: ID!){
+          mutation: gqlt`mutation ($id: ID!, $details: String, $operator: ID!){
             createTicketdetail(input: {
               data: {
                 ticket: $id

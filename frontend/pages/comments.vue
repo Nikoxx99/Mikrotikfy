@@ -125,7 +125,7 @@
 </template>
 
 <script>
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 export default {
   name: 'CommentGenerator',
   components: {
@@ -134,7 +134,7 @@ export default {
   apollo: {
     clients () {
       return {
-        query: gql`
+        query: gqlt`
         query($city: ID!){
           clients(where: {
             city: $city
@@ -187,7 +187,7 @@ export default {
     },
     MikrotikClient () {
       return {
-        query: gql`
+        query: gqlt`
         query($city: String){
           MikrotikClient(city: $city){
             name
@@ -258,7 +258,7 @@ export default {
       const newClientInfo = this.clients
       for (let i = 0; i < newClientInfo.length; i++) {
         this.$apollo.mutate({
-          mutation: gql`mutation ($clientid: ID, $comment: String){
+          mutation: gqlt`mutation ($clientid: ID, $comment: String){
             setClientComment(clientid: $clientid, comment: $comment)
           }`,
           variables: {
@@ -315,7 +315,7 @@ export default {
     },
     save (id, status) {
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: UpdatePasswordChangeInput){
+        mutation: gqlt`mutation ($input: UpdatePasswordChangeInput){
           updatePasswordChangeRequest(input: $input)
         }`,
         variables: {

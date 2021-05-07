@@ -54,7 +54,7 @@
 </template>
 
 <script>
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 export default {
   props: {
     telegrambotid: {
@@ -68,7 +68,7 @@ export default {
   methods: {
     deleteTelegrambot (telegrambotid) {
       this.$apollo.mutate({
-        mutation: gql`mutation ($id: ID!){
+        mutation: gqlt`mutation ($id: ID!){
           deleteTelegrambot(input: {
             where: {
               id: $id

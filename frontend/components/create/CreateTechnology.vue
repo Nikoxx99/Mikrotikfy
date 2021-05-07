@@ -93,7 +93,7 @@
 </template>
 
 <script>
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 import EditTechnology from '../edit/EditTechnology'
 import ModalDeleteTechnology from '../delete/ModalDeleteTechnology'
 export default {
@@ -132,7 +132,7 @@ export default {
       this.createdMessage = 'Technologia creada correctamente.'
     }
     this.$apollo.query({
-      query: gql`query ($limit: Int){
+      query: gqlt`query ($limit: Int){
         technologies(limit: $limit){
           id
           name
@@ -165,7 +165,7 @@ export default {
     createTechnology () {
       this.isSubmitting = !this.isSubmitting
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: TechnologyInput){
+        mutation: gqlt`mutation ($input: TechnologyInput){
           createTechnology(input: $input){
             success
             errors{

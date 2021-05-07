@@ -104,7 +104,7 @@
 </template>
 
 <script>
-// import gql from 'graphql-tag'
+// import gqlt from 'graphql-tag'
 import Cookie from 'js-cookie'
 export default {
   middleware: ['defaultCity', 'authenticated', 'session'],
@@ -170,7 +170,7 @@ export default {
       this.bg = 'cbg.jpg'
     }
     // this.$apollo.query({
-    //   query: gql`
+    //   query: gqlt`
     //   query {
     //     passwordchanges{
     //       closed

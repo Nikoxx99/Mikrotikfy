@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 export default {
   name: 'DeleteClient',
   props: {
@@ -70,7 +70,7 @@ export default {
   methods: {
     deleteClient (clientid) {
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: deleteClientInput){
+        mutation: gqlt`mutation ($input: deleteClientInput){
           deleteClient(input: $input){
             client {
               id

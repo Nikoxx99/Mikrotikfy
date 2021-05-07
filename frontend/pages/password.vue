@@ -101,7 +101,7 @@
 </template>
 
 <script>
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 export default {
   components: {
   },
@@ -109,7 +109,7 @@ export default {
   apollo: {
     passwordchanges () {
       return {
-        query: gql`
+        query: gqlt`
         query{
           passwordchanges(sort: "createdAt:desc"){
             _id
@@ -184,7 +184,7 @@ export default {
     },
     save (id, status) {
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: UpdatePasswordChangeInput){
+        mutation: gqlt`mutation ($input: UpdatePasswordChangeInput){
           updatePasswordChangeRequest(input: $input)
         }`,
         variables: {

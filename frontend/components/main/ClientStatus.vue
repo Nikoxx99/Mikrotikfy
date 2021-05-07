@@ -94,13 +94,13 @@
 </template>
 
 <script>
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 export default {
   name: 'ClientStatus',
   apollo: {
     ClientStatus () {
       return {
-        query: gql`query ($id: ID){
+        query: gqlt`query ($id: ID){
           ClientStatus(id: $id){
             status
             address

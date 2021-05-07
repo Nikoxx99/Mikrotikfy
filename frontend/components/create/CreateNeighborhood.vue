@@ -88,7 +88,7 @@
 </template>
 
 <script>
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 import EditNeighborhood from '../edit/EditNeighborhood'
 import ModalDeleteNeighborhood from '../delete/ModalDeleteNeighborhood'
 export default {
@@ -125,7 +125,7 @@ export default {
       this.createdMessage = 'Barrio creado correctamente.'
     }
     this.$apollo.query({
-      query: gql`query ($limit: Int){
+      query: gqlt`query ($limit: Int){
         neighborhoods(limit: $limit){
           id
           name
@@ -158,7 +158,7 @@ export default {
     createNeighborhood () {
       this.isSubmitting = !this.isSubmitting
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: createNeighborhoodInput){
+        mutation: gqlt`mutation ($input: createNeighborhoodInput){
           createNeighborhood(input: $input){
             neighborhood{
               name

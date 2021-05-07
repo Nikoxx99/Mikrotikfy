@@ -73,7 +73,7 @@
 </template>
 
 <script>
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 export default {
   props: {
     item: {
@@ -102,7 +102,7 @@ export default {
   methods: {
     createActivationrequest () {
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: createActivationrequestInput){
+        mutation: gqlt`mutation ($input: createActivationrequestInput){
           createActivationrequest(input: $input){
             activationrequest{
               client{

@@ -54,7 +54,7 @@
 </template>
 
 <script>
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 export default {
   props: {
     cityid: {
@@ -72,7 +72,7 @@ export default {
   methods: {
     deleteCity (cityid) {
       this.$apollo.mutate({
-        mutation: gql`mutation ($id: Int){
+        mutation: gqlt`mutation ($id: Int){
           deleteCity(id: $id){
             success
             errors{

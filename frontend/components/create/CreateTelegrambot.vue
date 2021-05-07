@@ -100,7 +100,7 @@
 </template>
 
 <script>
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 import EditTelegrambot from '../edit/EditTelegrambot'
 import ModalDeleteTelegrambot from '../delete/ModalDeleteTelegrambot'
 export default {
@@ -143,7 +143,7 @@ export default {
       this.createdMessage = 'Ciudad creada correctamente.'
     }
     this.$apollo.query({
-      query: gql`query ($limit: Int){
+      query: gqlt`query ($limit: Int){
         telegrambots(limit: $limit){
           name
           token
@@ -178,7 +178,7 @@ export default {
     createTelegrambot () {
       this.isSubmitting = !this.isSubmitting
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: createTelegrambotInput){
+        mutation: gqlt`mutation ($input: createTelegrambotInput){
           createTelegrambot(input: $input){
             telegrambot {
               token

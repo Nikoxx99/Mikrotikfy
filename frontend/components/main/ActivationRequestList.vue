@@ -134,13 +134,13 @@
 </template>
 
 <script>
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 export default {
   name: 'ActivationRequestsList',
   apollo: {
     activationrequests () {
       return {
-        query: gql`
+        query: gqlt`
         query($city: String){
           activationrequests(where: {
             city:$city
@@ -310,7 +310,7 @@ export default {
         this.activationRequestsList[index].client.active = !this.activationRequestsList[index].client.active
         this.activationRequestsList[index].loading = !this.activationRequestsList[index].loading
         this.$apollo.mutate({
-          mutation: gql`mutation ($input: adminDeleteFromRequestInput){
+          mutation: gqlt`mutation ($input: adminDeleteFromRequestInput){
             adminDeleteFromRequest(input: $input)
           }`,
           variables: {
@@ -339,7 +339,7 @@ export default {
         this.activationRequestsList[index].loading = !this.activationRequestsList[index].loading
         const currentClientToCreate = this.activationRequestsList[index].client
         this.$apollo.mutate({
-          mutation: gql`mutation ($input: adminCreateFromRequestInput){
+          mutation: gqlt`mutation ($input: adminCreateFromRequestInput){
             adminCreateFromRequest(input: $input)
           }`,
           variables: {

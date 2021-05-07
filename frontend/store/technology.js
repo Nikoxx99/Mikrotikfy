@@ -1,4 +1,4 @@
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 export const state = () => ({
   technologies: []
 })
@@ -16,7 +16,7 @@ export const actions = {
     try {
       const apollo = this.app.apolloProvider.defaultClient
       await apollo.query({
-        query: gql`query{
+        query: gqlt`query{
           technologies{
             id
             name

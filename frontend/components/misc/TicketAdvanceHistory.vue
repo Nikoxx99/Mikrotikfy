@@ -63,13 +63,13 @@
 </template>
 
 <script>
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 export default {
   name: 'TicketAdvanceHistory',
   apollo: {
     ticketdetails () {
       return {
-        query: gql`
+        query: gqlt`
           query($id: ID!){
             ticketdetails(where: {
               ticket: $id

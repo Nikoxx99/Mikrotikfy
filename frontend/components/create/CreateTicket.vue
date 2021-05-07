@@ -76,13 +76,13 @@
 </template>
 
 <script>
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 export default {
   name: 'CreateTicket',
   apollo: {
     tickettypes () {
       return {
-        query: gql`query{
+        query: gqlt`query{
           tickettypes{
             id
             name
@@ -136,7 +136,7 @@ export default {
     },
     createTicket () {
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: createTicketInput){
+        mutation: gqlt`mutation ($input: createTicketInput){
           createTicket(input: $input){
             ticket{
               client{

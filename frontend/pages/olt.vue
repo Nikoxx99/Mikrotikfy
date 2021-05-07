@@ -69,12 +69,12 @@
 </template>
 
 <script>
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 export default {
   apollo: {
     plans () {
       return {
-        query: gql`
+        query: gqlt`
         query{
           plans{
             _id
@@ -128,7 +128,7 @@ export default {
     getSecretsFromMikrotik () {
       this.secretList = []
       this.$apollo.query({
-        query: gql`
+        query: gqlt`
         query($city: String) {
           getClientSecrets(city: $city){
             name
@@ -152,7 +152,7 @@ export default {
       this.initialLoading = true
       this.dataTable = []
       this.$apollo.query({
-        query: gql`
+        query: gqlt`
         query($city: ID!) {
           city(id: $city){
             name
@@ -263,7 +263,7 @@ export default {
         this.snackText = 'El proceso ha comenzado...'
         for (let i = 0; i < pendingDx.length; i++) {
           this.$apollo.mutate({
-            mutation: gql`mutation ($input: DxInfoInput){
+            mutation: gqlt`mutation ($input: DxInfoInput){
               dxClient(input: $input){
                 code
                 name

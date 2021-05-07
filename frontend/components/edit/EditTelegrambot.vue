@@ -36,7 +36,7 @@
 
 <script>
 /* eslint-disable vue/prop-name-casing */
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 export default {
   name: 'EditTelegrambot',
   props: {
@@ -65,7 +65,7 @@ export default {
   methods: {
     updateTelegrambot () {
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: updateTelegrambotInput){
+        mutation: gqlt`mutation ($input: updateTelegrambotInput){
           updateTelegrambot(input: $input){
             telegrambot {
               name

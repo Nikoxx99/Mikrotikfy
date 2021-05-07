@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 
 export default {
   data: () => ({
@@ -106,7 +106,7 @@ export default {
     },
     createUser () {
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: UserInput!){
+        mutation: gqlt`mutation ($input: UserInput!){
           createUser(input: $input){
             success
             token

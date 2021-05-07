@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 import Cookie from 'js-cookie'
 
 export default {
@@ -97,7 +97,7 @@ export default {
       this.isLoading = true
       this.loginFailed = false
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: UsersPermissionsLoginInput!){
+        mutation: gqlt`mutation ($input: UsersPermissionsLoginInput!){
           login(input: $input){
             jwt
             user{
@@ -119,7 +119,7 @@ export default {
         }
       }).then((first) => {
         this.$apollo.query({
-          query: gql`query ($id: ID!){
+          query: gqlt`query ($id: ID!){
             role(id: $id){
               allowed_components{
                 name

@@ -39,7 +39,7 @@
 
 <script>
 /* eslint-disable vue/prop-name-casing */
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 export default {
   name: 'EditNeighborhood',
   props: {
@@ -68,7 +68,7 @@ export default {
   methods: {
     updateNeighborhood () {
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: NeighborhoodInput){
+        mutation: gqlt`mutation ($input: NeighborhoodInput){
           updateNeighborhood(input: $input){
             success
             errors{

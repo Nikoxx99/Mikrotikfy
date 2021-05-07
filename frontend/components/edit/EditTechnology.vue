@@ -39,7 +39,7 @@
 
 <script>
 /* eslint-disable vue/prop-name-casing */
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 export default {
   name: 'EditTechnology',
   props: {
@@ -68,7 +68,7 @@ export default {
   methods: {
     updateTechnology () {
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: TechnologyInput){
+        mutation: gqlt`mutation ($input: TechnologyInput){
           updateTechnology(input: $input){
             success
             errors{

@@ -212,7 +212,7 @@
 </template>
 
 <script>
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 import Logo from '../components/main/Logo'
 export default {
   layout: 'outuser',
@@ -250,7 +250,7 @@ export default {
     testDni () {
       if (this.user_dni.length > 0) {
         this.$apollo.query({
-          query: gql`
+          query: gqlt`
           query($dni: String) {
             TestPasswordChange(dni: $dni)
           }
@@ -285,7 +285,7 @@ export default {
       const date = Date.now()
       if (this.valid) {
         this.$apollo.mutate({
-          mutation: gql`mutation ($input: PasswordChangeInput){
+          mutation: gqlt`mutation ($input: PasswordChangeInput){
           createPasswordChangeRequest(input: $input)
         }`,
           variables: {

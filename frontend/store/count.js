@@ -1,4 +1,4 @@
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 export const state = () => ({
   clientCount: {
     active: 0,
@@ -42,7 +42,7 @@ export const actions = {
     const apollo = this.app.apolloProvider.defaultClient
     try {
       await apollo.query({
-        query: gql`query ($city: String){
+        query: gqlt`query ($city: String){
           ActiveClients(city: $city){
             name
           }
@@ -63,7 +63,7 @@ export const actions = {
     const apollo = this.app.apolloProvider.defaultClient
     try {
       await apollo.query({
-        query: gql`query ($city: String){
+        query: gqlt`query ($city: String){
           clientCount(city: $city)
         }
       `,
@@ -82,7 +82,7 @@ export const actions = {
     const apollo = this.app.apolloProvider.defaultClient
     try {
       await apollo.query({
-        query: gql`query ($city: String){
+        query: gqlt`query ($city: String){
           clientCountActive(city: $city)
         }
       `,
@@ -101,7 +101,7 @@ export const actions = {
     const apollo = this.app.apolloProvider.defaultClient
     try {
       await apollo.query({
-        query: gql`query ($city: String){
+        query: gqlt`query ($city: String){
           clientCountDisable(city: $city)
         }
       `,

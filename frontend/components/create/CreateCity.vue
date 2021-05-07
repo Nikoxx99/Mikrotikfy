@@ -105,7 +105,7 @@
 </template>
 
 <script>
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 import EditCity from '../edit/EditCity'
 import ModalDeleteCity from '../delete/ModalDeleteCity'
 export default {
@@ -151,7 +151,7 @@ export default {
       this.createdMessage = 'Ciudad creada correctamente.'
     }
     this.$apollo.query({
-      query: gql`query ($limit: Int){
+      query: gqlt`query ($limit: Int){
         cities(limit: $limit){
           id
           name
@@ -189,7 +189,7 @@ export default {
     createCity () {
       this.isSubmitting = !this.isSubmitting
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: createCityInput){
+        mutation: gqlt`mutation ($input: createCityInput){
           createCity(input: $input){
             city {
               name

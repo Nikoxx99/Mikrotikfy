@@ -11,7 +11,7 @@
           >
             Tickets {{ currentCity ? currentCity.name : '' }}
           </v-card-title>
-          <v-card-text>
+          <v-card-text class="py-1">
             <v-row>
               <v-tooltip top>
                 <!-- eslint-disable -->
@@ -60,7 +60,7 @@
               @click:row="showTicketInfo"
             >
               <template v-slot:top>
-                <v-row class="mx-1">
+                <v-row class="mx-1 my-1">
                   <v-spacer class="d-none d-xs-none d-sm-block d-md-block d-lg-block d-lx-block" />
                   <v-text-field
                     ref="searchTicket"

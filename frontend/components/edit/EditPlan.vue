@@ -45,7 +45,7 @@
 
 <script>
 /* eslint-disable vue/prop-name-casing */
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 export default {
   name: 'EditPlan',
   props: {
@@ -78,7 +78,7 @@ export default {
   methods: {
     updatePlan () {
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: PlanInput){
+        mutation: gqlt`mutation ($input: PlanInput){
           updatePlan(input: $input){
             success
             errors{

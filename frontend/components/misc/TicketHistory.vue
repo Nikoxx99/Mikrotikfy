@@ -80,7 +80,7 @@
 </template>
 
 <script>
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 import TicketAdvanceHistory from '../misc/TicketAdvanceHistory'
 export default {
   name: 'TicketHistory',
@@ -90,7 +90,7 @@ export default {
   apollo: {
     tickets () {
       return {
-        query: gql`
+        query: gqlt`
           query($id: ID!){
             tickets(where: {
               client: $id

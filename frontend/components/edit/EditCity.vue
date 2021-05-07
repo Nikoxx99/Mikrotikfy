@@ -55,7 +55,7 @@
 
 <script>
 /* eslint-disable vue/prop-name-casing */
-import gql from 'graphql-tag'
+import gqlt from 'graphql-tag'
 export default {
   name: 'EditCity',
   props: {
@@ -97,7 +97,7 @@ export default {
   },
   mounted () {
     this.$apollo.query({
-      query: gql`query ($limit: Int){
+      query: gqlt`query ($limit: Int){
         telegrambots(limit: $limit){
           id
           name
@@ -118,7 +118,7 @@ export default {
   methods: {
     updateCity () {
       this.$apollo.mutate({
-        mutation: gql`mutation ($input: updateCityInput){
+        mutation: gqlt`mutation ($input: updateCityInput){
           updateCity(input: $input){
             city {
               name
