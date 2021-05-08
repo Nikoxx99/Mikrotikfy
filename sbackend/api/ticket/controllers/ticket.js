@@ -20,11 +20,13 @@ module.exports = {
     let entities;
     let client;
     let city = ctx.query.city
+    let limit = ctx.query.limit
+    console.log(ctx.query)
     if (ctx.query.client) {
       client = ctx.query.client
       entities = await strapi.services.ticket.find({'client': client});
     } else {
-      entities = await strapi.services.ticket.find({'city':city});
+      entities = await strapi.services.ticket.search(ctx.query);
     }
 
     return entities.map(entity => sanitizeEntity(entity, { model: strapi.models.ticket }));
