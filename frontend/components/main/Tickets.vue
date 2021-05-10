@@ -216,7 +216,7 @@
                       :role="allowed_components"
                     />
                   <CreateTicketAdvance
-                    v-if="props.item.tickettype.name !== 'TRASLADO'"
+                    v-if="editModalData.tickettype.name !== 'TRASLADO'"
                     :editindex="tickets ? tickets.indexOf(editModalData.id) : ''"
                     :ticketid="editModalData.id"
                     :name="editModalData.client.name"
