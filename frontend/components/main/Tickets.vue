@@ -217,16 +217,16 @@
                     />
                   <CreateTicketAdvance
                     v-if="props.item.tickettype.name !== 'TRASLADO'"
-                    :editindex="tickets.indexOf(props.item)"
-                    :ticketid="props.item.id"
-                    :name="props.item.client.name"
+                    :editindex="tickets ? tickets.indexOf(editModalData.id) : ''"
+                    :ticketid="editModalData.id"
+                    :name="editModalData.client.name"
                     @updateTicketStatus="updateTicketStatus($event)"
                   />
                   <CreateTicketAdvanceTraslate
                     v-else
-                    :editindex="tickets.indexOf(props.item)"
-                    :ticketid="props.item.id"
-                    :name="props.item.client.name"
+                    :editindex="tickets ? tickets.indexOf(editModalData.id) : ''"
+                    :ticketid="editModalData.id"
+                    :name="editModalData.client.name"
                     @updateTicketStatus="updateTicketStatus($event)"
                   />
                   <TicketAdvanceHistory
