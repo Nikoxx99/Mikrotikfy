@@ -340,6 +340,7 @@ export default {
         this.tickets[editindex].active = !closeTicket
       }
       this.showClosed(false)
+      this.infoModal = false
     },
     async showClosed (value) {
       if (this.tickets) {
