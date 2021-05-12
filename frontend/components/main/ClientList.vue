@@ -308,7 +308,6 @@ export default {
   },
   data () {
     return {
-      clients: [],
       allowedcomponents: [],
       createDialog: false,
       headers: [
@@ -340,9 +339,9 @@ export default {
     }
   },
   computed: {
-    // clients () {
-    //   return this.$store.state.client.clients
-    // },
+    clients () {
+      return this.$store.state.client.clients
+    },
     currentCity () {
       // eslint-disable-next-line eqeqeq
       return this.$store.state.cities ? this.$store.state.cities.find(c => c.id == this.$route.query.city) : ''
@@ -378,23 +377,16 @@ export default {
       this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: this.itemsPerPage, city })
     },
     async page () {
-      // this.$store.dispatch('client/getUsersFromDatabase', { start, limit, city })
-      this.clients = await this.$strapi.find('clients', {
-        city: this.$route.query.city,
-        _start: (this.page - 1) * this.itemsPerPage,
-        _limit: this.itemsPerPage ? this.itemsPerPage : 10,
-        _sort: this.$route.query.sort ? this.$route.query.sort : 'createdAt:desc'
-      })
+      const start = (this.page - 1) * this.itemsPerPage
+      const limit = this.itemsPerPage
+      const city = this.$route.query.city
+      await this.$store.dispatch('client/getUsersFromDatabase', { start, limit, city })
       this.stateIdentifier()
     }
   },
   async mounted () {
-    // await this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: this.itemsPerPage, city })
-    this.clients = await this.$strapi.find('clients', {
-      city: this.$route.query.city,
-      _limit: this.itemsPerPage ? this.itemsPerPage : 10,
-      _sort: this.$route.query.sort ? this.$route.query.sort : 'createdAt:desc'
-    })
+    const city = this.$route.query.city
+    await this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: this.itemsPerPage, city })
     this.loadingDataTable = false
     this.stateIdentifier()
   },
@@ -408,45 +400,19 @@ export default {
     async getClientBySearch () {
       this.loadingDataTable = true
       const search = this.searchClientInput
+      const city = this.$route.query.city
       if (search) {
-        // this.$store.dispatch('client/getUsersFromDatabaseBySearch', { search, city })
-        this.clients = await this.$strapi.find('searchClient', {
-          search,
-          city: this.$route.query.city
-          // _sort: this.$route.query.sort ? this.$route.query.sort : 'createdAt:desc'
-        })
+        await this.$store.dispatch('client/getUsersFromDatabaseBySearch', { search, city })
         await this.stateIdentifier()
         this.loadingDataTable = false
       } else {
-        // this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: this.itemsPerPage, city })
-        this.clients = await this.$strapi.find('clients', {
-          city: this.$route.query.city,
-          _limit: this.itemsPerPage ? this.itemsPerPage : 10,
-          _sort: this.$route.query.sort ? this.$route.query.sort : 'createdAt:desc'
-        })
+        await this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: this.itemsPerPage, city })
         await this.stateIdentifier()
         this.loadingDataTable = false
       }
     },
     stateIdentifier () {
-      this.clients.map((client) => {
-        // eslint-disable-next-line eqeqeq
-        const ac = this.activeClientsList.find(c => c == client.code)
-        if (ac) {
-          this.$set(client, 'status', 'green')
-          return client
-        } else {
-          // eslint-disable-next-line eqeqeq
-          const ac2 = this.activeClientsList.find(c => c == client.dni)
-          if (ac2) {
-            this.$set(client, 'status', 'green')
-            return client
-          } else {
-            this.$set(client, 'status', 'red')
-            return client
-          }
-        }
-      })
+      this.$store.commit('client/calculateClientStatus', this.activeClientsList)
     },
     savePlanFromModal (clientId, newPlan, isRx, operator, index) {
       this.$store.dispatch('client/setPlanFromModal', { clientId, newPlan, isRx, operator, index })
