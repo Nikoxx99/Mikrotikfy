@@ -67,8 +67,14 @@ export default {
   ** Nuxt.js modules
   */
   modules: [
-    '@nuxtjs/axios'
+    '@nuxtjs/axios',
+    '@nuxtjs/strapi'
   ],
+  strapi: {
+    url: process.env.API_STRAPI_ENDPOINT,
+    key: 'authToken',
+    entities: ['tickets']
+  },
   axios: {
     baseURL: process.env.API_AXIOS_ENDPOINT
   },

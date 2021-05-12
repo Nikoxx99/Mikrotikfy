@@ -163,17 +163,14 @@ module.exports = {
         const mikrotikHost = reqCityIpArray[i]
         await mkSetComment(mikrotikHost, dni, code, model, comment)
         if (reqCityIpArray.length - 1 === i) {
-          console.log('this ', model, comment)
           return true
         }
       }
     } else {
       const mikrotikHost = reqCityIpArray[0]
       await mkSetComment(mikrotikHost, dni, code, model, comment)
-      console.log('other ')
       return true
     }
-    console.log('how')
   },
   async delete(ctx) {
     const { id } = ctx.params;
@@ -291,7 +288,6 @@ module.exports = {
   },
   async getClientSecrets(ctx) {
     const city = ctx.query._city
-    console.log('city', city)
     const search = await strapi.services.city.find({ _id: city })
     const cityObj = search[0]
 
@@ -325,8 +321,8 @@ module.exports = {
     }
   },
   async searchClient(ctx) {
-    const search = ctx.query._search
-    const city = ctx.query._city
+    const search = ctx.query.search
+    const city = ctx.query.city
     if (search) {
       const neighborhood = await strapi.services.neighborhood.find({ 'name': { $regex: new RegExp(search, 'i') } })
       if (neighborhood.length > 0) {
@@ -341,25 +337,6 @@ module.exports = {
           ]
         })
         const n = res.map(entity => sanitizeEntity(entity, { model: strapi.models.client }));
-        const cityQueryForActiveResult = await strapi.services.city.find({ _id: city})
-        const ipArray = cityQueryForActiveResult[0].ip
-        const active = await mkActiveClientCount(ipArray)
-        n.map((client) => {
-          const ac = active.find(c => c.name == client.code)
-          if (ac) {
-            client.status = 'green'
-            return client
-          } else {
-            const ac2 = active.find(c => c.name == client.dni)
-            if (ac2) {
-              client.status = 'green'
-              return client
-            } else {
-              client.status = 'red'
-              return client
-            }
-          }
-        })
         return n
       } else {
         const res = await strapi.services.client.find({
@@ -372,25 +349,6 @@ module.exports = {
           ]
         })
         const n = res.map(entity => sanitizeEntity(entity, { model: strapi.models.client }));
-        const cityQueryForActiveResult = await strapi.services.city.find({ _id: city})
-        const ipArray = cityQueryForActiveResult[0].ip
-        const active = await mkActiveClientCount(ipArray)
-        n.map((client) => {
-          const ac = active.find(c => c.name == client.code)
-          if (ac) {
-            client.status = 'green'
-            return client
-          } else {
-            const ac2 = active.find(c => c.name == client.dni)
-            if (ac2) {
-              client.status = 'green'
-              return client
-            } else {
-              client.status = 'red'
-              return client
-            }
-          }
-        })
         return n
       }
     } else {
@@ -398,7 +356,6 @@ module.exports = {
     }
   },
   async editClientPlan(ctx) {
-    console.log(ctx.request.body)
     const id = ctx.request.body.id
     const newClientPlanSearch = ctx.request.body.plan
     const isRx = ctx.request.body.isRx
@@ -497,37 +454,37 @@ module.exports = {
     if (ctx.query._q) {
       entities = await strapi.services.client.search(ctx.query);
     } else {
-      const city = await strapi.services.city.find({ _id: ctx.query.city })
-      const ipArray = city[0].ip
-      const active = await mkActiveClientCount(ipArray)
+      // const city = await strapi.services.city.find({ _id: ctx.query.city })
+      // const ipArray = city[0].ip
+      // const active = await mkActiveClientCount(ipArray)
       entities = await strapi.services.client.search(ctx.query);
-      entities.map((client) => {
-        const ac = active.find(c => c.name == client.code)
-        if (ac) {
-          client.status = 'green'
-          return client
-        } else {
-          const ac2 = active.find(c => c.name == client.dni)
-          if (ac2) {
-            client.status = 'green'
-            return client
-          } else {
-            client.status = 'red'
-            return client
-          }
-        }
-        // for(let i = 0; i < active.length; i++){
-        //   if (client.code == active[i].name){
-        //     console.log('green1')
-        //     client.status = 'green'
-        //   } else if (client.dni == active[i].name) {
-        //     console.log('green2')
-        //     client.status = 'green'
-        //   } else {
-        //     client.status = 'red'
-        //   }
-        // }
-      })
+      // entities.map((client) => {
+      //   const ac = active.find(c => c.name == client.code)
+      //   if (ac) {
+      //     client.status = 'green'
+      //     return client
+      //   } else {
+      //     const ac2 = active.find(c => c.name == client.dni)
+      //     if (ac2) {
+      //       client.status = 'green'
+      //       return client
+      //     } else {
+      //       client.status = 'red'
+      //       return client
+      //     }
+      //   }
+      //   // for(let i = 0; i < active.length; i++){
+      //   //   if (client.code == active[i].name){
+      //   //     console.log('green1')
+      //   //     client.status = 'green'
+      //   //   } else if (client.dni == active[i].name) {
+      //   //     console.log('green2')
+      //   //     client.status = 'green'
+      //   //   } else {
+      //   //     client.status = 'red'
+      //   //   }
+      //   // }
+      // })
       return entities.map(entity => sanitizeEntity(entity, { model: strapi.models.client }));
     }
 

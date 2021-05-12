@@ -311,9 +311,9 @@ export default {
     }
   },
   computed: {
-    tickets () {
-      return this.$store.state.tickets
-    },
+    // tickets () {
+    //   return this.$store.state.tickets
+    // },
     currentCity () {
       // eslint-disable-next-line eqeqeq
       return this.$store.state.cities ? this.$store.state.cities.find(c => c.id == this.$route.query.city) : ''
@@ -326,14 +326,20 @@ export default {
   methods: {
     async refreshTickets () {
       this.initialLoading = true
-      await this.$store.dispatch('refreshTickets', { limit: 30, city: this.$route.query.city })
+      // await this.$store.dispatch('refreshTickets', { limit: 30, city: this.$route.query.city })
+      this.tickets = await this.$strapi.find('tickets', {
+        city: this.$route.query.city,
+        _limit: this.$route.query.limit ? parseInt(this.$route.query.limit) : 30,
+        _sort: this.$route.query.sort ? this.$route.query.sort : 'createdAt:desc'
+      })
       await this.showClosed(false)
       this.initialLoading = false
     },
-    updateTicketStatus (value) {
-      if (value.editindex > -1) {
-        this.$store.commit('updateTicketState', value)
+    updateTicketStatus ({ editindex, closeTicket }) {
+      if (editindex > -1) {
+        this.tickets[editindex].active = !closeTicket
       }
+      this.showClosed(false)
     },
     async showClosed (value) {
       if (this.tickets) {

@@ -50,7 +50,7 @@
     },
     {
       "method": "GET",
-      "path": "/getactiveclients/:city",
+      "path": "/getactiveclients",
       "handler": "city.getActiveClients",
       "config": {
         "policies": []

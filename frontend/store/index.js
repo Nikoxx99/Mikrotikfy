@@ -9,6 +9,7 @@ export const state = () => {
     technologies: null,
     neighborhoods: null,
     activeClients: null,
+    activeClientsList: null,
     clientCount: null,
     clientCountActive: null,
     clientCountDisable: null
@@ -18,12 +19,13 @@ export const mutations = {
   setAuth (state, auth) {
     state.auth = auth
   },
-  setLocalStorage (state, { cities, plans, technologies, neighborhoods, activeClients, clientCount, clientCountActive, clientCountDisable }) {
+  setLocalStorage (state, { cities, plans, technologies, neighborhoods, activeClients, activeClientsList, clientCount, clientCountActive, clientCountDisable }) {
     state.cities = JSON.parse(cities)
     state.plans = JSON.parse(plans)
     state.technologies = JSON.parse(technologies)
     state.neighborhoods = JSON.parse(neighborhoods)
     state.activeClients = JSON.parse(activeClients)
+    state.activeClientsList = JSON.parse(activeClientsList)
     state.clientCount = JSON.parse(clientCount)
     state.clientCountActive = JSON.parse(clientCountActive)
     state.clientCountDisable = JSON.parse(clientCountDisable)
@@ -31,9 +33,10 @@ export const mutations = {
   setTicketsFromLocalStorage (state, tickets) {
     state.tickets = JSON.parse(tickets)
   },
-  refreshActiveClients (state, res) {
+  refreshActiveClients (state, { count, clientActiveList }) {
     try {
-      state.activeClients = res
+      state.activeClients = count
+      state.activeClientsList = clientActiveList
     } catch (error) {
       throw new Error(`REFRESHACTIVECOUNT MUTATE ${error}`)
     }
@@ -63,15 +66,16 @@ export const actions = {
     commit('setAuth', auth)
   },
   loadLocalStorage ({ commit }) {
-    const cities = localStorage.getItem('cities')
     const plans = localStorage.getItem('plans')
+    const cities = localStorage.getItem('cities')
+    const clientCount = localStorage.getItem('clientCount')
     const technologies = localStorage.getItem('technologies')
     const neighborhoods = localStorage.getItem('neighborhoods')
     const activeClients = localStorage.getItem('activeClients')
-    const clientCount = localStorage.getItem('clientCount')
+    const activeClientsList = localStorage.getItem('activeClientsList')
     const clientCountActive = localStorage.getItem('clientCountActive')
     const clientCountDisable = localStorage.getItem('clientCountDisable')
-    commit('setLocalStorage', { cities, plans, technologies, neighborhoods, activeClients, clientCount, clientCountActive, clientCountDisable })
+    commit('setLocalStorage', { cities, plans, technologies, neighborhoods, activeClients, activeClientsList, clientCount, clientCountActive, clientCountDisable })
   },
   getTicketsFromLocalStorage ({ commit }) {
     const tickets = localStorage.getItem('tickets')
@@ -79,9 +83,16 @@ export const actions = {
   },
   async refreshActiveClients ({ commit }, city) {
     try {
-      const res = await this.$axios.$get(`/getactiveclients/${city}`)
+      const res = await this.$strapi.find('getactiveclients', {
+        city
+      })
+      const count = res.length
       localStorage.setItem('activeClients', res.length)
-      commit('refreshActiveClients', res.length)
+      const clientActiveList = await res.map((c) => {
+        return c.name
+      })
+      localStorage.setItem('activeClientsList', JSON.stringify(clientActiveList))
+      commit('refreshActiveClients', { count, clientActiveList })
     } catch (error) {
       throw new Error(`ACTIVECOUNT ACTION ${error}`)
     }

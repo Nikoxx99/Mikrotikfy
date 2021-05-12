@@ -100,6 +100,7 @@ export const actions = {
           limit: payload.limit
         }
       }).then((input) => {
+        console.log(input.data.clients)
         commit('getUsersFromDatabase', input.data.clients)
       }).catch((error) => {
         // eslint-disable-next-line no-console

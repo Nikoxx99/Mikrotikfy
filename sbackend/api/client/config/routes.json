@@ -47,6 +47,14 @@
       "config": {
         "policies": []
       }
+    },
+    {
+      "method": "GET",
+      "path": "/searchClient",
+      "handler": "client.searchClient",
+      "config": {
+        "policies": []
+      }
     }
   ]
 }

@@ -51,8 +51,12 @@ export const actions = {
         variables: {
           city
         }
-      }).then((res) => {
+      }).then(async (res) => {
         localStorage.setItem('activeClients', res.data.ActiveClients.length)
+        const clientActiveList = await res.data.ActiveClients.map((c) => {
+          return c.name
+        })
+        localStorage.setItem('activeClientsList', JSON.stringify(clientActiveList))
         commit('activeClients', res)
       })
     } catch (error) {
