@@ -3,25 +3,8 @@ export const state = () => ({
   clients: []
 })
 export const mutations = {
-  calculateClientStatus (state, payload) {
-    state.clients.map((client, i) => {
-      // eslint-disable-next-line eqeqeq
-      const ac = payload.find(c => c == client.code)
-      if (ac) {
-        client.status = 'green'
-        return client
-      } else {
-        // eslint-disable-next-line eqeqeq
-        const ac2 = payload.find(c => c == client.dni)
-        if (ac2) {
-          client.status = 'green'
-          return client
-        } else {
-          client.status = 'red'
-          return client
-        }
-      }
-    })
+  calculateClientStatus (state, newState) {
+    state.clients = newState
   },
   getUsersFromDatabase (state, clientsList) {
     try {
@@ -67,6 +50,27 @@ export const mutations = {
   }
 }
 export const actions = {
+  async calculateClientStatus ({ state, commit }, payload) {
+    const newState = await state.clients.map((client) => {
+      // eslint-disable-next-line eqeqeq
+      const ac = payload.find(c => c == client.code)
+      if (ac) {
+        client.status = 'green'
+        return client
+      } else {
+        // eslint-disable-next-line eqeqeq
+        const ac2 = payload.find(c => c == client.dni)
+        if (ac2) {
+          client.status = 'green'
+          return client
+        } else {
+          client.status = 'red'
+          return client
+        }
+      }
+    })
+    commit('calculateClientStatus', newState)
+  },
   async getUsersFromDatabase ({ commit }, payload) {
     try {
       const clients = await this.$strapi.find('clients', {

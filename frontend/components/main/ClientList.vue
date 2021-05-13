@@ -173,27 +173,29 @@
                 </svg>
               </template>
               <template v-slot:item.active="props">
-                <v-tooltip v-if="can('CreateForm')" left>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn
-                      :color="props.item.active ? 'green darken-3' : 'red darken-3'"
-                      dark
-                      small
-                      :loading="props.item.loading"
-                      v-bind="attrs"
-                      text
-                      v-on="on"
-                      @click="updateStatus(props.item, clients.map(function(x) {return x._id; }).indexOf(props.item._id))"
-                    >
-                      <v-icon>mdi-{{ props.item.active ? 'check' : 'close' }} {{ props.index }}</v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Activar Cliente</span>
-                </v-tooltip>
-                <ActivationRequest
-                  :item="props.item"
-                  :allowedcomponents="$store.state.auth.allowed_components"
-                />
+                <div style="white-space:nowrap;display:inline-flex">
+                  <v-tooltip v-if="can('CreateForm')" left>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn
+                        :color="props.item.active ? 'green darken-3' : 'red darken-3'"
+                        dark
+                        small
+                        :loading="props.item.loading"
+                        v-bind="attrs"
+                        text
+                        v-on="on"
+                        @click="updateStatus(props.item, clients.map(function(x) {return x._id; }).indexOf(props.item._id))"
+                      >
+                        <v-icon>mdi-{{ props.item.active ? 'check' : 'close' }} {{ props.index }}</v-icon>
+                      </v-btn>
+                    </template>
+                    <span>Activar Cliente</span>
+                  </v-tooltip>
+                  <ActivationRequest
+                    :item="props.item"
+                    :allowedcomponents="$store.state.auth.allowed_components"
+                  />
+                </div>
               </template>
               <template v-slot:item.actions="{ item }">
                 <div style="white-space:nowrap">
@@ -381,7 +383,7 @@ export default {
       const limit = this.itemsPerPage
       const city = this.$route.query.city
       await this.$store.dispatch('client/getUsersFromDatabase', { start, limit, city })
-      this.stateIdentifier()
+      await this.stateIdentifier()
     }
   },
   async mounted () {
@@ -411,8 +413,8 @@ export default {
         this.loadingDataTable = false
       }
     },
-    stateIdentifier () {
-      this.$store.commit('client/calculateClientStatus', this.activeClientsList)
+    async stateIdentifier () {
+      await this.$store.dispatch('client/calculateClientStatus', this.activeClientsList)
     },
     savePlanFromModal (clientId, newPlan, isRx, operator, index) {
       this.$store.dispatch('client/setPlanFromModal', { clientId, newPlan, isRx, operator, index })
