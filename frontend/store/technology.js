@@ -12,7 +12,7 @@ export const mutations = {
   }
 }
 export const actions = {
-  async getTechnologiesFromDatabase ({ commit }, payload) {
+  async getTechnologiesFromDatabase ({ commit }) {
     try {
       const apollo = this.app.apolloProvider.defaultClient
       await apollo.query({
@@ -22,10 +22,7 @@ export const actions = {
             name
           }
         }
-      `,
-        variables: {
-          id: payload
-        }
+      `
       }).then((input) => {
         localStorage.setItem('technologies', JSON.stringify(input.data.technologies))
         commit('getTechnologiesFromDatabase', input.data.technologies)

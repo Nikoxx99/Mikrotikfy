@@ -12,7 +12,7 @@ export const mutations = {
   }
 }
 export const actions = {
-  async getNeighborhoodsFromDatabase ({ commit }, payload) {
+  async getNeighborhoodsFromDatabase ({ commit }) {
     try {
       const apollo = this.app.apolloProvider.defaultClient
       await apollo.query({
@@ -22,10 +22,7 @@ export const actions = {
             name
           }
         }
-      `,
-        variables: {
-          id: payload
-        }
+      `
       }).then((input) => {
         localStorage.setItem('neighborhoods', JSON.stringify(input.data.neighborhoods))
         commit('getNeighborhoodsFromDatabase', input.data.neighborhoods)

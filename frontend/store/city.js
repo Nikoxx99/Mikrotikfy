@@ -12,7 +12,7 @@ export const mutations = {
   }
 }
 export const actions = {
-  async getCitiesFromDatabase ({ commit }, payload) {
+  async getCitiesFromDatabase ({ commit }) {
     try {
       const apollo = this.app.apolloProvider.defaultClient
       await apollo.query({
@@ -23,10 +23,7 @@ export const actions = {
             color
           }
         }
-      `,
-        variables: {
-          id: payload
-        }
+      `
       }).then((input) => {
         localStorage.setItem('cities', JSON.stringify(input.data.cities))
         commit('getCitiesFromDatabase', input.data.cities)
