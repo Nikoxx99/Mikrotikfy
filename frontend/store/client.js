@@ -43,13 +43,22 @@ export const mutations = {
   },
   insertClient (state, client) {
     try {
-      Object.assign(state.clients[0], client)
+      // Object.assign(state.clients[0], client)
+      state.clients.unshift(client)
     } catch (error) {
       throw new Error(`INSERT CLIENT MUTATE ${error}`)
     }
   }
 }
 export const actions = {
+  async insertClient ({ commit }, client) {
+    try {
+      // Object.assign(state.clients[0], client)
+      await commit('insertClient', client)
+    } catch (error) {
+      throw new Error(`INSERT CLIENT MUTATE ${error}`)
+    }
+  },
   async calculateClientStatus ({ state, commit }, payload) {
     const newState = await state.clients.map((client) => {
       // eslint-disable-next-line eqeqeq

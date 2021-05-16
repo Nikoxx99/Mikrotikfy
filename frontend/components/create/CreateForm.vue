@@ -13,38 +13,53 @@
       <v-row>
         <v-col>
           <v-text-field
+            ref="code"
             v-model="Client.code"
             type="number"
-            label="Codigo"
+            :label="codeSuccess ? 'Código correcto' : 'Código'"
             required
             outlined
             dense
-            hide-details
+            :error="codeError"
+            :success="codeSuccess"
+            :hint="d00pHint"
+            :hide-details="hideD00pHint"
+            :persistent-hint="!hideD00pHint"
+            @change="testCodeForDuplicated(Client.code)"
+            @keyup="codeSuccess = false, codeError = false, hideD00pHint = true"
           />
         </v-col>
         <v-col>
           <v-text-field
+            ref="dni"
             v-model="Client.dni"
             type="number"
             label="Cedula"
+            :rules="valid_dni"
+            autocomplete="off"
+            required
+            :valid="true"
+            outlined
+            dense
+            :hide-details="$refs.dni ? $refs.dni.valid ? true : $refs.dni.isFocused ? $refs.dni.badInput ? false : true : $refs.dni.badInput ? false : true : false"
+            @keyup="calculateSsid"
+          />
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <v-text-field
+            :value="Client.name.toUpperCase()"
+            label="Nombre Completo"
             required
             outlined
             dense
             hide-details
             @keyup="calculateSsid"
+            @input="Client.name = $event.toUpperCase()"
           />
         </v-col>
       </v-row>
-      <v-text-field
-        :value="Client.name.toUpperCase()"
-        label="Nombre Completo"
-        required
-        outlined
-        dense
-        hide-details
-        @keyup="calculateSsid"
-        @input="Client.name = $event.toUpperCase()"
-      />
       <v-row>
         <v-col cols="6" lg="3" md="3">
           <v-select
@@ -213,17 +228,21 @@
           />
         </v-col>
       </v-row>
-      <v-select
-        v-model="Client.newModel"
-        :items="idwith"
-        item-text="name"
-        item-value="id"
-        mandatory
-        label="Identificar con:"
-        outlined
-        dense
-        hide-details
-      />
+      <v-row>
+        <v-col>
+          <v-select
+            v-model="Client.newModel"
+            :items="idwith"
+            item-text="name"
+            item-value="id"
+            mandatory
+            label="Identificar con:"
+            outlined
+            dense
+            hide-details
+          />
+        </v-col>
+      </v-row>
       <v-switch v-model="Client.hasRepeater" hide-details input-value="false" label="Tiene repetidor?" />
       <v-switch v-model="Client.sendToMikrotik" input-value="true" label="Crear en Mikrotik?" />
       <v-btn
@@ -251,56 +270,6 @@ export default {
     role: {
       type: String,
       default: ''
-    }
-  },
-  apollo: {
-    cities () {
-      return {
-        query: gqlt`
-        query{
-          cities{
-            id
-            name
-          }
-        }
-      `
-      }
-    },
-    neighborhoods () {
-      return {
-        query: gqlt`
-        query{
-          neighborhoods{
-            id
-            name
-          }
-        }
-      `
-      }
-    },
-    plans () {
-      return {
-        query: gqlt`
-        query{
-          plans{
-            id
-            name
-          }
-        }
-      `
-      }
-    },
-    technologies () {
-      return {
-        query: gqlt`
-        query{
-          technologies{
-            id
-            name
-          }
-        }
-      `
-      }
     }
   },
   data: () => {
@@ -359,7 +328,32 @@ export default {
       idwith: [
         { id: 0, name: 'Cedula' },
         { id: 1, name: 'Codigo' }
-      ]
+      ],
+      valid_dni: [
+        (value) => {
+          const pattern = /^[A-Za-z0-9]+$/
+          return pattern.test(value) || 'La Cédula/NIT no debe llevar guiónes.'
+        }
+      ],
+      codeError: false,
+      hideHint: true,
+      hideD00pHint: true,
+      d00pHint: '',
+      codeSuccess: null
+    }
+  },
+  computed: {
+    cities () {
+      return this.$store.state.cities
+    },
+    plans () {
+      return this.$store.state.plans
+    },
+    neighborhoods () {
+      return this.$store.state.neighborhoods
+    },
+    technologies () {
+      return this.$store.state.technologies
     }
   },
   mounted () {
@@ -368,6 +362,24 @@ export default {
     }
   },
   methods: {
+    test () {
+      console.log('test')
+    },
+    async testCodeForDuplicated (code) {
+      const clients = await this.$strapi.find('clients', {
+        code
+      })
+      if (clients.length > 0) {
+        this.codeError = true
+        this.d00pHint = 'Error. El codigo ya existe.'
+        this.hideD00pHint = false
+      } else {
+        this.codeError = false
+        this.d00pHint = ''
+        this.hideD00pHint = true
+        this.codeSuccess = true
+      }
+    },
     createClient () {
       this.isSubmitting = !this.isSubmitting
       this.$apollo.mutate({

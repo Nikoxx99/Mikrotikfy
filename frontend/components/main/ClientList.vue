@@ -267,7 +267,7 @@
                 >
                   <v-icon>mdi-close</v-icon>
                 </v-btn>
-                <v-toolbar-title><span class="headline">Crear Cliente en</span></v-toolbar-title>
+                <v-toolbar-title><span class="headline">Crear Cliente en {{ currentCity.name }}</span></v-toolbar-title>
               </v-toolbar>
             </v-card-title>
             <v-card-text>
@@ -447,8 +447,9 @@ export default {
         return 'green'
       }
     },
-    createClient (client) {
-      this.$store.commit('client/insertClient', client)
+    async createClient (client) {
+      await this.$store.commit('client/insertClient', client)
+      await this.stateIdentifier()
     },
     createClientDialog (value) {
       this.createDialog = false
