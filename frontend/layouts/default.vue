@@ -52,7 +52,7 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
             <v-icon
-              class="mr-1 green--text darken-4"
+              :class="$nuxt.isOffline ? 'red--text darken-4 mr-1' : 'green--text darken-4 mr-1'"
               v-bind="attrs"
               v-on="on"
             >

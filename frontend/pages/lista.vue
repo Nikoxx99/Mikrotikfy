@@ -1,5 +1,12 @@
 <template>
   <div>
+    <v-alert
+      v-if="$nuxt.isOffline"
+      dense
+      type="error"
+    >
+      Estas sin acceso a internet. Verifica la conexión WIFI o de datos.
+    </v-alert>
     <v-tabs
       v-model="tab"
       fixed-tabs
