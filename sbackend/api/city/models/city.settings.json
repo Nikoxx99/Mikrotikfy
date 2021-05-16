@@ -43,6 +43,11 @@
     "telegrambot": {
       "via": "city",
       "model": "telegrambot"
+    },
+    "users": {
+      "via": "cities",
+      "plugin": "users-permissions",
+      "collection": "user"
     }
   }
 }

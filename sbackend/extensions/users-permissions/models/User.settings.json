@@ -73,6 +73,11 @@
     "resetSession": {
       "type": "boolean",
       "default": false
+    },
+    "cities": {
+      "collection": "city",
+      "via": "users",
+      "dominant": true
     }
   }
 }

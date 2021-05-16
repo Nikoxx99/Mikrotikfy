@@ -93,10 +93,10 @@ export default {
       this.username = ''
       this.password = ''
     },
-    login () {
+    async login () {
       this.isLoading = true
       this.loginFailed = false
-      this.$apollo.mutate({
+      const first = await this.$apollo.mutate({
         mutation: gqlt`mutation ($input: UsersPermissionsLoginInput!){
           login(input: $input){
             jwt
@@ -117,65 +117,63 @@ export default {
             provider: 'local'
           }
         }
-      }).then((first) => {
-        this.$apollo.query({
-          query: gqlt`query ($id: ID!){
-            role(id: $id){
-              allowed_components{
-                name
-              }
+      })
+      const second = await this.$apollo.query({
+        query: gqlt`query ($id: ID!){
+          role(id: $id){
+            allowed_components{
+              name
             }
-          }`,
-          variables: {
-            id: first.data.login.user.role.id
           }
-        }).then(async (second) => {
-          if (!first.errors) {
-            const ac = await second.data.role.allowed_components.map((c) => {
-              return c.name
-            })
-            const auth = {
-              accessToken: first.data.login.jwt,
-              id: first.data.login.user.id,
-              username: first.data.login.user.username,
-              role: first.data.login.user.role.id,
-              rolename: first.data.login.user.role.name,
-              allowed_components: ac
+        }`,
+        variables: {
+          id: first.data.login.user.role.id
+        }
+      })
+      const third = await this.$apollo.query({
+        query: gqlt`query ($id: ID!){
+          user(id: $id){
+            cities{
+              id
+              name
+              color
             }
-            this.$store.commit('setAuth', auth)
-            await this.$store.dispatch('plan/getPlansFromDatabase')
-            await this.$store.dispatch('technology/getTechnologiesFromDatabase')
-            await this.$store.dispatch('city/getCitiesFromDatabase')
-            await this.$store.dispatch('neighborhood/getNeighborhoodsFromDatabase')
-            await this.$store.dispatch('count/activeClients', this.$route.query.city)
-            await this.$store.dispatch('count/clientCount', this.$route.query.city)
-            await this.$store.dispatch('count/clientCountActive', this.$route.query.city)
-            await this.$store.dispatch('count/clientCountDisable', this.$route.query.city)
-            Cookie.set('auth', auth, { expires: 7 })
-            Cookie.set('authToken', auth.accessToken, { expires: 7 })
-            if (this.username === 'Nohora' || this.username === 'edinson' || this.username === 'natalia' || this.username === 'brayan' || this.username === 'jannes' || this.username === 'andresruiz') {
-              await this.$store.dispatch('ticket/getTicketsFromDatabase', { limit: 50, city: '5fc3f0408e3de73d204cd430' })
-              window.location.href = '/lista?city=5fc3f0408e3de73d204cd430'
-            } else {
-              await this.$store.dispatch('ticket/getTicketsFromDatabase', { limit: 50, city: '5f832e8fb0c43e2c64b37437' })
-              window.location.href = '/lista?city=5f832e8fb0c43e2c64b37437'
-            }
-          } else {
-            this.loginFailed = true
-            this.isLoading = false
           }
-        }).catch((error) => {
-          // eslint-disable-next-line no-console
-          this.errorMessages = error.message
-          this.loginFailed = true
-          this.isLoading = false
+        }`,
+        variables: {
+          id: first.data.login.user.id
+        }
+      })
+      if (!first.errors) {
+        const ac = await second.data.role.allowed_components.map((c) => {
+          return c.name
         })
-      }).catch((error) => {
-        // eslint-disable-next-line no-console
-        this.errorMessages = error.message
+        const auth = {
+          accessToken: first.data.login.jwt,
+          id: first.data.login.user.id,
+          username: first.data.login.user.username,
+          role: first.data.login.user.role.id,
+          rolename: first.data.login.user.role.name,
+          allowed_components: ac,
+          cities: third.data.user.cities
+        }
+        this.$store.commit('setAuth', auth)
+        await this.$store.dispatch('plan/getPlansFromDatabase')
+        await this.$store.dispatch('technology/getTechnologiesFromDatabase')
+        await this.$store.dispatch('city/getCitiesFromDatabase')
+        await this.$store.dispatch('neighborhood/getNeighborhoodsFromDatabase')
+        await this.$store.dispatch('count/activeClients', third.data.user.cities[0].id)
+        await this.$store.dispatch('count/clientCount', third.data.user.cities[0].id)
+        await this.$store.dispatch('count/clientCountActive', third.data.user.cities[0].id)
+        await this.$store.dispatch('count/clientCountDisable', third.data.user.cities[0].id)
+        Cookie.set('auth', auth, { expires: 7 })
+        Cookie.set('authToken', auth.accessToken, { expires: 7 })
+        await this.$store.dispatch('ticket/getTicketsFromDatabase', { limit: 30, city: third.data.user.cities[0].id })
+        window.location.href = `/lista?city=${third.data.user.cities[0].id}`
+      } else {
         this.loginFailed = true
         this.isLoading = false
-      })
+      }
     }
   }
 }

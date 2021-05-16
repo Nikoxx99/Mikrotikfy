@@ -52,7 +52,7 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
             <v-icon
-              :class="$nuxt.isOffline ? 'red--text darken-4 mr-1' : 'green--text darken-4 mr-1'"
+              :class="$nuxt.isOffline ? 'red--text darken-4' : 'green--text darken-4'"
               v-bind="attrs"
               v-on="on"
             >
@@ -63,9 +63,9 @@
         </v-tooltip>
         <span class="mr-1 d-none d-xs-none d-sm-none d-md-inline d-lg-inline" style="font-size:0.7rem">{{ $store.state.auth.username.charAt(0).toUpperCase() + $store.state.auth.username.slice(1) }}</span>
         <v-btn
-          v-for="city in $store.state.cities"
+          v-for="city in $store.state.auth.cities"
           :key="city.id"
-          class="mr-4"
+          class="ml-2"
           small
           outlined
           :color="city.color"
@@ -79,6 +79,7 @@
           <v-btn
             icon
             large
+            class="ml-2"
             v-bind="attrs"
             v-on="on"
             @click="logout"
@@ -107,7 +108,7 @@
 // import gqlt from 'graphql-tag'
 import Cookie from 'js-cookie'
 export default {
-  middleware: ['defaultCity', 'authenticated', 'session'],
+  middleware: ['defaultCity', 'authenticated'],
   data () {
     return {
       hasPendingChanges: false,
@@ -169,6 +170,7 @@ export default {
     if (month === 11) {
       this.bg = 'cbg.jpg'
     }
+    this.comprobeSession()
     // this.$apollo.query({
     //   query: gqlt`
     //   query {
@@ -192,12 +194,26 @@ export default {
     // })
   },
   methods: {
+    async comprobeSession () {
+      const session = await this.$strapi.find('users', {
+        id: this.$store.state.auth.id
+      })
+      if (session[0].resetSession) {
+        await this.restoreReset()
+        await this.logout()
+      }
+    },
+    async restoreReset () {
+      await this.$strapi.update('users', this.$store.state.auth.id, {
+        resetSession: false
+      })
+    },
     logout () {
       Cookie.remove('auth')
       Cookie.remove('authToken')
       localStorage.clear()
       this.$store.commit('setAuth', null)
-      this.$router.replace('/login')
+      window.location.href = '/login'
     }
   }
 }
