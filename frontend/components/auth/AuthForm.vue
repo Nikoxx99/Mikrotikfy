@@ -19,6 +19,13 @@
       Credenciales Inválidas, intenta de nuevo. <br>
       <span class="text-subtitle-2">{{ errorMessages }}</span>
     </v-alert>
+    <v-alert
+      v-if="$route.query.resetSession"
+      type="info"
+      tile
+    >
+      Tu sesión ha sido reiniciada manualmente por un administrador debido a una actualizacion de la API. Porfavor inicia sesion nuevamente.
+    </v-alert>
     <v-card-title class="justify-center">
       Ingresa tu usuario
     </v-card-title>

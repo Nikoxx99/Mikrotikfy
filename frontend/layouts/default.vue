@@ -82,7 +82,7 @@
             class="ml-2"
             v-bind="attrs"
             v-on="on"
-            @click="logout"
+            @click="logout(false)"
           >
             <v-icon>mdi-exit-to-app</v-icon>
           </v-btn>
@@ -200,7 +200,7 @@ export default {
       })
       if (session[0].resetSession) {
         await this.restoreReset()
-        await this.logout()
+        await this.logout(true)
       }
     },
     async restoreReset () {
@@ -208,12 +208,12 @@ export default {
         resetSession: false
       })
     },
-    logout () {
+    logout (params) {
       Cookie.remove('auth')
       Cookie.remove('authToken')
       localStorage.clear()
       this.$store.commit('setAuth', null)
-      window.location.href = '/login'
+      window.location.href = params ? '/login?resetSession=true' : '/login'
     }
   }
 }
