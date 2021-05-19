@@ -195,12 +195,14 @@ export default {
   },
   methods: {
     async comprobeSession () {
-      const session = await this.$strapi.find('users', {
-        id: this.$store.state.auth.id
-      })
-      if (session[0].resetSession) {
-        await this.restoreReset()
-        await this.logout(true)
+      if (this.$store.state.auth) {
+        const session = await this.$strapi.find('users', {
+          id: this.$store.state.auth.id
+        })
+        if (session[0].resetSession) {
+          await this.restoreReset()
+          await this.logout(true)
+        }
       }
     },
     async restoreReset () {
@@ -212,6 +214,7 @@ export default {
       Cookie.remove('auth')
       Cookie.remove('authToken')
       localStorage.clear()
+      sessionStorage.clear()
       this.$store.commit('setAuth', null)
       window.location.href = params ? '/login?resetSession=true' : '/login'
     }

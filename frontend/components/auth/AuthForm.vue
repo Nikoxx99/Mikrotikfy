@@ -165,6 +165,8 @@ export default {
           cities: third.data.user.cities
         }
         this.$store.commit('setAuth', auth)
+        Cookie.set('auth', auth, { expires: 7 })
+        Cookie.set('authToken', auth.accessToken, { expires: 7 })
         await this.$store.dispatch('plan/getPlansFromDatabase')
         await this.$store.dispatch('technology/getTechnologiesFromDatabase')
         await this.$store.dispatch('city/getCitiesFromDatabase')
@@ -173,8 +175,6 @@ export default {
         await this.$store.dispatch('count/clientCount', third.data.user.cities[0].id)
         await this.$store.dispatch('count/clientCountActive', third.data.user.cities[0].id)
         await this.$store.dispatch('count/clientCountDisable', third.data.user.cities[0].id)
-        Cookie.set('auth', auth, { expires: 7 })
-        Cookie.set('authToken', auth.accessToken, { expires: 7 })
         await this.$store.dispatch('ticket/getTicketsFromDatabase', { limit: 30, city: third.data.user.cities[0].id })
         window.location.href = `/lista?city=${third.data.user.cities[0].id}`
       } else {

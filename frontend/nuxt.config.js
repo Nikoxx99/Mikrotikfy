@@ -73,6 +73,7 @@ export default {
   strapi: {
     url: process.env.API_STRAPI_ENDPOINT,
     key: 'authToken',
+    expires: '7d',
     entities: ['tickets']
   },
   axios: {
