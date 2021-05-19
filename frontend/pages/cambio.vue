@@ -73,13 +73,13 @@
                       <v-text-field
                         v-model="user_old_password"
                         label="Ingresa nombre del titular"
-                        hint="Puedes dejar esto en blanco, pero entonces el proceso estará sujeto a verificación."
+                        hint="Obligatorio"
                         persistent-hint
                         outlined
                       />
                     </v-col>
                   </v-card>
-                  <v-btn class="mt-4" color="primary" @click="e1 = 3">
+                  <v-btn class="mt-4" color="primary" @click="testName()">
                     Continuar
                   </v-btn>
                   <v-btn class="mt-4" color="grey" @click="e1 = 1">
@@ -100,7 +100,7 @@
                       />
                     </v-col>
                   </v-card>
-                  <v-btn class="mt-4" color="primary" @click="e1 = 4">
+                  <v-btn class="mt-4" color="primary" @click="testAddress()">
                     Continuar
                   </v-btn>
                   <v-btn class="mt-4" color="grey" @click="e1 = 2">
@@ -271,6 +271,24 @@ export default {
           console.error(error)
           this.initialLoading = false
         })
+      } else {
+        this.error = true
+        this.errorMessage = 'No puedes dejar este campo en blanco.'
+      }
+    },
+    testName () {
+      if (this.user_old_password) {
+        this.error = false
+        this.e1 = 3
+      } else {
+        this.error = true
+        this.errorMessage = 'No puedes dejar este campo en blanco.'
+      }
+    },
+    testAddress () {
+      if (this.user_address) {
+        this.error = false
+        this.e1 = 4
       } else {
         this.error = true
         this.errorMessage = 'No puedes dejar este campo en blanco.'

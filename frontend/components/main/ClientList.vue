@@ -44,7 +44,7 @@
             <v-data-table
               :headers="headers"
               :items.sync="clients"
-              :server-items-length="totalClients"
+              :server-items-length="clientCount"
               :items-per-page.sync="itemsPerPage"
               :page.sync="page"
               :options.sync="options"
@@ -230,7 +230,7 @@
               </template>
             </v-data-table>
           </client-only>
-          <v-row>
+          <v-row v-if="showPagintation">
             <v-col cols="12" sm="8" md="10" lg="11" style="max-width:90%;margin:auto;">
               <v-pagination
                 v-model="page"
@@ -337,7 +337,7 @@ export default {
       snack: false,
       snackColor: '',
       snackText: '',
-      totalClients: 1000
+      showPagintation: true
     }
   },
   computed: {
@@ -401,15 +401,17 @@ export default {
     },
     async getClientBySearch () {
       this.loadingDataTable = true
-      const search = this.searchClientInput
+      const search = this.searchClientInput.trim()
       const city = this.$route.query.city
       if (search) {
         await this.$store.dispatch('client/getUsersFromDatabaseBySearch', { search, city })
         await this.stateIdentifier()
+        this.showPagintation = false
         this.loadingDataTable = false
       } else {
         await this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: this.itemsPerPage, city })
         await this.stateIdentifier()
+        this.showPagintation = true
         this.loadingDataTable = false
       }
     },
