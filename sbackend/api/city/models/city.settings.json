@@ -48,6 +48,10 @@
       "via": "cities",
       "plugin": "users-permissions",
       "collection": "user"
+    },
+    "mikrotiks": {
+      "via": "city",
+      "collection": "mikrotik"
     }
   }
 }

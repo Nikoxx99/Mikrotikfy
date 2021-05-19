@@ -13,16 +13,19 @@
       dark
       :color="currentCity ? currentCity.color : ''"
     >
-      <v-tab v-if="can('ActivationRequestsList')" href="#tab-1">
+      <v-tab v-if="can('DeviceStatus')" href="#tab-1">
+        Estatus Mikrotik
+      </v-tab>
+      <v-tab v-if="can('ActivationRequestsList')" href="#tab-2">
         Activaciones
       </v-tab>
-      <v-tab href="#tab-2">
+      <v-tab href="#tab-3">
         <v-icon class="mr-2">
           mdi-tooltip-edit
         </v-icon>
         Tickets
       </v-tab>
-      <v-tab href="#tab-3">
+      <v-tab href="#tab-4">
         <v-icon class="mr-2">
           mdi-account
         </v-icon>
@@ -31,21 +34,28 @@
     </v-tabs>
     <v-tabs-items v-model="tab" touchless>
       <v-tab-item
-        v-if="can('ActivationRequestsList')"
+        v-if="can('DeviceStatus')"
         :key="1"
         :value="'tab-1'"
+      >
+        <DeviceStatus />
+      </v-tab-item>
+      <v-tab-item
+        v-if="can('ActivationRequestsList')"
+        :key="1"
+        :value="'tab-2'"
       >
         <ActivationRequestList />
       </v-tab-item>
       <v-tab-item
         :key="2"
-        :value="'tab-2'"
+        :value="'tab-3'"
       >
         <Tickets />
       </v-tab-item>
       <v-tab-item
         :key="3"
-        :value="'tab-3'"
+        :value="'tab-4'"
       >
         <ClientList />
       </v-tab-item>
@@ -57,15 +67,17 @@
 import ClientList from '../components/main/ClientList'
 import Tickets from '../components/main/Tickets'
 import ActivationRequestList from '../components/main/ActivationRequestList'
+import DeviceStatus from '../components/main/DeviceStatus'
 export default {
   components: {
     ClientList,
     Tickets,
-    ActivationRequestList
+    ActivationRequestList,
+    DeviceStatus
   },
   data () {
     return {
-      tab: 'tab-2'
+      tab: 'tab-1'
     }
   },
   computed: {
