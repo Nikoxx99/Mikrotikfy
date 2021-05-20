@@ -1,8 +1,8 @@
 {
   "kind": "collectionType",
-  "collectionName": "telegrambots",
+  "collectionName": "mikrotiks",
   "info": {
-    "name": "telegrambot",
+    "name": "mikrotik",
     "description": ""
   },
   "options": {
@@ -11,20 +11,14 @@
     "draftAndPublish": true
   },
   "attributes": {
-    "token": {
-      "type": "string"
-    },
-    "chat": {
-      "type": "string"
-    },
-    "city": {
-      "via": "telegrambot",
-      "model": "city"
-    },
     "name": {
       "type": "string"
     },
-    "binnacle": {
+    "city": {
+      "via": "mikrotiks",
+      "model": "city"
+    },
+    "ip": {
       "type": "string"
     }
   }

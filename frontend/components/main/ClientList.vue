@@ -78,42 +78,6 @@
                   >
                     <v-icon>mdi-reload</v-icon>
                   </v-btn>
-                  <v-chip
-                    color="white white--text"
-                    small
-                    outlined
-                    label
-                    class="mr-4"
-                  >
-                    En Linea: {{ activeClients }}
-                  </v-chip>
-                  <v-chip
-                    color="green darken-3 white--text"
-                    small
-                    label
-                    outlined
-                    class="mr-4 d-none d-md-flex d-lg-flex d-xl-flex"
-                  >
-                    Activos: {{ clientCountActive }}
-                  </v-chip>
-                  <v-chip
-                    color="red lighten-1 white--text"
-                    small
-                    outlined
-                    label
-                    class="mr-4 d-none d-md-flex d-lg-flex d-xl-flex"
-                  >
-                    En Mora: {{ clientCountDisable }}
-                  </v-chip>
-                  <v-chip
-                    color="primary"
-                    small
-                    outlined
-                    label
-                    class="mr-4 d-none d-sm-flex d-md-flex d-lg-flex d-xl-flex"
-                  >
-                    Totales: {{ clientCount }}
-                  </v-chip>
                   <v-spacer />
                   <!-- <v-text-field
                     :value="options.itemsPerPage"
@@ -357,20 +321,8 @@ export default {
     technologies () {
       return this.$store.state.technologies
     },
-    activeClients () {
-      return this.$store.state.activeClients
-    },
     activeClientsList () {
       return this.$store.state.activeClientsList
-    },
-    clientCount () {
-      return this.$store.state.clientCount
-    },
-    clientCountActive () {
-      return this.$store.state.clientCountActive
-    },
-    clientCountDisable () {
-      return this.$store.state.clientCountDisable
     }
   },
   watch: {

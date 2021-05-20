@@ -15,8 +15,8 @@
       "type": "string"
     },
     "clients": {
-      "via": "city",
-      "collection": "client"
+      "collection": "client",
+      "via": "city"
     },
     "color": {
       "type": "string"
@@ -25,29 +25,30 @@
       "collection": "neighborhood",
       "via": "cities"
     },
-    "ip": {
-      "type": "json"
-    },
     "histories": {
-      "via": "city",
-      "collection": "history"
+      "collection": "history",
+      "via": "city"
     },
     "tickets": {
-      "via": "city",
-      "collection": "ticket"
+      "collection": "ticket",
+      "via": "city"
     },
     "activationrequests": {
-      "via": "city",
-      "collection": "activationrequest"
+      "collection": "activationrequest",
+      "via": "city"
     },
     "telegrambot": {
-      "via": "city",
-      "model": "telegrambot"
+      "model": "telegrambot",
+      "via": "city"
     },
     "users": {
-      "via": "cities",
       "plugin": "users-permissions",
-      "collection": "user"
+      "collection": "user",
+      "via": "cities"
+    },
+    "mikrotiks": {
+      "collection": "mikrotik",
+      "via": "city"
     }
   }
 }

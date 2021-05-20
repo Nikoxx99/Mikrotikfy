@@ -4,7 +4,8 @@ export const state = () => ({
     active: 0,
     clientCount: 0,
     clientCountActive: 0,
-    clientCountDisable: 0
+    clientCountDisable: 0,
+    clientCountRetired: 0
   }
 })
 export const mutations = {
@@ -34,6 +35,13 @@ export const mutations = {
       state.clientCount.clientCountDisable = res.data.clientCountDisable
     } catch (error) {
       throw new Error(`CLIENTCOUNTDISABLE MUTATE ${error}`)
+    }
+  },
+  clientCountRetired (state, res) {
+    try {
+      state.clientCount.clientCountRetired = res.data.clientCountRetired
+    } catch (error) {
+      throw new Error(`CLIENTCOUNTRETIRED MUTATE ${error}`)
     }
   }
 }
@@ -118,6 +126,25 @@ export const actions = {
       })
     } catch (error) {
       throw new Error(`CLIENTCOUNTDISABLE ACTION ${error}`)
+    }
+  },
+  async clientCountRetired ({ commit }, city) {
+    const apollo = this.app.apolloProvider.defaultClient
+    try {
+      await apollo.query({
+        query: gqlt`query ($city: String){
+          clientCountRetired(city: $city)
+        }
+      `,
+        variables: {
+          city
+        }
+      }).then((res) => {
+        localStorage.setItem('clientCountRetired', res.data.clientCountRetired)
+        commit('clientCountRetired', res)
+      })
+    } catch (error) {
+      throw new Error(`CLIENTCOUNTRETIRED ACTION ${error}`)
     }
   }
 }

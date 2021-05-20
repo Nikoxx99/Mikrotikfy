@@ -11,23 +11,27 @@ module.exports = {
     const operator_role = ctx.request.body.operator_role
     if (operator_role === 'superadmin') {
       let entity;
+      
       let request = []
       request[0] = ctx.request.body
       const newClient = request.map(c => {
         c.active = true
         return c
       })
+
       entity = await strapi.services.client.create(newClient[0]);
+      
       const telegrambot = await strapi.services.telegrambot.find({city: entity.city.id})
+
       simpleTelegramCreate(entity, telegrambot[0])
       if (sendToMikrotik) {
         const searchCity = await strapi.services.city.find({ id: ctx.request.body.city })
         const searchPlan = await strapi.services.plan.find({ id: ctx.request.body.plan })
         const searchNeighborhood = await strapi.services.neighborhood.find({ id: ctx.request.body.neighborhood })
         const searchTechnology = await strapi.services.technology.find({ id: ctx.request.body.technology })
-        if (searchCity[0].ip.length > 1) {
-          for (let i = 0; i < searchCity[0].ip.length; i++) {
-            const mikrotikHost = searchCity[0].ip[i]
+        if (searchCity[0].mikrotiks.length > 1) {
+          for (let i = 0; i < searchCity[0].mikrotiks.length; i++) {
+            const mikrotikHost = searchCity[0].mikrotiks[i].ip
             const plan = searchPlan[0].mikrotik_name
             const planName = searchPlan[0].name
             const cityName = searchCity[0].name
@@ -40,7 +44,7 @@ module.exports = {
           const searchPlan = await strapi.services.plan.find({ id: ctx.request.body.plan })
           const searchNeighborhood = await strapi.services.neighborhood.find({ id: ctx.request.body.neighborhood })
           const searchTechnology = await strapi.services.technology.find({ id: ctx.request.body.technology })
-          const mikrotikHost = searchCity[0].ip[0]
+          const mikrotikHost = searchCity[0].mikrotiks[0].ip
           const plan = searchPlan[0].mikrotik_name
           const planName = searchPlan[0].name
           const cityName = searchCity[0].name
@@ -66,9 +70,9 @@ module.exports = {
     const searchTechnology = await strapi.services.technology.find({ id: ctx.request.body.input.technology })
     const telegrambot = await strapi.services.telegrambot.find({city: ctx.request.body.input.city})
     simpleTelegramAdminCreate(entity, telegrambot[0])
-    if (searchCity[0].ip.length > 1) {
-      for (let i = 0; i < searchCity[0].ip.length; i++) {
-        const mikrotikHost = searchCity[0].ip[i]
+    if (searchCity[0].mikrotiks.length > 1) {
+      for (let i = 0; i < searchCity[0].mikrotiks.length; i++) {
+        const mikrotikHost = searchCity[0].mikrotiks[i].ip
         const plan = searchPlan[0].mikrotik_name
         const planName = searchPlan[0].name
         const cityName = searchCity[0].name
@@ -77,7 +81,7 @@ module.exports = {
         mkCreateClient(mikrotikHost, plan, ctx.request.body.input, cityName, planName, neighborhoodName, technologyName)
       }
     } else {
-      const mikrotikHost = searchCity[0].ip[0]
+      const mikrotikHost = searchCity[0].mikrotiks[0].ip
       const plan = searchPlan[0].mikrotik_name
       const planName = searchPlan[0].name
       const cityName = searchCity[0].name
@@ -100,9 +104,9 @@ module.exports = {
     const searchTechnology = await strapi.services.technology.find({ id: ctx.request.body.input.client.technology })
     const telegrambot = await strapi.services.telegrambot.find({city: ctx.request.body.input.client.city})
     simpleTelegramAdminCreate(entity, telegrambot[0], approvedBy)
-    if (searchCity[0].ip.length > 1) {
-      for (let i = 0; i < searchCity[0].ip.length; i++) {
-        const mikrotikHost = searchCity[0].ip[i]
+    if (searchCity[0].mikrotiks.length > 1) {
+      for (let i = 0; i < searchCity[0].mikrotiks.length; i++) {
+        const mikrotikHost = searchCity[0].mikrotiks[i].ip
         const plan = searchPlan[0].mikrotik_name
         const planName = searchPlan[0].name
         const cityName = searchCity[0].name
@@ -111,7 +115,7 @@ module.exports = {
         mkCreateClient(mikrotikHost, plan, ctx.request.body.input.client, cityName, planName, neighborhoodName, technologyName)
       }
     } else {
-      const mikrotikHost = searchCity[0].ip[0]
+      const mikrotikHost = searchCity[0].mikrotiks[0].ip
       const plan = searchPlan[0].mikrotik_name
       const planName = searchPlan[0].name
       const cityName = searchCity[0].name
@@ -130,21 +134,21 @@ module.exports = {
     simpleTelegramUpdate(entity, telegrambot[0])
     await strapi.services.history.create(ctx.request.body)
     const search = await strapi.services.client.find({ _id: id })
+    const searchCity = await strapi.services.city.find({ id: search[0].city.id })
     const clientObj = search[0]
     const dni = clientObj.dni
     const code = clientObj.code
     const model = clientObj.newModel
-    const reqCityIpArray = clientObj.city.ip
     const comment = await createComment(clientObj)
-    if (reqCityIpArray.length > 1) {
+    if (searchCity[0].mikrotiks.length > 1) {
       const successfulMikrotikResponses = []
-      for (let i = 0; i < reqCityIpArray.length; i++) {
-        const mikrotikHost = reqCityIpArray[i]
+      for (let i = 0; i < searchCity[0].mikrotiks.length; i++) {
+        const mikrotikHost = searchCity[0].mikrotiks[i].ip
         const res = await mkSetComment(mikrotikHost, dni, code, model, comment)
         successfulMikrotikResponses.push(res)
       }
     } else {
-      const mikrotikHost = reqCityIpArray[0]
+      const mikrotikHost = searchCity[0].mikrotiks[0].ip
       await mkSetComment(mikrotikHost, dni, code, model, comment)
     }
     const res = sanitizeEntity(entity, { model: strapi.models.client })
@@ -153,21 +157,21 @@ module.exports = {
   async setClientComment(ctx) {
     const { clientid, comment } = ctx.request.body
     const search = await strapi.services.client.find({ _id: clientid })
+    const searchCity = await strapi.services.city.find({ id: search[0].city.id })
     const clientObj = search[0]
     const dni = clientObj.dni
     const code = clientObj.code
     const model = clientObj.newModel
-    const reqCityIpArray = clientObj.city.ip
-    if (reqCityIpArray.length > 1) {
-      for (let i = 0; i < reqCityIpArray.length; i++) {
-        const mikrotikHost = reqCityIpArray[i]
+    if (searchCity[0].mikrotiks.length > 1) {
+      for (let i = 0; i < searchCity[0].mikrotiks.length; i++) {
+        const mikrotikHost = searchCity[0].mikrotiks[i].ip
         await mkSetComment(mikrotikHost, dni, code, model, comment)
-        if (reqCityIpArray.length - 1 === i) {
+        if (searchCity[0].mikrotiks.length - 1 === i) {
           return true
         }
       }
     } else {
-      const mikrotikHost = reqCityIpArray[0]
+      const mikrotikHost = searchCity[0].mikrotiks[0].ip
       await mkSetComment(mikrotikHost, dni, code, model, comment)
       return true
     }
@@ -175,20 +179,20 @@ module.exports = {
   async delete(ctx) {
     const { id } = ctx.params;
     const search = await strapi.services.client.find({ _id: id })
+    const searchCity = await strapi.services.city.find({ id: search[0].city.id })
     const clientObj = search[0]
     const dni = clientObj.dni
     const code = clientObj.code
     const model = clientObj.newModel
-    const reqCityIpArray = clientObj.city.ip
-    if (reqCityIpArray.length > 1) {
+    if (searchCity[0].mikrotiks.length > 1) {
       const successfulMikrotikResponses = []
-      for (let i = 0; i < reqCityIpArray.length; i++) {
-        const mikrotikHost = reqCityIpArray[i]
+      for (let i = 0; i < searchCity[0].mikrotiks.length; i++) {
+        const mikrotikHost = searchCity[0].mikrotiks[i].ip
         const res = await mkDeleteClient(mikrotikHost, dni, code, model)
         successfulMikrotikResponses.push(res)
       }
     } else {
-      const mikrotikHost = reqCityIpArray[0]
+      const mikrotikHost = searchCity[0].mikrotiks[0].ip
       await mkDeleteClient(mikrotikHost, dni, code, model)
     }
     const entity = await strapi.services.client.delete({ id });
@@ -201,20 +205,20 @@ module.exports = {
     const { id } = ctx.request.body.input
     await strapi.services.client.update({ id }, { 'active': false });
     const search = await strapi.services.client.find({ _id: id })
+    const searchCity = await strapi.services.city.find({ id: search[0].city.id })
     const clientObj = search[0]
     const dni = clientObj.dni
     const code = clientObj.code
     const model = clientObj.newModel
-    const reqCityIpArray = clientObj.city.ip
-    if (reqCityIpArray.length > 1) {
+    if (searchCity[0].mikrotiks.length > 1) {
       const successfulMikrotikResponses = []
-      for (let i = 0; i < reqCityIpArray.length; i++) {
-        const mikrotikHost = reqCityIpArray[i]
+      for (let i = 0; i < searchCity[0].mikrotiks.length; i++) {
+        const mikrotikHost = searchCity[0].mikrotiks[i].ip
         const res = await mkDeleteClient(mikrotikHost, dni, code, model)
         successfulMikrotikResponses.push(res)
       }
     } else {
-      const mikrotikHost = reqCityIpArray[0]
+      const mikrotikHost = searchCity[0].mikrotiks[0].ip
       await mkDeleteClient(mikrotikHost, dni, code, model)
       return true
     }
@@ -226,20 +230,20 @@ module.exports = {
     await strapi.services.client.update({ id: id_client }, { 'active': false });
     await strapi.services.activationrequest.update({ id }, { 'active': true })
     const search = await strapi.services.client.find({ _id: id_client })
+    const searchCity = await strapi.services.city.find({ id: search[0].city.id })
     const clientObj = search[0]
     const dni = clientObj.dni
     const code = clientObj.code
     const model = clientObj.newModel
-    const reqCityIpArray = clientObj.city.ip
-    if (reqCityIpArray.length > 1) {
+    if (searchCity[0].mikrotiks.length > 1) {
       const successfulMikrotikResponses = []
-      for (let i = 0; i < reqCityIpArray.length; i++) {
-        const mikrotikHost = reqCityIpArray[i]
+      for (let i = 0; i < searchCity[0].mikrotiks.length; i++) {
+        const mikrotikHost = searchCity[0].mikrotiks[i].ip
         const res = await mkDeleteClient(mikrotikHost, dni, code, model)
         successfulMikrotikResponses.push(res)
       }
     } else {
-      const mikrotikHost = reqCityIpArray[0]
+      const mikrotikHost = searchCity[0].mikrotiks[0].ip
       await mkDeleteClient(mikrotikHost, dni, code, model)
       return true
     }
@@ -259,29 +263,30 @@ module.exports = {
     return mb3 + mb4 + mb4lte + mb6 + mb8 + mb10 + mb100
   },
   async countDisable(ctx) {
-    const disconnected = await strapi.services.client.count({ city: ctx.query._city, plan: '5f52a7572824f015ac8ceb5e' })
-    const retired = await strapi.services.client.count({ city: ctx.query._city, plan: '5f52a75f2824f015ac8ceb5f' })
-    return retired + disconnected
+    return await strapi.services.client.count({ city: ctx.query._city, plan: '5f52a7572824f015ac8ceb5e' })
+  },
+  async countRetired(ctx) {
+    return await strapi.services.client.count({ city: ctx.query._city, plan: '5f52a75f2824f015ac8ceb5f' })
   },
   async getClientComment(ctx) {
     const id = ctx.query.id
     const search = await strapi.services.client.find({ _id: id })
+    const searchCity = await strapi.services.city.find({ id: search[0].city.id })
     const clientObj = search[0]
     const code = clientObj.code
     const dni = clientObj.dni
     const model = clientObj.newModel
 
-    const reqCityIpArray = clientObj.city.ip
-    if (reqCityIpArray.length > 1) {
+    if (searchCity[0].mikrotiks.length > 1) {
       const successfulMikrotikResponses = []
-      for (let i = 0; i < reqCityIpArray.length; i++) {
-        const mikrotikHost = reqCityIpArray[i]
+      for (let i = 0; i < searchCity[0].mikrotiks.length; i++) {
+        const mikrotikHost = searchCity[0].mikrotiks[i].ip
         const res = await mkGetComment(mikrotikHost, dni, code, model)
         successfulMikrotikResponses.push(res)
       }
       return successfulMikrotikResponses[0]
     } else {
-      const mikrotikHost = reqCityIpArray[0]
+      const mikrotikHost = searchCity[0].mikrotiks[0].ip
       const res = await mkGetComment(mikrotikHost, dni, code, model)
       return res
     }
@@ -289,13 +294,12 @@ module.exports = {
   async getClientSecrets(ctx) {
     const city = ctx.query._city
     const search = await strapi.services.city.find({ _id: city })
-    const cityObj = search[0]
+    const searchCity = await strapi.services.city.find({ id: search[0].city.id })
 
-    const reqCityIpArray = cityObj.ip
-    if (reqCityIpArray.length > 1) {
+    if (searchCity[0].mikrotiks.length > 1) {
       const successfulMikrotikResponses = []
-      for (let i = 0; i < reqCityIpArray.length; i++) {
-        const mikrotikHost = reqCityIpArray[i]
+      for (let i = 0; i < searchCity[0].mikrotiks.length; i++) {
+        const mikrotikHost = searchCity[0].mikrotiks[i].ip
         const res = await mkGetSecrets(mikrotikHost)
         successfulMikrotikResponses.push(res)
       }
@@ -309,7 +313,7 @@ module.exports = {
       return secretArray
     } else {
       let secretArray = []
-      const mikrotikHost = reqCityIpArray[0]
+      const mikrotikHost = searchCity[0].mikrotiks[0].ip
       const res = await mkGetSecrets(mikrotikHost)
       await res.map((s) => {
         if (s['last-caller-id']){
@@ -363,34 +367,34 @@ module.exports = {
     const searchPlan = await strapi.services.plan.find({ _id: newClientPlanSearch })
     const newClientPlan = searchPlan[0].mikrotik_name
     const search = await strapi.services.client.find({ _id: id })
+    const searchCity = await strapi.services.city.find({ id: search[0].city.id })
     const clientObj = search[0]
     const dni = clientObj.dni
     const code = clientObj.code
     const model = clientObj.newModel
     const removeActive = true
-    const reqCityIpArray = clientObj.city.ip
     const successfulMikrotikResponses = []
     const entity = await strapi.services.client.update({ id }, { plan: newClientPlanSearch })
     const telegrambot = await strapi.services.telegrambot.find({city: entity.city.id})
     simpleTelegramUpdatePlan(entity, operator, isRx, telegrambot[0])
     // console.log(clientObj)
     // await strapi.services.history.create(clientObj);
-    if (reqCityIpArray.length > 1) {
+    if (searchCity[0].mikrotiks.length > 1) {
       //for loop
-      for (let i = 0; i < reqCityIpArray.length; i++) {
-        const mikrotikHost = reqCityIpArray[i]
+      for (let i = 0; i < searchCity[0].mikrotiks.length; i++) {
+        const mikrotikHost = searchCity[0].mikrotiks[i].ip
         const res = await mkSetClientPlanInformation(mikrotikHost, { newClientPlan, dni, code, model, removeActive })
         successfulMikrotikResponses.push(res)
       }
       //INPROVE: detect if the array elements are true or false
-      if (successfulMikrotikResponses.length === reqCityIpArray.length) {
+      if (successfulMikrotikResponses.length === searchCity[0].mikrotiks.length) {
         return true
       } else {
         return false
       }
     } else {
       //normal req
-      const mikrotikHost = reqCityIpArray[0]
+      const mikrotikHost = searchCity[0].mikrotiks[0].ip
       const res = await mkSetClientPlanInformation(mikrotikHost, { newClientPlan, dni, code, model, removeActive })
       if (res) {
         return true
@@ -412,6 +416,7 @@ module.exports = {
     const process = []
     const input = ctx.request.body.input
     const search = await strapi.services.client.findOne({ 'code': input.dx.code, 'city': input.dxCity })
+    const searchCity = await strapi.services.city.find({ id: search[0].city.id })
     const clientObj = search
     const code = clientObj.code
     if (search.length < 1) {
@@ -423,10 +428,9 @@ module.exports = {
     const planDx = input.dxPlan.id
     const planDxMk = input.dxPlan.name
     const kick = input.dxKick
-    const reqCityIpArray = clientObj.city.ip
-    if (reqCityIpArray.length > 1) {
-      for (let i = 0; i < reqCityIpArray.length; i++) {
-        const cityIp = reqCityIpArray[i]
+    if (searchCity[0].mikrotiks.length > 1) {
+      for (let i = 0; i < searchCity[0].mikrotiks.length; i++) {
+        const cityIp = searchCity[0].mikrotiks[i].ip
         const res = await strapi.services.client.update({ _id: clientObj._id }, { plan: planDx })
         const resMk = await mkDxClient({ dni, code, cityIp, model, planDxMk, kick })
         if (res && resMk) {
@@ -437,7 +441,7 @@ module.exports = {
       }
       return process
     } else {
-      const cityIp = reqCityIpArray[0]
+      const cityIp = searchCity[0].mikrotiks[0].ip
       const res = await strapi.services.client.update({ _id: clientObj._id }, { plan: planDx })
       const resMk = await mkDxClient({ dni, code, cityIp, model, planDxMk, kick })
       if (res && resMk) {
@@ -450,41 +454,10 @@ module.exports = {
   },
   async find(ctx) {
     let entities;
-    const search = ctx.query
     if (ctx.query._q) {
       entities = await strapi.services.client.search(ctx.query);
     } else {
-      // const city = await strapi.services.city.find({ _id: ctx.query.city })
-      // const ipArray = city[0].ip
-      // const active = await mkActiveClientCount(ipArray)
       entities = await strapi.services.client.search(ctx.query);
-      // entities.map((client) => {
-      //   const ac = active.find(c => c.name == client.code)
-      //   if (ac) {
-      //     client.status = 'green'
-      //     return client
-      //   } else {
-      //     const ac2 = active.find(c => c.name == client.dni)
-      //     if (ac2) {
-      //       client.status = 'green'
-      //       return client
-      //     } else {
-      //       client.status = 'red'
-      //       return client
-      //     }
-      //   }
-      //   // for(let i = 0; i < active.length; i++){
-      //   //   if (client.code == active[i].name){
-      //   //     console.log('green1')
-      //   //     client.status = 'green'
-      //   //   } else if (client.dni == active[i].name) {
-      //   //     console.log('green2')
-      //   //     client.status = 'green'
-      //   //   } else {
-      //   //     client.status = 'red'
-      //   //   }
-      //   // }
-      // })
       return entities.map(entity => sanitizeEntity(entity, { model: strapi.models.client }));
     }
 

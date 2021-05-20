@@ -32,7 +32,6 @@
     </v-navigation-drawer>
     <v-app-bar
       app
-      :src="bg"
     >
       <template v-slot:img="{ props }">
         <v-img
@@ -155,8 +154,7 @@ export default {
       miniVariant: false,
       right: true,
       rightDrawer: false,
-      title: 'Aplicación de Gestión Dinámica ARNOP',
-      bg: 'https://picsum.photos/1920/1080?random'
+      title: 'Aplicación de Gestión Dinámica ARNOP'
     }
   },
   computed: {
