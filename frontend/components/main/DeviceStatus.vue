@@ -1,5 +1,6 @@
 <template>
   <div>
+    pasar las request de los datos por un microservicio estilo las ads de fenix que los actualice casa X tiempo
     <v-row class="d-flex justify-center my-6">
       <v-col
         cols="2"
