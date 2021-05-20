@@ -1,12 +1,29 @@
 <template>
   <div>
-    <v-row class="d-flex justify-center my-6 px-5">
+    <v-row class="d-flex justify-center my-6">
       <v-col
-        cols="3"
+        cols="2"
       >
         <v-card
           elevation="1"
           class="green darken-3 justify-center"
+          style="display:grid;"
+          shaped
+        >
+          <v-card-title>
+            Clientes En Linea
+          </v-card-title>
+          <v-card-text>
+            <h1>{{ activeClients }}</h1>
+          </v-card-text>
+        </v-card>
+      </v-col>
+      <v-col
+        cols="2"
+      >
+        <v-card
+          elevation="1"
+          class="blue darken-4 justify-center"
           style="display:grid;"
           shaped
         >
@@ -19,7 +36,7 @@
         </v-card>
       </v-col>
       <v-col
-        cols="3"
+        cols="2"
       >
         <v-card
           elevation="1"
@@ -36,7 +53,7 @@
         </v-card>
       </v-col>
       <v-col
-        cols="3"
+        cols="2"
       >
         <v-card
           elevation="1"
@@ -53,7 +70,7 @@
         </v-card>
       </v-col>
       <v-col
-        cols="3"
+        cols="2"
       >
         <v-card
           elevation="1"
@@ -82,6 +99,9 @@ export default {
     Mikrotik
   },
   computed: {
+    activeClients () {
+      return this.$store.state.activeClients
+    },
     clientCount () {
       return this.$store.state.clientCount
     },

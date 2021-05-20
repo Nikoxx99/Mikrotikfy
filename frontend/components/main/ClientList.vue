@@ -78,15 +78,6 @@
                   >
                     <v-icon>mdi-reload</v-icon>
                   </v-btn>
-                  <v-chip
-                    color="white white--text"
-                    small
-                    outlined
-                    label
-                    class="mr-4"
-                  >
-                    En Linea: {{ activeClients }}
-                  </v-chip>
                   <v-spacer />
                   <!-- <v-text-field
                     :value="options.itemsPerPage"
@@ -329,9 +320,6 @@ export default {
     },
     technologies () {
       return this.$store.state.technologies
-    },
-    activeClients () {
-      return this.$store.state.activeClients
     },
     activeClientsList () {
       return this.$store.state.activeClientsList
