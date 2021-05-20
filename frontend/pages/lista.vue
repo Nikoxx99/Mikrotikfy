@@ -14,6 +14,9 @@
       :color="currentCity ? currentCity.color : ''"
     >
       <v-tab v-if="can('DeviceStatus')" href="#tab-1">
+        <v-icon class="mr-2">
+          mdi-server-network
+        </v-icon>
         Estatus Mikrotik
       </v-tab>
       <v-tab v-if="can('ActivationRequestsList')" href="#tab-2">

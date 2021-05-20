@@ -175,6 +175,7 @@ export default {
         await this.$store.dispatch('count/clientCount', third.data.user.cities[0].id)
         await this.$store.dispatch('count/clientCountActive', third.data.user.cities[0].id)
         await this.$store.dispatch('count/clientCountDisable', third.data.user.cities[0].id)
+        await this.$store.dispatch('count/clientCountRetired', third.data.user.cities[0].id)
         await this.$store.dispatch('ticket/getTicketsFromDatabase', { limit: 30, city: third.data.user.cities[0].id })
         window.location.href = `/lista?city=${third.data.user.cities[0].id}`
       } else {

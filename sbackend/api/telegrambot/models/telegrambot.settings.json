@@ -18,8 +18,8 @@
       "type": "string"
     },
     "city": {
-      "model": "city",
-      "via": "telegrambot"
+      "via": "telegrambot",
+      "model": "city"
     },
     "name": {
       "type": "string"

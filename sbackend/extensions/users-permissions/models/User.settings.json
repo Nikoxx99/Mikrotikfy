@@ -75,8 +75,8 @@
       "default": false
     },
     "cities": {
-      "collection": "city",
       "via": "users",
+      "collection": "city",
       "dominant": true
     }
   }

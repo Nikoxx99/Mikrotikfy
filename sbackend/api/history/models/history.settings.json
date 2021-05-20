@@ -39,8 +39,8 @@
       "via": "histories"
     },
     "city": {
-      "model": "city",
-      "via": "histories"
+      "via": "histories",
+      "model": "city"
     },
     "plan": {
       "model": "plan",

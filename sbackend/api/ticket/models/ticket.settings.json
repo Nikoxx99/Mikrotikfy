@@ -19,8 +19,8 @@
       "model": "client"
     },
     "city": {
-      "model": "city",
-      "via": "tickets"
+      "via": "tickets",
+      "model": "city"
     },
     "tickettype": {
       "model": "tickettype"

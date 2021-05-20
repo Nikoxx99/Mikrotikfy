@@ -123,6 +123,7 @@ module.exports = {
     clientCount(city: String): Int
     clientCountActive(city: String): Int
     clientCountDisable(city: String): Int
+    clientCountRetired(city: String): Int
     searchClient(search: String, limit: Int, city: String): [SearchClient]
     getClientComment(id: ID): ClientComment
     getClientSecrets(city: String): [clientSecretItem]
@@ -158,6 +159,10 @@ module.exports = {
       clientCountDisable: {
         description: 'Return disable client count',
         resolver: 'application::client.client.countDisable'
+      },
+      clientCountRetired: {
+        description: 'Return retired client count',
+        resolver: 'application::client.client.countRetired'
       },
       searchClient: {
         description: 'Search for a Client',

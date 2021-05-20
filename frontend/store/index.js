@@ -12,14 +12,15 @@ export const state = () => {
     activeClientsList: null,
     clientCount: null,
     clientCountActive: null,
-    clientCountDisable: null
+    clientCountDisable: null,
+    clientCountRetired: null
   }
 }
 export const mutations = {
   setAuth (state, auth) {
     state.auth = auth
   },
-  setLocalStorage (state, { cities, plans, technologies, neighborhoods, activeClients, activeClientsList, clientCount, clientCountActive, clientCountDisable }) {
+  setLocalStorage (state, { cities, plans, technologies, neighborhoods, activeClients, activeClientsList, clientCount, clientCountActive, clientCountDisable, clientCountRetired }) {
     state.cities = JSON.parse(cities)
     state.plans = JSON.parse(plans)
     state.technologies = JSON.parse(technologies)
@@ -29,6 +30,7 @@ export const mutations = {
     state.clientCount = JSON.parse(clientCount)
     state.clientCountActive = JSON.parse(clientCountActive)
     state.clientCountDisable = JSON.parse(clientCountDisable)
+    state.clientCountRetired = JSON.parse(clientCountRetired)
   },
   setTicketsFromLocalStorage (state, tickets) {
     state.tickets = JSON.parse(tickets)
@@ -75,7 +77,8 @@ export const actions = {
     const activeClientsList = localStorage.getItem('activeClientsList')
     const clientCountActive = localStorage.getItem('clientCountActive')
     const clientCountDisable = localStorage.getItem('clientCountDisable')
-    commit('setLocalStorage', { cities, plans, technologies, neighborhoods, activeClients, activeClientsList, clientCount, clientCountActive, clientCountDisable })
+    const clientCountRetired = localStorage.getItem('clientCountRetired')
+    commit('setLocalStorage', { cities, plans, technologies, neighborhoods, activeClients, activeClientsList, clientCount, clientCountActive, clientCountDisable, clientCountRetired })
   },
   getTicketsFromLocalStorage ({ commit }) {
     const tickets = localStorage.getItem('tickets')
