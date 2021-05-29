@@ -4,6 +4,7 @@
  * to customize this controller
  */
 const { sanitizeEntity } = require('strapi-utils');
+const RouterOSAPI = require('node-routeros').RouterOSAPI
 const { mkCreateClient, mkDeleteClient, mkSetClientPlanInformation, mkClientStatus, mkActiveClientCount, mkGetComment, mkSetComment, mkDxClient, simpleTelegramCreate, simpleTelegramAdminCreate, mkGetSecrets, simpleTelegramDelete, simpleTelegramUpdate, simpleTelegramUpdatePlan, createComment } = require('../../../mikrotik/functions');
 module.exports = {
   async create(ctx) {
@@ -250,7 +251,7 @@ module.exports = {
     return true
   },
   async count(ctx) {
-    return await strapi.services.client.count({ city: ctx.query._city });
+    return await strapi.services.client.count({ city: ctx.query._city })
   },
   async countActive(ctx) {
     const mb3 = await strapi.services.client.count({ city: ctx.query._city, plan: '5f52a7232824f015ac8ceb5a' })
@@ -267,6 +268,59 @@ module.exports = {
   },
   async countRetired(ctx) {
     return await strapi.services.client.count({ city: ctx.query._city, plan: '5f52a75f2824f015ac8ceb5f' })
+  },
+  async refreshClientData (ctx) {
+    const cityQuery = await strapi.services.city.findOne({ _id: ctx.query.city });
+    const cityIpArray = cityQuery.mikrotiks
+    if (cityIpArray.length > 1) {
+      const cityActiveClients = []
+      for (let i = 0; i < cityIpArray.length; i++) {
+        const conn = new RouterOSAPI({
+          host: cityIpArray[i].ip,
+          user: 'API_ARNOP',
+          password: strapi.config.get('server.admin.mikrotik.secret', 'null'),
+          port: 8087
+        })
+        await conn.connect()
+        const result = await conn.write('/ppp/active/print', [
+          '=.proplist=name',
+        ])
+        conn.close()
+        cityActiveClients.push(result)
+      }
+      var active = cityActiveClients[0].concat(cityActiveClients[1])
+    } else {
+      const conn = new RouterOSAPI({
+        host: cityIpArray[0].ip,
+        user: 'API_ARNOP',
+        password: strapi.config.get('server.admin.mikrotik.secret', 'null'),
+        port: 8087
+      })
+      await conn.connect()
+      const result2 = await conn.write('/ppp/active/print', [
+        '=.proplist=name',
+      ])
+      conn.close()
+      var active = result2
+    }
+
+    const count = await strapi.services.client.count({ city: ctx.query.city });
+    const mb3 = await strapi.services.client.count({ city: ctx.query.city, plan: '5f52a7232824f015ac8ceb5a' })
+    const mb4 = await strapi.services.client.count({ city: ctx.query.city, plan: '5f52a73c2824f015ac8ceb5c' })
+    const mb4lte = await strapi.services.client.count({ city: ctx.query.city, plan: '60116a1396f2053b1bbc3e09' })
+    const mb6 = await strapi.services.client.count({ city: ctx.query.city, plan: '5f52a7442824f015ac8ceb5d' })
+    const mb8 = await strapi.services.client.count({ city: ctx.query.city, plan: '5f52a6fe2824f015ac8ceb58' })
+    const mb10 = await strapi.services.client.count({ city: ctx.query.city, plan: '5f52a70a2824f015ac8ceb59' })
+    const mb100 = await strapi.services.client.count({ city: ctx.query.city, plan: '5f52a72d2824f015ac8ceb5b' })
+    const countActive = mb3 + mb4 + mb4lte + mb6 + mb8 + mb10 + mb100
+    const countDisable = await strapi.services.client.count({ city: ctx.query.city, plan: '5f52a7572824f015ac8ceb5e' })
+    const countRetired = await strapi.services.client.count({ city: ctx.query.city, plan: '5f52a75f2824f015ac8ceb5f' })
+    const activeRes = await strapi.services.static.update({ 'name': 'active', 'city': ctx.query.city}, {'data': String(active.length)})
+    const countRes = await strapi.services.static.update({ 'name': 'count', 'city': ctx.query.city}, {'data': String(count)})
+    const countActiveRes = await strapi.services.static.update({ 'name': 'countActive', 'city': ctx.query.city }, {'data': String(countActive)})
+    const countDisableRes = await strapi.services.static.update({ 'name': 'countDisable', 'city': ctx.query.city }, {'data': String(countDisable)})
+    const countRetiredRes = await strapi.services.static.update({ 'name': 'countRetired', 'city': ctx.query.city }, {'data': String(countRetired)})
+    return activeRes + countRes + countActiveRes + countDisableRes + countRetiredRes
   },
   async getClientComment(ctx) {
     const id = ctx.query.id

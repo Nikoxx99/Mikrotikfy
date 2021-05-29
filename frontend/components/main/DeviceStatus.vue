@@ -1,9 +1,13 @@
 <template>
   <div>
-    pasar las request de los datos por un microservicio estilo las ads de fenix que los actualice casa X tiempo
     <v-row class="d-flex justify-center my-6">
       <v-col
-        cols="2"
+        cols="10"
+        xl="2"
+        lg="2"
+        md="3"
+        sm="6"
+        xs="12"
       >
         <v-card
           elevation="1"
@@ -15,12 +19,17 @@
             Clientes En Linea
           </v-card-title>
           <v-card-text>
-            <h1>{{ activeClients }}</h1>
+            <h1>{{ active }}</h1>
           </v-card-text>
         </v-card>
       </v-col>
       <v-col
-        cols="2"
+        cols="10"
+        xl="2"
+        lg="2"
+        md="3"
+        sm="6"
+        xs="12"
       >
         <v-card
           elevation="1"
@@ -32,12 +41,17 @@
             Clientes Activos
           </v-card-title>
           <v-card-text>
-            <h1>{{ clientCountActive }}</h1>
+            <h1>{{ countActive }}</h1>
           </v-card-text>
         </v-card>
       </v-col>
       <v-col
-        cols="2"
+        cols="10"
+        xl="2"
+        lg="2"
+        md="3"
+        sm="6"
+        xs="12"
       >
         <v-card
           elevation="1"
@@ -49,12 +63,17 @@
             Clientes en Mora
           </v-card-title>
           <v-card-text>
-            <h1>{{ clientCountDisable }}</h1>
+            <h1>{{ countDisable }}</h1>
           </v-card-text>
         </v-card>
       </v-col>
       <v-col
-        cols="2"
+        cols="10"
+        xl="2"
+        lg="2"
+        md="3"
+        sm="6"
+        xs="12"
       >
         <v-card
           elevation="1"
@@ -66,12 +85,17 @@
             Clientes Retirados
           </v-card-title>
           <v-card-text>
-            <h1>{{ clientCountRetired }}</h1>
+            <h1>{{ countRetired }}</h1>
           </v-card-text>
         </v-card>
       </v-col>
       <v-col
-        cols="2"
+        cols="10"
+        xl="2"
+        lg="2"
+        md="3"
+        sm="6"
+        xs="12"
       >
         <v-card
           elevation="1"
@@ -83,12 +107,12 @@
             Clientes Totales
           </v-card-title>
           <v-card-text>
-            <h1>{{ clientCount }}</h1>
+            <h1>{{ count }}</h1>
           </v-card-text>
         </v-card>
       </v-col>
     </v-row>
-    <Mikrotik />
+    <Mikrotik :data="mikrotikData" />
   </div>
 </template>
 
@@ -99,22 +123,95 @@ export default {
   components: {
     Mikrotik
   },
-  computed: {
-    activeClients () {
-      return this.$store.state.activeClients
+  data () {
+    return {
+      active: 0,
+      count: 0,
+      countActive: 0,
+      countDisable: 0,
+      countRetired: 0,
+      mikrotikData: {}
+    }
+  },
+  mounted () {
+    this.countClientData()
+    this.getMikrotikStatus()
+  },
+  methods: {
+    async countClientData () {
+      const data = await this.$strapi.graphql({
+        query: `
+          query($city: ID) {
+            statics(where:{
+              city: $city
+            }) {
+              name
+              data
+            }
+          }
+        `,
+        variables: {
+          city: this.$route.query.city
+        }
+      })
+      this.count = data.statics[0].data
+      this.countActive = data.statics[1].data
+      this.countDisable = data.statics[2].data
+      this.countRetired = data.statics[3].data
+      this.active = data.statics[4].data
     },
-    clientCount () {
-      return this.$store.state.clientCount
-    },
-    clientCountActive () {
-      return this.$store.state.clientCountActive
-    },
-    clientCountDisable () {
-      return this.$store.state.clientCountDisable
-    },
-    clientCountRetired () {
-      return this.$store.state.clientCountRetired
+    async getMikrotikStatus () {
+      const data = await this.$strapi.graphql({
+        query: `
+          query($city: String) {
+            mikrotiks(where:{
+              city:$city
+            }) {
+              name
+              city{
+                name
+              }
+              ip
+              uptime
+              cpu
+              memory
+              version
+              buildtime
+              factorysoftware
+              totalmemory
+              cpucount
+              cpufrequency
+              freehddspace
+              totalhddspace
+              architecturename
+              platform
+              boardname
+            }
+          }
+        `,
+        variables: {
+          city: this.$route.query.city
+        }
+      })
+      this.mikrotikData = data.mikrotiks
     }
   }
+  // computed: {
+  //   activeClients () {
+  //     return this.$store.state.activeClients
+  //   },
+  //   clientCount () {
+  //     return this.$store.state.clientCount
+  //   },
+  //   clientCountActive () {
+  //     return this.$store.state.clientCountActive
+  //   },
+  //   clientCountDisable () {
+  //     return this.$store.state.clientCountDisable
+  //   },
+  //   clientCountRetired () {
+  //     return this.$store.state.clientCountRetired
+  //   }
+  // }
 }
 </script>

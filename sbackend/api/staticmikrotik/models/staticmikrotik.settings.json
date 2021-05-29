@@ -1,0 +1,23 @@
+{
+  "kind": "collectionType",
+  "collectionName": "staticmikrotiks",
+  "info": {
+    "name": "staticmikrotik"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "data": {
+      "type": "string"
+    },
+    "mikrotik": {
+      "model": "mikrotik"
+    }
+  }
+}

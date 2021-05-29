@@ -55,6 +55,14 @@
       "config": {
         "policies": []
       }
+    },
+    {
+      "method": "GET",
+      "path": "/refreshClientData",
+      "handler": "client.refreshClientData",
+      "config": {
+        "policies": []
+      }
     }
   ]
 }

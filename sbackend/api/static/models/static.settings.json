@@ -1,0 +1,24 @@
+{
+  "kind": "collectionType",
+  "collectionName": "statics",
+  "info": {
+    "name": "static",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "data": {
+      "type": "string"
+    },
+    "city": {
+      "model": "city"
+    }
+  }
+}

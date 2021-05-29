@@ -123,6 +123,44 @@ module.exports.mkSetClientPlanInformation = async function (mikrotikHost, input)
     console.log(error)
   }
 }
+module.exports.mkGetMikrotikInfo = async function (mikrotikHost) {
+  const conn = new RouterOSAPI({
+    host: mikrotikHost,
+    user: 'API_ARNOP',
+    password: strapi.config.get('server.admin.mikrotik.secret', 'null'),
+    port: 8087
+  })
+  await conn.connect()
+  try {
+    var com1 = await conn.write('/system/identity/print').catch((error) => {
+      conn.close()
+      return error
+    })
+    var com2 = await conn.write('/system/resource/print')
+    conn.close()
+    const res = {...com1[0], ...com2[0]}
+    const send = {}
+    send.name = res.name
+    send.uptime = res.uptime
+    send.cpu = res['cpu-load']
+    send.memory = res['free-memory']
+    send.version = res.version
+    send.buildtime = res['build-time']
+    send.factorysoftware = res['factory-software']
+    send.totalmemory = res['total-memory']
+    send.cpucount = res['cpu-count']
+    send.cpufrequency = res['cpu-frequency']
+    send.freehddspace = res['free-hdd-space']
+    send.totalhddspace = res['total-hdd-space']
+    send.architecturename = res['architecture-name']
+    send.boardname = res['board-name']
+    send.platform = res.platform
+    return send
+  } catch (error) {
+    conn.close()
+    return error
+  }
+}
 module.exports.mkClientStatus = async function (mikrotikHost, code, dni, model) {
   const conn = new RouterOSAPI({
     host: mikrotikHost,

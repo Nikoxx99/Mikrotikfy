@@ -5,6 +5,7 @@
  * to customize this controller
  */
 const RouterOSAPI = require('node-routeros').RouterOSAPI
+const { mkGetMikrotikInfo } = require('../../../mikrotik/functions');
 module.exports = {
   async getMikrotikClients(ctx) {
     const cityQuery = await strapi.services.city.findOne({ _id: ctx.query._city });
@@ -58,4 +59,21 @@ module.exports = {
     }
 
   },
+  async getMikrotikStatus(ctx) {
+    const city = ctx.params._city
+    const searchCity = await strapi.services.city.find({ id: city })
+    const mikrotiks = searchCity[0].mikrotiks
+    const ipList = await mikrotiks.map((mikrotik) => {
+      return mikrotik.ip
+    })
+    return await Promise.all(
+      ipList.map(async (ip) => {
+        const res = await mkGetMikrotikInfo(ip)
+        const mikrotikSearch = await strapi.services.mikrotik.find({ 'name': res.name })
+        const actualMikrotik = mikrotikSearch[0].id
+        const update = await strapi.services.mikrotik.update({ 'id': String(actualMikrotik)}, res)
+        return update
+      })
+    )
+  }
 };

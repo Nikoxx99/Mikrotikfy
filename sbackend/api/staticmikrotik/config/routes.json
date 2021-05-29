@@ -1,0 +1,52 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/staticmikrotiks",
+      "handler": "staticmikrotik.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/staticmikrotiks/count",
+      "handler": "staticmikrotik.count",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/staticmikrotiks/:id",
+      "handler": "staticmikrotik.findOne",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/staticmikrotiks",
+      "handler": "staticmikrotik.create",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/staticmikrotiks/:id",
+      "handler": "staticmikrotik.update",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/staticmikrotiks/:id",
+      "handler": "staticmikrotik.delete",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}

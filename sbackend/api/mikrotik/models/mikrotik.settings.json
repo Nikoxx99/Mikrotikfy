@@ -15,10 +15,52 @@
       "type": "string"
     },
     "city": {
-      "via": "mikrotiks",
-      "model": "city"
+      "model": "city",
+      "via": "mikrotiks"
     },
     "ip": {
+      "type": "string"
+    },
+    "uptime": {
+      "type": "string"
+    },
+    "cpu": {
+      "type": "string"
+    },
+    "memory": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "buildtime": {
+      "type": "string"
+    },
+    "factorysoftware": {
+      "type": "string"
+    },
+    "totalmemory": {
+      "type": "string"
+    },
+    "cpucount": {
+      "type": "string"
+    },
+    "cpufrequency": {
+      "type": "string"
+    },
+    "freehddspace": {
+      "type": "string"
+    },
+    "totalhddspace": {
+      "type": "string"
+    },
+    "architecturename": {
+      "type": "string"
+    },
+    "platform": {
+      "type": "string"
+    },
+    "boardname": {
       "type": "string"
     }
   }

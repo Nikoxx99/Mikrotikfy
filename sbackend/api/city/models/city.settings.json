@@ -47,8 +47,8 @@
       "via": "cities"
     },
     "mikrotiks": {
-      "collection": "mikrotik",
-      "via": "city"
+      "via": "city",
+      "collection": "mikrotik"
     }
   }
 }

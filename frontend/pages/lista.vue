@@ -45,19 +45,19 @@
       </v-tab-item>
       <v-tab-item
         v-if="can('ActivationRequestsList')"
-        :key="1"
+        :key="2"
         :value="'tab-2'"
       >
         <ActivationRequestList />
       </v-tab-item>
       <v-tab-item
-        :key="2"
+        :key="3"
         :value="'tab-3'"
       >
         <Tickets />
       </v-tab-item>
       <v-tab-item
-        :key="3"
+        :key="4"
         :value="'tab-4'"
       >
         <ClientList />
