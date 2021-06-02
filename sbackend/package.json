@@ -15,15 +15,15 @@
     "node-fetch": "^2.6.1",
     "node-routeros": "^1.6.9",
     "strapi": "3.6.2",
-    "strapi-admin": "3.2.3",
-    "strapi-connector-mongoose": "3.2.3",
-    "strapi-plugin-content-manager": "3.2.5",
-    "strapi-plugin-content-type-builder": "3.2.5",
-    "strapi-plugin-email": "3.2.3",
+    "strapi-admin": "3.6.2",
+    "strapi-connector-mongoose": "3.6.2",
+    "strapi-plugin-content-manager": "3.6.2",
+    "strapi-plugin-content-type-builder": "3.6.2",
+    "strapi-plugin-email": "3.6.2",
     "strapi-plugin-graphql": "^3.6.2",
-    "strapi-plugin-upload": "3.2.3",
-    "strapi-plugin-users-permissions": "3.2.3",
-    "strapi-utils": "3.2.3"
+    "strapi-plugin-upload": "3.6.2",
+    "strapi-plugin-users-permissions": "3.6.2",
+    "strapi-utils": "3.6.2"
   },
   "author": {
     "name": "Nicolas Echeverry"

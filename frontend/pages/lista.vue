@@ -80,7 +80,7 @@ export default {
   },
   data () {
     return {
-      tab: 'tab-1'
+      tab: 'tab-3'
     }
   },
   computed: {
