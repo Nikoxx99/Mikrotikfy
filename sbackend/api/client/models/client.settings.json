@@ -81,8 +81,8 @@
       "via": "client"
     },
     "tickets": {
-      "collection": "ticket",
-      "via": "client"
+      "via": "client",
+      "collection": "ticket"
     },
     "hasRepeater": {
       "type": "boolean",

@@ -15,27 +15,31 @@
       "type": "boolean"
     },
     "client": {
-      "via": "tickets",
-      "model": "client"
+      "model": "client",
+      "via": "tickets"
     },
     "city": {
-      "via": "tickets",
-      "model": "city"
+      "model": "city",
+      "via": "tickets"
     },
     "tickettype": {
       "model": "tickettype"
     },
     "assiganted": {
-      "via": "tickets",
       "plugin": "users-permissions",
-      "model": "user"
+      "model": "user",
+      "via": "tickets"
     },
     "details": {
       "type": "string"
     },
     "ticketdetails": {
-      "via": "ticket",
-      "collection": "ticketdetail"
+      "collection": "ticketdetail",
+      "via": "ticket"
+    },
+    "answered": {
+      "type": "boolean",
+      "default": false
     }
   }
 }

@@ -12,8 +12,8 @@
   },
   "attributes": {
     "ticket": {
-      "model": "ticket",
-      "via": "ticketdetails"
+      "via": "ticketdetails",
+      "model": "ticket"
     },
     "details": {
       "type": "string"

@@ -104,8 +104,8 @@
                 />
               </template>
               <template v-slot:item.active="props">
-                <v-chip small :color="getColor(props.item.active)" class="white--text">
-                  {{ getState(props.item.active) }}
+                <v-chip small :color="getColor(props.item.active, props.item.answered ? props.item.answered : null)" class="white--text">
+                  {{ getState(props.item.active, props.item.answered ? props.item.answered : null) }}
                 </v-chip>
               </template>
               <template v-slot:item.createdAt="{ item }">
@@ -362,16 +362,20 @@ export default {
       const humanDateFormat = dateObject.toLocaleString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric' })
       return humanDateFormat
     },
-    getColor (state) {
-      if (state) {
+    getColor (state, answered) {
+      if (state && !answered) {
         return 'blue darken-4'
+      } else if (answered && state) {
+        return 'orange darken-4'
       } else {
         return 'red'
       }
     },
-    getState (state) {
-      if (state) {
+    getState (state, answered) {
+      if (state && !answered) {
         return 'Abierto'
+      } else if (answered && state) {
+        return 'Respondido'
       } else {
         return 'Cerrado'
       }

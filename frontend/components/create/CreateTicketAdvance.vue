@@ -120,6 +120,7 @@ export default {
           }
           data: {
             active: $status
+            answered: true
           }
         }){
           ticket{

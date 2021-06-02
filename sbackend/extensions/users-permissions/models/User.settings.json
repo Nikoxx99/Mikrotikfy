@@ -59,8 +59,8 @@
       "via": "operator"
     },
     "tickets": {
-      "collection": "ticket",
-      "via": "assiganted"
+      "via": "assiganted",
+      "collection": "ticket"
     },
     "ticketdetails": {
       "collection": "ticketdetail",
