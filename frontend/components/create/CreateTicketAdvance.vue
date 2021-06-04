@@ -33,6 +33,12 @@
               label="Detalles adicionales"
             />
             <v-checkbox
+              v-if="$store.state.auth.rolename === 'superadmin'"
+              v-model="ticketAdvance.escalated"
+              color="red"
+              label="Escalar caso?"
+            />
+            <v-checkbox
               v-model="ticketAdvance.closeTicket"
               color="red"
               label="Cerrar Ticket?"
@@ -44,7 +50,7 @@
             :color="ticketAdvance.closeTicket ? 'red darken-4' : 'blue darken-4'"
             @click="CreateTicketAdvance()"
           >
-            {{ ticketAdvance.closeTicket ? 'Cerrar Ticket' : 'Crear Avance' }}
+            {{ ticketAdvance.closeTicket ? ticketAdvance.escalated ? 'Cerrar Ticket' : 'Cerrar Ticket' : ticketAdvance.escalated ? 'Escalar caso' : 'Crear Avance' }}
           </v-btn>
           <v-spacer />
           <v-btn
@@ -102,6 +108,7 @@ export default {
       id: '',
       details: '',
       closeTicket: false,
+      escalated: false,
       editindex: -1
     }
   }),
@@ -113,7 +120,7 @@ export default {
     },
     CreateTicketAdvance () {
       this.$apollo.mutate({
-        mutation: gqlt`mutation ($id: ID!, $status: Boolean){
+        mutation: gqlt`mutation ($id: ID!, $status: Boolean, $escalated: Boolean){
           updateTicket(input: {
           where: {
             id: $id
@@ -121,6 +128,7 @@ export default {
           data: {
             active: $status
             answered: true
+            escalated: $escalated
           }
         }){
           ticket{
@@ -130,7 +138,8 @@ export default {
         }`,
         variables: {
           id: this.ticketAdvance.id,
-          status: !this.ticketAdvance.closeTicket
+          status: !this.ticketAdvance.closeTicket,
+          escalated: this.ticketAdvance.escalated
         }
       }).then(() => {
         this.$apollo.mutate({

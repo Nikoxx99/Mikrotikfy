@@ -40,6 +40,10 @@
     "answered": {
       "type": "boolean",
       "default": false
+    },
+    "escalated": {
+      "type": "boolean",
+      "default": false
     }
   }
 }
