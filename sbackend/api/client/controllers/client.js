@@ -458,13 +458,31 @@ module.exports = {
     }
   },
   async getClientStatus(ctx) {
-    const search = await strapi.services.client.findOne({ id: ctx.query.id })
-    const mikrotikHost = search.city.ip[0]
-    const code = search.code
-    const dni = search.dni
-    const model = search.newModel
-    const res = await mkClientStatus(mikrotikHost, code, dni, model)
-    return res
+    console.log(ctx.query.id)
+    const searchClient = await strapi.services.client.findOne({ id: ctx.query.id })
+    console.log(searchClient)
+    const searchCity = await strapi.services.city.find({ id: searchClient.city.id })
+    const mikrotiks = searchCity[0].mikrotiks
+    const ipList = await mikrotiks.map((mikrotik) => {
+      return mikrotik.ip
+    })
+    const response = await Promise.all(
+      ipList.map(async (ip) => {
+        console.log(ip)
+        const res = await mkClientStatus(ip, searchClient.code, searchClient.dni, searchClient.model)
+        if (res.success) {
+          return res
+        } else {
+          return res
+        }
+      })
+    )
+    console.log(response)
+    return response.map((mikrotik) => {
+      if (mikrotik.sucess) {
+        return mikrotik.data
+      }
+    })
   },
   async dxClient(ctx) {
     const process = []

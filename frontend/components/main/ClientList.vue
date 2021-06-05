@@ -44,7 +44,7 @@
             <v-data-table
               :headers="headers"
               :items.sync="clients"
-              :server-items-length="clientCount"
+              :server-items-length="clientCount()"
               :items-per-page.sync="itemsPerPage"
               :page.sync="page"
               :options.sync="options"
@@ -393,6 +393,9 @@ export default {
       } else if (model === 1) {
         return 'cyan'
       }
+    },
+    clientCount () {
+      return parseInt(localStorage.getItem('clientCount'))
     },
     getTechnology (technology) {
       if (technology === '5f832eadb0c43e2c64b3743b') {
