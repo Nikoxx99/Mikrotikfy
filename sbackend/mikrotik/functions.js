@@ -170,9 +170,11 @@ module.exports.mkClientStatus = async function (mikrotikHost, code, dni, model) 
   })
   await conn.connect()
   try {
-    console.log('trycatch')
+    var identity = await conn.write('/system/identity/print').catch((error) => {
+      conn.close()
+      return error
+    })
     if (model === 1) {
-      console.log('code model')
       var printInterface = await conn.write('/interface/print', [
         '=.proplist=tx-byte,rx-byte,last-link-up-time,last-disconnect-reason,last-caller-id',
         '?=name=<pppoe-' + code + '>',
@@ -182,7 +184,6 @@ module.exports.mkClientStatus = async function (mikrotikHost, code, dni, model) 
         '?=name=' + code,
       ])
     } else {
-      console.log('dni model')
       // eslint-disable-next-line no-redeclare
       var printInterface = await conn.write('/interface/print', [
         '=.proplist=tx-byte,rx-byte,last-link-up-time,last-disconnect-reason,last-caller-id',
@@ -194,32 +195,46 @@ module.exports.mkClientStatus = async function (mikrotikHost, code, dni, model) 
         '?=name=' + dni,
       ])
     }
-    if (printInterface.length > 0 && printActiveConnections.length > 0) {
-      console.log('found')
-      let client = {}
-      client.status = true
-      client.mikrotik = false
-      client.download = printInterface[0]['tx-byte']
-      client.upload = printInterface[0]['rx-byte']
-      client.offlineTime = printInterface[0]['last-link-up-time']
-      client.disconnectReason = printInterface[0]['last-disconnect-reason']
-      client.lastCallerId = printInterface[0]['last-caller-id']
-      client.address = printActiveConnections[0]['address']
-      client.mac_address = printActiveConnections[0]['caller-id']
-      client.uptime = printActiveConnections[0].uptime
+    let client = {}
+    client.mikrotik = identity[0].name
+    if (printInterface.length > 0) {
       conn.close()
+      console.log(printActiveConnections)
+      if (printActiveConnections.length > 0) {
+        console.log('Active exists')
+        client.download = printInterface[0]['tx-byte']
+        client.upload = printInterface[0]['rx-byte']
+        client.address = printActiveConnections[0]['address']
+        client.mac_address = printActiveConnections[0]['caller-id']
+        client.uptime = printActiveConnections[0].uptime
+        client.status = true
+        client.clientExists = true
+        return {
+          ip: mikrotikHost,
+          success: true,
+          data: client
+        }
+      } else {
+        console.log('Active not exists')
+        client.offlineTime = printInterface[0]['last-link-up-time']
+        client.disconnectReason = printInterface[0]['last-disconnect-reason']
+        client.lastCallerId = printInterface[0]['last-caller-id']
+        client.status = false
+        client.clientExists = true
+        return {
+          ip: mikrotikHost,
+          success: true,
+          data: client
+        }
+      }
+    } else {
+      conn.close()
+      client.status = false
+      client.clientExists = false
       return {
         ip: mikrotikHost,
         success: true,
         data: client
-      }
-    } else {
-      console.log('not found')
-      conn.close()
-      return {
-        ip: mikrotikHost,
-        success: false,
-        data: {}
       }
     }
   } catch (error) {

@@ -3,7 +3,8 @@ module.exports = {
     type ClientStatus {
       status: Boolean
       address: String
-      mikrotik: Boolean
+      mikrotik: String
+      clientExists: Boolean
       mac_address: String
       offlineTime: String
       disconnectReason: String

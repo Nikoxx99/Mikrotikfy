@@ -19,7 +19,7 @@
     >
       <v-card
         :loading="loading"
-        :class="online ? 'teal darken-4' : ''"
+        :class="clientData.status ? 'teal darken-4' : ''"
       >
         <v-card-title class="headline">
           Estatus en Mikrotik
@@ -28,7 +28,7 @@
           <v-card-text>
             <h2> {{ name }} </h2>
             <v-alert
-              v-if="online"
+              v-if="clientData.status"
               dense
               text
               type="success"
@@ -37,15 +37,15 @@
               El cliente esta <strong>En Linea</strong>
             </v-alert>
             <v-alert
-              v-else-if="clientExists"
+              v-else-if="clientData.clientExists"
               dense
               outlined
               type="error"
               class="my-4"
             >
-              Fuera de linea desde <strong>{{ offlineTime }}</strong> <br>
-              Razón de la desconexión: <strong>{{ disconnectReason }}</strong> <br>
-              Última MAC conocida: <strong>{{ lastCallerId }}</strong>
+              Fuera de linea desde <strong>{{ clientData.offlineTime }}</strong> <br>
+              Razón de la desconexión: <strong>{{ clientData.disconnectReason }}</strong> <br>
+              Última MAC conocida: <strong>{{ clientData.lastCallerId }}</strong>
             </v-alert>
             <v-alert
               v-else
@@ -57,21 +57,21 @@
               El cliente no se encontró en la Mikrotik
             </v-alert>
             <v-divider class="my-4" />
-            <div v-if="online">
+            <div v-if="clientData.status">
               <v-row>
                 <v-col>
-                  <h3>Acceso: <strong><a :href="`http://${address}`" target="_blank">{{ address }}</a></strong></h3>
+                  <h3>Acceso: <strong><a :href="`http://${clientData.address}`" target="_blank">{{ clientData.address }}</a></strong></h3>
                   <v-spacer />
-                  <h3>Mac: {{ mac_address }}</h3>
+                  <h3>Mac: {{ clientData.mac_address }}</h3>
                   <v-spacer />
-                  <h3>Uptime: {{ uptime }}</h3>
+                  <h3>Uptime: {{ clientData.uptime }}</h3>
                   <v-spacer />
                   <h3 v-if="can('access_password')">Clave: 4Rn0P{{ code }}</h3>
                 </v-col>
                 <v-col>
-                  <h3>Descarga: <strong>{{ formatBytes(download) }}</strong></h3>
-                  <h3>Subida: <strong>{{ formatBytes(upload) }}</strong></h3>
-                  <h3>Mikrotik: {{ mikrotik ? 'AHx4' : 'CCR' }}</h3>
+                  <h3>Descarga: <strong>{{ formatBytes(clientData.download) }}</strong></h3>
+                  <h3>Subida: <strong>{{ formatBytes(clientData.upload) }}</strong></h3>
+                  <h3>Mikrotik: {{ clientData.mikrotik }}</h3>
                 </v-col>
               </v-row>
             </div>
@@ -94,35 +94,8 @@
 </template>
 
 <script>
-import gqlt from 'graphql-tag'
 export default {
   name: 'ClientStatus',
-  apollo: {
-    ClientStatus () {
-      return {
-        query: gqlt`query ($id: ID){
-          ClientStatus(id: $id){
-            status
-            address
-            mikrotik
-            mac_address
-            offlineTime
-            disconnectReason
-            lastCallerId
-            uptime
-            download
-            upload
-          }
-        }`,
-        variables: {
-          id: this.clientid
-        },
-        skip () {
-          return true
-        }
-      }
-    }
-  },
   props: {
     clientid: {
       type: String,
@@ -142,65 +115,43 @@ export default {
     }
   },
   data: () => ({
+    clientData: {},
     modal: false,
     clientExists: false,
     showCard: false,
     loading: true,
     showInfo: false,
-    online: false,
-    address: 0,
-    mirkotik: 0,
-    mac_address: 0,
-    uptime: 0,
-    offlineTime: 0,
-    disconnectReason: '',
-    lastCallerId: '',
-    download: 0,
-    upload: 0
+    online: false
   }),
   methods: {
     async initComponent () {
       this.loading = true
       this.modal = true
       this.online = false
-      this.$apollo.queries.ClientStatus.skip = false
-      await this.$apollo.queries.ClientStatus.fetchMore({
+      const data = await this.$strapi.graphql({
+        query: `
+          query($id: ID) {
+            ClientStatus(id: $id){
+              status
+              address
+              mikrotik
+              clientExists
+              mac_address
+              offlineTime
+              disconnectReason
+              lastCallerId
+              uptime
+              download
+              upload
+            }
+          }
+        `,
         variables: {
           id: this.clientid
-        },
-        updateQuery: (_, { fetchMoreResult }) => {
-          const newStatusInfo = fetchMoreResult.ClientStatus
-          const status = newStatusInfo.status
-          if (status) {
-            this.loading = false
-            this.address = newStatusInfo.address
-            this.mikrotik = newStatusInfo.mikrotik
-            this.mac_address = newStatusInfo.mac_address
-            this.uptime = newStatusInfo.uptime
-            this.offlineTime = newStatusInfo.offlineTime
-            this.disconnectReason = newStatusInfo.disconnectReason
-            this.lastCallerId = newStatusInfo.lastCallerId
-            this.download = newStatusInfo.download
-            this.upload = newStatusInfo.upload
-            if (newStatusInfo.address) {
-              this.loading = false
-              this.clientExists = true
-              this.online = true
-              this.showCard = true
-            } else {
-              this.loading = false
-              this.clientExists = true
-              this.online = false
-              this.showCard = true
-            }
-          } else {
-            this.loading = false
-            this.clientExists = false
-            this.online = false
-            this.showCard = true
-          }
         }
       })
+      this.loading = false
+      this.clientData = data.ClientStatus
     },
     formatBytes (bytes, decimals = 2) {
       if (bytes === 0) { return '0 Bytes' }
