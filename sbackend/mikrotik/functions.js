@@ -161,82 +161,88 @@ module.exports.mkGetMikrotikInfo = async function (mikrotikHost) {
     return error
   }
 }
-module.exports.mkClientStatus = async function (mikrotikHost, code, dni, model) {
+module.exports.mkClientStatus = async function (mikrotikHost, code, dni, model) { 
+  /* VAR INIT */
+  let client = {
+    exists: null,
+    online: null,
+    mikrotik: null,
+    address: null,
+    uptime: null,
+    lastCallerId: null,
+    mac_address: null,
+    offlineTime: null,
+    disconnectReason: null,
+    download: null,
+    upload: null
+  }
+  /* Mikrotik connection init */
   const conn = new RouterOSAPI({
     host: mikrotikHost,
     user: 'API_ARNOP',
     password: strapi.config.get('server.admin.mikrotik.secret', 'null'),
     port: 8087
   })
+
   await conn.connect()
+  
   try {
-    var identity = await conn.write('/system/identity/print').catch((error) => {
-      conn.close()
-      return error
-    })
-    if (model === 1) {
-      var printInterface = await conn.write('/interface/print', [
-        '=.proplist=tx-byte,rx-byte,last-link-up-time,last-disconnect-reason,last-caller-id',
-        '?=name=<pppoe-' + code + '>',
-      ])
-      var printActiveConnections = await conn.write('/ppp/active/print', [
-        '=.proplist=caller-id,uptime,address',
-        '?=name=' + code,
-      ])
-    } else {
-      // eslint-disable-next-line no-redeclare
-      var printInterface = await conn.write('/interface/print', [
-        '=.proplist=tx-byte,rx-byte,last-link-up-time,last-disconnect-reason,last-caller-id',
-        '?=name=<pppoe-' + dni + '>',
-      ])
-      // eslint-disable-next-line no-redeclare
-      var printActiveConnections = await conn.write('/ppp/active/print', [
-        '=.proplist=caller-id,uptime,address',
-        '?=name=' + dni,
-      ])
-    }
-    let client = {}
+    /* Get Current mikrotik identity */
+    var identity = await conn.write('/system/identity/print').catch((error) => { conn.close(); return error })
     client.mikrotik = identity[0].name
-    if (printInterface.length > 0) {
-      conn.close()
-      console.log(printActiveConnections)
-      if (printActiveConnections.length > 0) {
-        console.log('Active exists')
-        client.download = printInterface[0]['tx-byte']
-        client.upload = printInterface[0]['rx-byte']
-        client.address = printActiveConnections[0]['address']
-        client.mac_address = printActiveConnections[0]['caller-id']
-        client.uptime = printActiveConnections[0].uptime
-        client.status = true
-        client.clientExists = true
-        return {
-          ip: mikrotikHost,
-          success: true,
-          data: client
-        }
+    
+    if (model === 1) {
+      var getSecret = await conn.write('/ppp/secret/print', [
+        '?=name=' + code,
+      ]).catch((error) => { conn.close(); return error })
+      var getActiveConnection = await conn.write('/ppp/active/print', [
+        '?=name=' + code,
+      ]).catch((error) => { conn.close(); return error })
+      var getInterfaceConnection = await conn.write('/interface/print', [
+        '?=name=<pppoe-' + code + '>',
+      ]).catch((error) => { conn.close(); return error })
+    } else {
+      // eslint-disable-next-line no-redeclare
+      var getSecret = await conn.write('/ppp/secret/print', [
+        '?=name=' + dni,
+      ]).catch((error) => { conn.close(); return error })
+      var getActiveConnection = await conn.write('/ppp/active/print', [
+        '?=name=' + dni,
+      ]).catch((error) => { conn.close(); return error })
+      // eslint-disable-next-line no-redeclare
+      var getInterfaceConnection = await conn.write('/interface/print', [
+        '?=name=<pppoe-' + dni + '>',
+      ]).catch((error) => { conn.close(); return error })
+    }
+    if (getSecret.length > 0) {
+      client.exists = true
+    } else {
+      client.exists = false
+    }
+
+    if (getActiveConnection.length > 0 && getInterfaceConnection.length > 0) {
+      client.online = true
+    } else {
+      client.online = false
+    }
+
+    if (client.exists) {
+      if (client.online) {
+        client.download = getInterfaceConnection[0]['tx-byte']
+        client.upload = getInterfaceConnection[0]['rx-byte']
+        client.address = getActiveConnection[0]['address']
+        client.mac_address = getActiveConnection[0]['caller-id']
+        client.uptime = getActiveConnection[0].uptime
       } else {
-        console.log('Active not exists')
-        client.offlineTime = printInterface[0]['last-link-up-time']
-        client.disconnectReason = printInterface[0]['last-disconnect-reason']
-        client.lastCallerId = printInterface[0]['last-caller-id']
-        client.status = false
-        client.clientExists = true
-        return {
-          ip: mikrotikHost,
-          success: true,
-          data: client
-        }
+        client.offlineTime = getSecret[0]['last-logged-out']
+        client.disconnectReason = getSecret[0]['last-disconnect-reason']
+        client.lastCallerId = getSecret[0]['last-caller-id']
       }
     } else {
-      conn.close()
-      client.status = false
-      client.clientExists = false
-      return {
-        ip: mikrotikHost,
-        success: true,
-        data: client
-      }
+      client.exists = false
     }
+    conn.close()
+    return client
   } catch (error) {
     console.log(error)
     conn.close()
