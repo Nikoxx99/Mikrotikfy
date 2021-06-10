@@ -362,9 +362,6 @@ export default {
     }
   },
   methods: {
-    test () {
-      console.log('test')
-    },
     async testCodeForDuplicated (code) {
       const clients = await this.$strapi.find('clients', {
         code,

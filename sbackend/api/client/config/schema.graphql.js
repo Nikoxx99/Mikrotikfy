@@ -1,10 +1,10 @@
 module.exports = {
   definition: `
     type ClientStatus {
-      status: Boolean
+      online: Boolean
+      exists: Boolean
       address: String
       mikrotik: String
-      clientExists: Boolean
       mac_address: String
       offlineTime: String
       disconnectReason: String

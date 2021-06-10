@@ -19,7 +19,7 @@
     >
       <v-card
         :loading="loading"
-        :class="clientData.status ? 'teal darken-4' : ''"
+        :class="clientData.online ? 'teal darken-4' : ''"
       >
         <v-card-title class="headline">
           Estatus en Mikrotik
@@ -28,7 +28,7 @@
           <v-card-text>
             <h2> {{ name }} </h2>
             <v-alert
-              v-if="clientData.status"
+              v-if="clientData.online && clientData.exists"
               dense
               text
               type="success"
@@ -37,7 +37,7 @@
               El cliente esta <strong>En Linea</strong>
             </v-alert>
             <v-alert
-              v-else-if="clientData.clientExists"
+              v-else-if="!clientData.online && clientData.exists"
               dense
               outlined
               type="error"
@@ -45,7 +45,8 @@
             >
               Fuera de linea desde <strong>{{ clientData.offlineTime }}</strong> <br>
               Razón de la desconexión: <strong>{{ clientData.disconnectReason }}</strong> <br>
-              Última MAC conocida: <strong>{{ clientData.lastCallerId }}</strong>
+              Última MAC conocida: <strong>{{ clientData.lastCallerId }}</strong> <br>
+              Última Mikrotik conocida: <strong>{{ clientData.mikrotik }}</strong>
             </v-alert>
             <v-alert
               v-else
@@ -54,10 +55,10 @@
               type="warning"
               class="my-4"
             >
-              El cliente no se encontró en la Mikrotik
+              Mal identificado en la API. Informa de esto al webmaster
             </v-alert>
             <v-divider class="my-4" />
-            <div v-if="clientData.status">
+            <div v-if="clientData.online">
               <v-row>
                 <v-col>
                   <h3>Acceso: <strong><a :href="`http://${clientData.address}`" target="_blank">{{ clientData.address }}</a></strong></h3>
@@ -132,10 +133,10 @@ export default {
         query: `
           query($id: ID) {
             ClientStatus(id: $id){
-              status
+              online
+              exists
               address
               mikrotik
-              clientExists
               mac_address
               offlineTime
               disconnectReason

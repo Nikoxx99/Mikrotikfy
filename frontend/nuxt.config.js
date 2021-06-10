@@ -51,7 +51,7 @@ export default {
     'nuxt-build-optimisations'
   ],
   buildOptimisations: {
-    profile: 'risky'
+    profile: 'experimental'
   },
   apollo: {
     clientConfigs: {
