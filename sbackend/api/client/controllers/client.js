@@ -485,7 +485,6 @@ module.exports = {
         }
       })
     )
-    console.log('send: ', send)
     return send[1]
   },
   async dxClient(ctx) {

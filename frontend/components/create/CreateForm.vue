@@ -367,7 +367,8 @@ export default {
     },
     async testCodeForDuplicated (code) {
       const clients = await this.$strapi.find('clients', {
-        code
+        code,
+        city: this.$route.query.city
       })
       if (clients.length > 0) {
         this.codeError = true

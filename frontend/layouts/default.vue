@@ -1,6 +1,6 @@
 <template>
   <v-app
-    dark
+    :style="currentCity.name === 'MARIQUITA' ? 'background-color:#1b2025!important;' : 'background-color:#16312d!important;'"
   >
     <v-navigation-drawer
       v-model="drawer"
@@ -33,12 +33,6 @@
     <v-app-bar
       app
     >
-      <template v-slot:img="{ props }">
-        <v-img
-          v-bind="props"
-          gradient="to top right, rgba(0,0,0,.8), rgba(0,0,0,.9)"
-        />
-      </template>
       <div v-if="hasPendingChanges">
         <svg height="13" width="20" style="position:absolute;top:12px;left:43px;">
           <circle cx="10" cy="8" r="5" fill="red" />
@@ -47,6 +41,13 @@
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-toolbar-title class="d-none d-md-flex d-lg-flex d-xl-flex" v-text="title" />
       <v-spacer />
+      <v-switch
+        v-model="light"
+        :prepend-icon="light ? 'mdi-white-balance-sunny' : 'mdi-moon-waning-crescent'"
+        inset
+        class="mt-4"
+        @change="changeTheme()"
+      />
       <div v-if="$store.state.auth">
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
@@ -110,6 +111,7 @@ export default {
   middleware: ['defaultCity', 'authenticated'],
   data () {
     return {
+      light: null,
       hasPendingChanges: false,
       drawer: false,
       items: [
@@ -160,6 +162,10 @@ export default {
   computed: {
     cities () {
       return this.$store.state.cities
+    },
+    currentCity () {
+      // eslint-disable-next-line eqeqeq
+      return this.$store.state.cities ? this.$store.state.cities.find(c => c.id == this.$route.query.city) : ''
     }
   },
   mounted () {
@@ -168,6 +174,7 @@ export default {
     if (month === 11) {
       this.bg = 'cbg.jpg'
     }
+    this.loadTheme()
     this.comprobeSession()
     // this.$apollo.query({
     //   query: gqlt`
@@ -192,6 +199,28 @@ export default {
     // })
   },
   methods: {
+    loadTheme () {
+      const currentTheme = localStorage.getItem('currentTheme')
+      if (currentTheme) {
+        if (currentTheme === 'dark') {
+          this.light = false
+          this.$vuetify.theme.dark = true
+        } else {
+          this.light = true
+          this.$vuetify.theme.dark = false
+        }
+      } else {
+        localStorage.setItem('currentTheme', 'dark')
+      }
+    },
+    changeTheme () {
+      this.$vuetify.theme.dark = !this.$vuetify.theme.dark
+      if (this.$vuetify.theme.dark) {
+        localStorage.setItem('currentTheme', 'dark')
+      } else {
+        localStorage.setItem('currentTheme', 'light')
+      }
+    },
     async comprobeSession () {
       if (this.$store.state.auth) {
         const session = await this.$strapi.find('users', {
@@ -219,3 +248,9 @@ export default {
   }
 }
 </script>
+<style scoped>
+.secondary-city {
+    background: #16312d;
+    color: #fff;
+}
+</style>

@@ -10,7 +10,6 @@
     <v-tabs
       v-model="tab"
       fixed-tabs
-      dark
       :color="currentCity ? currentCity.color : ''"
     >
       <v-tab v-if="can('DeviceStatus')" href="#tab-1">
