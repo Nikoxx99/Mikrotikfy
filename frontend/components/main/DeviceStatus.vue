@@ -141,12 +141,13 @@ export default {
     async countClientData () {
       const data = await this.$strapi.graphql({
         query: `
-          query($city: ID) {
-            statics(where:{
-              city: $city
-            }) {
-              name
-              data
+          query($city: ID!) {
+            city(id: $city) {
+              active
+              count
+              countActive
+              countDisable
+              countRetired
             }
           }
         `,
@@ -154,11 +155,11 @@ export default {
           city: this.$route.query.city
         }
       })
-      this.count = data.statics[0].data
-      this.countActive = data.statics[1].data
-      this.countDisable = data.statics[2].data
-      this.countRetired = data.statics[3].data
-      this.active = data.statics[4].data
+      this.active = data.city.active
+      this.count = data.city.count
+      this.countActive = data.city.countActive
+      this.countDisable = data.city.countDisable
+      this.countRetired = data.city.countRetired
     },
     async getMikrotikStatus () {
       const data = await this.$strapi.graphql({

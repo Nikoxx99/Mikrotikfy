@@ -19,6 +19,9 @@
         Estatus Mikrotik
       </v-tab>
       <v-tab v-if="can('ActivationRequestsList')" href="#tab-2">
+        <v-icon class="mr-2">
+          mdi-check-network-outline
+        </v-icon>
         Activaciones
       </v-tab>
       <v-tab href="#tab-3">
@@ -34,7 +37,7 @@
         Clientes
       </v-tab>
     </v-tabs>
-    <v-tabs-items v-model="tab" touchless>
+    <v-tabs-items v-model="tab" touchless class="mt-3">
       <v-tab-item
         v-if="can('DeviceStatus')"
         :key="1"

@@ -11,9 +11,9 @@
       sx="12"
     >
       <v-card
-        elevation="1"
+        elevation="5"
         max-width="95%"
-        class="mx-auto grey darken-4 mb-10"
+        class="my-5 mx-auto"
         shaped
       >
         <v-card-title>

@@ -272,6 +272,7 @@ module.exports = {
   async refreshClientData (ctx) {
     const cityQuery = await strapi.services.city.findOne({ _id: ctx.query.city });
     const cityIpArray = cityQuery.mikrotiks
+    console.log(cityIpArray[0].ip)
     if (cityIpArray.length > 1) {
       const cityActiveClients = []
       for (let i = 0; i < cityIpArray.length; i++) {
@@ -303,7 +304,6 @@ module.exports = {
       conn.close()
       var active = result2
     }
-
     const count = await strapi.services.client.count({ city: ctx.query.city });
     const mb3 = await strapi.services.client.count({ city: ctx.query.city, plan: '5f52a7232824f015ac8ceb5a' })
     const mb4 = await strapi.services.client.count({ city: ctx.query.city, plan: '5f52a73c2824f015ac8ceb5c' })
@@ -315,11 +315,11 @@ module.exports = {
     const countActive = mb3 + mb4 + mb4lte + mb6 + mb8 + mb10 + mb100
     const countDisable = await strapi.services.client.count({ city: ctx.query.city, plan: '5f52a7572824f015ac8ceb5e' })
     const countRetired = await strapi.services.client.count({ city: ctx.query.city, plan: '5f52a75f2824f015ac8ceb5f' })
-    const activeRes = await strapi.services.static.update({ 'name': 'active', 'city': ctx.query.city}, {'data': String(active.length)})
-    const countRes = await strapi.services.static.update({ 'name': 'count', 'city': ctx.query.city}, {'data': String(count)})
-    const countActiveRes = await strapi.services.static.update({ 'name': 'countActive', 'city': ctx.query.city }, {'data': String(countActive)})
-    const countDisableRes = await strapi.services.static.update({ 'name': 'countDisable', 'city': ctx.query.city }, {'data': String(countDisable)})
-    const countRetiredRes = await strapi.services.static.update({ 'name': 'countRetired', 'city': ctx.query.city }, {'data': String(countRetired)})
+    const activeRes = await strapi.services.city.update({ 'id': ctx.query.city}, {'active': String(active.length)})
+    const countRes = await strapi.services.city.update({ 'id': ctx.query.city}, {'count': String(count)})
+    const countActiveRes = await strapi.services.city.update({ 'id': ctx.query.city}, {'countActive': String(countActive)})
+    const countDisableRes = await strapi.services.city.update({ 'id': ctx.query.city}, {'countDisable': String(countDisable)})
+    const countRetiredRes = await strapi.services.city.update({ 'id': ctx.query.city}, {'countRetired': String(countRetired)})
     return activeRes + countRes + countActiveRes + countDisableRes + countRetiredRes
   },
   async getClientComment(ctx) {

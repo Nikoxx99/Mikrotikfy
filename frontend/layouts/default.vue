@@ -1,12 +1,12 @@
 <template>
   <v-app
-    :style="currentCity.name === 'MARIQUITA' ? 'background-color:#1b2025!important;' : 'background-color:#16312d!important;'"
+    :style="currentCity.name === 'MARIQUITA' ? light ? 'background-color:#efefef!important;' : 'background-color:#1b2025!important;' : light ? 'background-color:#efefef!important;' : 'background-color:#16312d!important;'"
   >
     <v-navigation-drawer
       v-model="drawer"
-      absolute
-      temporary
       app
+      temporary
+      bottom
     >
       <v-list>
         <v-list-item
@@ -45,7 +45,7 @@
         v-model="light"
         :prepend-icon="light ? 'mdi-white-balance-sunny' : 'mdi-moon-waning-crescent'"
         inset
-        class="mt-4"
+        class="mt-5"
         @change="changeTheme()"
       />
       <div v-if="$store.state.auth">

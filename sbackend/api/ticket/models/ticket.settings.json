@@ -19,8 +19,8 @@
       "via": "tickets"
     },
     "city": {
-      "model": "city",
-      "via": "tickets"
+      "via": "tickets",
+      "model": "city"
     },
     "tickettype": {
       "model": "tickettype"

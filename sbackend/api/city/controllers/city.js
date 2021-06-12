@@ -70,6 +70,7 @@ module.exports = {
       ipList.map(async (ip) => {
         const res = await mkGetMikrotikInfo(ip)
         const mikrotikSearch = await strapi.services.mikrotik.find({ 'name': res.name })
+        console.log(mikrotikSearch)
         const actualMikrotik = mikrotikSearch[0].id
         const update = await strapi.services.mikrotik.update({ 'id': String(actualMikrotik)}, res)
         return update

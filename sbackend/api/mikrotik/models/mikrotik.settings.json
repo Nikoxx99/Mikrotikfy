@@ -15,8 +15,8 @@
       "type": "string"
     },
     "city": {
-      "model": "city",
-      "via": "mikrotiks"
+      "via": "mikrotiks",
+      "model": "city"
     },
     "ip": {
       "type": "string"

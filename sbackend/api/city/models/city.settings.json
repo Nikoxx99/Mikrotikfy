@@ -49,6 +49,21 @@
     "mikrotiks": {
       "via": "city",
       "collection": "mikrotik"
+    },
+    "active": {
+      "type": "string"
+    },
+    "count": {
+      "type": "string"
+    },
+    "countActive": {
+      "type": "string"
+    },
+    "countDisable": {
+      "type": "string"
+    },
+    "countRetired": {
+      "type": "string"
     }
   }
 }
