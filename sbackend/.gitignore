@@ -111,3 +111,4 @@ coverage
 license.txt
 exports
 .cache
+build/*
