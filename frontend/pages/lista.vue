@@ -11,6 +11,7 @@
       v-model="tab"
       fixed-tabs
       :color="currentCity ? currentCity.color : ''"
+      @change="setTab(tab)"
     >
       <v-tab v-if="can('DeviceStatus')" href="#tab-1">
         <v-icon class="mr-2">
@@ -96,6 +97,7 @@ export default {
   },
   async mounted () {
     await this.comprobeCity()
+    await this.comprobeTab()
     this.$store.dispatch('loadLocalStorage')
     localStorage.setItem('currentCity', this.$route.query.city)
   },
@@ -106,6 +108,18 @@ export default {
       // eslint-disable-next-line camelcase
       const current_component = component
       return allowed_components.includes(current_component)
+    },
+    setTab (tab) {
+      localStorage.setItem('currentTab', tab)
+    },
+    comprobeTab () {
+      const recordedTab = localStorage.getItem('currentTab')
+      if (recordedTab) {
+        this.tab = recordedTab
+      } else {
+        this.tab = 'tab-3'
+        localStorage.setItem('currentTab', 'tab-3')
+      }
     },
     comprobeCity () {
       const recordedCity = localStorage.getItem('currentCity')
