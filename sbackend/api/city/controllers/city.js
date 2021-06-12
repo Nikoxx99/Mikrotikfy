@@ -60,7 +60,7 @@ module.exports = {
 
   },
   async getMikrotikStatus(ctx) {
-    const city = ctx.params._city
+    const city = ctx.query.city
     const searchCity = await strapi.services.city.find({ id: city })
     const mikrotiks = searchCity[0].mikrotiks
     const ipList = await mikrotiks.map((mikrotik) => {
@@ -70,7 +70,6 @@ module.exports = {
       ipList.map(async (ip) => {
         const res = await mkGetMikrotikInfo(ip)
         const mikrotikSearch = await strapi.services.mikrotik.find({ 'name': res.name })
-        console.log(mikrotikSearch)
         const actualMikrotik = mikrotikSearch[0].id
         const update = await strapi.services.mikrotik.update({ 'id': String(actualMikrotik)}, res)
         return update
