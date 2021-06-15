@@ -12,7 +12,7 @@
         <v-list-item
           v-for="(item, i) in items"
           :key="i"
-          :href="item.to"
+          :href="`${item.to}?city=${$store.state.auth.cities[0].id}`"
           router
           exact
         >
