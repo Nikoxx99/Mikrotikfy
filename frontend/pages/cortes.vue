@@ -38,6 +38,7 @@
               v-model="input"
               outlined
               label="Codigos a desconectar"
+              class="mt-4"
             />
           </v-col>
           <v-col

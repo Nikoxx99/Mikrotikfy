@@ -493,7 +493,7 @@ module.exports = {
     const process = []
     const input = ctx.request.body.input
     const search = await strapi.services.client.findOne({ 'code': input.dx.code, 'city': input.dxCity })
-    const searchCity = await strapi.services.city.find({ id: search[0].city.id })
+    const searchCity = await strapi.services.city.find({ id: search.city.id })
     const clientObj = search
     const code = clientObj.code
     if (search.length < 1) {
