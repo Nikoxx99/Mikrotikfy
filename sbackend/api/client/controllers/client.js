@@ -381,33 +381,74 @@ module.exports = {
   async searchClient(ctx) {
     const search = ctx.query.search
     const city = ctx.query.city
-    if (search) {
-      const neighborhood = await strapi.services.neighborhood.find({ 'name': { $regex: new RegExp(search, 'i') } })
-      if (neighborhood.length > 0) {
-        const res = await strapi.services.client.find({
-          $or: [
-            { 'city': city, 'code': { $regex: new RegExp(search, 'i') } },
-            { 'city': city, 'name': { $regex: new RegExp(search, 'i') } },
-            { 'city': city, 'address': { $regex: new RegExp(search, 'i') } },
-            { 'city': city, 'neighborhood': neighborhood[0]._id },
-            { 'city': city, 'dni': { $regex: new RegExp(search, 'i') } },
-            { 'city': city, 'phone': { $regex: new RegExp(search, 'i') } }
-          ]
-        })
-        const n = res.map(entity => sanitizeEntity(entity, { model: strapi.models.client }));
-        return n
-      } else {
-        const res = await strapi.services.client.find({
-          $or: [
-            { 'city': city, 'code': { $regex: new RegExp(search, 'i') } },
-            { 'city': city, 'name': { $regex: new RegExp(search, 'i') } },
-            { 'city': city, 'address': { $regex: new RegExp(search, 'i') } },
-            { 'city': city, 'dni': { $regex: new RegExp(search, 'i') } },
-            { 'city': city, 'phone': { $regex: new RegExp(search, 'i') } }
-          ]
-        })
-        const n = res.map(entity => sanitizeEntity(entity, { model: strapi.models.client }));
-        return n
+    if (search) { // SI LA BUSQUEDA NO ES NULA
+      if (search.length === 5) { //SI LA BUSQUEDA TIENE 5 CARACTERES
+        const toNumber = parseInt(search)
+        if (!isNaN(toNumber)) { // SI SON NUMEROS ESOS 5 CARACTERES
+          const res = await strapi.services.client.find({
+            $or: [
+              { 'city': city, 'code': { $regex: new RegExp(search, 'i') } }
+            ]
+          })
+          const n = res.map(entity => sanitizeEntity(entity, { model: strapi.models.client }));
+          return n
+        } else { // SI NO SON NUMEROS, PUEDEN SER UN BARRIO
+          const neighborhood = await strapi.services.neighborhood.find({ 'name': { $regex: new RegExp(search, 'i') } })
+          if (neighborhood.length > 0) { // SI ES UN BARRIO
+            const res = await strapi.services.client.find({
+              $or: [
+                { 'city': city, 'code': { $regex: new RegExp(search, 'i') } },
+                { 'city': city, 'name': { $regex: new RegExp(search, 'i') } },
+                { 'city': city, 'address': { $regex: new RegExp(search, 'i') } },
+                { 'city': city, 'neighborhood': neighborhood[0]._id },
+                { 'city': city, 'dni': { $regex: new RegExp(search, 'i') } },
+                { 'city': city, 'phone': { $regex: new RegExp(search, 'i') } }
+              ]
+            })
+            const n = res.map(entity => sanitizeEntity(entity, { model: strapi.models.client }));
+            return n
+          } else { // SINO ES UN BARRIO, PUEDE SER OTRO DATO
+            const res = await strapi.services.client.find({
+              $or: [
+                { 'city': city, 'code': { $regex: new RegExp(search, 'i') } },
+                { 'city': city, 'name': { $regex: new RegExp(search, 'i') } },
+                { 'city': city, 'address': { $regex: new RegExp(search, 'i') } },
+                { 'city': city, 'dni': { $regex: new RegExp(search, 'i') } },
+                { 'city': city, 'phone': { $regex: new RegExp(search, 'i') } }
+              ]
+            })
+            const n = res.map(entity => sanitizeEntity(entity, { model: strapi.models.client }));
+            return n
+          }
+        }
+      } else { // SI LA BUSQUEDA TIENE MENOS O MAS DE 5 CARACTERES
+        const neighborhood = await strapi.services.neighborhood.find({ 'name': { $regex: new RegExp(search, 'i') } })
+        if (neighborhood.length > 0) { // SI ES UN BARRIO
+          const res = await strapi.services.client.find({
+            $or: [
+              { 'city': city, 'code': { $regex: new RegExp(search, 'i') } },
+              { 'city': city, 'name': { $regex: new RegExp(search, 'i') } },
+              { 'city': city, 'address': { $regex: new RegExp(search, 'i') } },
+              { 'city': city, 'neighborhood': neighborhood[0]._id },
+              { 'city': city, 'dni': { $regex: new RegExp(search, 'i') } },
+              { 'city': city, 'phone': { $regex: new RegExp(search, 'i') } }
+            ]
+          })
+          const n = res.map(entity => sanitizeEntity(entity, { model: strapi.models.client }));
+          return n
+        } else { // SINO ES UN BARRIO, PUEDE SER OTRO DATO
+          const res = await strapi.services.client.find({
+            $or: [
+              { 'city': city, 'code': { $regex: new RegExp(search, 'i') } },
+              { 'city': city, 'name': { $regex: new RegExp(search, 'i') } },
+              { 'city': city, 'address': { $regex: new RegExp(search, 'i') } },
+              { 'city': city, 'dni': { $regex: new RegExp(search, 'i') } },
+              { 'city': city, 'phone': { $regex: new RegExp(search, 'i') } }
+            ]
+          })
+          const n = res.map(entity => sanitizeEntity(entity, { model: strapi.models.client }));
+          return n
+        }
       }
     } else {
       return [{ init: 'initial request' }]
