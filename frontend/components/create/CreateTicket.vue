@@ -57,6 +57,7 @@
           <v-btn
             color="blue darken-4"
             :loading="loading"
+            :disabled="loading"
             @click="createTicket()"
           >
             Crear Ticket
@@ -135,6 +136,7 @@ export default {
       this.ticketPayload.assignated = this.assignated
     },
     createTicket () {
+      this.loading = true
       this.$apollo.mutate({
         mutation: gqlt`mutation ($input: createTicketInput){
           createTicket(input: $input){
