@@ -517,6 +517,7 @@ module.exports = {
         return onlineRes[0]
       } else {
         const goodReponse = mkResponse.filter(client => client.offlineTime !== 'jan/01/1970 00:00:00')
+        console.log(goodReponse)
         let mostRecentDate = new Date(Math.max.apply(null, goodReponse.map( e => {
           return new Date(e.offlineTime);
         })));

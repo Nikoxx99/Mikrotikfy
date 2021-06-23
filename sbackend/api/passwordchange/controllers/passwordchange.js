@@ -20,6 +20,11 @@ module.exports = {
   async updatePasswordChangeRequest(ctx) {
     const id = ctx.request.body.input._id
     const payload = ctx.request.body.input
+    const newPassword = ctx.request.body.input.password
+    const clientid = ctx.request.body.input.clientid
+    if (clientid) {
+      await strapi.services.client.update({'id': clientid}, {'wifi_password': newPassword})
+    }
     await strapi.services.passwordchange.update({ id }, payload);
     return true
   },

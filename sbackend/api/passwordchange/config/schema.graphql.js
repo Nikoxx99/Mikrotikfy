@@ -15,6 +15,8 @@ module.exports = {
     input UpdatePasswordChangeInput {
       _id: ID
       closed: ClosedObjectInput
+      password: String
+      clientid: ID
     }
     input ClosedObjectInput {
       name: String

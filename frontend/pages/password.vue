@@ -42,32 +42,14 @@
               @page-count="pageCount = $event"
             >
               <template v-slot:item.closed="props">
-                <v-edit-dialog
-                  :return-value.sync="props.item.closed"
-                  persistent
-                  large
-                  cancel-text="Cancelar"
-                  save-text="Guardar"
-                  @save="save(props.item._id, props.item.closed)"
-                  @cancel="cancel"
-                  @close="close"
+                <v-chip
+                  small
+                  :color="getColor(props.item.closed)"
+                  class="white--text"
+                  @click="save(props.item._id, props.item.closed, props.item.client ? props.item.client.id : null, props.item.new_password, props.index)"
                 >
-                  <v-chip small :color="getColor(props.item.closed)" class="white--text">
-                    {{ getState(props.item.closed) }}
-                  </v-chip>
-                  <template v-slot:input>
-                    <v-select
-                      v-model="props.item.closed"
-                      item-text="name"
-                      item-value="value"
-                      :items="States"
-                      return-object
-                      single-line
-                      label="Estado"
-                      dense
-                    />
-                  </template>
-                </v-edit-dialog>
+                  {{ getState(props.item.closed) }}
+                </v-chip>
               </template>
               <template v-slot:item.created_at="{ item }">
                 <span>
@@ -115,6 +97,7 @@ export default {
             _id
             dni
             client {
+              id
               name
               city {
                 name
@@ -182,7 +165,8 @@ export default {
         return 'Abierto'
       }
     },
-    save (id, status) {
+    save (id, status, clientid, password, index) {
+      this.passwordchanges[index].closed.value = !this.passwordchanges[index].closed.value
       this.$apollo.mutate({
         mutation: gqlt`mutation ($input: UpdatePasswordChangeInput){
           updatePasswordChangeRequest(input: $input)
@@ -193,10 +177,12 @@ export default {
             closed: {
               name: status.name,
               value: status.value
-            }
+            },
+            clientid,
+            password
           }
         }
-      }).then((input) => {
+      }).then((_) => {
         this.snack = true
         this.snackColor = 'info'
         this.snackText = 'Petición actualizada con éxito.'
