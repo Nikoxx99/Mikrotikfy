@@ -541,6 +541,24 @@ module.exports.simpleTelegramDelete = async function (input, telegrambot) {
     console.log("Booo");
   });
 }
+module.exports.simpleTelegramPasswordChange = async function (input, telegrambot) {
+  const fetch = require('node-fetch');
+  require('dotenv').config()
+  const bot = telegrambot.token
+  const chatid = telegrambot.chat
+  const line1 = 'CAMBIO DE CLAVE'
+  const line2 = input.code
+  const line3 = input.name
+  const message = `${line1}\n${line2}\n${line3}`
+  const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + sanitizeString(message)
+  fetch(req).then(function (response) {
+    return true
+  }).then(function (data) {
+    console.log(data);
+  }).catch(function () {
+    console.log("Booo");
+  });
+}
 module.exports.simpleTelegramCreateTicket = async function (input, neighborhood, telegrambot) {
   const fetch = require('node-fetch');
   require('dotenv').config()

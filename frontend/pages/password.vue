@@ -56,6 +56,16 @@
                   {{ getDate(item.createdAt) }}
                 </span>
               </template>
+              <template v-slot:item.actions="{ item }">
+                <ClientStatus
+                  :name="item.client ? item.client.name : ''"
+                  :clientid="item.client ? item.client.id : ''"
+                  :code="item.client ? item.client.code : ''"
+                  :role="$store.state.auth.allowed_components"
+                >
+                  {{ item }}
+                </ClientStatus>
+              </template>
             </v-data-table>
           </client-only>
           <div class="text-center pt-2">
@@ -84,8 +94,10 @@
 
 <script>
 import gqlt from 'graphql-tag'
+import ClientStatus from '../components/main/ClientStatus'
 export default {
   components: {
+    ClientStatus
   },
   middleware: 'authenticated',
   apollo: {
@@ -98,6 +110,7 @@ export default {
             dni
             client {
               id
+              code
               name
               city {
                 name
@@ -136,7 +149,8 @@ export default {
         { text: 'Clave Nueva', sortable: true, value: 'new_password' },
         { text: 'Ciudad', sortable: true, value: 'client.city.name' },
         { text: 'Estado', sortable: true, value: 'closed' },
-        { text: 'Fecha', sortable: false, value: 'created_at' }
+        { text: 'Fecha', sortable: false, value: 'created_at' },
+        { text: 'Acciones', sortable: false, value: 'actions' }
       ],
       title: 'Cambios de Clave',
       States: [{ name: 'Abierto', value: false }, { name: 'Cerrado', value: true }],

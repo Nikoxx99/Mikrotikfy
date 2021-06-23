@@ -153,6 +153,12 @@ export default {
           to: '/olt'
         }
       ],
+      notifications: [
+        { id: 1, title: 'Click Me' },
+        { id: 2, title: 'Click Me' },
+        { id: 3, title: 'Click Me' },
+        { id: 4, title: 'Click Me 2' }
+      ],
       miniVariant: false,
       right: true,
       rightDrawer: false,
