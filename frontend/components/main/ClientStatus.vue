@@ -2,14 +2,20 @@
   <span>
     <v-tooltip top>
       <template v-slot:activator="{ on, attrs }">
-        <v-icon
+        <v-btn
           v-bind="attrs"
-          color="blue darken-4"
+          :block="block"
+          :text="!block"
+          :x-small="!block"
+          color="green darken-4"
           v-on="on"
           @click="initComponent"
         >
-          mdi-server
-        </v-icon>
+          <v-icon>mdi-server</v-icon>
+          <span v-if="block">
+            Ver Estado
+          </span>
+        </v-btn>
       </template>
       <span>Estatus</span>
     </v-tooltip>
@@ -113,6 +119,10 @@ export default {
     role: {
       type: Array,
       default: () => {}
+    },
+    block: {
+      type: Boolean,
+      default: false
     }
   },
   data: () => ({

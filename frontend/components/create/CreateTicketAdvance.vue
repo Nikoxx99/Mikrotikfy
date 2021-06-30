@@ -2,14 +2,20 @@
   <span>
     <v-tooltip top>
       <template v-slot:activator="{ on, attrs }">
-        <v-icon
+        <v-btn
           v-bind="attrs"
-          color="cyan darken-4"
+          :block="block"
+          :text="!block"
+          :x-small="!block"
+          color="yellow darken-4"
           v-on="on"
           @click="initComponent()"
         >
-          mdi-plus
-        </v-icon>
+          <v-icon>mdi-plus</v-icon>
+          <span v-if="block">
+            Crear Avance
+          </span>
+        </v-btn>
       </template>
       <span>Crear Avance</span>
     </v-tooltip>
@@ -98,6 +104,10 @@ export default {
     name: {
       type: String,
       default: ''
+    },
+    block: {
+      type: Boolean,
+      default: false
     }
   },
   data: () => ({

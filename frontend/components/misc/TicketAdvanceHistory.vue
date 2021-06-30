@@ -2,14 +2,20 @@
   <span>
     <v-tooltip top>
       <template v-slot:activator="{ on, attrs }">
-        <v-icon
+        <v-btn
           v-bind="attrs"
+          :block="block"
+          :text="!block"
+          :x-small="!block"
           color="blue darken-4"
           v-on="on"
           @click="initComponent()"
         >
-          mdi-history
-        </v-icon>
+          <v-icon>mdi-history</v-icon>
+          <span v-if="block">
+            Ver Avances
+          </span>
+        </v-btn>
       </template>
       <span>Historial de Avances</span>
     </v-tooltip>
@@ -108,6 +114,10 @@ export default {
     name: {
       type: String,
       default: ''
+    },
+    block: {
+      type: Boolean,
+      default: false
     }
   },
   data: () => ({

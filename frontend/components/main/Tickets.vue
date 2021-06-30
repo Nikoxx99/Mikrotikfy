@@ -77,31 +77,33 @@
                 </v-row>
               </template>
               <template v-if="isDesktop" v-slot:item.actions="props">
-                <ClientStatus
-                    v-if="can('ClientStatus')"
+                <div class="nowspace">
+                  <ClientStatus
+                      v-if="can('ClientStatus')"
+                      :name="props.item.client.name"
+                      :clientid="props.item.client.id"
+                      :code="props.item.client.code"
+                      :role="$store.state.auth.allowed_components"
+                    />
+                  <CreateTicketAdvance
+                    v-if="props.item.tickettype.name !== 'TRASLADO'"
+                    :editindex="tickets.indexOf(props.item)"
+                    :ticketid="props.item.id"
                     :name="props.item.client.name"
-                    :clientid="props.item.client.id"
-                    :code="props.item.client.code"
-                    :role="$store.state.auth.allowed_components"
+                    @updateTicketStatus="updateTicketStatus($event)"
                   />
-                <CreateTicketAdvance
-                  v-if="props.item.tickettype.name !== 'TRASLADO'"
-                  :editindex="tickets.indexOf(props.item)"
-                  :ticketid="props.item.id"
-                  :name="props.item.client.name"
-                  @updateTicketStatus="updateTicketStatus($event)"
-                />
-                <CreateTicketAdvanceTraslate
-                  v-else
-                  :editindex="tickets.indexOf(props.item)"
-                  :ticketid="props.item.id"
-                  :name="props.item.client.name"
-                  @updateTicketStatus="updateTicketStatus($event)"
-                />
-                <TicketAdvanceHistory
-                  :ticketid="props.item.id"
-                  :name="props.item.client.name"
-                />
+                  <CreateTicketAdvanceTraslate
+                    v-else
+                    :editindex="tickets.indexOf(props.item)"
+                    :ticketid="props.item.id"
+                    :name="props.item.client.name"
+                    @updateTicketStatus="updateTicketStatus($event)"
+                  />
+                  <TicketAdvanceHistory
+                    :ticketid="props.item.id"
+                    :name="props.item.client.name"
+                  />
+                </div>
               </template>
               <template v-slot:item.active="props">
                 <v-chip small :color="getColor(props.item.active, props.item.answered, props.item.escalated)" class="white--text">
@@ -207,33 +209,35 @@
             </v-list-item>
             <v-list-item>
               <v-list-item-content v-if="editModalData.client !== undefined">
-                <div style="white-space:nowrap">
-                  <ClientStatus
-                      v-if="can('ClientStatus')"
-                      :name="editModalData.client.name"
-                      :clientid="editModalData.client.id"
-                      :code="editModalData.client.code"
-                      :role="allowed_components"
-                    />
-                  <CreateTicketAdvance
-                    v-if="editModalData.tickettype.name !== 'TRASLADO'"
-                    :editindex="tickets ? tickets.indexOf(editModalData.id) : ''"
-                    :ticketid="editModalData.id"
+                <ClientStatus
+                    v-if="can('ClientStatus')"
+                    :block="true"
                     :name="editModalData.client.name"
-                    @updateTicketStatus="updateTicketStatus($event)"
+                    :clientid="editModalData.client.id"
+                    :code="editModalData.client.code"
+                    :role="allowed_components"
                   />
-                  <CreateTicketAdvanceTraslate
-                    v-else
-                    :editindex="tickets ? tickets.indexOf(editModalData.id) : ''"
-                    :ticketid="editModalData.id"
-                    :name="editModalData.client.name"
-                    @updateTicketStatus="updateTicketStatus($event)"
-                  />
-                  <TicketAdvanceHistory
-                    :ticketid="editModalData.id"
-                    :name="editModalData.client.name"
-                  />
-                </div>
+                <CreateTicketAdvance
+                  v-if="editModalData.tickettype.name !== 'TRASLADO'"
+                  :block="true"
+                  :editindex="tickets ? tickets.indexOf(editModalData.id) : ''"
+                  :ticketid="editModalData.id"
+                  :name="editModalData.client.name"
+                  @updateTicketStatus="updateTicketStatus($event)"
+                />
+                <CreateTicketAdvanceTraslate
+                  v-else
+                  :block="true"
+                  :editindex="tickets ? tickets.indexOf(editModalData.id) : ''"
+                  :ticketid="editModalData.id"
+                  :name="editModalData.client.name"
+                  @updateTicketStatus="updateTicketStatus($event)"
+                />
+                <TicketAdvanceHistory
+                  :block="true"
+                  :ticketid="editModalData.id"
+                  :name="editModalData.client.name"
+                />
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -292,12 +296,12 @@ export default {
       headers: [
         { text: 'Estado', sortable: true, value: 'active', width: '5%' },
         { text: 'Codigo', sortable: true, value: 'client.code', width: 60, align: ' d-none d-lg-table-cell' },
-        { text: 'Cliente', sortable: true, value: 'client.name', width: 150 },
-        { text: 'Dirección', sortable: true, value: 'client.address', width: 200, align: ' d-none d-lg-table-cell' },
-        { text: 'Barrio', sortable: true, value: 'client.neighborhood.name', width: 100, align: ' d-none d-lg-table-cell' },
-        { text: 'Telefono', sortable: true, value: 'client.phone', width: 100, align: ' d-none d-lg-table-cell' },
-        { text: 'Tipo', sortable: true, value: 'tickettype.name', width: 150 },
-        { text: 'Operador', sortable: false, value: 'assiganted.username', width: 60, align: ' d-none d-lg-table-cell' },
+        { text: 'Cliente', sortable: true, value: 'client.name' },
+        { text: 'Dirección', sortable: true, value: 'client.address', align: ' d-none d-lg-table-cell' },
+        { text: 'Barrio', sortable: true, value: 'client.neighborhood.name', align: ' d-none d-lg-table-cell' },
+        { text: 'Telefono', sortable: true, value: 'client.phone', align: ' d-none d-lg-table-cell' },
+        { text: 'Tipo', sortable: true, value: 'tickettype.name' },
+        { text: 'Operador', sortable: false, value: 'assiganted.username', align: ' d-none d-lg-table-cell' },
         { text: 'Detalles', sortable: true, value: 'details', width: 400, align: ' d-none d-lg-table-cell' },
         { text: 'Creado', sortable: true, value: 'createdAt', align: ' d-none d-lg-table-cell' },
         { text: 'Acciones', sortable: true, value: 'actions', align: ' d-none d-lg-table-cell' }
@@ -414,3 +418,7 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+  .nowspace {white-space: nowrap !important;}
+</style>
