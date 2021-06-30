@@ -41,7 +41,7 @@
                 no-data-text="No hay avances para mostrar aun..."
                 loading-text="Cargando información de tickets..."
                 hide-default-footer
-                mobile-breakpoint="100"
+                mobile-breakpoint="1024"
                 @page-count="pageCount = $event"
               >
                 <template v-slot:item.createdAt="{ item }">
