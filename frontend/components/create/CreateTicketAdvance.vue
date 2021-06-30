@@ -47,6 +47,8 @@
         </div>
         <v-card-actions>
           <v-btn
+            :loading="loading"
+            :diabled="loading"
             :color="ticketAdvance.closeTicket ? 'red darken-4' : 'blue darken-4'"
             @click="CreateTicketAdvance()"
           >
@@ -119,6 +121,7 @@ export default {
       this.ticketAdvance.editindex = this.editindex
     },
     CreateTicketAdvance () {
+      this.loading = true
       this.$apollo.mutate({
         mutation: gqlt`mutation ($id: ID!, $status: Boolean, $escalated: Boolean){
           updateTicket(input: {
@@ -163,16 +166,18 @@ export default {
             details: this.ticketAdvance.details,
             operator: this.$store.state.auth.id
           }
-        }).then((input) => {
+        }).then((_) => {
           this.modal = false
           this.$emit('updateTicketStatus', this.ticketAdvance)
           this.snack = true
           this.snackColor = 'info'
           this.snackText = 'Ticket actualizado con éxito.'
+          this.loading = false
         }).catch((error) => {
           this.snack = true
           this.snackColor = 'red'
           this.snackText = error
+          this.loading = false
         })
       }).catch((error) => {
         this.snack = true
