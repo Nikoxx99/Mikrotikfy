@@ -27,11 +27,18 @@
                 >
                   No entontrado: {{ errorCount }}
                 </v-chip>
+                <v-btn
+                  color="yellow darken-4"
+                  @click="fixmac()"
+                >
+                  Arreglar MACS
+                </v-btn>
               </v-col>
             </v-row>
             <v-textarea
               v-model="input"
               outlined
+              class="mt-4"
               label="MAC 00:00:00:00:00:00"
             />
           </v-col>
@@ -103,6 +110,7 @@ export default {
       secretList: [],
       filteredList: [],
       dataTable: [],
+      fixmacList: [],
       successfulCuts: [],
       input: '',
       headers: [
@@ -125,6 +133,27 @@ export default {
     this.getDatabaseClients()
   },
   methods: {
+    fixmac () {
+      const newMacClients = {}
+      this.filteredList.forEach((client) => {
+        newMacClients.id = client._id
+        newMacClients.mac_address = client.searchedMac
+        this.fixmacList.push(newMacClients)
+      })
+      // this.fixmac =
+      // await this.$strapi.graphql({
+      //   mutation: `
+      //     mutation($clients: ClientList) {
+      //       updateOltMac(clients: $clients)
+      //     }
+      //   `,
+      //   variables: {
+      //     clients: this.filteredList
+      //   }
+      // }).catch((e) => {
+      //   console.log(e)
+      // })
+    },
     getSecretsFromMikrotik () {
       this.secretList = []
       this.$apollo.query({
@@ -236,10 +265,12 @@ export default {
             if (clientDatabaseSearch2 < 1) {
               // no existe
             } else {
+              clientDatabaseSearch2[0].searchedMac = input[i]
               this.filteredList.push(clientDatabaseSearch2[0])
               this.foundCount++
             }
           } else {
+            clientDatabaseSearch[0].searchedMac = input[i]
             this.filteredList.push(clientDatabaseSearch[0])
             this.foundCount++
           }
