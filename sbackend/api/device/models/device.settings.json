@@ -1,0 +1,24 @@
+{
+  "kind": "collectionType",
+  "collectionName": "devices",
+  "info": {
+    "name": "device"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "mac_address": {
+      "type": "string"
+    },
+    "brand": {
+      "type": "string"
+    },
+    "technology": {
+      "model": "technology",
+      "via": "devices"
+    }
+  }
+}

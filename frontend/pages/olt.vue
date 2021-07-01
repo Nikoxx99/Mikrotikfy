@@ -29,6 +29,8 @@
                 </v-chip>
                 <v-btn
                   color="yellow darken-4"
+                  :loading="loading"
+                  :disabled="loading"
                   @click="fixmac()"
                 >
                   Arreglar MACS
@@ -125,7 +127,7 @@ export default {
       snack: false,
       snackColor: '',
       snackText: '',
-      loading: true
+      loading: false
     }
   },
   created () {
@@ -133,26 +135,27 @@ export default {
     this.getDatabaseClients()
   },
   methods: {
-    fixmac () {
-      const newMacClients = {}
+    async fixmac () {
+      this.loading = true
       this.filteredList.forEach((client) => {
+        const newMacClients = {}
         newMacClients.id = client._id
         newMacClients.mac_address = client.searchedMac
         this.fixmacList.push(newMacClients)
       })
-      // this.fixmac =
-      // await this.$strapi.graphql({
-      //   mutation: `
-      //     mutation($clients: ClientList) {
-      //       updateOltMac(clients: $clients)
-      //     }
-      //   `,
-      //   variables: {
-      //     clients: this.filteredList
-      //   }
-      // }).catch((e) => {
-      //   console.log(e)
-      // })
+      await this.$strapi.graphql({
+        query: `
+          mutation updateMacOlt($clients: [ClientList]) {
+            updateOltMac(clients: $clients)
+          }
+        `,
+        variables: {
+          clients: this.fixmacList
+        }
+      }).catch((e) => {
+        console.log(e)
+      })
+      this.loading = false
     },
     getSecretsFromMikrotik () {
       this.secretList = []
@@ -289,6 +292,7 @@ export default {
         this.snackText = 'Debes ingresar datos antes de proceder.'
         this.loading = false
       } else {
+        this.loading = true
         this.snack = true
         this.snackColor = 'info'
         this.snackText = 'El proceso ha comenzado...'
@@ -313,6 +317,7 @@ export default {
               }
             }
           }).then((input) => {
+            this.loading = false
             this.successfulCuts.push(input.data.dxClient[0])
           }).catch((error) => {
             this.snack = true
