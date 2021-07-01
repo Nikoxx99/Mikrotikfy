@@ -347,8 +347,7 @@ module.exports = {
   },
   async getClientSecrets(ctx) {
     const city = ctx.query._city
-    const search = await strapi.services.city.find({ _id: city })
-    const searchCity = await strapi.services.city.find({ id: search[0].city.id })
+    const searchCity = await strapi.services.city.find({ id: city })
 
     if (searchCity[0].mikrotiks.length > 1) {
       const successfulMikrotikResponses = []
