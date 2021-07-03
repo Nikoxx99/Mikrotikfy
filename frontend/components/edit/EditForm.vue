@@ -174,7 +174,7 @@
                   style="flex-direction:column;display: inline-flex;"
                 >
                   <v-combobox
-                    v-model="editClient.mac_address"
+                    v-model="editClient.mac_addresses"
                     disabled
                     label="Mac Equipo"
                     item-text="mac_address"
@@ -197,21 +197,23 @@
                   <v-row>
                     <v-col>
                       <v-text-field
+                        :value="pref_mac ? pref_mac.toUpperCase() : ''"
                         label="Mac"
-                        color="green darken-4"
-                        success
+                        :rules="valid_mac"
                         required
                         outlined
                         dense
-                        hide-details
+                        @input="pref_mac = $event.toUpperCase()"
                       />
                     </v-col>
                     <v-col>
-                      <v-text-field
+                      <v-autocomplete
+                        v-model="devicebrands"
+                        item-text="name"
+                        item-value="_id"
+                        :items="devicebrands"
+                        return-object
                         label="Marca"
-                        color="green darken-4"
-                        success
-                        required
                         outlined
                         dense
                         hide-details
@@ -365,6 +367,7 @@ export default {
       addDevice: false,
       valid: false,
       editClient: {},
+      pref_mac: '',
       dir1: '',
       dir2: '',
       dir3: '',
@@ -388,6 +391,13 @@ export default {
       idwith: [
         { id: 0, name: 'Cedula' },
         { id: 1, name: 'Codigo' }
+      ],
+      valid_mac: [
+        value => !!value || 'Debes especificar la Mac',
+        (value) => {
+          const pattern = /^[A-Za-z0-9]+$/
+          return pattern.test(value) || 'La mac no puede llevar dos puntos ni guiones'
+        }
       ],
       success: false,
       error: false,
@@ -414,6 +424,9 @@ export default {
     },
     technologies () {
       return this.$store.state.technologies
+    },
+    devicebrands () {
+      return this.$store.state.devicebrands
     }
   },
   watch: {
