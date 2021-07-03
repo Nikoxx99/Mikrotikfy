@@ -75,7 +75,7 @@
                 outlined
                 dense
                 hide-details
-                class="pb-3"
+                class="pb-3 mt-3"
                 @input="editClient.name = $event.toUpperCase()"
               />
               <v-row>
@@ -170,6 +170,57 @@
                 </v-col>
               </v-row>
               <v-row>
+                <v-col
+                  style="flex-direction:column;display: inline-flex;"
+                >
+                  <v-combobox
+                    v-model="editClient.mac_address"
+                    disabled
+                    label="Mac Equipo"
+                    item-text="mac_address"
+                    return-object
+                    required
+                    multiple
+                    small-chips
+                    outlined
+                    dense
+                    hide-details
+                  />
+                  <v-checkbox
+                    v-model="addDevice"
+                    label="Agreg. Mac"
+                    class="ml-2 mt-1"
+                    hide-details
+                  />
+                </v-col>
+                <v-col v-if="addDevice">
+                  <v-row>
+                    <v-col>
+                      <v-text-field
+                        label="Mac"
+                        color="green darken-4"
+                        success
+                        required
+                        outlined
+                        dense
+                        hide-details
+                      />
+                    </v-col>
+                    <v-col>
+                      <v-text-field
+                        label="Marca"
+                        color="green darken-4"
+                        success
+                        required
+                        outlined
+                        dense
+                        hide-details
+                      />
+                    </v-col>
+                  </v-row>
+                </v-col>
+              </v-row>
+              <v-row>
                 <v-col>
                   <v-select
                     v-model="editClient.technology"
@@ -179,17 +230,6 @@
                     :items="technologies"
                     return-object
                     label="Tecnología"
-                    outlined
-                    dense
-                    hide-details
-                  />
-                </v-col>
-                <v-col>
-                  <v-text-field
-                    v-model="editClient.mac_address"
-                    :disabled="!can('EditFormMacAddress')"
-                    label="Mac Equipo"
-                    required
                     outlined
                     dense
                     hide-details
@@ -322,6 +362,7 @@ export default {
   },
   data: () => {
     return {
+      addDevice: false,
       valid: false,
       editClient: {},
       dir1: '',

@@ -1,0 +1,52 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/devicebrandparts",
+      "handler": "devicebrandpart.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/devicebrandparts/count",
+      "handler": "devicebrandpart.count",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/devicebrandparts/:id",
+      "handler": "devicebrandpart.findOne",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/devicebrandparts",
+      "handler": "devicebrandpart.create",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/devicebrandparts/:id",
+      "handler": "devicebrandpart.update",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/devicebrandparts/:id",
+      "handler": "devicebrandpart.delete",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}

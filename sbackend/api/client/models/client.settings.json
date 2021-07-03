@@ -26,9 +26,6 @@
     "wifi_password": {
       "type": "string"
     },
-    "mac_address": {
-      "type": "string"
-    },
     "comment": {
       "type": "richtext"
     },
@@ -70,6 +67,7 @@
       "type": "boolean"
     },
     "passwordchanges": {
+      "targetColumnName": "dni",
       "collection": "passwordchange",
       "via": "client"
     },
@@ -104,6 +102,11 @@
     },
     "status": {
       "type": "string"
+    },
+    "mac_addresses": {
+      "collection": "device",
+      "via": "clients",
+      "dominant": true
     }
   }
 }

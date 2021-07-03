@@ -2,7 +2,8 @@
   "kind": "collectionType",
   "collectionName": "devices",
   "info": {
-    "name": "device"
+    "name": "device",
+    "description": ""
   },
   "options": {
     "increments": true,
@@ -13,12 +14,17 @@
     "mac_address": {
       "type": "string"
     },
-    "brand": {
-      "type": "string"
-    },
     "technology": {
       "model": "technology",
       "via": "devices"
+    },
+    "devicebrand": {
+      "via": "devices",
+      "model": "devicebrand"
+    },
+    "clients": {
+      "via": "mac_addresses",
+      "collection": "client"
     }
   }
 }
