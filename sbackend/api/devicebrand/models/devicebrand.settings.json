@@ -1,8 +1,9 @@
 {
   "kind": "collectionType",
-  "collectionName": "technologies",
+  "collectionName": "devicebrands",
   "info": {
-    "name": "Technology"
+    "name": "devicebrand",
+    "description": ""
   },
   "options": {
     "increments": true,
@@ -13,17 +14,13 @@
     "name": {
       "type": "string"
     },
-    "clients": {
-      "via": "technology",
-      "collection": "client"
-    },
-    "histories": {
-      "via": "technology",
-      "collection": "history"
-    },
     "devices": {
-      "via": "technology",
+      "via": "devicebrand",
       "collection": "device"
+    },
+    "devicebrandparts": {
+      "via": "devicebrand",
+      "collection": "devicebrandpart"
     }
   }
 }

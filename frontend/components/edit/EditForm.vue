@@ -75,7 +75,7 @@
                 outlined
                 dense
                 hide-details
-                class="pb-3"
+                class="pb-3 mt-3"
                 @input="editClient.name = $event.toUpperCase()"
               />
               <v-row>
@@ -170,6 +170,59 @@
                 </v-col>
               </v-row>
               <v-row>
+                <v-col
+                  style="flex-direction:column;display: inline-flex;"
+                >
+                  <v-combobox
+                    v-model="editClient.mac_addresses"
+                    disabled
+                    label="Mac Equipo"
+                    item-text="mac_address"
+                    return-object
+                    required
+                    multiple
+                    small-chips
+                    outlined
+                    dense
+                    hide-details
+                  />
+                  <v-checkbox
+                    v-model="addDevice"
+                    label="Agreg. Mac"
+                    class="ml-2 mt-1"
+                    hide-details
+                  />
+                </v-col>
+                <v-col v-if="addDevice">
+                  <v-row>
+                    <v-col>
+                      <v-text-field
+                        :value="device.mac_address ? device.mac_address.toUpperCase() : ''"
+                        label="Mac"
+                        :rules="valid_mac"
+                        required
+                        outlined
+                        dense
+                        @input="device.mac_address = $event.toUpperCase()"
+                      />
+                    </v-col>
+                    <v-col>
+                      <v-autocomplete
+                        v-model="device.devicebrand"
+                        item-text="name"
+                        item-value="_id"
+                        :items="devicebrands"
+                        return-object
+                        label="Marca"
+                        outlined
+                        dense
+                        hide-details
+                      />
+                    </v-col>
+                  </v-row>
+                </v-col>
+              </v-row>
+              <v-row>
                 <v-col>
                   <v-select
                     v-model="editClient.technology"
@@ -179,17 +232,6 @@
                     :items="technologies"
                     return-object
                     label="Tecnología"
-                    outlined
-                    dense
-                    hide-details
-                  />
-                </v-col>
-                <v-col>
-                  <v-text-field
-                    v-model="editClient.mac_address"
-                    :disabled="!can('EditFormMacAddress')"
-                    label="Mac Equipo"
-                    required
                     outlined
                     dense
                     hide-details
@@ -322,8 +364,11 @@ export default {
   },
   data: () => {
     return {
+      addDevice: false,
+      device: {},
       valid: false,
       editClient: {},
+      pref_mac: '',
       dir1: '',
       dir2: '',
       dir3: '',
@@ -348,17 +393,18 @@ export default {
         { id: 0, name: 'Cedula' },
         { id: 1, name: 'Codigo' }
       ],
+      valid_mac: [
+        value => !!value || 'Debes especificar la Mac',
+        (value) => {
+          const pattern = /^[A-Fa-f0-9]+$/
+          return pattern.test(value) || 'La mac no es válida. No pongas guiones ni dos puntos'
+        }
+      ],
       success: false,
       error: false,
       commentDisabled: false,
       successMessage: '',
-      errorMessage: '',
-      commentLoading: false
-      // item: {
-      //   operator: {
-      //     username: 'No registra'
-      //   }
-      // }
+      errorMessage: ''
     }
   },
   computed: {
@@ -373,19 +419,29 @@ export default {
     },
     technologies () {
       return this.$store.state.technologies
+    },
+    devicebrands () {
+      return this.$store.state.devicebrands
     }
   },
   watch: {
     client () {
       Object.assign(this.editClient, this.client)
+    },
+    addDevice () {
+      this.device = {}
     }
   },
   mounted () {
     Object.assign(this.editClient, this.client)
   },
   methods: {
-    updateClient (client, index) {
+    async updateClient (client, index) {
       const operator = this.$store.state.auth.id
+      if (this.addDevice) {
+        await this.$strapi.create('devices', { mac_address: this.device.mac_address, devicebrand: this.device.devicebrand.id, clients: [this.editClient._id] })
+        this.device = {}
+      }
       this.$store.dispatch('client/updateClient', { client, index, operator })
       this.dialogEdit = false
     },
@@ -400,11 +456,11 @@ export default {
     getResolution () {
       const res = document.body.clientWidth
       if (res < 800) {
-        const clientRes = true
-        return clientRes
+        const isMobile = true
+        return isMobile
       } else {
-        const clientRes = false
-        return clientRes
+        const isMobile = false
+        return isMobile
       }
     },
     can (component) {

@@ -15,8 +15,8 @@
       "type": "string"
     },
     "clients": {
-      "collection": "client",
-      "via": "city"
+      "via": "city",
+      "collection": "client"
     },
     "color": {
       "type": "string"

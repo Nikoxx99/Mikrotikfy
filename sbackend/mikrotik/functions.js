@@ -622,3 +622,109 @@ module.exports.createComment = async function (client) {
   const newComment = `${client.code} ${client.technology.name} ${client.neighborhood.name} ${client.address} ${client.name} ${client.dni} ${client.phone} ${client.plan.name} ${client.mac_address} NAP-ONU: ${client.nap_onu_address} POTENCIA: ${client.opticalPower} ${client.wifi_ssid} ${client.wifi_password}`
   return newComment
 }
+module.exports.genBrand = async function (mac_address) {
+  const macFirstBlockChop = mac_address.split(':')
+  const macFirstBlock = macFirstBlockChop[0] + macFirstBlockChop[1] + macFirstBlockChop[2]
+  let res;
+  switch(macFirstBlock){
+    case 'E89FEC':
+      res =  'Kingtype'
+      break;
+    case '000F1E':
+      res =  'Kingtype'
+      break;
+    case '386B1C':
+      res =  'Mercusys'
+      break;
+    case '500FF5':
+      res =  'Tenda'
+      break;
+    case '7C8779':
+      res =  'CData Antigua'
+      break;
+    case '8014A8':
+      res =  'Kingtype'
+      break;
+    case '94026B':
+      res =  'Optictimes'
+      break;
+    case 'A86B7C':
+      res =  'TPLINK'
+      break;
+    case 'AC84C6':
+      res =  'TPLINK'
+      break;
+    case 'C0A5DD':
+      res =  'Optictimes Antigua'
+      break;
+    case 'E0E8E6':
+      res =  'CData'
+      break;
+    case 'E865D4':
+      res =  'Tenda'
+      break;
+    case '8014A8':
+      res =  'QPCOM'
+      break;
+    case '88A5BD':
+      res =  'QPCOM'
+      break;
+    default:
+      res = 'No Registra'
+      break;
+  }
+  return res
+},
+module.exports.genTech = async function (mac_address) {
+  const macFirstBlockChop = mac_address.split(':')
+  const macFirstBlock = macFirstBlockChop[0] + macFirstBlockChop[1] + macFirstBlockChop[2]
+  let res;
+  switch(macFirstBlock){
+    case 'E89FEC':
+      res =  '5f832ea7b0c43e2c64b3743a'
+      break;
+    case '000F1E':
+      res =  '5f832ea7b0c43e2c64b3743a'
+      break;
+    case '386B1C':
+      res =  '5f832eadb0c43e2c64b3743b'
+      break;
+    case '500FF5':
+      res =  '5f832eadb0c43e2c64b3743b'
+      break;
+    case '7C8779':
+      res =  '5f832ea7b0c43e2c64b3743a'
+      break;
+    case '8014A8':
+      res =  '5f832ea7b0c43e2c64b3743a'
+      break;
+    case '94026B':
+      res =  '5f832ea7b0c43e2c64b3743a'
+      break;
+    case 'A86B7C':
+      res =  '5f832eadb0c43e2c64b3743b'
+      break;
+    case 'AC84C6':
+      res =  '5f832eadb0c43e2c64b3743b'
+      break;
+    case 'C0A5DD':
+      res =  '5f832ea7b0c43e2c64b3743a'
+      break;
+    case 'E0E8E6':
+      res =  '5f832ea7b0c43e2c64b3743a'
+      break;
+    case 'E865D4':
+      res =  '5f832eadb0c43e2c64b3743b'
+      break;
+    case '8014A8':
+      res =  '5f832eadb0c43e2c64b3743b'
+      break;
+    case '88A5BD':
+      res =  '5f832eadb0c43e2c64b3743b'
+      break;
+    default:
+      res = '5f832ea7b0c43e2c64b3743a'
+      break;
+  }
+  return res
+}

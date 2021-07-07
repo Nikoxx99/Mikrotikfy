@@ -7,6 +7,7 @@ export const state = () => {
     cities: null,
     plans: null,
     technologies: null,
+    devicebrands: null,
     neighborhoods: null,
     activeClients: null,
     activeClientsList: null,
@@ -20,11 +21,12 @@ export const mutations = {
   setAuth (state, auth) {
     state.auth = auth
   },
-  setLocalStorage (state, { cities, plans, technologies, neighborhoods, activeClients, activeClientsList, clientCount, clientCountActive, clientCountDisable, clientCountRetired }) {
+  setLocalStorage (state, { cities, plans, technologies, neighborhoods, deviceBrands, activeClients, activeClientsList, clientCount, clientCountActive, clientCountDisable, clientCountRetired }) {
     state.cities = JSON.parse(cities)
     state.plans = JSON.parse(plans)
     state.technologies = JSON.parse(technologies)
     state.neighborhoods = JSON.parse(neighborhoods)
+    state.devicebrands = JSON.parse(deviceBrands)
     state.activeClients = JSON.parse(activeClients)
     state.activeClientsList = JSON.parse(activeClientsList)
     state.clientCount = JSON.parse(clientCount)
@@ -72,13 +74,14 @@ export const actions = {
     const cities = localStorage.getItem('cities')
     const clientCount = localStorage.getItem('clientCount')
     const technologies = localStorage.getItem('technologies')
+    const deviceBrands = localStorage.getItem('devicebrands')
     const neighborhoods = localStorage.getItem('neighborhoods')
     const activeClients = localStorage.getItem('activeClients')
     const activeClientsList = localStorage.getItem('activeClientsList')
     const clientCountActive = localStorage.getItem('clientCountActive')
     const clientCountDisable = localStorage.getItem('clientCountDisable')
     const clientCountRetired = localStorage.getItem('clientCountRetired')
-    commit('setLocalStorage', { cities, plans, technologies, neighborhoods, activeClients, activeClientsList, clientCount, clientCountActive, clientCountDisable, clientCountRetired })
+    commit('setLocalStorage', { cities, plans, technologies, neighborhoods, deviceBrands, activeClients, activeClientsList, clientCount, clientCountActive, clientCountDisable, clientCountRetired })
   },
   getTicketsFromLocalStorage ({ commit }) {
     const tickets = localStorage.getItem('tickets')

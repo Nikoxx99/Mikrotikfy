@@ -15,8 +15,8 @@
       "type": "boolean"
     },
     "client": {
-      "model": "client",
-      "via": "tickets"
+      "via": "tickets",
+      "model": "client"
     },
     "city": {
       "via": "tickets",

@@ -55,8 +55,8 @@
       "configurable": false
     },
     "clients": {
-      "collection": "client",
-      "via": "operator"
+      "via": "operator",
+      "collection": "client"
     },
     "tickets": {
       "via": "assiganted",

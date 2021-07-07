@@ -193,6 +193,7 @@ export default {
           Cookie.set('authToken', auth.accessToken, { expires: 7 })
           await this.$store.dispatch('plan/getPlansFromDatabase')
           await this.$store.dispatch('technology/getTechnologiesFromDatabase')
+          await this.$store.dispatch('device/getDeviceBrandsFromDatabase')
           await this.$store.dispatch('city/getCitiesFromDatabase')
           await this.$store.dispatch('neighborhood/getNeighborhoodsFromDatabase')
           await this.$store.dispatch('count/activeClients', third.data.user.cities[0].id)
