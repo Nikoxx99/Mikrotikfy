@@ -197,18 +197,18 @@
                   <v-row>
                     <v-col>
                       <v-text-field
-                        :value="pref_mac ? pref_mac.toUpperCase() : ''"
+                        :value="device.mac_address ? device.mac_address.toUpperCase() : ''"
                         label="Mac"
                         :rules="valid_mac"
                         required
                         outlined
                         dense
-                        @input="pref_mac = $event.toUpperCase()"
+                        @input="device.mac_address = $event.toUpperCase()"
                       />
                     </v-col>
                     <v-col>
                       <v-autocomplete
-                        v-model="devicebrands"
+                        v-model="device.devicebrand"
                         item-text="name"
                         item-value="_id"
                         :items="devicebrands"
@@ -365,6 +365,7 @@ export default {
   data: () => {
     return {
       addDevice: false,
+      device: {},
       valid: false,
       editClient: {},
       pref_mac: '',
@@ -395,21 +396,15 @@ export default {
       valid_mac: [
         value => !!value || 'Debes especificar la Mac',
         (value) => {
-          const pattern = /^[A-Za-z0-9]+$/
-          return pattern.test(value) || 'La mac no puede llevar dos puntos ni guiones'
+          const pattern = /^[A-Fa-f0-9]+$/
+          return pattern.test(value) || 'La mac no es válida. No pongas guiones ni dos puntos'
         }
       ],
       success: false,
       error: false,
       commentDisabled: false,
       successMessage: '',
-      errorMessage: '',
-      commentLoading: false
-      // item: {
-      //   operator: {
-      //     username: 'No registra'
-      //   }
-      // }
+      errorMessage: ''
     }
   },
   computed: {
@@ -432,14 +427,21 @@ export default {
   watch: {
     client () {
       Object.assign(this.editClient, this.client)
+    },
+    addDevice () {
+      this.device = {}
     }
   },
   mounted () {
     Object.assign(this.editClient, this.client)
   },
   methods: {
-    updateClient (client, index) {
+    async updateClient (client, index) {
       const operator = this.$store.state.auth.id
+      if (this.addDevice) {
+        await this.$strapi.create('devices', { mac_address: this.device.mac_address, devicebrand: this.device.devicebrand.id, clients: [this.editClient._id] })
+        this.device = {}
+      }
       this.$store.dispatch('client/updateClient', { client, index, operator })
       this.dialogEdit = false
     },
@@ -454,11 +456,11 @@ export default {
     getResolution () {
       const res = document.body.clientWidth
       if (res < 800) {
-        const clientRes = true
-        return clientRes
+        const isMobile = true
+        return isMobile
       } else {
-        const clientRes = false
-        return clientRes
+        const isMobile = false
+        return isMobile
       }
     },
     can (component) {

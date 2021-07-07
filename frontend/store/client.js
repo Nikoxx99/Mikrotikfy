@@ -204,6 +204,7 @@ export const actions = {
               wifi_ssid: client.wifi_ssid,
               wifi_password: client.wifi_password,
               mac_address: client.mac_address,
+              mac_addresses: client.mac_addresses,
               comment: client.comment,
               hasRepeater: client.hasRepeater,
               nap_onu_address: client.nap_onu_address,
