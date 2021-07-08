@@ -129,7 +129,7 @@ module.exports = {
   },
   async update(ctx) {
     const { id } = ctx.params;
-    let entity, history;
+    let entity;
     entity = await strapi.services.client.update({ id }, ctx.request.body)
     const telegrambot = await strapi.services.telegrambot.find({city: entity.city.id})
     simpleTelegramUpdate(entity, telegrambot[0])

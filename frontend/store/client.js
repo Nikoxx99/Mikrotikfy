@@ -41,6 +41,13 @@ export const mutations = {
       throw new Error(`UPDATE CLIENT MUTATE ${error}`)
     }
   },
+  updateClientDevices (state, { device, index }) {
+    try {
+      state.clients[index].mac_addresses.push(device)
+    } catch (error) {
+      throw new Error(`UPDATE CLIENT DEVICE MUTATE ${error}`)
+    }
+  },
   insertClient (state, client) {
     try {
       // Object.assign(state.clients[0], client)
@@ -203,8 +210,6 @@ export const actions = {
               technology: client.technology.id,
               wifi_ssid: client.wifi_ssid,
               wifi_password: client.wifi_password,
-              mac_address: client.mac_address,
-              mac_addresses: client.mac_addresses,
               comment: client.comment,
               hasRepeater: client.hasRepeater,
               nap_onu_address: client.nap_onu_address,
@@ -220,5 +225,8 @@ export const actions = {
     } catch (error) {
       throw new Error(`UPDATE USER ACTION ${error}`)
     }
+  },
+  updateClientDevices ({ commit }, { device, index }) {
+    commit('updateClientDevices', { device, index })
   }
 }

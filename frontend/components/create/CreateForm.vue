@@ -180,7 +180,7 @@
           />
         </v-col>
       </v-row>
-      <v-row>
+      <!-- <v-row>
         <v-col>
           <v-select
             v-model="Client.technology"
@@ -204,8 +204,8 @@
             hide-details
           />
         </v-col>
-      </v-row>
-      <v-row>
+      </v-row> -->
+      <!-- <v-row>
         <v-col>
           <v-text-field
             :value="Client.nap_onu_address.toUpperCase()"
@@ -227,7 +227,7 @@
             @input="Client.opticalPower = $event.toUpperCase()"
           />
         </v-col>
-      </v-row>
+      </v-row> -->
       <v-row>
         <v-col>
           <v-select
@@ -292,10 +292,7 @@ export default {
         },
         wifi_ssid: '',
         wifi_password: '',
-        technology: {
-          id: 0,
-          name: ''
-        },
+        technology: {},
         mac_address: '',
         comment: '',
         newModel: 1,
@@ -401,14 +398,10 @@ export default {
               plan: this.Client.plan.id,
               wifi_ssid: this.Client.wifi_ssid,
               wifi_password: this.Client.wifi_password,
-              technology: this.Client.technology.id,
-              mac_address: this.Client.mac_address,
               comment: this.Client.comment,
               newModel: this.Client.newModel,
               sendToMikrotik: this.Client.sendToMikrotik,
               hasRepeater: this.Client.hasRepeater,
-              nap_onu_address: this.Client.nap_onu_address,
-              opticalPower: this.Client.opticalPower,
               operator: this.$store.state.auth.id,
               operator_role: this.role
             }
