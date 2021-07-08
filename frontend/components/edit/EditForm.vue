@@ -188,7 +188,7 @@
                   />
                   <v-checkbox
                     v-model="addDevice"
-                    label="Agreg. Mac"
+                    label="Agregar Equipo"
                     class="ml-2 mt-1"
                     hide-details
                   />
@@ -439,7 +439,8 @@ export default {
     async updateClient (client, index) {
       const operator = this.$store.state.auth.id
       if (this.addDevice) {
-        await this.$strapi.create('devices', { mac_address: this.device.mac_address, devicebrand: this.device.devicebrand.id, clients: [this.editClient._id] })
+        const device = await this.$strapi.create('devices', { mac_address: this.device.mac_address, devicebrand: this.device.devicebrand.id, clients: [this.editClient._id] })
+        this.$store.dispatch('client/updateClientDevices', { device, index })
         this.device = {}
       }
       this.$store.dispatch('client/updateClient', { client, index, operator })
