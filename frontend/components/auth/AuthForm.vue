@@ -17,7 +17,7 @@
       type="error"
       tile
     >
-      Credenciales Inválidas, intenta de nuevo. <br>
+      Error de inicio de sesión. <br>
       <span class="text-subtitle-2">{{ errorMessages }}</span>
     </v-alert>
     <v-alert
@@ -175,7 +175,12 @@ export default {
             id: first.data.login.user.id
           }
         })
-        if (!first.errors) {
+        if (third.data.user.cities.length < 1) {
+          this.errorMessages = 'Ciudad no especificada para el usuario'
+          this.loginFailed = true
+          this.loginSuccessful = false
+          this.isLoading = false
+        } else if (!first.errors) {
           const ac = await second.data.role.allowed_components.map((c) => {
             return c.name
           })
