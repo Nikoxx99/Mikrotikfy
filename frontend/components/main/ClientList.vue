@@ -127,8 +127,8 @@
                 </svg>
               </template>
               <template v-slot:item.technology.name="{ item }">
-                <span :class="getTechnology(item.technology.id) + '--text'">
-                  {{ item.technology.name }}
+                <span :class="getTechnology(item.technology ? item.technology.id : '') + '--text'">
+                  {{ item.technology ? item.technology.name : 'No Reg.' }}
                 </span>
               </template>
               <template v-slot:item.newModel="{ item }">
@@ -402,6 +402,8 @@ export default {
         return 'cyan'
       } else if (technology === '5f832ea7b0c43e2c64b3743a') {
         return 'green'
+      } else {
+        return 'grey'
       }
     },
     async createClient (client) {

@@ -12,7 +12,7 @@ module.exports = strapi => {
           console.log('REQUEST:')
           console.info(ctx.request.body.query);
           console.log('RESPONSE:')
-          console.error(JSON.parse(ctx.body));
+          // console.error(ctx.body);
         } else {
           // just exec the mileware stack for other requests
           await next();

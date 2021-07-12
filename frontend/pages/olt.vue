@@ -210,7 +210,9 @@ export default {
               }
               wifi_ssid
               wifi_password
-              mac_address
+              mac_addresses{
+                mac_address
+              }
               comment
               createdAt
               newModel

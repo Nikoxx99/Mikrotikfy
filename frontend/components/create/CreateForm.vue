@@ -430,15 +430,29 @@ export default {
     },
     calculateSsid () {
       const name = this.Client.name.split(' ')
-      if (name[2] && this.Client.code) {
-        const lastNameLowerCase = name[2].toLowerCase()
-        const nombreLowerCase = name[0].toLowerCase()
-        const processedName = nombreLowerCase.charAt(0).toUpperCase() + nombreLowerCase.slice(1)
-        this.Client.wifi_password = processedName + this.Client.code
-        this.Client.wifi_ssid = `ARNOP${lastNameLowerCase.charAt(0).toUpperCase() + lastNameLowerCase.slice(1)}`
-      } else {
-        return false
+      const length = name.length
+      // eslint-disable-next-line no-var
+      var lastNameLowerCase = ''
+      switch (length) {
+        case 1:
+          break
+        case 2:
+          lastNameLowerCase = name[1].toLowerCase()
+          break
+        case 3:
+          lastNameLowerCase = name[1].toLowerCase()
+          break
+        case 4:
+          lastNameLowerCase = name[2].toLowerCase()
+          break
+        default:
+          lastNameLowerCase = ''
+          break
       }
+      const nombreLowerCase = name[0].toLowerCase()
+      const processedName = nombreLowerCase.charAt(0).toUpperCase() + nombreLowerCase.slice(1)
+      this.Client.wifi_password = processedName + this.Client.code
+      this.Client.wifi_ssid = `ARNOP${lastNameLowerCase.charAt(0).toUpperCase() + lastNameLowerCase.slice(1)}`
     }
   }
 }
