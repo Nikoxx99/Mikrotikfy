@@ -35,6 +35,19 @@
                 >
                   Arreglar MACS
                 </v-btn>
+                <v-chip
+                  color="cyan darken-4"
+                >
+                  Macs Preparadas: {{ fixmacList.length }}
+                </v-chip>
+                <v-btn
+                  color="cyan darken-4"
+                  :loading="loading"
+                  :disabled="loading"
+                  @click="executeFixMac()"
+                >
+                  Ejecutar Arreglo
+                </v-btn>
               </v-col>
             </v-row>
             <v-textarea
@@ -114,9 +127,10 @@ export default {
       dataTable: [],
       fixmacList: [],
       successfulCuts: [],
+      devicebrands: [],
       input: '',
       headers: [
-        { text: 'MAC', sortable: true, value: 'mac_address' },
+        { text: 'MAC', sortable: true, value: 'searchedMac' },
         { text: 'Nombre', sortable: true, value: 'name' },
         { text: 'Code', sortable: true, value: 'code' },
         { text: 'Tec.', sortable: true, value: 'technology.name' },
@@ -133,9 +147,10 @@ export default {
   created () {
     this.getSecretsFromMikrotik()
     this.getDatabaseClients()
+    this.getDeviceBrands()
   },
   methods: {
-    async fixmac () {
+    fixmac () {
       this.loading = true
       this.filteredList.forEach((client) => {
         const newMacClients = {}
@@ -143,17 +158,13 @@ export default {
         newMacClients.mac_address = client.searchedMac
         this.fixmacList.push(newMacClients)
       })
-      await this.$strapi.graphql({
-        query: `
-          mutation updateMacOlt($clients: [ClientList]) {
-            updateOltMac(clients: $clients)
-          }
-        `,
-        variables: {
-          clients: this.fixmacList
-        }
-      }).catch((e) => {
-        console.log(e)
+      this.loading = false
+    },
+    executeFixMac () {
+      const fixedmacList = this.fixmacList
+      fixedmacList.forEach(async (fixedmac) => {
+        const device = await this.$strapi.create('devices', { mac_address: fixedmac.mac_address, devicebrand: this.device.devicebrand.id, clients: [fixedmac._id] })
+        console.log(device)
       })
       this.loading = false
     },
@@ -180,6 +191,19 @@ export default {
         this.initialLoading = false
       })
     },
+    async getDeviceBrands () {
+      this.devicebrands = await this.$strapi.graphql({
+        query: `query {
+          devicebrands{
+            id
+            name
+            devicebrandparts{
+              mac_part
+            }
+          }
+        }`
+      })
+    },
     getDatabaseClients () {
       this.initialLoading = true
       this.dataTable = []
@@ -199,23 +223,13 @@ export default {
               city{
                 name
               }
-              dni
-              plan{
-                id
-                name
-              }
               technology{
                 id
                 name
               }
-              wifi_ssid
-              wifi_password
               mac_addresses{
                 mac_address
               }
-              comment
-              createdAt
-              newModel
             }
           }
         }
@@ -231,21 +245,10 @@ export default {
           dataTable.status = '#777'
           dataTable.code = input.data.city.clients[i].code
           dataTable.name = input.data.city.clients[i].name
-          dataTable.dni = input.data.city.clients[i].dni
           dataTable.address = input.data.city.clients[i].address
           dataTable.neighborhood = input.data.city.clients[i].neighborhood
           dataTable.city = input.data.city.clients[i].city
-          dataTable.phone = input.data.city.clients[i].phone
-          dataTable.plan = input.data.city.clients[i].plan
           dataTable.technology = input.data.city.clients[i].technology
-          dataTable.wifi_ssid = input.data.city.clients[i].wifi_ssid
-          dataTable.wifi_password = input.data.city.clients[i].wifi_password
-          dataTable.mac_address = input.data.city.clients[i].mac_address
-          dataTable.comment = input.data.city.clients[i].comment
-          dataTable.operator = input.data.city.clients[i].operator
-          dataTable.created_at = input.data.city.clients[i].created_at
-          dataTable.newModel = input.data.city.clients[i].newModel
-          dataTable.citycolor = input.data.city.color
           this.dataTable.push(dataTable)
         }
         this.initialLoading = false
@@ -283,57 +286,6 @@ export default {
           this.errorCount++
         }
       }
-    },
-    async exec () {
-      this.loading = true
-      const city = this.$route.query.city
-      const pendingDx = this.pendingCuts
-      if (this.setPlan.id === 0 || this.pendingCuts.length < 1) {
-        this.snack = true
-        this.snackColor = 'red darken-4'
-        this.snackText = 'Debes ingresar datos antes de proceder.'
-        this.loading = false
-      } else {
-        this.loading = true
-        this.snack = true
-        this.snackColor = 'info'
-        this.snackText = 'El proceso ha comenzado...'
-        for (let i = 0; i < pendingDx.length; i++) {
-          this.$apollo.mutate({
-            mutation: gqlt`mutation ($input: DxInfoInput){
-              dxClient(input: $input){
-                code
-                name
-                success
-              }
-            }`,
-            variables: {
-              input: {
-                dx: pendingDx[i],
-                dxPlan: {
-                  id: this.setPlan._id,
-                  name: this.setPlan.mikrotik_name
-                },
-                dxKick: this.kickStat.id,
-                dxCity: city
-              }
-            }
-          }).then((input) => {
-            this.loading = false
-            this.successfulCuts.push(input.data.dxClient[0])
-          }).catch((error) => {
-            this.snack = true
-            this.snackColor = 'red'
-            this.snackText = error
-            this.loading = false
-          })
-          await this.sleep(1000)
-        }
-        this.loading = false
-      }
-    },
-    sleep (ms) {
-      return new Promise(resolve => setTimeout(resolve, ms))
     }
   },
   head () {

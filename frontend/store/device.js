@@ -18,8 +18,11 @@ export const actions = {
       await apollo.query({
         query: gqlt`query{
           devicebrands{
-            name
             id
+            name
+            devicebrandparts{
+              mac_part
+            }
           }
         }
       `
