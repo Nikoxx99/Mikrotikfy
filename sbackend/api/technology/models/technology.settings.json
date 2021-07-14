@@ -20,10 +20,6 @@
     "histories": {
       "via": "technology",
       "collection": "history"
-    },
-    "devices": {
-      "via": "technology",
-      "collection": "device"
     }
   }
 }

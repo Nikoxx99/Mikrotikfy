@@ -163,7 +163,7 @@ export default {
     executeFixMac () {
       const fixedmacList = this.fixmacList
       fixedmacList.forEach(async (fixedmac) => {
-        const device = await this.$strapi.create('devices', { mac_address: fixedmac.mac_address, devicebrand: this.device.devicebrand.id, clients: [fixedmac._id] })
+        const device = await this.$strapi.create('devices', { mac_address: fixedmac.mac_address, clients: [fixedmac.id] })
         console.log(device)
       })
       this.loading = false

@@ -12,5 +12,6 @@ module.exports = {
     .populate('plan')
     .populate('neighborhood')
     .populate('technology')
+    .populate('mac_addresses')
   },
 };

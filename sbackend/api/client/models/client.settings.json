@@ -104,8 +104,8 @@
       "type": "string"
     },
     "mac_addresses": {
-      "collection": "device",
       "via": "clients",
+      "collection": "device",
       "dominant": true
     }
   }

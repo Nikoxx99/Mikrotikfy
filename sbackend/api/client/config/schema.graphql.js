@@ -26,7 +26,7 @@ module.exports = {
       wifi_ssid: String
       wifi_password: String
       technology: Technology
-      mac_address: String
+      mac_addresses: [Device]
       comment: String
       operator: operator
       created_at: String
