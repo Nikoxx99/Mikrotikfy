@@ -141,7 +141,6 @@ module.exports = {
     adminDelete(input: adminDeleteInput): Boolean
     adminDeleteFromRequest(input: adminDeleteFromRequestInput): Boolean
     setClientComment(clientid:ID, comment: String): Boolean
-    updateOltMac(clients: [ClientList]): Boolean
   `,
   type: {
     ActiveClientList: {
@@ -211,10 +210,6 @@ module.exports = {
       setClientComment: {
         description: 'Sets client comment on mikrotik',
         resolver: 'application::client.client.setClientComment'
-      },
-      updateOltMac: {
-        description: 'Sets client mac from olt',
-        resolver: 'application::client.client.updateOltMac'
       }
     }
   },

@@ -377,25 +377,6 @@ module.exports = {
       return secretArray
     }
   },
-  async updateOltMac(ctx) {
-    const clients = ctx.request.body.clients
-    try {
-      clients.forEach(async (client) => {
-        let entity = await strapi.services.client.update({ 'id':client.id }, {'mac_address':client.mac_address})
-        let deviceSearch = await strapi.services.device.find({ 'mac_address':client.mac_address })
-        if (deviceSearch.length < 1) {
-          await strapi.services.device.create({'brand': await genBrand(client.mac_address), 'mac_address': client.mac_address, 'technology': await genTech(client.mac_address)});
-        }
-        if (entity.length > 0) {
-          return true
-        } else {
-          return false
-        }
-      })
-    } catch (error) {
-      console.log(error)
-    }
-  },
   async searchClient(ctx) {
     const search = ctx.query.search
     const city = ctx.query.city
