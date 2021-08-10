@@ -319,7 +319,9 @@ export default {
     },
     createTicket () {
       this.loading = true
-      this.ticketPayload.details = `DX: ${this.dx.finalAddress} \n CX: ${this.cx.finalAddress}`
+      if (this.ticketPayload.type.name === 'TRASLADO') {
+        this.ticketPayload.details = `DX: ${this.dx.finalAddress} \n CX: ${this.cx.finalAddress}`
+      }
       this.$apollo.mutate({
         mutation: gqlt`mutation ($input: createTicketInput){
           createTicket(input: $input){
