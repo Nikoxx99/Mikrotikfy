@@ -20,13 +20,6 @@ export const mutations = {
       throw new Error(`MUTATE ${error}`)
     }
   },
-  setPlanToStoreFromModal (state, planInfo) {
-    try {
-      state.clients[planInfo.index].plan = planInfo.newPLan
-    } catch (error) {
-      throw new Error(`PLAN MUTATE ${error}`)
-    }
-  },
   adminToggle (state, { client, index }) {
     try {
       state.clients[index].active = !client.active
@@ -112,10 +105,19 @@ export const actions = {
       throw new Error(`ACTION ${error}`)
     }
   },
-  setPlanFromModal ({ commit }, payload) {
+  updateFromModal ({ commit }, client) {
+    console.log('1 updateFromModal', client)
+    try {
+      commit('updateFromModal', client)
+    } catch (error) {
+      throw new Error(`MUTATE ${error}`)
+    }
+  },
+  async setPlanFromModal (_, payload) {
+    console.log('2 setPlanFromModal action', payload)
     const apollo = this.app.apolloProvider.defaultClient
     try {
-      apollo.mutate({
+      await apollo.mutate({
         mutation: gqlt`mutation ($id: String, $plan: String, $isRx: Boolean, $operator: String){
           editClientPlan(id: $id, plan: $plan, isRx: $isRx, operator: $operator)
         }`,
@@ -125,8 +127,6 @@ export const actions = {
           isRx: payload.isRx,
           operator: payload.operator
         }
-      }).then((data) => {
-        commit('updateFromModal', data)
       })
     } catch (error) {
       throw new Error(`CLIENT ACTION ${error}`)

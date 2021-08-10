@@ -130,7 +130,7 @@ export default {
       countActive: 0,
       countDisable: 0,
       countRetired: 0,
-      mikrotikData: {}
+      mikrotikData: []
     }
   },
   mounted () {

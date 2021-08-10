@@ -7,6 +7,7 @@
           dark
           small
           :loading="item.loading"
+          :disabled="item.loading"
           v-bind="attrs"
           text
           v-on="on"
@@ -38,6 +39,8 @@
         <v-card-actions>
           <v-btn
             color="blue darken-1"
+            :loading="loading"
+            :disabled="loading"
             @click="createActivationrequest()"
           >
             Enviar Solicitud
@@ -101,6 +104,7 @@ export default {
   },
   methods: {
     createActivationrequest () {
+      this.loading = true
       this.$apollo.mutate({
         mutation: gqlt`mutation ($input: createActivationrequestInput){
           createActivationrequest(input: $input){
@@ -125,16 +129,19 @@ export default {
         if (input.data.createActivationrequest.activationrequest.client._id) {
           this.modal = false
           this.error = false
+          this.loading = false
           this.snack = true
           this.snackText = 'Solicitud enviada correctamente!'
           this.snackColor = 'cyan'
         } else {
           this.snack = true
+          this.loading = false
           this.snackText = 'Error desconocido, reporta esto a nico'
           this.snackColor = 'red'
         }
       }).catch((error) => {
         this.snack = true
+        this.loading = false
         this.snackText = 'Error de conexion, recarga la pagina o verifica que tienes internet' + error
         this.snackColor = 'red'
       })

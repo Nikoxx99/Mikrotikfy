@@ -2,74 +2,114 @@
   <v-card>
     <v-card-title>Buscar Rutas MAC {{ cityName }}</v-card-title>
     <v-card-text>
-      <v-container>
-        <v-row>
-          <v-col
-            cols="12"
-            lg="12"
-            md="6"
-          >
-            <v-row>
-              <v-col>
-                <v-btn
-                  color="blue darken-4"
-                  @click="prepare()"
-                >
-                  Preparar Clientes
-                </v-btn>
-                <v-chip
-                  color="info darken-4"
-                >
-                  Encontrados: {{ foundCount }}
-                </v-chip>
-                <v-chip
-                  color="red darken-4"
-                >
-                  No entontrado: {{ errorCount }}
-                </v-chip>
-                <v-btn
-                  color="yellow darken-4"
-                  :loading="loading"
-                  :disabled="loading"
-                  @click="fixmac()"
-                >
-                  Arreglar MACS
-                </v-btn>
-                <v-chip
-                  color="cyan darken-4"
-                >
-                  Macs Preparadas: {{ fixmacList.length }}
-                </v-chip>
-                <v-btn
-                  color="cyan darken-4"
-                  :loading="loading"
-                  :disabled="loading"
-                  @click="executeFixMac()"
-                >
-                  Ejecutar Arreglo
-                </v-btn>
-              </v-col>
-            </v-row>
-            <v-textarea
-              v-model="input"
-              outlined
-              class="mt-4"
-              label="MAC 00:00:00:00:00:00"
-            />
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col>
-            <client-only>
-              <v-data-table
-                no-data-text="Aun no MAC para buscar"
-                :items="filteredList"
-                :headers="headers"
-                :loading="loading"
+      <v-container fluid>
+        <v-stepper v-model="e1">
+          <v-stepper-header>
+            <v-stepper-step
+              :complete="e1 > 1"
+              step="1"
+            >
+              Ingresar Macs
+            </v-stepper-step>
+
+            <v-divider />
+
+            <v-stepper-step
+              :complete="e1 > 2"
+              step="2"
+            >
+              Revisar
+            </v-stepper-step>
+
+            <v-divider />
+            <v-stepper-step step="3">
+              Operaciones
+            </v-stepper-step>
+          </v-stepper-header>
+
+          <v-stepper-items>
+            <v-stepper-content step="1">
+              <v-textarea
+                v-model="input"
+                outlined
+                class="mt-4"
+                label="00:00:00:00:00:00"
               />
-            </client-only>
-          </v-col>
-        </v-row>
+
+              <v-btn
+                color="blue darken-4"
+                @click="searchInDatabaseFromMikrotik()"
+              >
+                Preparar Clientes
+              </v-btn>
+            </v-stepper-content>
+
+            <v-stepper-content step="2">
+              <v-chip
+                color="info darken-4"
+              >
+                Encontrados: {{ foundCount }}
+              </v-chip>
+              <v-chip
+                color="red darken-4"
+              >
+                No entontrado: {{ errorCount }}
+              </v-chip>
+              <v-btn
+                color="blue darken-4"
+                :loading="loading"
+                :disabled="loading"
+                @click="setBrand()"
+              >
+                Asignar Marca
+              </v-btn>
+              <client-only>
+                <v-data-table
+                  no-data-text="Aun no MAC para buscar"
+                  :items="discoveredClients"
+                  :headers="headers"
+                  :loading="loading"
+                  class="mt-3 mb-3"
+                />
+              </client-only>
+
+              <v-btn
+                color="primary"
+                @click="e1 = 3, fixmac()"
+              >
+                Continuar
+              </v-btn>
+
+              <v-btn text @click="e1 = 1, discoveredClients = [], foundCount = 0, errorCount = 0, clientCount = 0">
+                Volver
+              </v-btn>
+            </v-stepper-content>
+
+            <v-stepper-content step="3">
+              <v-chip
+                color="cyan darken-4"
+              >
+                Macs Preparadas: {{ fixmacList.length }}
+              </v-chip>
+              <v-btn
+                color="cyan darken-4"
+                :loading="loading"
+                :disabled="loading"
+                @click="executeFixMac()"
+              >
+                Ejecutar Arreglo
+              </v-btn>
+              <v-chip
+                color="cyan darken-4"
+              >
+                Dispositivos Agregados: {{ successfulDevices }}
+              </v-chip>
+              <v-btn text @click="e1 = 1, discoveredClients = [], fixmacList = [], foundCount = 0, errorCount = 0, clientCount = 0">
+                Cancelar
+              </v-btn>
+            </v-stepper-content>
+          </v-stepper-items>
+        </v-stepper>
       </v-container>
     </v-card-text>
     <v-snackbar
@@ -113,6 +153,7 @@ export default {
   middleware: ['defaultCity', 'authenticated'],
   data () {
     return {
+      e1: 1,
       cityName: 'default',
       title: 'Rutas OLT ',
       page: 1,
@@ -123,10 +164,10 @@ export default {
       foundCount: 0,
       clientCount: 0,
       secretList: [],
-      filteredList: [],
+      discoveredClients: [],
       dataTable: [],
       fixmacList: [],
-      successfulCuts: [],
+      successfulDevices: 0,
       devicebrands: [],
       input: '',
       headers: [
@@ -136,6 +177,7 @@ export default {
         { text: 'Tec.', sortable: true, value: 'technology.name' },
         { text: 'Barrio', sortable: true, value: 'neighborhood.name' },
         { text: 'Direccion', sortable: true, value: 'address' },
+        { text: 'Marca', sortable: true, value: 'brand.name' },
         { text: 'Aciones', value: 'actions', sortable: false }
       ],
       snack: false,
@@ -150,9 +192,28 @@ export default {
     this.getDeviceBrands()
   },
   methods: {
+    setBrand () {
+      this.loading = true
+      for (let i = 0; i < this.discoveredClients.length; i++) {
+        const mac = this.discoveredClients[i].searchedMac.split(':')
+        const macPart = mac[0] + mac[1] + mac[2]
+        this.$strapi.find('devicebrandparts', { mac_part: macPart }).then((response) => {
+          const brand = response[0].devicebrand
+          if (response.length > 0) {
+            this.$set(this.discoveredClients[i], 'brand', brand)
+          } else {
+            const brand = {
+              name: 'No reg.'
+            }
+            this.$set(this.discoveredClients[i], 'brand', brand)
+          }
+        })
+      }
+      this.loading = false
+    },
     fixmac () {
       this.loading = true
-      this.filteredList.forEach((client) => {
+      this.discoveredClients.forEach((client) => {
         const newMacClients = {}
         newMacClients.id = client._id
         newMacClients.mac_address = client.searchedMac
@@ -164,7 +225,9 @@ export default {
       const fixedmacList = this.fixmacList
       fixedmacList.forEach(async (fixedmac) => {
         const device = await this.$strapi.create('devices', { mac_address: fixedmac.mac_address, clients: [fixedmac.id] })
-        console.log(device)
+        if (device.id) {
+          this.successfulDevices++
+        }
       })
       this.loading = false
     },
@@ -258,7 +321,7 @@ export default {
         this.initialLoading = false
       })
     },
-    prepare () {
+    searchInDatabaseFromMikrotik () {
       const input = this.input.split('\n')
       for (let i = 0; i < input.length; i++) {
         // eslint-disable-next-line eqeqeq
@@ -271,20 +334,25 @@ export default {
             // eslint-disable-next-line eqeqeq
             const clientDatabaseSearch2 = this.dataTable.filter(c => c.dni == macSearch)
             if (clientDatabaseSearch2 < 1) {
-              // no existe
-            } else {
+              // no existe como DNI
+              this.errorCount++
+            } else { // existe como DNI
               clientDatabaseSearch2[0].searchedMac = input[i]
-              this.filteredList.push(clientDatabaseSearch2[0])
+              this.discoveredClients.push(clientDatabaseSearch2[0])
               this.foundCount++
             }
           } else {
+            // existe como CODIGO
             clientDatabaseSearch[0].searchedMac = input[i]
-            this.filteredList.push(clientDatabaseSearch[0])
+            this.discoveredClients.push(clientDatabaseSearch[0])
             this.foundCount++
           }
-        } else {
+        } else { // no existe como CODIGO
           this.errorCount++
         }
+      }
+      if (input.length > 0) {
+        this.e1 = 2
       }
     }
   },

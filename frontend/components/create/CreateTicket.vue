@@ -46,7 +46,136 @@
               outlined
               return-object
             />
+          </v-card-text>
+          <v-card-text v-if="ticketPayload.type.name === 'TRASLADO'">
+            <p>Direccion de desconexion</p>
+            <v-row class="mb-2">
+              <v-col cols="6" lg="3" md="3">
+                <v-select
+                  v-model="dx.dir1"
+                  :items="dx.dirFragment1"
+                  label="Dirección"
+                  outlined
+                  dense
+                  hide-details
+                  @change="dxGenAddress"
+                />
+              </v-col>
+              <v-col cols="6" lg="3" md="3">
+                <v-text-field
+                  v-model="dx.dir2"
+                  label="#"
+                  outlined
+                  dense
+                  hide-details
+                  @change="dxGenAddress"
+                />
+              </v-col>
+              <v-col cols="6" lg="3" md="3">
+                <v-select
+                  v-model="dx.dir3"
+                  :items="dx.dirFragment2"
+                  label="#"
+                  value="#"
+                  outlined
+                  dense
+                  hide-details
+                  @change="dxGenAddress"
+                />
+              </v-col>
+              <v-col cols="6" lg="3" md="3">
+                <v-text-field
+                  v-model="dx.dir4"
+                  label="#"
+                  outlined
+                  dense
+                  hide-details
+                  @change="dxGenAddress"
+                />
+              </v-col>
+            </v-row>
+            <v-row class="mb-2">
+              <v-col>
+                <v-autocomplete
+                  v-model="dx.neighborhood"
+                  item-text="name"
+                  item-value="id"
+                  :items="neighborhoods"
+                  label="Barrio"
+                  outlined
+                  dense
+                  hide-details
+                  return-object
+                  @change="dxGenAddress"
+                />
+              </v-col>
+            </v-row>
+            <p>Direccion de conexion</p>
+            <v-row class="mb-2">
+              <v-col cols="6" lg="3" md="3">
+                <v-select
+                  v-model="cx.dir1"
+                  :items="cx.dirFragment1"
+                  label="Dirección"
+                  outlined
+                  dense
+                  hide-details
+                  @change="cxGenAddress"
+                />
+              </v-col>
+              <v-col cols="6" lg="3" md="3">
+                <v-text-field
+                  v-model="cx.dir2"
+                  label="#"
+                  outlined
+                  dense
+                  hide-details
+                  @change="cxGenAddress"
+                />
+              </v-col>
+              <v-col cols="6" lg="3" md="3">
+                <v-select
+                  v-model="cx.dir3"
+                  :items="cx.dirFragment2"
+                  label="#"
+                  value="#"
+                  outlined
+                  dense
+                  hide-details
+                  @change="cxGenAddress"
+                />
+              </v-col>
+              <v-col cols="6" lg="3" md="3">
+                <v-text-field
+                  v-model="cx.dir4"
+                  label="#"
+                  outlined
+                  dense
+                  hide-details
+                  @change="cxGenAddress"
+                />
+              </v-col>
+            </v-row>
+            <v-row class="mb-2">
+              <v-col>
+                <v-autocomplete
+                  v-model="cx.neighborhood"
+                  item-text="name"
+                  item-value="id"
+                  :items="neighborhoods"
+                  label="Barrio"
+                  outlined
+                  dense
+                  hide-details
+                  return-object
+                  @change="cxGenAddress"
+                />
+              </v-col>
+            </v-row>
+          </v-card-text>
+          <v-card-text>
             <v-textarea
+              v-if="ticketPayload.type.name !== 'TRASLADO'"
               v-model="ticketPayload.details"
               outlined
               label="Detalles adicionales"
@@ -126,9 +255,62 @@ export default {
       details: '',
       city: '',
       assignated: ''
+    },
+    dx: {
+      neighborhood: {},
+      dir1: '',
+      dir2: '',
+      dir3: '#',
+      dir4: '',
+      dirFragment1: [
+        '(SIN INICIAL)',
+        'CARRERA',
+        'CALLE',
+        'MANZANA',
+        'DIAGONAL'
+      ],
+      dirFragment2: [
+        '#',
+        'CASA',
+        'DIAGONAL',
+        'LOTE'
+      ],
+      finalAddress: ''
+    },
+    cx: {
+      neighborhood: {},
+      dir1: '',
+      dir2: '',
+      dir3: '#',
+      dir4: '',
+      dirFragment1: [
+        '(SIN INICIAL)',
+        'CARRERA',
+        'CALLE',
+        'MANZANA',
+        'DIAGONAL'
+      ],
+      dirFragment2: [
+        '#',
+        'CASA',
+        'DIAGONAL',
+        'LOTE'
+      ],
+      finalAddress: ''
     }
   }),
+  computed: {
+    neighborhoods () {
+      return this.$store.state.neighborhoods
+    }
+  },
   methods: {
+    dxGenAddress () {
+      this.dx.finalAddress = `${this.dx.dir1} ${this.dx.dir2} ${this.dx.dir3} ${this.dx.dir4} ${this.dx.neighborhood.name}`
+    },
+    cxGenAddress () {
+      this.cx.finalAddress = `${this.cx.dir1} ${this.cx.dir2} ${this.cx.dir3} ${this.cx.dir4} ${this.cx.neighborhood.name}`
+    },
     initComponent () {
       this.modal = true
       this.ticketPayload.client = this.clientid
@@ -137,6 +319,7 @@ export default {
     },
     createTicket () {
       this.loading = true
+      this.ticketPayload.details = `DX: ${this.dx.finalAddress} \n CX: ${this.cx.finalAddress}`
       this.$apollo.mutate({
         mutation: gqlt`mutation ($input: createTicketInput){
           createTicket(input: $input){

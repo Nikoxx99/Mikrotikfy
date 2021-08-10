@@ -216,8 +216,8 @@ export default {
   name: 'Mikrotik',
   props: {
     data: {
-      type: Object,
-      default: () => {}
+      type: Array,
+      default: () => []
     }
   },
   methods: {

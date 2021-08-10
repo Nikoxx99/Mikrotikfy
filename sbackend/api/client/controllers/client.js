@@ -23,8 +23,8 @@ module.exports = {
       entity = await strapi.services.client.create(newClient[0]);
       
       const telegrambot = await strapi.services.telegrambot.find({city: entity.city.id})
-
       simpleTelegramCreate(entity, telegrambot[0])
+
       if (sendToMikrotik) {
         const searchCity = await strapi.services.city.find({ id: ctx.request.body.city })
         const searchPlan = await strapi.services.plan.find({ id: ctx.request.body.plan })

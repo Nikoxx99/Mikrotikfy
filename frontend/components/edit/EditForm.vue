@@ -237,24 +237,6 @@
                     hide-details
                   />
                 </v-col>
-              </v-row>
-              <v-row>
-                <v-col>
-                  <v-select
-                    v-model="editClient.newModel"
-                    :disabled="!can('EditFormNewModel')"
-                    :items="idwith"
-                    item-text="name"
-                    item-value="id"
-                    mandatory
-                    label="Identificar con:"
-                    outlined
-                    dense
-                    hide-details
-                  />
-                </v-col>
-              </v-row>
-              <v-row>
                 <v-col>
                   <v-text-field
                     :value="editClient.nap_onu_address ? editClient.nap_onu_address.toUpperCase() : ''"
@@ -301,6 +283,20 @@
                     hide-details
                   />
                 </v-col>
+                <v-col>
+                  <v-select
+                    v-model="editClient.newModel"
+                    :disabled="!can('EditFormNewModel')"
+                    :items="idwith"
+                    item-text="name"
+                    item-value="id"
+                    mandatory
+                    label="Identificar con:"
+                    outlined
+                    dense
+                    hide-details
+                  />
+                </v-col>
                 <!-- <v-col>
                   <v-text-field
                     :value="item.operator.username"
@@ -314,7 +310,7 @@
                   />
                 </v-col> -->
               </v-row>
-              <div v-if="can('EditFormComment')">
+              <!-- <div v-if="can('EditFormComment')">
                 <v-textarea
                   :value="editClient.comment"
                   auto-grow
@@ -325,7 +321,7 @@
                   readonly
                   disabled
                 />
-              </div>
+              </div> -->
               <v-checkbox v-model="editClient.hasRepeater" hide-details label="Tiene repetidor?" />
             </v-form>
           </v-container>
@@ -333,7 +329,7 @@
         <v-card-actions>
           <v-btn
             class="mr-4"
-            color="info"
+            color="primary"
             @click="updateClient(editClient, index)"
           >
             Confirmar

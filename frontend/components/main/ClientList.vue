@@ -21,7 +21,7 @@
               style="margin-top:2px;"
               @click="getClientBySearch()"
             >
-              Buscar
+              <v-icon>mdi-magnify</v-icon>
             </v-btn>
             <v-text-field
               ref="searchClient"
@@ -93,16 +93,22 @@
               </template>
               <template v-slot:item.plan.name="props">
                 <v-edit-dialog
+                  ref="dialog"
                   :return-value.sync="props.item.plan"
                   large
                   cancel-text="Cancelar"
                   save-text="Guardar"
                   @save="savePlanFromModal(props.item._id, props.item.plan, isRx, $store.state.auth.username)"
+                  @cancel="cancel()"
                 >
                   <v-chip small label outlined :color="getColor(props.item.plan.id)" class="white--text">
                     {{ props.item.plan.name }}
                   </v-chip>
                   <template v-slot:input>
+                    <v-checkbox
+                      v-model="isRx"
+                      label="Es reconexion?"
+                    />
                     <v-select
                       :value="props.item.plan"
                       item-text="name"
@@ -113,10 +119,6 @@
                       label="Plan"
                       dense
                       @change="updatePlanFromModal(props.item._id, $event, clients.map(function(x) {return x._id; }).indexOf(props.item._id))"
-                    />
-                    <v-switch
-                      v-model="isRx"
-                      label="Es reconexion?"
                     />
                   </template>
                 </v-edit-dialog>
@@ -187,7 +189,6 @@
                     :client="item"
                     :index="clients.indexOf(item)"
                     :role="$store.state.auth.allowed_components"
-                    @updateComment="updateComment($event)"
                   />
                   <DeleteClient v-if="can('DeleteClient')" :name="item.name" :clientid="item._id" />
                 </div>
@@ -345,6 +346,7 @@ export default {
     this.stateIdentifier()
   },
   methods: {
+    save: v => alert(v),
     async refreshActiveClients () {
       this.refreshLoading = true
       await this.$store.dispatch('refreshActiveClients', this.$route.query.city)
@@ -374,7 +376,10 @@ export default {
       this.$store.dispatch('client/setPlanFromModal', { clientId, newPlan, isRx, operator, index })
     },
     updatePlanFromModal (clientid, newPlan, index) {
-      this.$store.commit('client/updateFromModal', { clientid, newPlan, index })
+      this.$store.dispatch('client/updateFromModal', { clientid, newPlan, index })
+    },
+    cancel () {
+      return true
     },
     getColor (plan) {
       if (plan === '5f52a6fe2824f015ac8ceb58') {
@@ -408,6 +413,7 @@ export default {
     },
     async createClient (client) {
       await this.$store.commit('client/insertClient', client)
+      await this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: this.itemsPerPage, city: this.$route.query.city })
       await this.stateIdentifier()
     },
     createClientDialog (value) {
