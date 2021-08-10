@@ -356,15 +356,16 @@ module.exports = {
         const mikrotikHost = searchCity[0].mikrotiks[i].ip
         const res = await mkGetSecrets(mikrotikHost)
         successfulMikrotikResponses.push(res)
-        console.log(successfulMikrotikResponses.length)
       }
       let secretArray = []
-      await successfulMikrotikResponses[0].map((s) => {
-        if (s['last-caller-id']){
-          s.mac_address = s['last-caller-id']
-          secretArray.push(s)
-        }
-      })
+      for (let i = 0; i < successfulMikrotikResponses.length; i++) {
+        await successfulMikrotikResponses[i].map((s) => {
+          if (s['last-caller-id']){
+            s.mac_address = s['last-caller-id']
+            secretArray.push(s)
+          }
+        })
+      }
       return secretArray
     } else {
       let secretArray = []

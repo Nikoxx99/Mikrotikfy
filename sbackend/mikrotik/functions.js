@@ -284,7 +284,6 @@ module.exports.mkActiveClientCount = async function (cityIpArray) {
   }
 }
 module.exports.mkGetSecrets = async function (mikrotikHost) {
-  console.log(mikrotikHost)
   try {
     const conn = new RouterOSAPI({
       host: mikrotikHost,
