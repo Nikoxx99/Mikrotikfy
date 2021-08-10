@@ -346,6 +346,7 @@ module.exports = {
     }
   },
   async getClientSecrets(ctx) {
+    console.log('getMkSecrets Command1')
     const city = ctx.query._city
     const searchCity = await strapi.services.city.find({ id: city })
 
@@ -355,6 +356,7 @@ module.exports = {
         const mikrotikHost = searchCity[0].mikrotiks[i].ip
         const res = await mkGetSecrets(mikrotikHost)
         successfulMikrotikResponses.push(res)
+        console.log(successfulMikrotikResponses.length)
       }
       let secretArray = []
       await successfulMikrotikResponses[0].map((s) => {
