@@ -186,7 +186,7 @@ export default {
       loading: false
     }
   },
-  created () {
+  mounted () {
     this.getSecretsFromMikrotik()
     this.getDatabaseClients()
     this.getDeviceBrands()
@@ -246,6 +246,7 @@ export default {
           city: this.$route.query.city
         }
       }).then((input) => {
+        console.log('end request')
         this.secretList = input.data.getClientSecrets
         this.loading = false
       }).catch((error) => {
