@@ -14,5 +14,10 @@ module.exports = {
   plugins: [
   ],
   // add your custom rules here
-  rules: {}
+  rules: {
+    // allow async-await
+    'vue/valid-v-slot': ['error', {
+      allowModifiers: true,
+    }]
+  }
 }
