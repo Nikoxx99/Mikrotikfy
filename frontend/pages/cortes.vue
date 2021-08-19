@@ -208,7 +208,6 @@ export default {
               }
               wifi_ssid
               wifi_password
-              mac_address
               comment
               createdAt
               newModel
