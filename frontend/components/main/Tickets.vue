@@ -76,7 +76,7 @@
                   />
                 </v-row>
               </template>
-              <template v-if="isDesktop" v-slot:item.actions="props">
+              <template v-if="isDesktop" v-slot:item.actions`]="props">
                 <div class="nowspace">
                   <ClientStatus
                       v-if="can('ClientStatus')"
@@ -105,12 +105,12 @@
                   />
                 </div>
               </template>
-              <template v-slot:item.active="props">
+              <template v-slot:[`item.active`]="props">
                 <v-chip small :color="getColor(props.item.active, props.item.answered, props.item.escalated)" class="white--text">
                   {{ getState(props.item.active, props.item.answered, props.item.escalated) }}
                 </v-chip>
               </template>
-              <template v-slot:item.createdAt="{ item }">
+              <template v-slot:[`item.createdAt`]="{ item }">
                 <span>
                   {{ getDate(item.createdAt) }}
                 </span>

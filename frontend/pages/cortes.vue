@@ -190,7 +190,7 @@ export default {
       this.dataTable = []
       this.$apollo.query({
         query: gqlt`
-        query($city: ID!) {
+        query dataClient ($city: ID!) {
           city(id: $city){
             name
             clients{

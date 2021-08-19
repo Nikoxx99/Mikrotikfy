@@ -91,7 +91,7 @@
                   /> -->
                 </v-toolbar>
               </template>
-              <template v-slot:item.plan.name="props">
+              <template v-slot:[`item.plan.name`]="props">
                 <v-edit-dialog
                   ref="dialog"
                   :return-value.sync="props.item.plan"
@@ -123,22 +123,22 @@
                   </template>
                 </v-edit-dialog>
               </template>
-              <template v-slot:item.status="{ item }">
+              <template v-slot:[`item.status`]="{ item }">
                 <svg height="13" width="20">
                   <circle :id="item._id" cx="10" cy="8" r="5" :fill="item.status" />
                 </svg>
               </template>
-              <template v-slot:item.technology.name="{ item }">
+              <template v-slot:[`item.technology.name`]="{ item }">
                 <span :class="getTechnology(item.technology ? item.technology.id : '') + '--text'">
                   {{ item.technology ? item.technology.name : 'No Reg.' }}
                 </span>
               </template>
-              <template v-slot:item.newModel="{ item }">
+              <template v-slot:[`item.newModel`]="{ item }">
                 <svg height="13" width="20">
                   <circle cx="10" cy="8" r="5" :fill="getModel(item.newModel)" />
                 </svg>
               </template>
-              <template v-slot:item.active="props">
+              <template v-slot:[`item.active`]="props">
                 <div style="white-space:nowrap;display:inline-flex">
                   <v-tooltip v-if="can('CreateForm')" left>
                     <template v-slot:activator="{ on, attrs }">
@@ -163,7 +163,7 @@
                   />
                 </div>
               </template>
-              <template v-slot:item.actions="{ item }">
+              <template v-slot:[`item.actions`]="{ item }">
                 <div style="white-space:nowrap">
                   <CreateTicket
                     v-if="can('CreateTicket')"

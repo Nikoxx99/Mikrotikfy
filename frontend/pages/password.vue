@@ -41,7 +41,7 @@
               mobile-breakpoint="100"
               @page-count="pageCount = $event"
             >
-              <template v-slot:item.closed="props">
+              <template v-slot:[`item.closed`]="props">
                 <v-chip
                   small
                   :color="getColor(props.item.closed)"
@@ -51,12 +51,12 @@
                   {{ getState(props.item.closed) }}
                 </v-chip>
               </template>
-              <template v-slot:item.created_at="{ item }">
+              <template v-slot:[`item.created_at`]="{ item }">
                 <span>
                   {{ getDate(item.createdAt) }}
                 </span>
               </template>
-              <template v-slot:item.actions="{ item }">
+              <template v-slot:[`item.actions`]="{ item }">
                 <ClientStatus
                   :name="item.client ? item.client.name : ''"
                   :clientid="item.client ? item.client.id : ''"

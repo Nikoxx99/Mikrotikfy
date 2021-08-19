@@ -55,12 +55,12 @@
                   :items="cities"
                   class="elevation-1"
                 >
-                  <template v-slot:item.color="{ item }">
+                  <template v-slot:[`item.color`]="{ item }">
                     <svg height="13" width="20">
                       <circle cx="10" cy="8" r="5" :fill="item.color" />
                     </svg>
                   </template>
-                  <template v-slot:item.actions="{ item }">
+                  <template v-slot:[`item.actions`]="{ item }">
                     <v-dialog v-model="dialogEdit" max-width="500px" :retain-focus="false">
                       <v-card>
                         <v-card-title>

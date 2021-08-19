@@ -80,7 +80,7 @@
             >
               <!-- COMPONENTS IMPLEMETATION -->
               <!-- eslint-disable -->
-              <template v-slot:item.actions="{ item }">
+              <template v-slot:[`item.actions`]="{ item }">
                 <div style="white-space:nowrap">
                   <v-tooltip top>
                     <template v-slot:activator="{ on, attrs }">

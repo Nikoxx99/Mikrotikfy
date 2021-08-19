@@ -42,18 +42,18 @@
                 mobile-breakpoint="100"
                 @page-count="pageCount = $event"
               >
-                <template v-slot:item.actions="props">
+                <template v-slot:[`item.actions`]="props">
                   <TicketAdvanceHistory
                     :ticketid="props.item.id"
                     :name="props.item.client.name"
                   />
                 </template>
-                <template v-slot:item.active="props">
+                <template v-slot:[`item.active`]="props">
                   <v-chip small :color="getColor(props.item.active)" class="white--text">
                     {{ getState(props.item.active) }}
                   </v-chip>
                 </template>
-                <template v-slot:item.createdAt="{ item }">
+                <template v-slot:[`item.createdAt`]="{ item }">
                   <span>
                     {{ getDate(item.createdAt) }}
                   </span>

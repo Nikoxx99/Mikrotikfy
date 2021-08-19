@@ -73,7 +73,7 @@
                   />
                 </v-row>
               </template>
-              <template v-slot:item.actions="props">
+              <template v-slot:[`item.actions`]="props">
                 <v-tooltip left>
                   <template v-slot:activator="{ on, attrs }">
                     <v-btn
@@ -92,17 +92,17 @@
                 <span>Activar Cliente</span>
                 </v-tooltip>
               </template>
-              <template v-slot:item.active="props">
+              <template v-slot:[`item.active`]="props">
                 <v-chip small :color="getColor(props.item.active)" class="white--text">
                   {{ getState(props.item.active) }}
                 </v-chip>
               </template>
-              <template v-slot:item.createdAt="{ item }">
+              <template v-slot:[`item.createdAt`]="{ item }">
                 <span>
                   {{ getDate(item.createdAt) }}
                 </span>
               </template>
-              <template v-slot:item.client.createdAt="{ item }">
+              <template v-slot:[`item.client.createdAt`]="{ item }">
                 <span>
                   {{ getDate(item.client.createdAt) }}
                 </span>

@@ -44,7 +44,7 @@
                 mobile-breakpoint="1024"
                 @page-count="pageCount = $event"
               >
-                <template v-slot:item.createdAt="{ item }">
+                <template v-slot:[`item.createdAt`]="{ item }">
                   <span>{{ getDate(item.createdAt) }}</span>
                 </template>
               </v-data-table>

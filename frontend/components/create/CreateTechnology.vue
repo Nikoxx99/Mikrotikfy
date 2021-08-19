@@ -48,7 +48,7 @@
                   :items="technologies"
                   class="elevation-1"
                 >
-                  <template v-slot:item.actions="{ item }">
+                  <template v-slot:[`item.actions`]="{ item }">
                     <v-dialog v-model="dialogEdit" max-width="500px" :retain-focus="false">
                       <v-card>
                         <v-card-title>
