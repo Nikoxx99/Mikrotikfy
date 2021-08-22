@@ -7,13 +7,23 @@
 
 module.exports = {
   find (params) {
-    const {city, _limit} = params
-    return strapi.query('ticket').model.find({'city': city}).limit(parseInt(_limit)).sort({'createdAt':'desc'})
-    .populate({
-      path: 'client tickettype assiganted',
-      populate: {
-        path: 'neighborhood technology'
-      }
-    })
+    const {active, city, _limit} = params
+    if(active) {
+      return strapi.query('ticket').model.find({'city':city, 'active': active}).limit(parseInt(_limit)).sort({'createdAt':'desc'})
+      .populate({
+        path: 'client tickettype assiganted',
+        populate: {
+          path: 'neighborhood technology'
+        }
+      })
+    } else {
+      return strapi.query('ticket').model.find({city}).limit(parseInt(_limit)).sort({'createdAt':'desc'})
+      .populate({
+        path: 'client tickettype assiganted',
+        populate: {
+          path: 'neighborhood technology'
+        }
+      })
+    }
   }
 };

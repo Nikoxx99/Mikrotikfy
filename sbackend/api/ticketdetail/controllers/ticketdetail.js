@@ -6,13 +6,12 @@
  */
 
 const { sanitizeEntity } = require('strapi-utils');
-const { simpleTelegramCreateTicketAdvance } = require('../../../mikrotik/functions');
+const { simpleTelegramCreateTicketAdvance, simpleTelegramSendActiveTicketList } = require('../../../mikrotik/functions');
 
 module.exports = {
   async create(ctx) {
     let entity;
     entity = await strapi.services.ticketdetail.create(ctx.request.body);
-    console.log(entity)
     const res = await sanitizeEntity(entity, { model: strapi.models.ticketdetail });
     const idclient = res.ticket.client
     const idtickettype = res.ticket.tickettype
@@ -20,7 +19,14 @@ module.exports = {
     const tickettype = await strapi.services.tickettype.findOne({ id: idtickettype });
     const assiganted = res.operator.username
     const telegrambot = await strapi.services.telegrambot.find({city: entity.ticket.city})
-    simpleTelegramCreateTicketAdvance(res, client, tickettype, assiganted, telegrambot[0])
-    console.log(res)
+    if (res.ticket.active) {
+      console.log('activo')
+      simpleTelegramCreateTicketAdvance(res, client, tickettype, assiganted, telegrambot[0])
+    } else {
+      console.log('cerrado')
+      simpleTelegramCreateTicketAdvance(res, client, tickettype, assiganted, telegrambot[0])
+      const ticketlist = await strapi.services.ticket.find({city: entity.ticket.city, active: true })
+      simpleTelegramSendActiveTicketList(ticketlist, telegrambot[0])
+    }
   }
 }

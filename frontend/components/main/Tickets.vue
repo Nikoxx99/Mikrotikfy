@@ -76,7 +76,7 @@
                   />
                 </v-row>
               </template>
-              <template v-if="isDesktop" v-slot:item.actions`]="props">
+              <template v-if="isDesktop" v-slot:[`item.actions`]="props">
                 <div class="nowspace">
                   <ClientStatus
                       v-if="can('ClientStatus')"
