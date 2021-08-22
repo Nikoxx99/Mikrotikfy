@@ -38,8 +38,8 @@
       "via": "city"
     },
     "telegrambot": {
-      "model": "telegrambot",
-      "via": "city"
+      "via": "city",
+      "model": "telegrambot"
     },
     "users": {
       "plugin": "users-permissions",

@@ -452,7 +452,7 @@ module.exports.simpleTelegramCreate = async function (input, telegrambot) {
   try {
     console.log('functions.js', input)
     const bot = telegrambot.token
-    const chatid = telegrambot.binnacle
+    const chatid = telegrambot.log
     var message = `CREADO\n${input.code}\n${input.name}\n${input.dni}\n${input.address}\n${input.neighborhood.name}\n${input.phone}\n${input.city.name}\n${input.plan.name}\n${input.wifi_ssid}\n${input.wifi_password}\n${input.operator.username}\n${input.createdAt}`
     const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + sanitizeString(message)
     fetch(req).then(function (response) {
@@ -494,7 +494,7 @@ module.exports.simpleTelegramUpdate = async function (input, telegrambot) {
   const fetch = require('node-fetch');
   require('dotenv').config()
   const bot = telegrambot.token
-  const chatid = telegrambot.binnacle
+  const chatid = telegrambot.log
   var message = `ACTUALIZADO\n${input.code}\n${input.name}\n${input.dni}\n${input.address}\n${input.neighborhood.name}\n${input.phone}\n${input.city.name}\n${input.plan.name}\n${input.wifi_ssid}\n${input.wifi_password}\n${input.technology.name}\nNAP-ONU: ${input.nap_onu_address}\nPOTENCIA: ${input.opticalPower}dBm\n${input.operator.username}\n${input.createdAt}`
   payload = message.replace('#', ' ')
   const req = 'https://api.telegram.org/bot' + bot + '/sendMessage?chat_id=' + chatid + '&text=' + sanitizeString(message)
@@ -531,7 +531,7 @@ module.exports.simpleTelegramDelete = async function (input, telegrambot) {
   const fetch = require('node-fetch');
   require('dotenv').config()
   const bot = telegrambot.token
-  const chatid = telegrambot.binnacle
+  const chatid = telegrambot.log
   const line1 = 'BORRADO'
   const line2 = input.code
   const line3 = input.name
