@@ -35,7 +35,7 @@
               v-model="showClosedValue"
               class="mr-4"
               label="Mostrar cerrados"
-              @change="showClosed(showClosedValue)"
+              @change="refreshTickets()"
             />
             </v-row>
           </v-card-text>
@@ -87,14 +87,14 @@
                     />
                   <CreateTicketAdvance
                     v-if="props.item.tickettype.name !== 'TRASLADO'"
-                    :editindex="tickets.indexOf(props.item)"
+                    :editindex="ticketList.indexOf(props.item)"
                     :ticketid="props.item.id"
                     :name="props.item.client.name"
                     @updateTicketStatus="updateTicketStatus($event)"
                   />
                   <CreateTicketAdvanceTraslate
                     v-else
-                    :editindex="tickets.indexOf(props.item)"
+                    :editindex="ticketList.indexOf(props.item)"
                     :ticketid="props.item.id"
                     :name="props.item.client.name"
                     @updateTicketStatus="updateTicketStatus($event)"
@@ -220,7 +220,7 @@
                 <CreateTicketAdvance
                   v-if="editModalData.tickettype.name !== 'TRASLADO'"
                   :block="true"
-                  :editindex="tickets ? tickets.indexOf(editModalData.id) : ''"
+                  :editindex="ticketList ? ticketList.indexOf(editModalData.id) : ''"
                   :ticketid="editModalData.id"
                   :name="editModalData.client.name"
                   @updateTicketStatus="updateTicketStatus($event)"
@@ -228,7 +228,7 @@
                 <CreateTicketAdvanceTraslate
                   v-else
                   :block="true"
-                  :editindex="tickets ? tickets.indexOf(editModalData.id) : ''"
+                  :editindex="ticketList ? ticketList.indexOf(editModalData.id) : ''"
                   :ticketid="editModalData.id"
                   :name="editModalData.client.name"
                   @updateTicketStatus="updateTicketStatus($event)"
@@ -268,7 +268,7 @@ import TicketAdvanceHistory from '../misc/TicketAdvanceHistory'
 import ClientStatus from '../main/ClientStatus'
 import CreateTicketAdvanceTraslate from '../create/CreateTicketAdvanceTraslate.vue'
 export default {
-  name: 'TicketChanges',
+  name: 'Tickets',
   components: {
     CreateTicketAdvance,
     TicketAdvanceHistory,
@@ -315,9 +315,6 @@ export default {
     }
   },
   computed: {
-    // tickets () {
-    //   return this.$store.state.tickets
-    // },
     currentCity () {
       // eslint-disable-next-line eqeqeq
       return this.$store.state.cities ? this.$store.state.cities.find(c => c.id == this.$route.query.city) : ''
@@ -330,36 +327,20 @@ export default {
   methods: {
     async refreshTickets () {
       this.initialLoading = true
-      // await this.$store.dispatch('refreshTickets', { limit: 30, city: this.$route.query.city })
-      this.tickets = await this.$strapi.find('tickets', {
+      this.ticketList = await this.$strapi.find('tickets', {
+        active: !this.showClosedValue,
         city: this.$route.query.city,
-        _limit: this.$route.query.limit ? parseInt(this.$route.query.limit) : 30,
+        _limit: this.$route.query.limit ? parseInt(this.$route.query.limit) : 50,
         _sort: this.$route.query.sort ? this.$route.query.sort : 'createdAt:desc'
       })
-      await this.showClosed(false)
       this.initialLoading = false
     },
     updateTicketStatus ({ editindex, closeTicket }) {
       if (editindex > -1) {
-        this.tickets[editindex].active = !closeTicket
+        this.ticketList[editindex].active = !closeTicket
       }
-      this.showClosed(false)
+      this.refreshTickets()
       this.infoModal = false
-    },
-    async showClosed (value) {
-      if (this.tickets) {
-        const newData = []
-        await this.tickets.map((ticket) => {
-          if (value === false) {
-            if (ticket.active) {
-              newData.push(ticket)
-            }
-          } else {
-            newData.push(ticket)
-          }
-        })
-        this.ticketList = newData
-      }
     },
     getDate (date) {
       const dateObject = new Date(date)
