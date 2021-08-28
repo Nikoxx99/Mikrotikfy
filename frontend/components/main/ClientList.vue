@@ -49,6 +49,7 @@
               :page.sync="page"
               :options.sync="options"
               :loading="loadingDataTable"
+              :item-class="itemRowBackground"
               no-data-text="No hay resultados a la busqueda..."
               loading-text="Cargando información de clientes..."
               dense
@@ -78,6 +79,8 @@
                   >
                     <v-icon>mdi-reload</v-icon>
                   </v-btn>
+                  <span class="online-text text-caption mr-2">-- Online</span>
+                  <span class="offline-text text-caption">-- Offline</span>
                   <v-spacer />
                   <!-- <v-text-field
                     :value="options.itemsPerPage"
@@ -101,7 +104,7 @@
                   @save="savePlanFromModal(props.item._id, props.item.plan, isRx, $store.state.auth.username)"
                   @cancel="cancel()"
                 >
-                  <v-chip small label outlined :color="getColor(props.item.plan.id)" class="white--text">
+                  <v-chip small label class="white black--text">
                     {{ props.item.plan.name }}
                   </v-chip>
                   <template v-slot:input>
@@ -123,13 +126,13 @@
                   </template>
                 </v-edit-dialog>
               </template>
-              <template v-slot:[`item.status`]="{ item }">
-                <svg height="13" width="20">
-                  <circle :id="item._id" cx="10" cy="8" r="5" :fill="item.status" />
-                </svg>
+              <template v-slot:[`item.code`]="{ item }">
+                <span :class="item.status === 'green' ? 'online-text' : 'offline-text'">
+                  {{ item.code }}
+                </span>
               </template>
               <template v-slot:[`item.technology.name`]="{ item }">
-                <span :class="getTechnology(item.technology ? item.technology.id : '') + '--text'">
+                <span>
                   {{ item.technology ? item.technology.name : 'No Reg.' }}
                 </span>
               </template>
@@ -279,7 +282,6 @@ export default {
       createDialog: false,
       headers: [
         { text: 'Codigo', value: 'code', sortable: false },
-        { text: 'Estado', sortable: false, value: 'status' },
         { text: 'Nombre', value: 'name', sortable: false },
         { text: 'Cedula', value: 'dni', sortable: false },
         { text: 'Direccion', sortable: false, value: 'address' },
@@ -346,7 +348,15 @@ export default {
     this.stateIdentifier()
   },
   methods: {
-    save: v => alert(v),
+    itemRowBackground (item) {
+      if (this.$vuetify.theme.dark) {
+        if (item.status === 'red') {
+          return 'offline'
+        } else {
+          return 'online'
+        }
+      }
+    },
     async refreshActiveClients () {
       this.refreshLoading = true
       await this.$store.dispatch('refreshActiveClients', this.$route.query.city)
@@ -381,35 +391,19 @@ export default {
     cancel () {
       return true
     },
-    getColor (plan) {
-      if (plan === '5f52a6fe2824f015ac8ceb58') {
-        return 'blue'
-      } else if (plan === '5f52a70a2824f015ac8ceb59') {
-        return 'green'
-      } else if (plan === '5f52a7572824f015ac8ceb5e') {
-        return 'red'
-      } else if (plan === '5f52a75f2824f015ac8ceb5f') {
-        return 'black'
-      }
-    },
     getModel (model) {
       if (model === 0) {
         return 'grey'
       } else if (model === 1) {
-        return 'cyan'
+        if (this.$vuetify.theme.dark) {
+          return 'white'
+        } else {
+          return 'black'
+        }
       }
     },
     clientCount () {
       return parseInt(localStorage.getItem('clientCount'))
-    },
-    getTechnology (technology) {
-      if (technology === '5f832eadb0c43e2c64b3743b') {
-        return 'cyan'
-      } else if (technology === '5f832ea7b0c43e2c64b3743a') {
-        return 'green'
-      } else {
-        return 'grey'
-      }
     },
     async createClient (client) {
       await this.$store.commit('client/insertClient', client)
@@ -444,5 +438,17 @@ export default {
 <style>
 .done {
   text-decoration: line-through;
+}
+.offline {
+  background-color: #291f1f;
+}
+.offline-text {
+  color: #ff254e;
+}
+.online-text {
+  color:#3be03b;
+}
+.online {
+  background-color: #1f291f;
 }
 </style>

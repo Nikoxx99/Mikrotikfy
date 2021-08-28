@@ -103,9 +103,20 @@ export default {
     }
   },
   methods: {
-    createActivationrequest () {
+    async createActivationrequest () {
       this.loading = true
-      this.$apollo.mutate({
+      const activationRequestExists = await this.$strapi.find('activationrequests', {
+        active: true,
+        'client.id': this.item.id
+      })
+      if (activationRequestExists.length > 0) {
+        this.loading = false
+        this.snack = true
+        this.snackColor = 'error'
+        this.snackText = 'Ya existe una solicitud de activación'
+        return
+      }
+      await this.$apollo.mutate({
         mutation: gqlt`mutation ($input: createActivationrequestInput){
           createActivationrequest(input: $input){
             activationrequest{

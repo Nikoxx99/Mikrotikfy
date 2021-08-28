@@ -4,7 +4,7 @@
       <template v-slot:activator="{ on, attrs }">
         <v-icon
           v-bind="attrs"
-          color="yellow darken-4"
+          :color="$vuetify.theme.dark ? 'white' : 'primary'"
           v-on="on"
           @click="dialogEdit = true"
         >
@@ -26,7 +26,7 @@
             >
               <v-icon>mdi-close</v-icon>
             </v-btn>
-            <v-toolbar-title>Editar Cliente</v-toolbar-title>
+            <v-toolbar-title>Editar Cliente <span class="text--disabled text-caption">// {{ editClient ? editClient.id : '' }}</span></v-toolbar-title>
           </v-toolbar>
         </v-card-title>
         <v-card-text>
@@ -230,10 +230,12 @@
                     item-text="name"
                     item-value="id"
                     :items="technologies"
+                    :rules="[v => !!v || 'Debes especificar la tecnología']"
                     return-object
                     label="Tecnología"
                     outlined
                     dense
+                    required
                     hide-details
                   />
                 </v-col>

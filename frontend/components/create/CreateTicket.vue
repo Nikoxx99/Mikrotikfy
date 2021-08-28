@@ -4,7 +4,7 @@
       <template v-slot:activator="{ on, attrs }">
         <v-icon
           v-bind="attrs"
-          color="cyan darken-4"
+          :color="$vuetify.theme.dark ? 'white' : 'primary'"
           v-on="on"
           @click="initComponent()"
         >

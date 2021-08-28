@@ -207,7 +207,7 @@ export const actions = {
               neighborhood: client.neighborhood.id,
               phone: client.phone,
               plan: client.plan.id,
-              technology: client.technology.id,
+              technology: client.technology ? client.technology.id : null,
               wifi_ssid: client.wifi_ssid,
               wifi_password: client.wifi_password,
               comment: client.comment,

@@ -7,11 +7,11 @@
           :block="block"
           :text="!block"
           :x-small="!block"
-          color="green darken-4"
+          :color="$vuetify.theme.dark ? 'white' : 'primary'"
           v-on="on"
           @click="initComponent"
         >
-          <v-icon>mdi-server</v-icon>
+          <v-icon>mdi-wifi-check</v-icon>
           <span v-if="block">
             Ver Estado
           </span>
