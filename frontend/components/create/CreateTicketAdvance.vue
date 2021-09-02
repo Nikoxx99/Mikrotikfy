@@ -7,7 +7,7 @@
           :block="block"
           :text="!block"
           :x-small="!block"
-          color="yellow darken-4"
+          :color="$vuetify.theme.dark && !block ? 'white' : 'primary'"
           v-on="on"
           @click="initComponent()"
         >

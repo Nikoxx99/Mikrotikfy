@@ -7,7 +7,7 @@
           :block="block"
           :text="!block"
           :x-small="!block"
-          :color="$vuetify.theme.dark ? 'white' : 'primary'"
+          :color="$vuetify.theme.dark && !block ? 'white' : 'primary'"
           v-on="on"
           @click="initComponent"
         >

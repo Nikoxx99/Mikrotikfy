@@ -79,8 +79,8 @@
                   >
                     <v-icon>mdi-reload</v-icon>
                   </v-btn>
-                  <span class="online-text text-caption mr-2">-- Online</span>
-                  <span class="offline-text text-caption">-- Offline</span>
+                  <span class="online-text text-caption mr-2">Online</span>
+                  <span class="offline-text text-caption">Offline</span>
                   <v-spacer />
                   <!-- <v-text-field
                     :value="options.itemsPerPage"
@@ -192,6 +192,7 @@
                     :client="item"
                     :index="clients.indexOf(item)"
                     :role="$store.state.auth.allowed_components"
+                    @updateSuccess="getClientsFromDatabase"
                   />
                   <DeleteClient v-if="can('DeleteClient')" :name="item.name" :clientid="item._id" />
                 </div>
@@ -338,14 +339,12 @@ export default {
       const limit = this.itemsPerPage
       const city = this.$route.query.city
       await this.$store.dispatch('client/getUsersFromDatabase', { start, limit, city })
-      await this.stateIdentifier()
+      await this.getClientStatusOnMikrotik()
     }
   },
-  async mounted () {
-    const city = this.$route.query.city
-    await this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: this.itemsPerPage, city })
-    this.loadingDataTable = false
-    this.stateIdentifier()
+  mounted () {
+    this.getClientsFromDatabase()
+    this.getClientStatusOnMikrotik()
   },
   methods: {
     itemRowBackground (item) {
@@ -357,10 +356,15 @@ export default {
         }
       }
     },
+    async getClientsFromDatabase () {
+      const city = this.$route.query.city
+      await this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: this.itemsPerPage, city })
+      this.loadingDataTable = false
+    },
     async refreshActiveClients () {
       this.refreshLoading = true
       await this.$store.dispatch('refreshActiveClients', this.$route.query.city)
-      await this.stateIdentifier()
+      await this.getClientStatusOnMikrotik()
       this.refreshLoading = false
     },
     async getClientBySearch () {
@@ -369,17 +373,17 @@ export default {
       const city = this.$route.query.city
       if (search) {
         await this.$store.dispatch('client/getUsersFromDatabaseBySearch', { search, city })
-        await this.stateIdentifier()
+        await this.getClientStatusOnMikrotik()
         this.showPagintation = false
         this.loadingDataTable = false
       } else {
         await this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: this.itemsPerPage, city })
-        await this.stateIdentifier()
+        await this.getClientStatusOnMikrotik()
         this.showPagintation = true
         this.loadingDataTable = false
       }
     },
-    async stateIdentifier () {
+    async getClientStatusOnMikrotik () {
       await this.$store.dispatch('client/calculateClientStatus', this.activeClientsList)
     },
     savePlanFromModal (clientId, newPlan, isRx, operator, index) {
@@ -408,7 +412,7 @@ export default {
     async createClient (client) {
       await this.$store.commit('client/insertClient', client)
       await this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: this.itemsPerPage, city: this.$route.query.city })
-      await this.stateIdentifier()
+      await this.getClientStatusOnMikrotik()
     },
     createClientDialog (value) {
       this.createDialog = false

@@ -76,6 +76,11 @@
                   />
                 </v-row>
               </template>
+              <template v-slot:[`item.tickettype.name`]="props">
+                <v-chip small :color="getTicketTypeColor(props.item.tickettype.name)" class="white--text">
+                  {{ props.item.tickettype.name }}
+                </v-chip>
+              </template>
               <template v-if="isDesktop" v-slot:[`item.actions`]="props">
                 <div class="nowspace">
                   <ClientStatus
@@ -147,61 +152,54 @@
         </v-card-title>
         <v-card-text>
           <v-list rounded>
-            <v-list-item two-line>
+            <v-list-item>
               <v-list-item-content>
-                <v-list-item-subtitle>Tipo</v-list-item-subtitle>
                 <v-list-item-title>{{ editModalData.tickettype ? editModalData.tickettype.name : '' }}</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item two-line>
+            <v-list-item>
               <v-list-item-content>
-                <v-list-item-subtitle>Codigo</v-list-item-subtitle>
                 <v-list-item-title>{{ editModalData.client ? editModalData.client.code : '' }}</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item two-line>
+            <v-list-item>
               <v-list-item-content>
-                <v-list-item-subtitle>Cliente</v-list-item-subtitle>
                 <v-list-item-title>{{ editModalData.client ? editModalData.client.name : '' }}</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item two-line>
+            <v-list-item>
               <v-list-item-content>
-                <v-list-item-subtitle>Direccion</v-list-item-subtitle>
                 <v-list-item-title>{{ editModalData.client ? editModalData.client.address : '' }}</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item two-line>
+            <v-list-item>
               <v-list-item-content>
-                <v-list-item-subtitle>Barrio</v-list-item-subtitle>
                 <v-list-item-title>{{ editModalData.client ? editModalData.client.neighborhood.name : '' }}</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item two-line>
+            <v-list-item>
               <v-list-item-content>
-                <v-list-item-subtitle>Telefono</v-list-item-subtitle>
                 <v-list-item-title>{{ editModalData.client ? editModalData.client.phone : '' }}</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item two-line>
+            <v-list-item>
               <v-list-item-content>
-                <v-list-item-subtitle>Tecnología</v-list-item-subtitle>
                 <v-list-item-title>{{ editModalData.client ? editModalData.client.technology.name : '' }}</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item two-line>
+            <v-list-item>
               <v-list-item-content>
                 <v-list-item-subtitle>Detalles</v-list-item-subtitle>
                 <p>{{ editModalData ? editModalData.details : '' }}</p>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item two-line>
+            <v-list-item>
               <v-list-item-content>
                 <v-list-item-subtitle>Reporto</v-list-item-subtitle>
                 <v-list-item-title>{{ editModalData.assiganted ? editModalData.assiganted.username : '' }}</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item two-line>
+            <v-list-item>
               <v-list-item-content>
                 <v-list-item-subtitle>Creado en</v-list-item-subtitle>
                 <v-list-item-title>{{ editModalData ? editModalData.createdAt : '' }}</v-list-item-title>
@@ -346,6 +344,17 @@ export default {
       const dateObject = new Date(date)
       const humanDateFormat = dateObject.toLocaleString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric' })
       return humanDateFormat
+    },
+    getTicketTypeColor (tickettype) {
+      if (tickettype === 'SIN SERVICIO') {
+        return 'red'
+      } else if (tickettype === 'SERVICIO LENTO') {
+        return 'orange darken-2'
+      } else if (tickettype === 'INTERMITENCIA') {
+        return 'orange darken-4'
+      } else {
+        return 'primary'
+      }
     },
     getColor (state, answered, escalated) {
       if (state && !answered) {

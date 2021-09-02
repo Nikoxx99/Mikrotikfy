@@ -438,10 +438,12 @@ export default {
       const operator = this.$store.state.auth.id
       if (this.addDevice) {
         const device = await this.$strapi.create('devices', { mac_address: this.device.mac_address, devicebrand: this.device.devicebrand.id, clients: [this.editClient._id] })
-        this.$store.dispatch('client/updateClientDevices', { device, index })
+        await this.$store.dispatch('client/updateClientDevices', { device, index })
+        this.$emit('updateSuccess')
         this.device = {}
       }
-      this.$store.dispatch('client/updateClient', { client, index, operator })
+      await this.$store.dispatch('client/updateClient', { client, index, operator })
+      this.$emit('updateSuccess')
       this.dialogEdit = false
     },
     genAddress () {
