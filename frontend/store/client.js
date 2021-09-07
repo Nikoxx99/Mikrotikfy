@@ -6,6 +6,9 @@ export const mutations = {
   calculateClientStatus (state, newState) {
     state.clients = newState
   },
+  clearClientsFromDatatable (state) {
+    state.clients = []
+  },
   getUsersFromDatabase (state, clientsList) {
     try {
       state.clients = clientsList
@@ -51,12 +54,19 @@ export const mutations = {
   }
 }
 export const actions = {
+  async clearClientsFromDatatable ({ commit }) {
+    try {
+      await commit('clearClientsFromDatatable', true)
+    } catch (error) {
+      throw new Error(`CLEAR CLIENT ACTION ${error}`)
+    }
+  },
   async insertClient ({ commit }, client) {
     try {
       // Object.assign(state.clients[0], client)
       await commit('insertClient', client)
     } catch (error) {
-      throw new Error(`INSERT CLIENT MUTATE ${error}`)
+      throw new Error(`INSERT CLIENT ACTION ${error}`)
     }
   },
   async calculateClientStatus ({ state, commit }, payload) {
@@ -106,7 +116,6 @@ export const actions = {
     }
   },
   updateFromModal ({ commit }, client) {
-    console.log('1 updateFromModal', client)
     try {
       commit('updateFromModal', client)
     } catch (error) {
@@ -114,7 +123,6 @@ export const actions = {
     }
   },
   async setPlanFromModal (_, payload) {
-    console.log('2 setPlanFromModal action', payload)
     const apollo = this.app.apolloProvider.defaultClient
     try {
       await apollo.mutate({

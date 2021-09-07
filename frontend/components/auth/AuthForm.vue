@@ -209,7 +209,7 @@ export default {
             await this.$store.dispatch('count/clientCountRetired', third.data.user.cities[0].id),
             await this.$store.dispatch('ticket/getTicketsFromDatabase', { limit: 30, city: third.data.user.cities[0].id })
           ]).then(() => {
-            window.location.href = `/lista?city=${third.data.user.cities[0].id}`
+            window.location.href = `/clients?city=${third.data.user.cities[0].id}`
           }).catch((e) => {
             this.errorMessages = e
             this.loginFailed = true

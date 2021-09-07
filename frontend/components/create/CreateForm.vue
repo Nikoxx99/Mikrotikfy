@@ -409,7 +409,6 @@ export default {
         }
       }).then((input) => {
         if (input.data.createClient.code !== '0') {
-          this.$emit('createClient', this.Client)
           this.$emit('createClientDialog', false)
           this.$emit('createClientSnack', true)
         } else {

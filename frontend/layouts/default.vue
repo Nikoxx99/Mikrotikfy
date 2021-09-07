@@ -1,19 +1,20 @@
 <template>
-  <v-app
-    :style="currentCity.name === 'MARIQUITA' ? light ? 'background-color:#efefef!important;' : 'background-color:#1b2025!important;' : light ? 'background-color:#efefef!important;' : 'background-color:#16312d!important;'"
-  >
+  <v-app>
     <v-navigation-drawer
       v-model="drawer"
       app
-      temporary
+      permanent
+      expand-on-hover
+      mobile-breakpoint="md"
       bottom
     >
       <v-list>
         <v-list-item
           v-for="(item, i) in items"
           :key="i"
-          :href="`${item.to}?city=${$store.state.auth.cities[0].id}`"
+          :to="`${item.to}?city=${$store.state.auth.cities[0].id}`"
           router
+          :class="role === 'admin' || role === 'superadmin' ? item.role === 'admin' ? 'd-flex' : 'd-flex' : item.role === 'user' ? 'd-flex' : 'd-none'"
           exact
         >
           <v-list-item-action>
@@ -38,7 +39,6 @@
           <circle cx="10" cy="8" r="5" fill="red" />
         </svg>
       </div>
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-toolbar-title class="d-none d-md-flex d-lg-flex d-xl-flex" v-text="title" />
       <v-spacer />
       <v-switch
@@ -69,7 +69,7 @@
           small
           outlined
           :color="city.color"
-          :href="`/lista?city=${city.id}`"
+          :href="`/clients?city=${city.id}`"
         >
           {{ city.name }}
         </v-btn>
@@ -91,6 +91,13 @@
       </v-tooltip>
     </v-app-bar>
     <v-main>
+      <v-alert
+        v-if="$nuxt.isOffline"
+        dense
+        type="error"
+      >
+        Estas sin acceso a internet. Verifica la conexión WIFI o de datos.
+      </v-alert>
       <v-container fluid>
         <nuxt />
       </v-container>
@@ -116,48 +123,67 @@ export default {
       drawer: false,
       items: [
         {
-          icon: 'mdi-apps',
-          title: 'Base de Datos',
-          to: '/lista'
+          icon: 'mdi-tooltip-edit',
+          title: 'Tickets',
+          to: '/tickets',
+          role: 'user'
+        },
+        {
+          icon: 'mdi-account',
+          title: 'Clientes',
+          to: '/clients',
+          role: 'user'
+        },
+        {
+          icon: 'mdi-check-network-outline',
+          title: 'Activaciones',
+          to: '/activations',
+          role: 'admin'
+        },
+        {
+          icon: 'mdi-server-network',
+          title: 'Estatus',
+          to: '/status',
+          role: 'admin'
         },
         {
           icon: 'mdi-cog',
           title: 'Ajustes',
-          to: '/config'
+          to: '/config',
+          role: 'admin'
         },
         {
           icon: 'mdi-key',
           title: 'Cambios de Clave',
           to: '/password',
+          role: 'admin',
           info: 0
         },
         {
           icon: 'mdi-key',
           title: 'Sol. Clave',
           to: '/cambio',
+          role: 'admin',
           info: 0
         },
         {
           icon: 'mdi-close-network',
           title: 'Suspencion por Mora',
-          to: '/cortes'
+          to: '/cortes',
+          role: 'admin'
         },
         {
           icon: 'mdi-comment',
           title: 'Comentarios Mikrotik',
-          to: '/comments'
+          to: '/comments',
+          role: 'admin'
         },
         {
           icon: 'mdi-routes',
           title: 'Rutas OLT',
-          to: '/olt'
+          to: '/olt',
+          role: 'admin'
         }
-      ],
-      notifications: [
-        { id: 1, title: 'Click Me' },
-        { id: 2, title: 'Click Me' },
-        { id: 3, title: 'Click Me' },
-        { id: 4, title: 'Click Me 2' }
       ],
       miniVariant: false,
       right: true,
@@ -172,40 +198,18 @@ export default {
     currentCity () {
       // eslint-disable-next-line eqeqeq
       return this.$store.state.cities ? this.$store.state.cities.find(c => c.id == this.$route.query.city) : ''
+    },
+    role () {
+      return this.$store.state.auth.rolename
     }
   },
   mounted () {
-    const date = new Date()
-    const month = date.getMonth()
-    if (month === 11) {
-      this.bg = 'cbg.jpg'
-    }
-    this.loadTheme()
-    this.comprobeSession()
-    // this.$apollo.query({
-    //   query: gqlt`
-    //   query {
-    //     passwordchanges{
-    //       closed
-    //     }
-    //   }
-    //   `
-    // }).then((input) => {
-    //   for (let i = 0; i < input.data.passwordchanges.length; i++) {
-    //     if (input.data.passwordchanges[i].closed.value === false) {
-    //       this.items[2].info++
-    //     }
-    //   }
-    //   if (this.items[2].info > 0) {
-    //     this.hasPendingChanges = true
-    //   }
-    // }).catch((error) => {
-    //   // eslint-disable-next-line no-console
-    //   console.error(error)
-    // })
+    this.comprobeDateToSetChristmasTheme()
+    this.loadThemeFromVuetifyThemeManager()
+    this.comprobeSessionResetStatus()
   },
   methods: {
-    loadTheme () {
+    loadThemeFromVuetifyThemeManager () {
       const currentTheme = localStorage.getItem('currentTheme')
       if (currentTheme) {
         if (currentTheme === 'dark') {
@@ -227,7 +231,7 @@ export default {
         localStorage.setItem('currentTheme', 'light')
       }
     },
-    async comprobeSession () {
+    async comprobeSessionResetStatus () {
       if (this.$store.state.auth) {
         const session = await this.$strapi.find('users', {
           id: this.$store.state.auth.id
@@ -242,6 +246,23 @@ export default {
       await this.$strapi.update('users', this.$store.state.auth.id, {
         resetSession: false
       })
+    },
+    setLocalStorage () {
+      localStorage.setItem('currentCity', this.$route.query.city)
+    },
+    comprobeCity () {
+      const recordedCity = localStorage.getItem('currentCity')
+      const currentCity = this.$route.query.city
+      if (currentCity !== recordedCity) {
+        this.$store.dispatch('refreshActiveClients', currentCity)
+      }
+    },
+    comprobeDateToSetChristmasTheme () {
+      const date = new Date()
+      const month = date.getMonth()
+      if (month === 11) {
+        this.bg = 'cbg.jpg'
+      }
     },
     logout (params) {
       Cookie.remove('auth')
