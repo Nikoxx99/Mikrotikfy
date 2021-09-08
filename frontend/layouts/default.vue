@@ -3,10 +3,9 @@
     <v-navigation-drawer
       v-model="drawer"
       app
-      permanent
-      expand-on-hover
-      mobile-breakpoint="600"
-      bottom
+      :permanent="!isMobile"
+      :expand-on-hover="!isMobile"
+      :bottom="isMobile"
     >
       <v-list>
         <v-list-item
@@ -39,6 +38,7 @@
           <circle cx="10" cy="8" r="5" fill="red" />
         </svg>
       </div>
+      <v-app-bar-nav-icon v-if="isMobile" @click.stop="drawer = !drawer" />
       <v-toolbar-title class="d-none d-md-flex d-lg-flex d-xl-flex" v-text="title" />
       <v-spacer />
       <v-switch
@@ -118,6 +118,7 @@ export default {
   middleware: ['defaultCity', 'authenticated'],
   data () {
     return {
+      isMobile: false,
       light: null,
       hasPendingChanges: false,
       drawer: false,
@@ -185,9 +186,6 @@ export default {
           role: 'admin'
         }
       ],
-      miniVariant: false,
-      right: true,
-      rightDrawer: false,
       title: 'Aplicación de Gestión Dinámica ARNOP'
     }
   },
@@ -207,6 +205,7 @@ export default {
     this.comprobeDateToSetChristmasTheme()
     this.loadThemeFromVuetifyThemeManager()
     this.comprobeSessionResetStatus()
+    this.isMobileScreen()
   },
   methods: {
     loadThemeFromVuetifyThemeManager () {
@@ -262,6 +261,15 @@ export default {
       const month = date.getMonth()
       if (month === 11) {
         this.bg = 'cbg.jpg'
+      }
+    },
+    isMobileScreen () {
+      const res = document.body.clientWidth
+      console.log(res)
+      if (res < 800) {
+        this.isMobile = true
+      } else {
+        this.isMobile = false
       }
     },
     logout (params) {
