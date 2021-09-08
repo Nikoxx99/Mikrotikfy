@@ -5,7 +5,7 @@
       app
       permanent
       expand-on-hover
-      mobile-breakpoint="md"
+      mobile-breakpoint="600"
       bottom
     >
       <v-list>

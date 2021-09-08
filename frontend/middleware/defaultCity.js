@@ -1,4 +1,7 @@
 export default function ({ route, redirect }) {
+  if (route.path === '/lista') {
+    return redirect('/clients')
+  }
   if (!route.query.city) {
     if (route.path === '/') {
       return redirect('/clients?city=5f832e8fb0c43e2c64b37437')
