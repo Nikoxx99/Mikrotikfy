@@ -172,6 +172,11 @@
               <v-row>
                 <v-col
                   style="flex-direction:column;display: inline-flex;"
+                  cols="12"
+                  xs="12"
+                  sm="12"
+                  md="4"
+                  lg="4"
                 >
                   <v-combobox
                     v-model="editClient.mac_addresses"
@@ -193,7 +198,14 @@
                     hide-details
                   />
                 </v-col>
-                <v-col v-if="addDevice">
+                <v-col
+                  v-if="addDevice"
+                  cols="12"
+                  xs="12"
+                  sm="12"
+                  md="4"
+                  lg="4"
+                >
                   <v-row>
                     <v-col>
                       <v-text-field
@@ -223,7 +235,7 @@
                 </v-col>
               </v-row>
               <v-row>
-                <v-col>
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4">
                   <v-select
                     v-model="editClient.technology"
                     :disabled="!can('EditFormTechnology')"
@@ -239,7 +251,7 @@
                     hide-details
                   />
                 </v-col>
-                <v-col>
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4">
                   <v-text-field
                     :value="editClient.nap_onu_address ? editClient.nap_onu_address.toUpperCase() : ''"
                     label="Direccion NAP/ONU"
@@ -249,7 +261,7 @@
                     @input="editClient.nap_onu_address = $event.toUpperCase()"
                   />
                 </v-col>
-                <v-col>
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4">
                   <v-text-field
                     v-model="editClient.opticalPower"
                     label="Potencia Óptica (Solo numeros)"
