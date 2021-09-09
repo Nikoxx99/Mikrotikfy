@@ -11,7 +11,7 @@
         <v-list-item
           v-for="(item, i) in items"
           :key="i"
-          :to="`${item.to}?city=${$store.state.auth.cities[0].id}`"
+          :to="`${item.to}?city=${$route.query.city}`"
           router
           :class="role === 'admin' || role === 'superadmin' ? item.role === 'admin' ? 'd-flex' : 'd-flex' : item.role === 'user' ? 'd-flex' : 'd-none'"
           exact
