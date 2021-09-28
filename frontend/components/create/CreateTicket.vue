@@ -45,6 +45,8 @@
               label="Problema"
               outlined
               return-object
+              :error="errors.type"
+              @focus="errors.type = false, alertBox = false"
             />
           </v-card-text>
           <v-card-text v-if="ticketPayload.type.name === 'TRASLADO'">
@@ -178,7 +180,9 @@
               v-if="ticketPayload.type.name !== 'TRASLADO'"
               v-model="ticketPayload.details"
               outlined
-              label="Detalles adicionales"
+              label="Detalles del ticket"
+              :error="errors.details"
+              @focus="errors.details = false, alertBox = false"
             />
           </v-card-text>
         </div>
@@ -249,6 +253,10 @@ export default {
     alertBox: false,
     alertBoxColor: '',
     createdMessage: '',
+    errors: {
+      type: false,
+      details: false
+    },
     ticketPayload: {
       client: '',
       type: {},
@@ -305,6 +313,9 @@ export default {
     }
   },
   methods: {
+    isEmpty (obj) {
+      return Object.keys(obj).length === 0
+    },
     dxGenAddress () {
       this.dx.finalAddress = `${this.dx.dir1} ${this.dx.dir2} ${this.dx.dir3} ${this.dx.dir4} ${this.dx.neighborhood.name}`
     },
@@ -321,6 +332,22 @@ export default {
       this.loading = true
       if (this.ticketPayload.type.name === 'TRASLADO') {
         this.ticketPayload.details = `DX: ${this.dx.finalAddress} \n CX: ${this.cx.finalAddress}`
+      }
+      if (this.isEmpty(this.ticketPayload.type)) {
+        this.alertBox = true
+        this.alertBoxColor = 'red darken-4'
+        this.createdMessage = 'Selecciona un tipo de ticket antes de continuar'
+        this.loading = false
+        this.errors.type = true
+        return
+      }
+      if (this.ticketPayload.details === '') {
+        this.alertBox = true
+        this.alertBoxColor = 'red darken-4'
+        this.createdMessage = 'Por favor especifica los detalles del ticket antes de continuar'
+        this.loading = false
+        this.errors.details = true
+        return
       }
       this.$apollo.mutate({
         mutation: gqlt`mutation ($input: createTicketInput){
