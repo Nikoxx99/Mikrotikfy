@@ -170,69 +170,7 @@
                 </v-col>
               </v-row>
               <v-row>
-                <v-col
-                  style="flex-direction:column;display: inline-flex;"
-                  cols="12"
-                  xs="12"
-                  sm="12"
-                  md="4"
-                  lg="4"
-                >
-                  <v-combobox
-                    v-model="editClient.mac_addresses"
-                    disabled
-                    label="Mac Equipo"
-                    item-text="mac_address"
-                    return-object
-                    required
-                    multiple
-                    small-chips
-                    outlined
-                    dense
-                    hide-details
-                  />
-                  <v-checkbox
-                    v-model="addDevice"
-                    label="Agregar Equipo"
-                    class="ml-2 mt-1"
-                    hide-details
-                  />
-                </v-col>
-                <v-col
-                  v-if="addDevice"
-                  cols="12"
-                  xs="12"
-                  sm="12"
-                  md="4"
-                  lg="4"
-                >
-                  <v-row>
-                    <v-col>
-                      <v-text-field
-                        :value="device.mac_address ? device.mac_address.toUpperCase() : ''"
-                        label="Mac"
-                        :rules="valid_mac"
-                        required
-                        outlined
-                        dense
-                        @input="device.mac_address = $event.toUpperCase()"
-                      />
-                    </v-col>
-                    <v-col>
-                      <v-autocomplete
-                        v-model="device.devicebrand"
-                        item-text="name"
-                        item-value="_id"
-                        :items="devicebrands"
-                        return-object
-                        label="Marca"
-                        outlined
-                        dense
-                        hide-details
-                      />
-                    </v-col>
-                  </v-row>
-                </v-col>
+                <CreateDevice :clientid="editClient.id" />
               </v-row>
               <v-row>
                 <v-col cols="12" xs="12" sm="12" md="4" lg="4">

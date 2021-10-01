@@ -180,6 +180,10 @@
                       :code="item.code"
                       :role="$store.state.auth.allowed_components"
                     />
+                    <MainDevices
+                      :name="item.name"
+                      :clientid="item._id"
+                    />
                     <EditForm
                       v-if="can('EditForm')"
                       :client="item"
