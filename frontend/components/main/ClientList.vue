@@ -1,57 +1,5 @@
 <template>
   <div>
-    <v-row class="mb-1 justify-center">
-      <v-col
-        cols="12"
-        xs="12"
-        sm="8"
-        md="6"
-        lg="6"
-        xl="6"
-      >
-        <v-card class="rounded-xl">
-          <v-card-title
-            outline
-            class="text-center"
-            :style="`color:${currentCity ? currentCity.color : ''};border-bottom:solid 1px ${currentCity ? currentCity.color : ''}`"
-          >
-            Clientes {{ currentCity ? currentCity.name : '' }}
-          </v-card-title>
-          <v-subheader>Empieza buscando la información del cliente</v-subheader>
-          <v-card-text>
-            <v-row
-              class="mx-1 mt-1 mb-1 justify-center"
-            >
-              <v-btn
-                color="white black--text"
-                dark
-                :loading="loadingDataTable"
-                class="mr-2"
-                large
-                style="margin-top:7px;"
-                @click="getClientBySearch()"
-              >
-                <v-icon>mdi-magnify</v-icon>
-              </v-btn>
-              <v-text-field
-                ref="searchClient"
-                v-model="searchClientInput"
-                :label="loadingDataTable ? 'Cargando... Por favor espere.' : 'Buscar Cliente'"
-                single-line
-                hide-details
-                filled
-                rounded
-                :loading="loadingDataTable"
-                :disabled="loadingDataTable"
-                class="white--text"
-                style="max-width: 600px"
-                @keyup.enter="getClientBySearch()"
-              />
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
     <v-row v-if="clients.length < 1" class="justify-center">
       <h4>Crea un cliente</h4>
     </v-row>
@@ -323,6 +271,16 @@ export default {
     TicketHistory,
     ActivationRequest
   },
+  props: {
+    search: {
+      type: String,
+      default: ''
+    },
+    resetsearch: {
+      type: Boolean,
+      default: false
+    }
+  },
   data () {
     return {
       allowedcomponents: [],
@@ -388,6 +346,14 @@ export default {
   //     await this.getClientStatusOnMikrotik()
   //   }
   // },
+  mounted () {
+    if (this.search) {
+      this.searchClientInput = this.search
+      this.getClientBySearch()
+    } else {
+      this.resetsearchfn()
+    }
+  },
   methods: {
     itemRowBackground (item) {
       if (this.$vuetify.theme.dark) {
@@ -413,12 +379,13 @@ export default {
         await this.getClientStatusOnMikrotik()
         this.showPagintation = false
         this.loadingDataTable = false
-      } else {
-        await this.$store.dispatch('client/clearClientsFromDatatable')
-        await this.getClientStatusOnMikrotik()
-        this.showPagintation = true
-        this.loadingDataTable = false
       }
+    },
+    async resetsearchfn () {
+      await this.$store.dispatch('client/clearClientsFromDatatable')
+      await this.getClientStatusOnMikrotik()
+      this.showPagintation = true
+      this.loadingDataTable = false
     },
     async getClientStatusOnMikrotik () {
       await this.$store.dispatch('client/calculateClientStatus', this.activeClientsList)

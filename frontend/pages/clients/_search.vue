@@ -1,12 +1,22 @@
 <template>
   <div>
-    <MainClientList />
+    <MainSearchBox />
+    <MainClientList :search="search" />
   </div>
 </template>
 
 <script>
 export default {
   middleware: ['defaultCity', 'authenticated'],
+  asyncData ({ params }) {
+    const search = params.search // When calling /abc the slug will be "abc"
+    return { search }
+  },
+  data () {
+    return {
+      title: ''
+    }
+  },
   computed: {
     role () {
       return this.$store.state.auth.allowed_components
@@ -33,7 +43,7 @@ export default {
   },
   head () {
     return {
-      title: 'Clientes API ARNOP',
+      title: this.search ? this.search + ' - Búsqueda ' + this.currentCity.name : 'Clientes API ' + this.currentCity.name,
       meta: [
         { hid: 'language', name: 'language', content: 'es' },
         { hid: 'audience', name: 'audience', content: 'all' },
