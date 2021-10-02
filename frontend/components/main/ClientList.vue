@@ -155,6 +155,7 @@
                     </v-tooltip>
                     <ActivationRequest
                       :item="props.item"
+                      :index="clients.indexOf(props.item)"
                       :allowedcomponents="$store.state.auth.allowed_components"
                     />
                   </div>

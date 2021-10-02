@@ -36,6 +36,16 @@
         <v-card-title class="headline">
           Solicitar Activación de {{ item.name }}
         </v-card-title>
+        <v-card-text>
+          <EditForm
+            v-if="showControls"
+            :client="item"
+            :index="index"
+            :role="$store.state.auth.allowed_components"
+            @updateSuccess="resetErrorFields"
+          />
+          <span v-if="showControls">Editar cliente ahora</span>
+        </v-card-text>
         <v-card-actions>
           <v-btn
             color="blue darken-1"
@@ -77,11 +87,19 @@
 
 <script>
 import gqlt from 'graphql-tag'
+import EditForm from '../edit/EditForm'
 export default {
+  components: {
+    EditForm
+  },
   props: {
     item: {
       type: Object,
       default: () => {}
+    },
+    index: {
+      type: Number,
+      default: -1
     },
     allowedcomponents: {
       type: Array,
@@ -91,6 +109,7 @@ export default {
   data () {
     return {
       modal: false,
+      showControls: false,
       snack: false,
       snackColor: '',
       snackText: '',
@@ -105,6 +124,16 @@ export default {
   methods: {
     async createActivationrequest () {
       this.loading = true
+      const clientData = await this.$strapi.find('clients', {
+        id: this.item.id
+      })
+      if (clientData[0].mac_addresses.length < 1 || clientData[0].technology.length < 1 || !('nap_onu_address' in clientData[0]) || !('opticalPower' in clientData[0])) {
+        this.loading = false
+        this.error = true
+        this.errorMessage = 'No puedes enviar una solicitud de activacion hasta no haber llenado los campos de NAP, Potencia Optica y haber registrado la MAC correspondiente al cliente'
+        this.showControls = true
+        return
+      }
       const activationRequestExists = await this.$strapi.find('activationrequests', {
         active: true,
         'client.id': this.item.id
@@ -156,6 +185,11 @@ export default {
         this.snackText = 'Error de conexion, recarga la pagina o verifica que tienes internet' + error
         this.snackColor = 'red'
       })
+    },
+    resetErrorFields () {
+      this.error = false
+      this.errorMessage = ''
+      this.showControls = false
     },
     can (component) {
       const allowedComponents = this.allowedcomponents

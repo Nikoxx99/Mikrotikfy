@@ -1,12 +1,10 @@
 <template>
   <span>
     <v-btn
-      v-bind="attrs"
       :block="block"
       :text="!block"
       :x-small="!block"
       :color="$vuetify.theme.dark && !block ? 'white' : 'primary'"
-      v-on="on"
       @click="dialogDevice = true"
     >
       <v-icon>mdi-plus</v-icon>
@@ -100,6 +98,10 @@ export default {
     clientid: {
       type: String,
       default: ''
+    },
+    block: {
+      type: Boolean,
+      default: false
     }
   },
   data: () => {
