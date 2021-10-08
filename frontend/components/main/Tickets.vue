@@ -83,6 +83,10 @@
               </template>
               <template v-if="isDesktop" v-slot:[`item.actions`]="props">
                 <div class="nowspace">
+                  <TicketHistory
+                    :clientid="props.item.client.id"
+                    :name="props.item.client.name"
+                  />
                   <ClientStatus
                       v-if="can('ClientStatus')"
                       :name="props.item.client.name"
@@ -236,6 +240,11 @@
                   :ticketid="editModalData.id"
                   :name="editModalData.client.name"
                 />
+                <TicketHistory
+                  :clientid="editModalData.client.id"
+                  :name="editModalData.client.name"
+                  :block="true"
+                />
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -263,6 +272,7 @@
 <script>
 import CreateTicketAdvance from '../create/CreateTicketAdvance'
 import TicketAdvanceHistory from '../misc/TicketAdvanceHistory'
+import TicketHistory from '../misc/TicketHistory'
 import ClientStatus from '../main/ClientStatus'
 import CreateTicketAdvanceTraslate from '../create/CreateTicketAdvanceTraslate.vue'
 export default {
@@ -270,6 +280,7 @@ export default {
   components: {
     CreateTicketAdvance,
     TicketAdvanceHistory,
+    TicketHistory,
     ClientStatus,
     CreateTicketAdvanceTraslate
   },

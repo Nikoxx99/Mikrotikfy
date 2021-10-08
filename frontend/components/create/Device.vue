@@ -4,7 +4,7 @@
       :block="block"
       :text="!block"
       :x-small="!block"
-      :color="$vuetify.theme.dark && !block ? 'white' : 'primary'"
+      :color="$vuetify.theme.dark && !block ? 'primary' : 'primary'"
       @click="dialogDevice = true"
     >
       <v-icon>mdi-plus</v-icon>

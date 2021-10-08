@@ -25,7 +25,7 @@
     >
       <v-card
         :loading="loading"
-        :class="clientData.online ? 'teal darken-4' : ''"
+        :class="clientData ? clientData.online ? 'teal darken-4' : '' : ''"
       >
         <v-card-title class="headline">
           Estatus en Mikrotik
@@ -34,7 +34,7 @@
           <v-card-text>
             <h2> {{ name }} </h2>
             <v-alert
-              v-if="clientData.online && clientData.exists"
+              v-if="clientData && clientData.online && clientData.exists"
               dense
               text
               type="success"
@@ -43,7 +43,7 @@
               El cliente esta <strong>En Linea</strong>
             </v-alert>
             <v-alert
-              v-else-if="!clientData.online && clientData.exists"
+              v-else-if="clientData && !clientData.online && clientData.exists"
               dense
               outlined
               type="error"
@@ -64,7 +64,7 @@
               Mal identificado en la API. Informa de esto al webmaster
             </v-alert>
             <v-divider class="my-4" />
-            <div v-if="clientData.online">
+            <div v-if="clientData && clientData.online">
               <v-row>
                 <v-col>
                   <h3>Acceso: <strong><a :href="`http://${clientData.address}`" target="_blank">{{ clientData.address }}</a></strong></h3>
@@ -85,6 +85,12 @@
           </v-card-text>
         </div>
         <v-card-actions>
+          <EditForm
+            v-if="can('EditForm') && item"
+            :client="item"
+            :index="index"
+            :role="$store.state.auth.allowed_components"
+          />
           <v-spacer />
 
           <v-btn
@@ -101,8 +107,12 @@
 </template>
 
 <script>
+import EditForm from '../edit/EditForm'
 export default {
   name: 'ClientStatus',
+  components: {
+    EditForm
+  },
   props: {
     clientid: {
       type: String,
@@ -123,6 +133,14 @@ export default {
     block: {
       type: Boolean,
       default: false
+    },
+    item: {
+      type: Object,
+      default: () => {}
+    },
+    index: {
+      type: Number,
+      default: -1
     }
   },
   data: () => ({

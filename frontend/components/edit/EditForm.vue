@@ -2,14 +2,20 @@
   <span>
     <v-tooltip top>
       <template v-slot:activator="{ on, attrs }">
-        <v-icon
+        <v-btn
           v-bind="attrs"
-          :color="$vuetify.theme.dark ? 'white' : 'primary'"
+          :block="block"
+          :text="!block"
+          :x-small="!block"
+          :color="$vuetify.theme.dark && !block ? 'white' : 'primary'"
           v-on="on"
           @click="dialogEdit = true"
         >
-          mdi-pencil
-        </v-icon>
+          <v-icon>mdi-pencil</v-icon>
+          <span v-if="block">
+            Editar Cliente
+          </span>
+        </v-btn>
       </template>
       <span>Editar Cliente</span>
     </v-tooltip>
@@ -308,6 +314,10 @@ export default {
     role: {
       type: Array,
       default: () => []
+    },
+    block: {
+      type: Boolean,
+      default: false
     }
   },
   data: () => {

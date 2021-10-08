@@ -179,6 +179,8 @@
                       :name="item.name"
                       :clientid="item._id"
                       :code="item.code"
+                      :item="item"
+                      :index="clients.indexOf(item)"
                       :role="$store.state.auth.allowed_components"
                     />
                     <MainDevices

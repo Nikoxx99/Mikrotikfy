@@ -42,7 +42,7 @@ export default {
   },
   head () {
     return {
-      title: 'Clientes API ' + this.currentCity.name,
+      title: 'Clientes ' + this.currentCity.name,
       meta: [
         { hid: 'language', name: 'language', content: 'es' },
         { hid: 'audience', name: 'audience', content: 'all' },

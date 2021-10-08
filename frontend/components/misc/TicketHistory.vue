@@ -2,14 +2,20 @@
   <span>
     <v-tooltip top>
       <template v-slot:activator="{ on, attrs }">
-        <v-icon
+        <v-btn
           v-bind="attrs"
-          :color="$vuetify.theme.dark ? 'white' : 'primary'"
+          :block="block"
+          :text="!block"
+          :x-small="!block"
+          :color="$vuetify.theme.dark && !block ? 'white' : 'primary'"
           v-on="on"
           @click="initComponent()"
         >
-          mdi-history
-        </v-icon>
+          <v-icon>mdi-comment-text-multiple-outline</v-icon>
+          <span v-if="block">
+            Historial de Tickets
+          </span>
+        </v-btn>
       </template>
       <span>Historial de Tickets</span>
     </v-tooltip>
@@ -130,6 +136,10 @@ export default {
     name: {
       type: String,
       default: ''
+    },
+    block: {
+      type: Boolean,
+      default: false
     }
   },
   data: () => ({

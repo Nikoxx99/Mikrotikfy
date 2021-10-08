@@ -2,14 +2,20 @@
   <span>
     <v-tooltip top>
       <template v-slot:activator="{ on, attrs }">
-        <v-icon
+        <v-btn
           v-bind="attrs"
-          :color="$vuetify.theme.dark ? 'white' : 'primary'"
+          :block="block"
+          :text="!block"
+          :x-small="!block"
+          :color="$vuetify.theme.dark && !block ? 'white' : 'primary'"
           v-on="on"
           @click="initComponent()"
         >
-          mdi-router-wireless
-        </v-icon>
+          <v-icon>mdi-router-wireless</v-icon>
+          <span v-if="block">
+            Ver Equipos
+          </span>
+        </v-btn>
       </template>
       <span>Router/ONU</span>
     </v-tooltip>
@@ -62,6 +68,21 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-snackbar
+      v-model="snack"
+      :timeout="4000"
+      :color="snackColor"
+      bottom
+      vertical
+    >
+      {{ snackText }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn v-bind="attrs" text @click="snack = false">
+          Cerrar
+        </v-btn>
+      </template>
+    </v-snackbar>
   </span>
 </template>
 
@@ -76,6 +97,10 @@ export default {
     clientid: {
       type: String,
       default: ''
+    },
+    block: {
+      type: Boolean,
+      default: false
     }
   },
   data: () => ({
@@ -96,6 +121,9 @@ export default {
   methods: {
     updateDeviceList (device) {
       this.devices.push(device)
+      this.snack = true
+      this.snackText = 'Dispositivo agregado correctamente'
+      this.snackColor = 'info'
     },
     async initComponent () {
       this.modal = true
