@@ -22,9 +22,6 @@ export default {
       return this.$store.state.cities ? this.$store.state.cities.find(c => c.id == this.$route.query.city) : ''
     }
   },
-  mounted () {
-    this.getLocalStorage()
-  },
   methods: {
     can (component) {
       // eslint-disable-next-line camelcase
@@ -32,9 +29,6 @@ export default {
       // eslint-disable-next-line camelcase
       const current_component = component
       return allowed_components.includes(current_component)
-    },
-    getLocalStorage () {
-      this.$store.dispatch('loadLocalStorage')
     },
     updateTitle (title) {
       this.title = title

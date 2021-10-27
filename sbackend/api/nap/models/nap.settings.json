@@ -1,0 +1,38 @@
+{
+  "kind": "collectionType",
+  "collectionName": "naps",
+  "info": {
+    "name": "nap",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "code": {
+      "type": "string"
+    },
+    "ports": {
+      "type": "integer"
+    },
+    "neighborhood": {
+      "model": "neighborhood"
+    },
+    "address": {
+      "type": "string"
+    },
+    "clients": {
+      "collection": "client",
+      "via": "naps",
+      "dominant": true
+    },
+    "city": {
+      "model": "city"
+    },
+    "technology": {
+      "model": "technology"
+    }
+  }
+}

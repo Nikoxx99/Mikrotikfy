@@ -16,3 +16,5 @@ sbackend/.strapi-updater.json
 laravel/
 
 sbackend/build/
+frontend/middleware/defaultCity.js
+sbackend/middlewares/graphlogs/index.js

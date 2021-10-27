@@ -201,6 +201,9 @@ export default {
       return this.$store.state.auth.rolename
     }
   },
+  beforeMount () {
+    this.getLocalStorage()
+  },
   mounted () {
     this.comprobeDateToSetChristmasTheme()
     this.loadThemeFromVuetifyThemeManager()
@@ -208,6 +211,9 @@ export default {
     this.isMobileScreen()
   },
   methods: {
+    getLocalStorage () {
+      this.$store.dispatch('loadLocalStorage')
+    },
     loadThemeFromVuetifyThemeManager () {
       const currentTheme = localStorage.getItem('currentTheme')
       if (currentTheme) {

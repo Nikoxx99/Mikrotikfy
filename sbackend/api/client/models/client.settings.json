@@ -107,6 +107,10 @@
       "via": "clients",
       "collection": "device",
       "dominant": true
+    },
+    "naps": {
+      "via": "clients",
+      "collection": "nap"
     }
   }
 }
