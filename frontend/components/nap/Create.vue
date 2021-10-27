@@ -1,5 +1,5 @@
 <template>
-  <v-card width="560px">
+  <v-card>
     <form v-if="cities">
       <v-container>
         <v-alert
@@ -14,10 +14,11 @@
         <v-row>
           <v-container>
             <v-text-field
-              :value="nap.name ? name.toUpperCase() : ''"
+              :v-model="nap.name"
               label="Codigo"
               required
-              @input="nap.name = $event.toUpperCase()"
+              outlined
+              @click="alertBox = false"
             />
             <v-select
               v-model="nap.port"
@@ -25,12 +26,14 @@
               item-text="name"
               item-value="value"
               label="Puertos"
+              outlined
               chips
             />
             <v-text-field
               v-model="nap.address"
               label="Direccion"
               required
+              outlined
             />
             <v-select
               v-model="nap.city"
@@ -51,14 +54,12 @@
               outlined
               dense
               hide-details
-              return-object
             />
             <v-select
               v-model="nap.technology"
               item-text="name"
               item-value="id"
               :items="technologies"
-              return-object
               label="Tecnología"
               outlined
               dense
@@ -117,20 +118,31 @@ export default {
     }
   },
   mounted () {
-    this.nap.city = {
-      id: this.$route.query.city
-    }
+    this.nap.city = this.$route.query.city
   },
   created () {
     if (this.$route.query.created) {
       this.alertBox = true
       this.alertBoxColor = 'blue darken-4'
-      this.createdMessage = 'Ciudad creada correctamente.'
+      this.createdMessage = 'Nap creada correctamente.'
     }
   },
   methods: {
     createNap () {
       this.isSubmitting = !this.isSubmitting
+      this.$store.dispatch('nap/createNap', this.nap)
+        .then(() => {
+          this.isSubmitting = !this.isSubmitting
+          this.alertBox = true
+          this.alertBoxColor = 'info darken-4'
+          this.createdMessage = 'NAP creada correctamente.'
+        })
+        .catch(() => {
+          this.isSubmitting = !this.isSubmitting
+          this.alertBox = true
+          this.alertBoxColor = 'red darken-4'
+          this.createdMessage = 'Error al crear la NAP.'
+        })
     }
   }
 }
