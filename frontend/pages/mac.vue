@@ -4,10 +4,10 @@
     <v-btn @click="initCamera()">
       {{ initialized ? 'Stop' : tries >= 1 ? 'Retry' : 'Start' }}
     </v-btn>
-    <div id="camera_stream" />
     <div>
       {{ mac_result }}
     </div>
+    <div id="camera_stream" />
   </div>
 </template>
 <script>
@@ -50,3 +50,10 @@ export default {
   }
 }
 </script>
+
+<style>
+#camera_stream {
+  width: 300px;
+  height: 300px;
+}
+</style>
