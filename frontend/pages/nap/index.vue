@@ -11,7 +11,12 @@
 <script>
 export default {
   name: 'NapManage',
-  middleware: ['defaultCity', 'authenticated']
+  middleware: ['defaultCity', 'authenticated'],
+  head () {
+    return {
+      title: 'Crear NAP'
+    }
+  }
 }
 </script>
 
