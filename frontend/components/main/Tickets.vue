@@ -305,10 +305,12 @@ export default {
       headers: [
         { text: 'Estado', sortable: true, value: 'active', width: '5%' },
         { text: 'Codigo', sortable: true, value: 'client.code', width: 60, align: ' d-none d-lg-table-cell' },
+        { text: 'Cedula', sortable: true, value: 'client.dni', width: 60, align: ' d-none d-lg-table-cell' },
         { text: 'Cliente', sortable: true, value: 'client.name' },
         { text: 'Dirección', sortable: true, value: 'client.address', align: ' d-none d-lg-table-cell' },
         { text: 'Barrio', sortable: true, value: 'client.neighborhood.name', align: ' d-none d-lg-table-cell' },
         { text: 'Telefono', sortable: true, value: 'client.phone', align: ' d-none d-lg-table-cell' },
+        { text: 'Tec.', sortable: true, value: 'client.technology.name', align: ' d-none d-lg-table-cell' },
         { text: 'Tipo', sortable: true, value: 'tickettype.name' },
         { text: 'Operador', sortable: false, value: 'assiganted.username', align: ' d-none d-lg-table-cell' },
         { text: 'Detalles', sortable: true, value: 'details', width: 400, align: ' d-none d-lg-table-cell' },
@@ -422,4 +424,7 @@ export default {
 
 <style scoped>
   .nowspace {white-space: nowrap !important;}
+  .v-data-table > .v-data-table__wrapper > table > tfoot > tr > td {
+    font-size: 12px;
+  }
 </style>
