@@ -34,7 +34,7 @@
         </v-card-title>
         <div v-if="!loading">
           <v-card-text>
-            <h2> {{ name }} </h2>
+            <h2> {{ client.name }} </h2>
           </v-card-text>
           <v-card-text>
             <v-select
@@ -50,69 +50,34 @@
             />
           </v-card-text>
           <v-card-text v-if="ticketPayload.type.name === 'TRASLADO'">
-            <p>Direccion de desconexion</p>
+            <p>Direccion de desconexion (Autogenerada)</p>
             <v-row class="mb-2">
-              <v-col cols="6" lg="3" md="3">
-                <v-select
-                  v-model="dx.dir1"
-                  :items="dx.dirFragment1"
-                  label="Dirección"
-                  outlined
-                  dense
-                  hide-details
-                  @change="dxGenAddress"
-                />
-              </v-col>
-              <v-col cols="6" lg="3" md="3">
+              <v-col cols="6">
                 <v-text-field
-                  v-model="dx.dir2"
+                  v-model="client.address"
                   label="#"
                   outlined
                   dense
                   hide-details
-                  @change="dxGenAddress"
+                  disabled
                 />
               </v-col>
-              <v-col cols="6" lg="3" md="3">
-                <v-select
-                  v-model="dx.dir3"
-                  :items="dx.dirFragment2"
-                  label="#"
-                  value="#"
-                  outlined
-                  dense
-                  hide-details
-                  @change="dxGenAddress"
-                />
-              </v-col>
-              <v-col cols="6" lg="3" md="3">
-                <v-text-field
-                  v-model="dx.dir4"
-                  label="#"
-                  outlined
-                  dense
-                  hide-details
-                  @change="dxGenAddress"
-                />
-              </v-col>
-            </v-row>
-            <v-row class="mb-2">
-              <v-col>
+              <v-col cols="6">
                 <v-autocomplete
-                  v-model="dx.neighborhood"
+                  v-model="client.neighborhood"
                   item-text="name"
                   item-value="id"
                   :items="neighborhoods"
                   label="Barrio"
                   outlined
                   dense
+                  disabled
                   hide-details
                   return-object
-                  @change="dxGenAddress"
                 />
               </v-col>
             </v-row>
-            <p>Direccion de conexion</p>
+            <p>Direccion de Traslado</p>
             <v-row class="mb-2">
               <v-col cols="6" lg="3" md="3">
                 <v-select
@@ -226,17 +191,9 @@ export default {
     }
   },
   props: {
-    clientid: {
-      type: String,
-      default: ''
-    },
-    name: {
-      type: String,
-      default: ''
-    },
-    city: {
-      type: String,
-      default: ''
+    client: {
+      type: Object,
+      default: () => {}
     },
     assignated: {
       type: String,
@@ -263,27 +220,6 @@ export default {
       details: '',
       city: '',
       assignated: ''
-    },
-    dx: {
-      neighborhood: {},
-      dir1: '',
-      dir2: '',
-      dir3: '#',
-      dir4: '',
-      dirFragment1: [
-        '(SIN INICIAL)',
-        'CARRERA',
-        'CALLE',
-        'MANZANA',
-        'DIAGONAL'
-      ],
-      dirFragment2: [
-        '#',
-        'CASA',
-        'DIAGONAL',
-        'LOTE'
-      ],
-      finalAddress: ''
     },
     cx: {
       neighborhood: {},
@@ -316,22 +252,19 @@ export default {
     isEmpty (obj) {
       return Object.keys(obj).length === 0
     },
-    dxGenAddress () {
-      this.dx.finalAddress = `${this.dx.dir1} ${this.dx.dir2} ${this.dx.dir3} ${this.dx.dir4} ${this.dx.neighborhood.name}`
-    },
     cxGenAddress () {
       this.cx.finalAddress = `${this.cx.dir1} ${this.cx.dir2} ${this.cx.dir3} ${this.cx.dir4} ${this.cx.neighborhood.name}`
     },
     initComponent () {
       this.modal = true
-      this.ticketPayload.client = this.clientid
-      this.ticketPayload.city = this.city
+      this.ticketPayload.client = this.client.id
+      this.ticketPayload.city = this.client.city.id
       this.ticketPayload.assignated = this.assignated
     },
     createTicket () {
       this.loading = true
       if (this.ticketPayload.type.name === 'TRASLADO') {
-        this.ticketPayload.details = `DX: ${this.dx.finalAddress} \n CX: ${this.cx.finalAddress}`
+        this.ticketPayload.details = `DX: ${this.client.address} ${this.client.neighborhood.name} \n CX: ${this.cx.finalAddress}`
       }
       if (this.isEmpty(this.ticketPayload.type)) {
         this.alertBox = true
@@ -353,6 +286,7 @@ export default {
         mutation: gqlt`mutation ($input: createTicketInput){
           createTicket(input: $input){
             ticket{
+              id
               client{
                 code
               }
@@ -366,14 +300,19 @@ export default {
               client: this.ticketPayload.client,
               city: this.ticketPayload.city,
               tickettype: this.ticketPayload.type.id,
-              assiganted: this.ticketPayload.assignated,
-              details: this.ticketPayload.details
+              assiganted: this.ticketPayload.assignated
+              // details: this.ticketPayload.details
             }
           }
         }
       }).then((input) => {
         if (input.data.createTicket.ticket.client.code) {
           // this.$emit('updateClient', this.item, this.editIndex)
+          this.$strapi.create('ticketdetails', {
+            ticket: input.data.createTicket.ticket.id,
+            details: this.ticketPayload.details,
+            operator: this.$store.state.auth.id
+          })
           this.ticketPayload = {
             client: '',
             type: {},

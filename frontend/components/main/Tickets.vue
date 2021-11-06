@@ -303,12 +303,12 @@ export default {
       editModalData: {},
       infoModal: false,
       headers: [
-        { text: 'Estado', sortable: true, value: 'active', width: '5%' },
+        { text: 'Estado', sortable: true, value: 'active', width: '5%', align: ' d-none d-lg-table-cell' },
         { text: 'Codigo', sortable: true, value: 'client.code', width: 60, align: ' d-none d-lg-table-cell' },
         { text: 'Cedula', sortable: true, value: 'client.dni', width: 60, align: ' d-none d-lg-table-cell' },
         { text: 'Cliente', sortable: true, value: 'client.name' },
         { text: 'Dirección', sortable: true, value: 'client.address', align: ' d-none d-lg-table-cell' },
-        { text: 'Barrio', sortable: true, value: 'client.neighborhood.name', align: ' d-none d-lg-table-cell' },
+        { text: 'Barrio', sortable: true, value: 'client.neighborhood.name' },
         { text: 'Telefono', sortable: true, value: 'client.phone', align: ' d-none d-lg-table-cell' },
         { text: 'Tec.', sortable: true, value: 'client.technology.name', align: ' d-none d-lg-table-cell' },
         { text: 'Tipo', sortable: true, value: 'tickettype.name' },
@@ -338,11 +338,17 @@ export default {
   methods: {
     async refreshTickets () {
       this.initialLoading = true
-      this.ticketList = await this.$strapi.find('tickets', {
+      const tickets = await this.$strapi.find('tickets', {
         active: !this.showClosedValue,
         city: this.$route.query.city,
         _limit: this.$route.query.limit ? parseInt(this.$route.query.limit) : 50,
         _sort: this.$route.query.sort ? this.$route.query.sort : 'createdAt:desc'
+      })
+      this.ticketList = tickets.map((t) => {
+        if (t.ticketdetails.length > 0) {
+          t.details = t.ticketdetails.slice(-1)[0].operator.username + ': ' + t.ticketdetails.slice(-1)[0].details
+        }
+        return t
       })
       this.initialLoading = false
     },

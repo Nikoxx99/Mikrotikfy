@@ -201,10 +201,8 @@ export default {
       return this.$store.state.auth.rolename
     }
   },
-  beforeMount () {
-    this.getLocalStorage()
-  },
   mounted () {
+    this.getLocalStorage()
     this.comprobeDateToSetChristmasTheme()
     this.loadThemeFromVuetifyThemeManager()
     this.comprobeSessionResetStatus()

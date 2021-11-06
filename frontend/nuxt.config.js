@@ -47,11 +47,21 @@ export default {
     '@nuxtjs/eslint-module',
     '@nuxtjs/apollo',
     '@nuxtjs/vuetify',
-    '@nuxtjs/pwa',
-    'nuxt-build-optimisations'
+    '@nuxtjs/pwa'
   ],
-  buildOptimisations: {
-    profile: 'experimental'
+  webpackOptimisations: {
+    features: {
+      // Note: just an example of keys, these are all keys and their default
+      debug: true,
+      postcssNoPolyfills: true,
+      esbuildLoader: true,
+      esbuildMinifier: true,
+      imageFileLoader: true,
+      webpackOptimisations: true,
+      cacheLoader: true,
+      hardSourcePlugin: false,
+      parallelPlugin: false
+    }
   },
   apollo: {
     clientConfigs: {

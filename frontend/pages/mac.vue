@@ -33,7 +33,8 @@ export default {
         },
         decoder: {
           readers: ['code_128_reader']
-        }
+        },
+        locate: true
       }, function (err) {
         if (err) {
           console.log(err)
@@ -42,7 +43,7 @@ export default {
         Quagga.start()
       })
       Quagga.onDetected((e) => {
-        Quagga.stop()
+        // Quagga.stop()
         this.initialized = false
         this.mac_result = e.codeResult.code
       })

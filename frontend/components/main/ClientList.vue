@@ -164,10 +164,8 @@
                   <div style="white-space:nowrap">
                     <CreateTicket
                       v-if="can('CreateTicket')"
-                      :name="item.name"
-                      :city="item.city.id"
+                      :client="item"
                       :assignated="$store.state.auth.id"
-                      :clientid="item._id"
                       :role="$store.state.auth.allowed_components"
                     />
                     <TicketHistory

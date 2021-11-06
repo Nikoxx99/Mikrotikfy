@@ -11,9 +11,9 @@ module.exports = {
     if(active) {
       return strapi.query('ticket').model.find({'city':city, 'active': active}).limit(parseInt(_limit)).sort({'createdAt':'desc'})
       .populate({
-        path: 'client tickettype assiganted',
+        path: 'client tickettype ticketdetails assiganted',
         populate: {
-          path: 'neighborhood technology'
+          path: 'neighborhood technology operator'
         }
       })
     } else {

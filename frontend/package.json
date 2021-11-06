@@ -21,8 +21,8 @@
     "graphql-tag": "^2.12.4",
     "js-cookie": "^2.2.1",
     "nuxt": "^2.15.4",
-    "nuxt-build-optimisations": "^1.0.3",
     "nuxt-i18n": "^6.27.0",
+    "nuxt-webpack-optimisations": "^2.0.3",
     "quagga": "^0.12.1"
   },
   "devDependencies": {
