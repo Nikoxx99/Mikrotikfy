@@ -303,7 +303,7 @@ export default {
       editModalData: {},
       infoModal: false,
       headers: [
-        { text: 'Estado', sortable: true, value: 'active', width: '5%', align: ' d-none d-lg-table-cell' },
+        { text: 'Estado', sortable: true, value: 'active', width: '5%' },
         { text: 'Codigo', sortable: true, value: 'client.code', width: 60, align: ' d-none d-lg-table-cell' },
         { text: 'Cedula', sortable: true, value: 'client.dni', width: 60, align: ' d-none d-lg-table-cell' },
         { text: 'Cliente', sortable: true, value: 'client.name' },

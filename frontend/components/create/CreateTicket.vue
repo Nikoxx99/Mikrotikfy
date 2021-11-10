@@ -300,35 +300,14 @@ export default {
               client: this.ticketPayload.client,
               city: this.ticketPayload.city,
               tickettype: this.ticketPayload.type.id,
-              assiganted: this.ticketPayload.assignated
-              // details: this.ticketPayload.details
+              assiganted: this.ticketPayload.assignated,
+              details: this.ticketPayload.details
             }
           }
         }
-      }).then((input) => {
-        if (input.data.createTicket.ticket.client.code) {
-          // this.$emit('updateClient', this.item, this.editIndex)
-          this.$strapi.create('ticketdetails', {
-            ticket: input.data.createTicket.ticket.id,
-            details: this.ticketPayload.details,
-            operator: this.$store.state.auth.id
-          })
-          this.ticketPayload = {
-            client: '',
-            type: {},
-            details: '',
-            city: '',
-            assignated: ''
-          }
-          this.modal = false
-          this.loading = false
-          // window.location.reload(true)
-        } else {
-          this.alertBox = true
-          this.alertBoxColor = 'red darken-4'
-          this.createdMessage = input.data.createTicket.errors[0].message
-          this.loading = false
-        }
+      }).then((_) => {
+        this.modal = false
+        this.loading = false
       }).catch((error) => {
         this.alertBox = true
         this.alertBoxColor = 'red darken-4'
