@@ -441,13 +441,13 @@ module.exports = {
         } else { // SINO ES UN BARRIO, PUEDE SER OTRO DATO
           const res = await strapi.services.client.find({
             $or: [
-              { 'city': city, 'code': { $regex: new RegExp(search, 'i') } },
+              { 'city': city, 'code': { $regex: new RegExp(search, 'i') }},
               { 'city': city, 'name': { $regex: new RegExp(search, 'i') } },
               { 'city': city, 'address': { $regex: new RegExp(search, 'i') } },
               { 'city': city, 'dni': { $regex: new RegExp(search, 'i') } },
               { 'city': city, 'phone': { $regex: new RegExp(search, 'i') } }
             ]
-          })
+          }).sort({ 'code': 'asc' })
           const n = res.map(entity => sanitizeEntity(entity, { model: strapi.models.client }));
           return n
         }

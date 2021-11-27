@@ -32,7 +32,7 @@ export const mutations = {
   },
   updateClient (state, { client, index }) {
     try {
-      Object.assign(state.clients[index], client)
+      state.clients[index] = client
     } catch (error) {
       throw new Error(`UPDATE CLIENT MUTATE ${error}`)
     }

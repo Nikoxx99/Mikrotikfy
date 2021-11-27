@@ -1,33 +1,42 @@
 <template>
   <div>
-    <v-row v-if="clients.length < 1" class="justify-center">
-      <h4>Crea un cliente</h4>
-    </v-row>
-    <v-row v-if="clients.length < 1" class="justify-center">
-      <v-fab-transition>
-        <v-btn
-          v-if="can('CreateForm')"
-          color="primary"
-          fab
-          large
-          dark
-          @click="createDialog = true"
-        >
-          <v-icon>mdi-plus</v-icon>
-        </v-btn>
-      </v-fab-transition>
-    </v-row>
-    <v-row v-if="clients.length < 1" class="justify-center">
-      <h3 class="text-center px-3">
-        O realiza una búsqueda para mostrar la información
-      </h3>
-    </v-row>
-    <v-row v-if="clients.length < 1" class="justify-center">
-      <h1>
-        <v-icon large>
-          mdi-magnify
-        </v-icon>
-      </h1>
+    <div v-if="clients.length < 1 && !$route.params.search">
+      <v-row class="justify-center">
+        <h4>Crea un cliente</h4>
+      </v-row>
+      <v-row class="justify-center">
+        <v-fab-transition>
+          <v-btn
+            v-if="can('CreateForm')"
+            color="primary"
+            fab
+            large
+            dark
+            @click="createDialog = true"
+          >
+            <v-icon>mdi-plus</v-icon>
+          </v-btn>
+        </v-fab-transition>
+      </v-row>
+      <v-row class="justify-center">
+        <h3 class="text-center px-3">
+          O realiza una búsqueda para mostrar la información
+        </h3>
+      </v-row>
+      <v-row class="justify-center">
+        <h1>
+          <v-icon large>
+            mdi-magnify
+          </v-icon>
+        </h1>
+      </v-row>
+    </div>
+    <v-row v-else-if="clients.length < 1 && $route.params.search" class="justify-center">
+      <v-card :loading="loadingDataTable">
+        <v-card-title>
+          {{ result }}
+        </v-card-title>
+      </v-card>
     </v-row>
     <v-row v-if="clients.length > 0" class="mt-0">
       <v-col class="pt-0">
@@ -314,7 +323,8 @@ export default {
       snack: false,
       snackColor: '',
       snackText: '',
-      showPagintation: true
+      showPagintation: true,
+      result: ''
     }
   },
   computed: {
@@ -379,11 +389,13 @@ export default {
       this.loadingDataTable = true
       const search = this.searchClientInput.trim()
       const city = this.$route.query.city
+      this.result = 'Buscando...'
       if (search) {
         await this.$store.dispatch('client/getUsersFromDatabaseBySearch', { search, city })
         await this.getClientStatusOnMikrotik()
         this.showPagintation = false
         this.loadingDataTable = false
+        this.result = 'No se han encontrado resultados.'
       }
     },
     async resetsearchfn () {
@@ -396,6 +408,7 @@ export default {
       await this.$store.dispatch('client/calculateClientStatus', this.activeClientsList)
     },
     savePlanFromModal (clientId, newPlan, isRx, operator, index) {
+      // set plan by callback after the update
       this.$store.dispatch('client/setPlanFromModal', { clientId, newPlan, isRx, operator, index })
     },
     updatePlanFromModal (clientid, newPlan, index) {
