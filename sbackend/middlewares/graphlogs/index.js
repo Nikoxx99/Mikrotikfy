@@ -8,10 +8,13 @@ module.exports = strapi => {
           // execute the middleware stack
           await next();
 
-          // then logs info
-          console.log('REQUEST:')
-          console.info(ctx.request.body.query);
-          console.log('RESPONSE:')
+          //then logs info
+          // if (ctx.request.body.query[1] !== 'IntrospectionQuery'){
+          //   console.log('REQUEST:')
+          //   console.info(ctx.request.body.query);
+          //   // console.log('RESPONSE:')
+          // }
+          
           // console.error(ctx.body);
         } else {
           // just exec the mileware stack for other requests
