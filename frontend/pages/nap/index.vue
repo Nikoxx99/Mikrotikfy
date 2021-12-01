@@ -1,13 +1,31 @@
 <template>
   <v-container fluid>
     <v-row>
-      <v-col cols="4">
+      <v-col
+        cols="12"
+        xs="12"
+        sm="12"
+        md="4"
+        lg="4"
+      >
         <NapCreate />
       </v-col>
-      <v-col cols="4">
+      <v-col
+        cols="12"
+        xs="12"
+        sm="12"
+        md="4"
+        lg="4"
+      >
         <NapList @showNapInfo="showNapInfo" />
       </v-col>
-      <v-col cols="4">
+      <v-col
+        cols="12"
+        xs="12"
+        sm="12"
+        md="4"
+        lg="4"
+      >
         <NapClients :napdata="napData" />
       </v-col>
     </v-row>

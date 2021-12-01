@@ -14,14 +14,14 @@
         <v-row>
           <v-container>
             <v-text-field
-              :v-model="nap.name"
+              v-model="nap.code"
               label="Codigo"
               required
               outlined
               @click="alertBox = false"
             />
             <v-select
-              v-model="nap.port"
+              v-model="nap.ports"
               :items="items"
               item-text="name"
               item-value="value"
@@ -86,12 +86,12 @@ export default {
   name: 'CreateNap',
   data: () => ({
     nap: {
-      name: '',
+      code: '',
       address: '',
       city: '',
       neighborhood: '',
       technology: '',
-      port: ''
+      ports: 0
     },
     alertBox: false,
     alertBoxColor: '',

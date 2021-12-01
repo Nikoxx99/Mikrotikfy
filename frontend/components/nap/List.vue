@@ -15,12 +15,14 @@
           tile
         >
           <v-card-title class="blue darken-3">
-            Naps en X CIUDAD
+            Naps en {{ currentCity.name }}
           </v-card-title>
           <client-only>
             <v-data-table
               :headers="headers"
               :items="napList"
+              :item-class="itemRowBackground"
+              :item-selected="selectedItem"
               sort-by="calories"
               class="elevation-1"
               @click:row="showNapInfo"
@@ -44,12 +46,17 @@ export default {
     isSubmitting: false,
     headers: [
       { text: 'Codigo', value: 'code' },
+      { text: 'Puertos', value: 'ports' },
       { text: 'Barrio', value: 'neighborhood.name' },
       { text: 'Direccion', value: 'address' },
       { text: 'Tec.', value: 'technology.name' }
     ]
   }),
   computed: {
+    currentCity () {
+      // eslint-disable-next-line eqeqeq
+      return this.$store.state.cities ? this.$store.state.cities.find(c => c.id == this.$route.query.city) : ''
+    },
     napList () {
       return this.$store.state.nap.naps
     }
@@ -58,8 +65,16 @@ export default {
     this.$store.dispatch('nap/getNaps', this.$route.query.city)
   },
   methods: {
+    selectedItem (item) {
+      console.log('item', item)
+    },
     showNapInfo (value) {
       this.$emit('showNapInfo', value)
+    },
+    itemRowBackground () {
+      if (this.$vuetify.theme.dark) {
+        return 'selected'
+      }
     },
     editItem (item) {
       this.editedIndex = this.neighborhoods.indexOf(item)
@@ -75,5 +90,7 @@ export default {
 </script>
 
 <style>
-
+.selected {
+  background-color: #2b3f2b;
+}
 </style>
