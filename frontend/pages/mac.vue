@@ -37,7 +37,6 @@ export default {
         locate: true
       }, function (err) {
         if (err) {
-          console.log(err)
           return
         }
         Quagga.start()

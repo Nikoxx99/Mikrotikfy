@@ -1,83 +1,93 @@
 <template>
   <v-card>
-    <form v-if="cities">
-      <v-container>
-        <v-alert
-          v-if="alertBox"
-          type="info"
-          :class="alertBoxColor"
-          tile
-          dismissible
-        >
-          {{ createdMessage }}
-        </v-alert>
-        <v-row>
+    <v-card-title>
+      Crear NAP
+    </v-card-title>
+    <v-card-text>
+      <client-only>
+        <form v-if="cities">
           <v-container>
-            <v-text-field
-              v-model="nap.code"
-              label="Codigo"
-              required
-              outlined
-              @click="alertBox = false"
-            />
-            <v-select
-              v-model="nap.ports"
-              :items="items"
-              item-text="name"
-              item-value="value"
-              label="Puertos"
-              outlined
-              chips
-            />
-            <v-text-field
-              v-model="nap.address"
-              label="Direccion"
-              required
-              outlined
-            />
-            <v-select
-              v-model="nap.city"
-              item-text="name"
-              item-value="id"
-              :items="cities"
-              label="Ciudad"
-              outlined
-              dense
-              hide-details
-            />
-            <v-autocomplete
-              v-model="nap.neighborhood"
-              item-text="name"
-              item-value="id"
-              :items="neighborhoods"
-              label="Barrio"
-              outlined
-              dense
-              hide-details
-            />
-            <v-select
-              v-model="nap.technology"
-              item-text="name"
-              item-value="id"
-              :items="technologies"
-              label="Tecnología"
-              outlined
-              dense
-              required
-              hide-details
-            />
-            <v-btn
-              class="mr-4 blue darken-4"
-              :loading="isSubmitting"
-              :disabled="isSubmitting"
-              @click="createNap"
+            <v-alert
+              v-if="alertBox"
+              type="info"
+              :class="alertBoxColor"
+              tile
+              dismissible
             >
-              Crear NAP
-            </v-btn>
+              {{ createdMessage }}
+            </v-alert>
+            <v-row>
+              <v-container>
+                <v-text-field
+                  v-model="nap.code"
+                  label="Codigo"
+                  required
+                  outlined
+                  @click="alertBox = false"
+                />
+                <v-select
+                  v-model="nap.ports"
+                  :items="items"
+                  item-text="name"
+                  item-value="value"
+                  label="Puertos"
+                  outlined
+                  chips
+                />
+                <v-text-field
+                  v-model="nap.address"
+                  label="Direccion"
+                  required
+                  outlined
+                />
+                <v-select
+                  v-model="nap.city"
+                  item-text="name"
+                  item-value="id"
+                  class="mb-3"
+                  :items="cities"
+                  label="Ciudad"
+                  outlined
+                  dense
+                  hide-details
+                />
+                <v-autocomplete
+                  v-model="nap.neighborhood"
+                  item-text="name"
+                  item-value="id"
+                  class="mb-3"
+                  :items="neighborhoods"
+                  label="Barrio"
+                  outlined
+                  dense
+                  hide-details
+                />
+                <v-select
+                  v-model="nap.technology"
+                  item-text="name"
+                  item-value="id"
+                  class="mb-3"
+                  :items="technologies"
+                  label="Tecnología"
+                  outlined
+                  dense
+                  required
+                  hide-details
+                />
+                <v-btn
+                  class="mr-4 blue darken-4"
+                  :loading="isSubmitting"
+                  :disabled="isSubmitting"
+                  @click="createNap"
+                >
+                  Crear NAP
+                </v-btn>
+              </v-container>
+            </v-row>
           </v-container>
-        </v-row>
-      </v-container>
-    </form>
+        </form>
+      </client-only>
+    </v-card-text>
   </v-card>
 </template>
 
@@ -102,7 +112,16 @@ export default {
         value: 16, name: 'NAP X16'
       },
       {
-        value: 8, name: 'NAP X8'
+        value: 8, name: 'NAP/ONU/SWITCH X8'
+      },
+      {
+        value: 4, name: 'ONU/SWITCH X4'
+      },
+      {
+        value: 2, name: 'ONU/SWITCH X2'
+      },
+      {
+        value: 1, name: 'ONU X1'
       }
     ]
   }),

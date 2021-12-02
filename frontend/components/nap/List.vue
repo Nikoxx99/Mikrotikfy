@@ -14,20 +14,38 @@
         <v-card
           tile
         >
-          <v-card-title class="blue darken-3">
+          <v-card-title>
             Naps en {{ currentCity.name }}
           </v-card-title>
-          <client-only>
-            <v-data-table
-              :headers="headers"
-              :items="napList"
-              :item-class="itemRowBackground"
-              :item-selected="selectedItem"
-              sort-by="calories"
-              class="elevation-1"
-              @click:row="showNapInfo"
+          <v-card-text>
+            <v-text-field
+              v-model="search"
+              append-icon="mdi-magnify"
+              label="Buscar Naps"
+              single-line
+              hide-details
             />
-          </client-only>
+          </v-card-text>
+          <v-card-text>
+            <client-only>
+              <v-data-table
+                :headers="headers"
+                :items="napList"
+                :item-class="itemRowBackground"
+                :page.sync="page"
+                :search="search"
+                sort-by="calories"
+                class="elevation-1"
+                hide-default-footer
+                @page-count="pageCount = $event"
+                @click:row="showNapInfo"
+              />
+            </client-only>
+          </v-card-text>
+          <v-pagination
+            v-model="page"
+            :length="pageCount"
+          />
         </v-card>
       </v-container>
     </form>
@@ -44,6 +62,9 @@ export default {
     alertBox: false,
     alertBoxColor: '',
     isSubmitting: false,
+    page: 0,
+    pageCount: 0,
+    search: '',
     headers: [
       { text: 'Codigo', value: 'code' },
       { text: 'Puertos', value: 'ports' },
@@ -65,25 +86,13 @@ export default {
     this.$store.dispatch('nap/getNaps', this.$route.query.city)
   },
   methods: {
-    selectedItem (item) {
-      console.log('item', item)
-    },
-    showNapInfo (value) {
-      this.$emit('showNapInfo', value)
+    showNapInfo (nap) {
+      this.$emit('showNapInfo', nap)
     },
     itemRowBackground () {
       if (this.$vuetify.theme.dark) {
         return 'selected'
       }
-    },
-    editItem (item) {
-      this.editedIndex = this.neighborhoods.indexOf(item)
-      this.edit.neighborhoods = Object.assign({}, item)
-      this.dialogEdit = true
-    },
-    updateNeighborhood (input) {
-    },
-    createNeighborhood () {
     }
   }
 }

@@ -142,6 +142,12 @@ export default {
           role: 'admin'
         },
         {
+          icon: 'mdi-archive-edit',
+          title: 'Nap y Onus',
+          to: '/nap',
+          role: 'admin'
+        },
+        {
           icon: 'mdi-server-network',
           title: 'Estatus',
           to: '/status',
@@ -269,7 +275,6 @@ export default {
     },
     isMobileScreen () {
       const res = document.body.clientWidth
-      console.log(res)
       if (res < 800) {
         this.isMobile = true
       } else {

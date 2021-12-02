@@ -7,7 +7,6 @@
 
 <script>
 export default {
-  middleware: ['defaultCity', 'authenticated'],
   asyncData ({ params }) {
     const search = params.search // When calling /abc the slug will be "abc"
     return { search }

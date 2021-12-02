@@ -5,8 +5,8 @@
         cols="12"
         xs="12"
         sm="12"
-        md="4"
-        lg="4"
+        md="2"
+        lg="2"
       >
         <NapCreate />
       </v-col>
@@ -14,8 +14,8 @@
         cols="12"
         xs="12"
         sm="12"
-        md="4"
-        lg="4"
+        md="5"
+        lg="5"
       >
         <NapList @showNapInfo="showNapInfo" />
       </v-col>
@@ -23,8 +23,8 @@
         cols="12"
         xs="12"
         sm="12"
-        md="4"
-        lg="4"
+        md="5"
+        lg="5"
       >
         <NapClients :napdata="napData" />
       </v-col>

@@ -7,7 +7,6 @@
 
 <script>
 export default {
-  middleware: ['defaultCity', 'authenticated'],
   data () {
     return {
       search: ''
