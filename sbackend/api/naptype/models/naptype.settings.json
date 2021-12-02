@@ -17,8 +17,8 @@
       "type": "integer"
     },
     "naps": {
-      "via": "naptype",
-      "model": "nap"
+      "via": "naptypes",
+      "collection": "nap"
     }
   }
 }
