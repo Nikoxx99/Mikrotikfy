@@ -31,10 +31,9 @@
     "technology": {
       "model": "technology"
     },
-    "naptypes": {
-      "collection": "naptype",
-      "via": "naps",
-      "dominant": true
+    "naptype": {
+      "model": "naptype",
+      "via": "naps"
     }
   }
 }
