@@ -1,0 +1,24 @@
+{
+  "kind": "collectionType",
+  "collectionName": "naptypes",
+  "info": {
+    "name": "naptype"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "ports": {
+      "type": "integer"
+    },
+    "naps": {
+      "via": "naptype",
+      "model": "nap"
+    }
+  }
+}

@@ -26,11 +26,11 @@
                   @click="alertBox = false"
                 />
                 <v-select
-                  v-model="nap.ports"
-                  :items="items"
+                  v-model="nap.naptype"
+                  :items="napTypes"
                   item-text="name"
-                  item-value="value"
-                  label="Puertos"
+                  item-value="id"
+                  label="Tipo de Nap"
                   outlined
                   chips
                 />
@@ -101,29 +101,13 @@ export default {
       city: '',
       neighborhood: '',
       technology: '',
-      ports: 0
+      naptype: ''
     },
     alertBox: false,
     alertBoxColor: '',
     createdMessage: '',
-    isSubmitting: false,
-    items: [
-      {
-        value: 16, name: 'NAP X16'
-      },
-      {
-        value: 8, name: 'NAP/ONU/SWITCH X8'
-      },
-      {
-        value: 4, name: 'ONU/SWITCH X4'
-      },
-      {
-        value: 2, name: 'ONU/SWITCH X2'
-      },
-      {
-        value: 1, name: 'ONU X1'
-      }
-    ]
+    napTypes: [],
+    isSubmitting: false
   }),
   computed: {
     cities () {
@@ -138,13 +122,7 @@ export default {
   },
   mounted () {
     this.nap.city = this.$route.query.city
-  },
-  created () {
-    if (this.$route.query.created) {
-      this.alertBox = true
-      this.alertBoxColor = 'blue darken-4'
-      this.createdMessage = 'Nap creada correctamente.'
-    }
+    this.getNapTypes()
   },
   methods: {
     createNap () {
@@ -161,6 +139,17 @@ export default {
           this.alertBox = true
           this.alertBoxColor = 'red darken-4'
           this.createdMessage = 'Error al crear la NAP.'
+        })
+    },
+    getNapTypes () {
+      this.$store.dispatch('nap/getNapTypes')
+        .then(() => {
+          this.napTypes = this.$store.state.nap.napTypes
+        })
+        .catch(() => {
+          this.alertBox = true
+          this.alertBoxColor = 'red darken-4'
+          this.createdMessage = 'Error al obtener los tipos de Nap.'
         })
     }
   }

@@ -15,6 +15,13 @@ export const mutations = {
     } catch (error) {
       throw new Error(`NAPS LIST MUTATE ${error}`)
     }
+  },
+  napTypes (state, napTypes) {
+    try {
+      state.napTypes = napTypes
+    } catch (error) {
+      throw new Error(`NAPSTYPES MUTATE ${error}`)
+    }
   }
 }
 export const actions = {
@@ -32,6 +39,14 @@ export const actions = {
       commit('napList', napList)
     } catch (error) {
       throw new Error(`NAPS GET ACTION ${error}`)
+    }
+  },
+  async getNapTypes ({ commit }) {
+    try {
+      const napTypes = await this.$strapi.find('naptypes')
+      commit('napTypes', napTypes)
+    } catch (error) {
+      throw new Error(`NAPSTYPES GET ACTION ${error}`)
     }
   }
 }

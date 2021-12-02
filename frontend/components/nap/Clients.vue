@@ -21,6 +21,7 @@
             :page.sync="page"
             class="elevation-1"
             no-data-text="No hay clientes que mostrar"
+            mobile-breakpoint="100"
             hide-default-footer
             @page-count="pageCount = $event"
           >
@@ -61,6 +62,7 @@
               :page.sync="page2"
               no-data-text="No han cargando los clientes"
               no-results-text="Error al cargar los clientes"
+              mobile-breakpoint="100"
               class="elevation-1"
               hide-default-footer
               @page-count="pageCount2 = $event"

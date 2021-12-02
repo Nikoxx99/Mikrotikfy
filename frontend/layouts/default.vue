@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app class="text-body-2">
     <v-navigation-drawer
       v-model="drawer"
       app

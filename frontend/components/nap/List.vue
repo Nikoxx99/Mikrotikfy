@@ -15,7 +15,7 @@
           tile
         >
           <v-card-title>
-            Naps en {{ currentCity.name }}
+            {{ $store.state.nap.naps.length }} Naps en {{ currentCity.name }}
           </v-card-title>
           <v-card-text>
             <v-text-field
@@ -35,6 +35,7 @@
                 :page.sync="page"
                 :search="search"
                 sort-by="calories"
+                mobile-breakpoint="100"
                 class="elevation-1"
                 hide-default-footer
                 @page-count="pageCount = $event"
@@ -67,7 +68,7 @@ export default {
     search: '',
     headers: [
       { text: 'Codigo', value: 'code' },
-      { text: 'Puertos', value: 'ports' },
+      { text: 'Tipo Nap', value: 'naptype.name' },
       { text: 'Barrio', value: 'neighborhood.name' },
       { text: 'Direccion', value: 'address' },
       { text: 'Tec.', value: 'technology.name' }

@@ -1,0 +1,52 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/naptypes",
+      "handler": "naptype.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/naptypes/count",
+      "handler": "naptype.count",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/naptypes/:id",
+      "handler": "naptype.findOne",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/naptypes",
+      "handler": "naptype.create",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/naptypes/:id",
+      "handler": "naptype.update",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/naptypes/:id",
+      "handler": "naptype.delete",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}

@@ -14,9 +14,6 @@
     "code": {
       "type": "string"
     },
-    "ports": {
-      "type": "integer"
-    },
     "neighborhood": {
       "model": "neighborhood"
     },
@@ -33,6 +30,10 @@
     },
     "technology": {
       "model": "technology"
+    },
+    "naptype": {
+      "model": "naptype",
+      "via": "naps"
     }
   }
 }
