@@ -1,4 +1,3 @@
-import gqlt from 'graphql-tag'
 export const state = () => ({
   technologies: []
 })
@@ -14,19 +13,9 @@ export const mutations = {
 export const actions = {
   async getTechnologiesFromDatabase ({ commit }) {
     try {
-      const apollo = this.app.apolloProvider.defaultClient
-      await apollo.query({
-        query: gqlt`query{
-          technologies{
-            id
-            name
-          }
-        }
-      `
-      }).then((input) => {
-        localStorage.setItem('technologies', JSON.stringify(input.data.technologies))
-        commit('getTechnologiesFromDatabase', input.data.technologies)
-      })
+      const technologies = await this.$strapi.find('technologies')
+      localStorage.setItem('technologies', JSON.stringify(technologies))
+      commit('getTechnologiesFromDatabase', technologies)
     } catch (error) {
       throw new Error(`TECHNOLOGY ACTION ${error}`)
     }

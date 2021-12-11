@@ -5,4 +5,8 @@
  * to customize this service
  */
 
-module.exports = {};
+module.exports = {
+  find () {
+    return strapi.query('city').model.find()
+  }
+};

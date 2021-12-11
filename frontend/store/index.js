@@ -61,6 +61,7 @@ export const actions = {
     let auth = null
     if (req.headers.cookie) {
       const parsed = cookieparser.parse(req.headers.cookie)
+      console.log('cookies parsed', parsed)
       try {
         auth = JSON.parse(parsed.auth)
       } catch (err) {

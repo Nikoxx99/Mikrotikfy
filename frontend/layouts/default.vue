@@ -283,7 +283,7 @@ export default {
     },
     logout (params) {
       Cookie.remove('auth')
-      Cookie.remove('authToken')
+      Cookie.remove('token')
       localStorage.clear()
       sessionStorage.clear()
       this.$store.commit('setAuth', null)

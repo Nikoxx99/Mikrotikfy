@@ -185,7 +185,6 @@ export default {
             return c.name
           })
           const auth = {
-            accessToken: first.data.login.jwt,
             id: first.data.login.user.id,
             username: first.data.login.user.username,
             role: first.data.login.user.role.id,
@@ -193,21 +192,15 @@ export default {
             allowed_components: ac,
             cities: third.data.user.cities
           }
-          this.$store.commit('setAuth', auth)
           Cookie.set('auth', auth, { expires: 7 })
-          Cookie.set('authToken', auth.accessToken, { expires: 7 })
+          Cookie.set('token', first.data.login.jwt, { expires: 7 })
           await Promise.all([
-            await this.$store.dispatch('plan/getPlansFromDatabase'),
-            await this.$store.dispatch('technology/getTechnologiesFromDatabase'),
-            await this.$store.dispatch('device/getDeviceBrandsFromDatabase'),
-            await this.$store.dispatch('city/getCitiesFromDatabase'),
-            await this.$store.dispatch('neighborhood/getNeighborhoodsFromDatabase'),
-            await this.$store.dispatch('count/activeClients', third.data.user.cities[0].id),
-            await this.$store.dispatch('count/clientCount', third.data.user.cities[0].id),
-            await this.$store.dispatch('count/clientCountActive', third.data.user.cities[0].id),
-            await this.$store.dispatch('count/clientCountDisable', third.data.user.cities[0].id),
-            await this.$store.dispatch('count/clientCountRetired', third.data.user.cities[0].id),
-            await this.$store.dispatch('ticket/getTicketsFromDatabase', { limit: 30, city: third.data.user.cities[0].id })
+            this.$store.dispatch('plan/getPlansFromDatabase'),
+            this.$store.dispatch('technology/getTechnologiesFromDatabase'),
+            this.$store.dispatch('device/getDeviceBrandsFromDatabase'),
+            this.$store.dispatch('city/getCitiesFromDatabase'),
+            this.$store.dispatch('neighborhood/getNeighborhoodsFromDatabase'),
+            this.$store.dispatch('ticket/getTicketsFromDatabase', { limit: 30, city: third.data.user.cities[0].id })
           ]).then(() => {
             window.location.href = `/clients?city=${third.data.user.cities[0].id}`
           }).catch((e) => {

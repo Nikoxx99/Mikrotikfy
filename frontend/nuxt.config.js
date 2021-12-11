@@ -68,7 +68,7 @@ export default {
       default: {
         httpEndpoint: process.env.API_ENDPOINT,
         authenticationType: 'Bearer',
-        tokenName: 'authToken'
+        tokenName: 'token'
       }
     }
   },
@@ -82,9 +82,8 @@ export default {
   ],
   strapi: {
     url: process.env.API_STRAPI_ENDPOINT,
-    key: 'authToken',
-    expires: '7d',
-    entities: ['tickets']
+    key: 'token',
+    expires: '7d'
   },
   axios: {
     baseURL: process.env.API_AXIOS_ENDPOINT
