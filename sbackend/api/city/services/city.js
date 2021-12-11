@@ -9,7 +9,8 @@ module.exports = {
   find () {
     return strapi.query('city').model.find()
     .populate({
-      path: 'mikrotiks'
+      path: 'mikrotiks',
+      select: 'ip'
     })
   }
 };
