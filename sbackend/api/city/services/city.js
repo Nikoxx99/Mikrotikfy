@@ -6,11 +6,20 @@
  */
 
 module.exports = {
-  find () {
-    return strapi.query('city').model.find()
-    .populate({
-      path: 'mikrotiks',
-      select: 'ip'
-    })
+  find (params) {
+    console.log(params)
+    if (Object.keys(params).length > 0){
+      return strapi.query('city').model.find({'_id': params.id})
+      .populate({
+        path: 'mikrotiks',
+        select: 'ip'
+      })
+    } else {
+      return strapi.query('city').model.find()
+      .populate({
+        path: 'mikrotiks',
+        select: 'ip'
+      })
+    }
   }
 };
