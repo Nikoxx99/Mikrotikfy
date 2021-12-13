@@ -346,7 +346,6 @@ module.exports = {
     }
   },
   async getClientSecrets(ctx) {
-    console.log('getMkSecrets Command1')
     const city = ctx.query._city
     const searchCity = await strapi.services.city.find({ id: city })
 
@@ -503,7 +502,9 @@ module.exports = {
   async getClientStatus(ctx) {
     const searchClient = await strapi.services.client.findOne({ id: ctx.query.id })
     const searchCity = await strapi.services.city.find({ id: searchClient.city.id })
+    console.log('searchCity',searchCity)
     const mikrotiks = searchCity[0].mikrotiks
+    console.log('mikrotik',mikrotiks)
     const ipList = await mikrotiks.map((mikrotik) => {
       return mikrotik.ip
     })
