@@ -6,7 +6,7 @@
  */
 
 module.exports = {
-  find () {
-    return strapi.query('neighborhood').model.find()
+  find (params) {
+    return strapi.query('neighborhood').model.find(params)
   }
 };
