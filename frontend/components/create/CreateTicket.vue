@@ -141,8 +141,19 @@
             </v-row>
           </v-card-text>
           <v-card-text>
+            <v-text-field
+              v-if="ticketPayload.type.name === 'CAMBIO DE CONTRASEÑA'"
+              v-model="ticketPayload.details"
+              :rules="valid_new_password"
+              label="Ingresa la nueva clave que desea el cliente"
+              :hide-details="hideHint"
+              outlined
+              @keyup="hideHint = false"
+            />
+          </v-card-text>
+          <v-card-text>
             <v-textarea
-              v-if="ticketPayload.type.name !== 'TRASLADO'"
+              v-if="ticketPayload.type.name !== 'TRASLADO' && ticketPayload.type.name !== 'CAMBIO DE CONTRASEÑA'"
               v-model="ticketPayload.details"
               outlined
               label="Detalles del ticket"
@@ -241,7 +252,16 @@ export default {
         'LOTE'
       ],
       finalAddress: ''
-    }
+    },
+    valid_new_password: [
+      value => !!value || 'Debes especificar la nueva contraseña deseada.',
+      value => (value || '').length >= 8 || 'La clave debe tener al menos 8 caracteres.',
+      (value) => {
+        const pattern = /^[A-Za-z0-9]+$/
+        return pattern.test(value) || 'La contraseña no puede contener caracteres especiales.'
+      }
+    ],
+    hideHint: true
   }),
   computed: {
     neighborhoods () {
