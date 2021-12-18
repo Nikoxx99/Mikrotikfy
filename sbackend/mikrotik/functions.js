@@ -512,7 +512,7 @@ module.exports.simpleTelegramCreate = async function (input, telegrambot) {
       "/sendMessage?chat_id=" +
       chatid +
       "&text=" +
-      sanitizeString(message);
+      encodeURIComponent(sanitizeString(message));
     fetch(req)
       .then(function (response) {
         return true;
@@ -539,7 +539,7 @@ module.exports.simpleTelegramCreateRequest = async function (
     "/sendMessage?chat_id=" +
     chatid +
     "&text=" +
-    sanitizeString(message);
+    encodeURIComponent(sanitizeString(message));
   fetch(req)
     .then(function (response) {
       return true;
@@ -564,7 +564,7 @@ module.exports.simpleTelegramAdminCreate = async function (
     "/sendMessage?chat_id=" +
     chatid +
     "&text=" +
-    sanitizeString(message);
+    encodeURIComponent(sanitizeString(message));
   fetch(req)
     .then(function (response) {
       return true;
@@ -579,14 +579,13 @@ module.exports.simpleTelegramUpdate = async function (input, telegrambot) {
   const bot = telegrambot.token;
   const chatid = telegrambot.log;
   var message = `ACTUALIZADO\n${input.code}\n${input.name}\n${input.dni}\n${input.address}\n${input.neighborhood.name}\n${input.phone}\n${input.city.name}\n${input.plan.name}\n${input.wifi_ssid}\n${input.wifi_password}\n${input.technology.name}\nNAP-ONU: ${input.nap_onu_address}\nPOTENCIA: ${input.opticalPower}dBm\n${input.operator.username}\n${input.createdAt}`;
-  payload = message.replace("#", " ");
   const req =
     "https://api.telegram.org/bot" +
     bot +
     "/sendMessage?chat_id=" +
     chatid +
     "&text=" +
-    sanitizeString(message);
+    encodeURIComponent(sanitizeString(message));
   fetch(req)
     .then(function (response) {
       return true;
@@ -622,7 +621,7 @@ module.exports.simpleTelegramUpdatePlan = async function (
     "/sendMessage?chat_id=" +
     chatid +
     "&text=" +
-    sanitizeString(message);
+    encodeURIComponent(sanitizeString(message));
   fetch(req)
     .then(function (response) {
       return true;
@@ -647,7 +646,7 @@ module.exports.simpleTelegramDelete = async function (input, telegrambot) {
     "/sendMessage?chat_id=" +
     chatid +
     "&text=" +
-    sanitizeString(message);
+    encodeURIComponent(sanitizeString(message));
   fetch(req)
     .then(function (response) {
       return true;
@@ -677,7 +676,7 @@ module.exports.simpleTelegramPasswordChange = async function (
     "/sendMessage?chat_id=" +
     chatid +
     "&text=" +
-    sanitizeString(message);
+    encodeURIComponent(sanitizeString(message));
   fetch(req)
     .then(function (response) {
       return true;
@@ -698,7 +697,7 @@ module.exports.simpleTelegramCreateTicket = async function (
   require("dotenv").config();
   const bot = telegrambot.token;
   const chatid = telegrambot.chat;
-  const line1 = "\xE2\x84\xB9 NUEVO TICKET \xE2\x84\xB9";
+  const line1 = "ℹ NUEVO TICKET ℹ️";
   const line2 = input.client.code;
   const line3 = sanitizeString(input.client.name);
   const line4 = sanitizeString(input.client.address);
@@ -714,9 +713,10 @@ module.exports.simpleTelegramCreateTicket = async function (
     "/sendMessage?chat_id=" +
     chatid +
     "&text=" +
-    message;
+    encodeURIComponent(message);
   fetch(req)
-    .then(function (_) {
+    .then(function (res) {
+      console.log(res)
       return true;
     })
     .catch(function (err) {
@@ -736,7 +736,7 @@ module.exports.simpleTelegramCreateTicketAdvance = async function (
   const chatid = telegrambot.chat;
   let line1 = "";
   if (!input.ticket.active) {
-    line1 = "\xE2\x9C\x85 CIERRE DE TICKET \xE2\x9C\x85";
+    line1 = "✅ CIERRE DE TICKET ✅";
   } else {
     line1 = "AVANCE DE TICKET";
   }
@@ -757,7 +757,7 @@ module.exports.simpleTelegramCreateTicketAdvance = async function (
     "/sendMessage?chat_id=" +
     chatid +
     "&text=" +
-    message;
+    encodeURIComponent(message);
   await fetch(req)
     .then(function (_) {
       return true;
@@ -774,10 +774,10 @@ module.exports.simpleTelegramSendActiveTicketList = async function (
   require("dotenv").config();
   const bot = telegrambot.token;
   const chatid = telegrambot.chat;
-  let message = "\xE2\x9C\xB4 TICKETS ACTIVOS RESTANTES \xE2\x9C\xB4\n\n";
+  let message = "✴️ TICKETS ACTIVOS RESTANTES ✴️";
   ticketlist.forEach((ticket) => {
     if (ticket.active) {
-      message += `\xE2\x9E\xA1 ${sanitizeString(
+      message += `➡️ ${sanitizeString(
         ticket.client.code
       )} - ${sanitizeString(ticket.client.name)} - ${sanitizeString(
         ticket.tickettype.name
@@ -790,7 +790,7 @@ module.exports.simpleTelegramSendActiveTicketList = async function (
     "/sendMessage?chat_id=" +
     chatid +
     "&text=" +
-    message;
+    encodeURIComponent(message);
   await fetch(req)
     .then(function (_) {
       return true;

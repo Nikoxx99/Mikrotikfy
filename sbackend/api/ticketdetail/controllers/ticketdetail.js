@@ -19,14 +19,14 @@ module.exports = {
     const tickettype = await strapi.services.tickettype.findOne({ id: idtickettype });
     const assiganted = res.operator.username
     const telegrambot = await strapi.services.telegrambot.find({city: entity.ticket.city})
-    if (res.ticket.active) {
-      console.log('activo')
-      simpleTelegramCreateTicketAdvance(res, client, tickettype, assiganted, telegrambot[0])
-    } else {
-      console.log('cerrado')
-      simpleTelegramCreateTicketAdvance(res, client, tickettype, assiganted, telegrambot[0])
-      const ticketlist = await strapi.services.ticket.find({city: entity.ticket.city, active: true })
-      simpleTelegramSendActiveTicketList(ticketlist, telegrambot[0])
-    }
+    simpleTelegramCreateTicketAdvance(res, client, tickettype, assiganted, telegrambot[0])
+    // if (res.ticket.active) {
+    //   console.log('activo')
+    // } else {
+    //   console.log('cerrado')
+    //   simpleTelegramCreateTicketAdvance(res, client, tickettype, assiganted, telegrambot[0])
+      // const ticketlist = await strapi.services.ticket.find({city: entity.ticket.city, active: true })
+      // simpleTelegramSendActiveTicketList(ticketlist, telegrambot[0])
+    
   }
 }
