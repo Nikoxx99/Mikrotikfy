@@ -4,13 +4,7 @@
       <v-col
         cols="12"
       >
-        <v-card>
-          <v-card-title
-            outline
-            :style="`color:${currentCity ? currentCity.color : ''};border-bottom:solid 1px ${currentCity ? currentCity.color : ''}`"
-          >
-            Tickets {{ currentCity ? currentCity.name : '' }}
-          </v-card-title>
+        <v-card flat tile>
           <v-card-text class="py-1">
             <v-row>
               <v-tooltip top>

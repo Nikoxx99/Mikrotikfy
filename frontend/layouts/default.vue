@@ -39,7 +39,7 @@
         </svg>
       </div>
       <v-app-bar-nav-icon v-if="isMobile" @click.stop="drawer = !drawer" />
-      <v-toolbar-title class="d-none d-md-flex d-lg-flex d-xl-flex" v-text="title" />
+      <v-toolbar-title class="d-none d-md-flex d-lg-flex d-xl-flex" v-text="setCityTitle" />
       <v-spacer />
       <v-switch
         v-model="light"
@@ -205,6 +205,9 @@ export default {
     },
     role () {
       return this.$store.state.auth.rolename
+    },
+    setCityTitle () {
+      return this.currentCity ? `${this.$route.name.toUpperCase()} ${this.currentCity.name}` : this.title
     }
   },
   mounted () {

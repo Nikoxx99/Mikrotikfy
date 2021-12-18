@@ -7,6 +7,12 @@
 
 module.exports = {
   find (params) {
-    return strapi.query('neighborhood').model.find(params)
+    if (params
+      && Object.keys(params).length === 0
+      && Object.getPrototypeOf(params) === Object.prototype) {
+        return strapi.query('neighborhood').model.find(params)
+      } else {
+        return strapi.query('neighborhood').find(params)
+    }
   }
 };

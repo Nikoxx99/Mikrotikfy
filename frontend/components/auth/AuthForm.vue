@@ -200,8 +200,7 @@ export default {
             this.$store.dispatch('device/getDeviceBrandsFromDatabase'),
             this.$store.dispatch('city/getCitiesFromDatabase'),
             this.$store.dispatch('neighborhood/getNeighborhoodsFromDatabase'),
-            this.$store.dispatch('count/activeClients'),
-            this.$store.dispatch('ticket/getTicketsFromDatabase', { limit: 30, city: third.data.user.cities[0].id })
+            this.$store.dispatch('count/activeClients')
           ]).then(() => {
             window.location.href = `/clients?city=${third.data.user.cities[0].id}`
           }).catch((e) => {

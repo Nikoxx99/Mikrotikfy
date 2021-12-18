@@ -12,14 +12,13 @@
         <v-card-title
           outline
           class="text-center"
-          :style="`color:${currentCity ? currentCity.color : ''};border-bottom:solid 1px ${currentCity ? currentCity.color : ''}`"
+          :style="`border-bottom:solid 1px white`"
         >
-          Clientes {{ currentCity ? currentCity.name : '' }}
+          Buscar Cliente
         </v-card-title>
-        <v-subheader>Empieza buscando la información del cliente</v-subheader>
         <v-card-text>
           <v-row
-            class="mx-1 mt-1 mb-1 justify-center"
+            class="mx-1 mt-4 mb-1 justify-center"
           >
             <v-btn
               color="white black--text"
@@ -35,7 +34,7 @@
             <v-text-field
               ref="searchClient"
               v-model="searchClientInput"
-              :label="loadingDataTable ? 'Cargando... Por favor espere.' : 'Buscar Cliente'"
+              :label="loadingDataTable ? 'Cargando... Por favor espere.' : 'Por código, nombre, barrio o dirección'"
               single-line
               hide-details
               filled
