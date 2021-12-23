@@ -8,7 +8,7 @@
         <v-fab-transition>
           <v-btn
             v-if="can('CreateForm')"
-            color="primary"
+            color="blue darken-4"
             fab
             large
             dark
@@ -60,12 +60,14 @@
                 @page-count="pageCount = $event"
               >
                 <template v-slot:top>
-                  <v-toolbar flat>
+                  <div class="mb-4">
                     <v-btn
                       v-if="can('CreateForm')"
-                      color="primary white--text"
+                      color="blue darken-4 white--text"
                       dark
-                      class="mr-4"
+                      elevation="0"
+                      rounded
+                      class="mr-2"
                       @click="createDialog = true"
                     >
                       <v-icon>mdi-plus</v-icon>
@@ -74,15 +76,15 @@
                     <v-btn
                       color="white black--text"
                       dark
+                      rounded
                       class="mr-4"
+                      elevation="0"
                       :disabled="refreshLoading"
                       :loading="refreshLoading"
                       @click="refreshActiveClients"
                     >
                       <v-icon>mdi-reload</v-icon>
                     </v-btn>
-                    <span class="online-text text-caption mr-2">Online</span>
-                    <span class="offline-text text-caption">Offline</span>
                     <v-spacer />
                     <!-- <v-text-field
                       :value="options.itemsPerPage"
@@ -94,7 +96,7 @@
                       hide-details
                       @input="options.itemsPerPage = parseInt($event, 10)"
                     /> -->
-                  </v-toolbar>
+                  </div>
                 </template>
                 <template v-slot:[`item.plan.name`]="props">
                   <v-edit-dialog
@@ -106,7 +108,7 @@
                     @save="savePlanFromModal(props.item._id, props.item.plan, isRx, $store.state.auth.username)"
                     @cancel="cancel()"
                   >
-                    <v-chip small label class="white black--text">
+                    <v-chip small class="white black--text">
                       {{ props.item.plan.name }}
                     </v-chip>
                     <template v-slot:input>
@@ -134,9 +136,9 @@
                   </span>
                 </template>
                 <template v-slot:[`item.technology.name`]="{ item }">
-                  <span>
+                  <v-chip small class="white black--text">
                     {{ item.technology ? item.technology.name : 'No Reg.' }}
-                  </span>
+                  </v-chip>
                 </template>
                 <template v-slot:[`item.newModel`]="{ item }">
                   <svg height="13" width="20">
@@ -310,7 +312,7 @@ export default {
         { text: 'Tecnologia', value: 'technology.name', sortable: false },
         { text: 'Tipo', value: 'newModel', sortable: false },
         { text: 'Activo', value: 'active', sortable: false },
-        { text: 'Aciones', value: 'actions', sortable: false }
+        { text: 'Acciones', value: 'actions', sortable: false }
       ],
       isRx: true,
       itemsPerPage: 15,

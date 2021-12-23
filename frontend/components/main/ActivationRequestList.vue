@@ -17,6 +17,7 @@
                     color="white black--text"
                     class="mt-4 mx-4"
                     dark
+                    rounded
                     :disabled="refreshLoading"
                     :loading="refreshLoading"
                     v-on="on"

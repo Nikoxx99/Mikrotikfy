@@ -11,22 +11,25 @@
       <v-card class="rounded-xl">
         <v-card-title
           outline
-          class="text-center"
-          :style="`border-bottom:solid 1px white`"
+          class="text-center justify-center"
+          style="font-size: 1.5rem"
         >
-          Buscar Cliente
+          <v-icon class="mr-2">
+            mdi-account
+          </v-icon>Buscar Cliente
         </v-card-title>
         <v-card-text>
           <v-row
-            class="mx-1 mt-4 mb-1 justify-center"
+            class="mx-1 mt-4 mb-1 justify-center d-flex"
           >
             <v-btn
               color="white black--text"
               dark
               :loading="loadingDataTable"
-              class="mr-2"
+              tile
               large
-              style="margin-top:7px;"
+              x-large
+              style="border-radius: 30px 0 0 30px;padding:5px;height:56px;"
               @click="getClientBySearch()"
             >
               <v-icon>mdi-magnify</v-icon>
@@ -42,7 +45,7 @@
               :loading="loadingDataTable"
               :disabled="loadingDataTable"
               class="white--text"
-              style="max-width: 600px"
+              style="width:100px;max-width: 600px;border-radius: 0 30px 30px 0;"
               @keyup.enter="getClientBySearch()"
             />
           </v-row>

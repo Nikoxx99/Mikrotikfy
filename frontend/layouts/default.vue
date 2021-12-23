@@ -104,6 +104,8 @@
     </v-main>
     <v-footer
       app
+      dark
+      inset
       absolute
     >
       <span>&copy; {{ new Date().getFullYear() }} Base de Datos interactiva - Desarrollada para ARNOProducciones por Nicolas Echeverry - Todos los derechos reservados.</span>
