@@ -97,9 +97,8 @@
                   />
                   <CreateTicketAdvanceTraslate
                     v-else
+                    :ticket="props.item"
                     :editindex="ticketList.indexOf(props.item)"
-                    :ticketid="props.item.id"
-                    :name="props.item.client.name"
                     @updateTicketStatus="updateTicketStatus($event)"
                   />
                   <TicketAdvanceHistory
@@ -225,8 +224,7 @@
                   v-else
                   :block="true"
                   :editindex="ticketList ? ticketList.indexOf(editModalData.id) : ''"
-                  :ticketid="editModalData.id"
-                  :name="editModalData.client.name"
+                  :ticket="editModalData"
                   @updateTicketStatus="updateTicketStatus($event)"
                 />
                 <TicketAdvanceHistory

@@ -273,7 +273,7 @@ export default {
       return Object.keys(obj).length === 0
     },
     cxGenAddress () {
-      this.cx.finalAddress = `${this.cx.dir1} ${this.cx.dir2} ${this.cx.dir3} ${this.cx.dir4} ${this.cx.neighborhood.name}`
+      this.cx.finalAddress = `${this.cx.dir1} ${this.cx.dir2} ${this.cx.dir3} ${this.cx.dir4} | ${this.cx.neighborhood.name}`
     },
     initComponent () {
       this.modal = true

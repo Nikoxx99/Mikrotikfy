@@ -31,7 +31,7 @@
         </v-card-title>
         <div v-if="!loading">
           <v-card-text>
-            <h2> {{ name }} </h2>
+            <h2> {{ ticket.name }} </h2>
             <p class="mt-2">Rellene la informacion especificando la ONU o NAP donde se genero la dx y que puerto queda libre.</p>
             <v-text-field
               v-model="dxInfo"
@@ -96,13 +96,9 @@ export default {
       type: Number,
       default: -1
     },
-    ticketid: {
-      type: String,
-      default: ''
-    },
-    name: {
-      type: String,
-      default: ''
+    ticket: {
+      type: Object,
+      default: () => ({})
     },
     block: {
       type: Boolean,
@@ -117,6 +113,9 @@ export default {
     snackColor: '',
     dxInfo: '',
     cxInfo: '',
+    newAddress: '',
+    newNeighborhood: '',
+    newNeighborhoodId: '',
     ticketAdvance: {
       id: '',
       details: '',
@@ -127,8 +126,9 @@ export default {
   methods: {
     initComponent () {
       this.modal = true
-      this.ticketAdvance.id = this.ticketid
+      this.ticketAdvance.id = this.ticket.id
       this.ticketAdvance.editindex = this.editindex
+      this.getNewAddress()
     },
     CreateTicketAdvance () {
       this.$apollo.mutate({
@@ -172,17 +172,54 @@ export default {
             details: this.ticketAdvance.details + '\n' + this.dxInfo,
             operator: this.$store.state.auth.id
           }
-        }).then((input) => {
+        }).then(async (_) => {
           this.modal = false
           this.$emit('updateTicketStatus', this.ticketAdvance)
           this.snack = true
           this.snackColor = 'info'
           this.snackText = 'Ticket actualizado con éxito.'
+          await this.getNeighborhoodIdByName()
+          await this.updateClientAddressInfo()
         }).catch((error) => {
           this.snack = true
           this.snackColor = 'red'
           this.snackText = error
         })
+      }).catch((error) => {
+        this.snack = true
+        this.snackColor = 'red'
+        this.snackText = error
+      })
+    },
+    getNewAddress () {
+      this.ticket.details.split('\n').forEach((line) => {
+        if (line.includes('CX: ')) {
+          const lineWhitoutCX = line.replace('CX: ', '')
+          this.newAddress = lineWhitoutCX.split('|')[0].trim()
+          const lastWord = lineWhitoutCX.split('|').pop()
+          this.newNeighborhood = lastWord.trim()
+        }
+      })
+    },
+    async updateClientAddressInfo () {
+      await this.$strapi.update('clients', this.ticket.client.id, {
+        address: this.newAddress,
+        neighborhood: this.newNeighborhoodId
+      }).then((_) => {
+        this.snack = true
+        this.snackColor = 'info'
+        this.snackText = 'Direccion actualizada con éxito.'
+      }).catch((error) => {
+        this.snack = true
+        this.snackColor = 'red'
+        this.snackText = error
+      })
+    },
+    async getNeighborhoodIdByName () {
+      await this.$strapi.find('neighborhoods', {
+        name: this.newNeighborhood
+      }).then((neighborhood) => {
+        this.newNeighborhoodId = neighborhood[0].id
       }).catch((error) => {
         this.snack = true
         this.snackColor = 'red'
