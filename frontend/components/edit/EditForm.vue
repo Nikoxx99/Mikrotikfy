@@ -176,7 +176,9 @@
                 </v-col>
               </v-row>
               <v-row>
-                <CreateDevice :clientid="editClient.id" />
+                <v-col>
+                  <CreateDevice :clientid="editClient.id" />
+                </v-col>
               </v-row>
               <v-row>
                 <v-col cols="12" xs="12" sm="12" md="4" lg="4">

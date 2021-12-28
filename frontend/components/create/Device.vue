@@ -2,6 +2,7 @@
   <span class="d-flex">
     <v-btn
       class="mr-4"
+      elevation="0"
       :block="block"
       :color="$vuetify.theme.dark && !block ? 'primary' : 'primary'"
       @click="dialogDevice = true"
