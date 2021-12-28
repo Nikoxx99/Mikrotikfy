@@ -1,9 +1,8 @@
 <template>
-  <span>
+  <span class="d-flex">
     <v-btn
+      class="mr-4"
       :block="block"
-      :text="!block"
-      :x-small="!block"
       :color="$vuetify.theme.dark && !block ? 'primary' : 'primary'"
       @click="dialogDevice = true"
     >
@@ -31,6 +30,7 @@
         </v-card-title>
         <v-card-text>
           <v-container>
+            <MiscMacScanner @detectedmac="detectedMac($event)" />
             <v-alert
               v-if="alertBox"
               type="info"
@@ -40,7 +40,7 @@
             >
               {{ createdMessage }}
             </v-alert>
-            <v-form ref="createDevice" v-model="valid">
+            <v-form ref="createDevice" v-model="valid" class="mt-3">
               <v-row>
                 <v-col
                   cols="12"
@@ -63,11 +63,13 @@
                         item-text="name"
                         item-value="_id"
                         :items="devicebrands"
+                        :rules="valid_brand"
                         return-object
                         label="Marca"
                         outlined
                         dense
                         hide-details
+                        @change="alertBox = false"
                       />
                     </v-col>
                   </v-row>
@@ -80,7 +82,7 @@
           <v-btn
             class="mr-4"
             color="primary"
-            @click="createDeviceFn(editClient, index)"
+            @click="createDeviceFn()"
           >
             Confirmar
           </v-btn>
@@ -120,6 +122,9 @@ export default {
           return pattern.test(value) || 'La mac no es válida. No pongas guiones ni dos puntos'
         }
       ],
+      valid_brand: [
+        value => !!value || 'Debes especificar la marca'
+      ],
       success: false,
       error: false,
       commentDisabled: false,
@@ -145,10 +150,19 @@ export default {
     }
   },
   methods: {
+    detectedMac (mac) {
+      this.$set(this.device, 'mac_address', mac)
+    },
     async createDeviceFn () {
-      const device = await this.$strapi.create('devices', { mac_address: this.device.mac_address, devicebrand: this.device.devicebrand.id, clients: [this.clientid] })
-      this.$emit('createDevice', device)
-      this.dialogDevice = false
+      if (this.valid) {
+        const device = await this.$strapi.create('devices', { mac_address: this.device.mac_address, devicebrand: this.device.devicebrand.id, clients: [this.clientid] })
+        this.$emit('createDevice', device)
+        this.dialogDevice = false
+      } else {
+        this.alertBox = true
+        this.createdMessage = 'Debes completar todos los campos'
+        this.alertBoxColor = 'red'
+      }
     },
     getDate (date) {
       const dateObject = new Date(date)
