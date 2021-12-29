@@ -192,6 +192,12 @@ export default {
           title: 'Rutas OLT',
           to: '/olt',
           role: 'admin'
+        },
+        {
+          icon: 'mdi-speedometer',
+          title: 'Test de Velocidad',
+          to: '/velocidad',
+          role: 'user'
         }
       ],
       title: 'Aplicación de Gestión Dinámica ARNOP'
