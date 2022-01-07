@@ -6,7 +6,13 @@
  */
 
 module.exports = {
-  find () {
-    return strapi.query('plan').model.find()
+  find (params) {
+    if (params
+      && Object.keys(params).length === 0
+      && Object.getPrototypeOf(params) === Object.prototype){
+        return strapi.query('plan').model.find(params)
+      } else {
+        return strapi.query('plan').find(params)
+      }
   }
 };

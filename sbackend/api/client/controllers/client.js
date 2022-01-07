@@ -272,7 +272,6 @@ module.exports = {
   async refreshClientData (ctx) {
     const cityQuery = await strapi.services.city.findOne({ _id: ctx.query.city });
     const cityIpArray = cityQuery.mikrotiks
-    console.log(cityIpArray[0].ip)
     if (cityIpArray.length > 1) {
       const cityActiveClients = []
       for (let i = 0; i < cityIpArray.length; i++) {
@@ -460,7 +459,7 @@ module.exports = {
     const newClientPlanSearch = ctx.request.body.plan
     const isRx = ctx.request.body.isRx
     const operator = ctx.request.body.operator
-    const searchPlan = await strapi.services.plan.find({ _id: newClientPlanSearch })
+    const searchPlan = await strapi.services.plan.find({ 'id': newClientPlanSearch })
     const newClientPlan = searchPlan[0].mikrotik_name
     const search = await strapi.services.client.find({ _id: id })
     const searchCity = await strapi.services.city.find({ id: search[0].city.id })
@@ -473,7 +472,6 @@ module.exports = {
     const entity = await strapi.services.client.update({ id }, { plan: newClientPlanSearch })
     const telegrambot = await strapi.services.telegrambot.find({city: entity.city.id})
     simpleTelegramUpdatePlan(entity, operator, isRx, telegrambot[0])
-    // console.log(clientObj)
     // await strapi.services.history.create(clientObj);
     if (searchCity[0].mikrotiks.length > 1) {
       //for loop
@@ -502,9 +500,7 @@ module.exports = {
   async getClientStatus(ctx) {
     const searchClient = await strapi.services.client.findOne({ id: ctx.query.id })
     const searchCity = await strapi.services.city.find({ id: searchClient.city.id })
-    console.log('searchCity',searchCity)
     const mikrotiks = searchCity[0].mikrotiks
-    console.log('mikrotik',mikrotiks)
     const ipList = await mikrotiks.map((mikrotik) => {
       return mikrotik.ip
     })
@@ -520,7 +516,6 @@ module.exports = {
         return onlineRes[0]
       } else {
         const goodReponse = mkResponse.filter(client => client.offlineTime !== 'jan/01/1970 00:00:00')
-        console.log(goodReponse)
         let mostRecentDate = new Date(Math.max.apply(null, goodReponse.map( e => {
           return new Date(e.offlineTime);
         })));
