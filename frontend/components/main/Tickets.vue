@@ -32,6 +32,12 @@
               label="Mostrar cerrados"
               @change="refreshTickets()"
             />
+            <v-checkbox
+              v-model="showRetired"
+              class="mr-4"
+              label="Mostrar retiros"
+              @change="refreshTickets()"
+            />
             </v-row>
           </v-card-text>
           <client-only>
@@ -291,6 +297,7 @@ export default {
       dialogEdit: false,
       initialLoading: false,
       showClosedValue: false,
+      showRetired: false,
       refreshLoading: false,
       isDesktop: false,
       editModalData: {},
@@ -331,12 +338,32 @@ export default {
   methods: {
     async refreshTickets () {
       this.initialLoading = true
-      const tickets = await this.$strapi.find('tickets', {
+      let query = {}
+      query = {
         active: !this.showClosedValue,
         city: this.$route.query.city,
+        'tickettype.name_ncontains': 'RETIRO',
         _limit: this.$route.query.limit ? parseInt(this.$route.query.limit) : 50,
         _sort: this.$route.query.sort ? this.$route.query.sort : 'createdAt:desc'
-      })
+      }
+      if (this.showClosedValue) {
+        query = {
+          active: !this.showClosedValue,
+          city: this.$route.query.city,
+          _limit: this.$route.query.limit ? parseInt(this.$route.query.limit) : 50,
+          _sort: this.$route.query.sort ? this.$route.query.sort : 'createdAt:desc'
+        }
+      }
+      if (this.showRetired) {
+        query = {
+          active: !this.showClosedValue,
+          'tickettype.name_contains': 'RETIRO',
+          city: this.$route.query.city,
+          _limit: this.$route.query.limit ? parseInt(this.$route.query.limit) : 50,
+          _sort: this.$route.query.sort ? this.$route.query.sort : 'createdAt:desc'
+        }
+      }
+      const tickets = await this.$strapi.find('tickets', query)
       this.ticketList = tickets.map((t) => {
         if (t.ticketdetails.length > 0) {
           t.details = t.ticketdetails.slice(-1)[0].operator.username + ': ' + t.ticketdetails.slice(-1)[0].details
