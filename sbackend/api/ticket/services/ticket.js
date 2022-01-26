@@ -9,20 +9,27 @@ module.exports = {
   async find (params) {  
     const {active, city, _limit} = params
     if(active) {
-      console.log(params)
-      const res = await strapi.query('ticket').find(params, ["client","tickettype","ticketdetails","assiganted"])
-      if (res.length > 0) {
-        if (res[0].ticketdetails.length > 0) {
-          const resdetails = await strapi.query('ticketdetail').find({_id: res[0].ticketdetails[0]._id})
-          res[0].ticketdetails = resdetails
-          return res
-        } else {
-          return res
-        }
-      } else {
-        return []
-      }
-
+      const res = await strapi.query('ticket').find(params, ["client","client.neighborhood", "tickettype","ticketdetails","assiganted"])
+      const resdetails = await Promise.all(
+        res.map(async (item) => {
+          if (item.ticketdetails.length > 0) {
+            const detailsquery = await strapi.query('ticketdetail').find({_id: item.ticketdetails[0]._id})
+            item.ticketdetails = detailsquery
+            return item
+          } else {
+            return item
+          }
+        })
+      )
+      const resclient = await Promise.all(
+        resdetails.map(async (item) => {
+          const clientquery = await strapi.query('client').findOne({_id: item.client._id})
+          console.log(clientquery)
+          item.client = clientquery
+          return item
+        })
+      )
+      return resclient
     } else {
       return strapi.query('ticket').model.find({city}).limit(parseInt(_limit)).sort({'createdAt':'desc'})
       .populate({

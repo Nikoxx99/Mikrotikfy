@@ -344,14 +344,14 @@ export default {
         city: this.$route.query.city,
         'tickettype.name_ncontains': 'RETIRO',
         _limit: this.$route.query.limit ? parseInt(this.$route.query.limit) : 50,
-        _sort: this.$route.query.sort ? this.$route.query.sort : 'createdAt:desc'
+        _sort: this.$route.query.sort ? this.$route.query.sort : 'createdAt:asc'
       }
       if (this.showClosedValue) {
         query = {
           active: !this.showClosedValue,
           city: this.$route.query.city,
           _limit: this.$route.query.limit ? parseInt(this.$route.query.limit) : 50,
-          _sort: this.$route.query.sort ? this.$route.query.sort : 'createdAt:desc'
+          _sort: this.$route.query.sort ? this.$route.query.sort : 'createdAt:asc'
         }
       }
       if (this.showRetired) {
@@ -360,7 +360,7 @@ export default {
           'tickettype.name_contains': 'RETIRO',
           city: this.$route.query.city,
           _limit: this.$route.query.limit ? parseInt(this.$route.query.limit) : 50,
-          _sort: this.$route.query.sort ? this.$route.query.sort : 'createdAt:desc'
+          _sort: this.$route.query.sort ? this.$route.query.sort : 'createdAt:asc'
         }
       }
       const tickets = await this.$strapi.find('tickets', query)
