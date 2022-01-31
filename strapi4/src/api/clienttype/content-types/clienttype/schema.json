@@ -1,0 +1,24 @@
+{
+  "kind": "collectionType",
+  "collectionName": "clienttypes",
+  "info": {
+    "singularName": "clienttype",
+    "pluralName": "clienttypes",
+    "displayName": "clienttype"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "clients": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::client.client",
+      "mappedBy": "clienttype"
+    }
+  }
+}
