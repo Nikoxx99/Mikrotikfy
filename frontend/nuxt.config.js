@@ -27,6 +27,11 @@ export default {
   */
   css: [
   ],
+
+  publicRuntimeConfig: {
+    API_STRAPI_ENDPOINT: process.env.API_STRAPI_ENDPOINT || 'http://localhost:1337/api/'
+  },
+
   /*
   ** Plugins to load before mounting the App
   ** https://nuxtjs.org/guide/plugins
