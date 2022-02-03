@@ -13,9 +13,16 @@ export const mutations = {
 export const actions = {
   async getNeighborhoodsFromDatabase ({ commit }) {
     try {
-      const neighborhoods = await this.$strapi.find('neighborhoods')
-      localStorage.setItem('neighborhoods', JSON.stringify(neighborhoods))
-      commit('getNeighborhoodsFromDatabase', neighborhoods)
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}neighborhoods`)
+        .then(res => res.json())
+        .then((res) => {
+          const neighborhoods = res.data.map((neighborhood) => {
+            neighborhood = neighborhood.attributes
+            return neighborhood
+          })
+          localStorage.setItem('neighborhoods', JSON.stringify(neighborhoods))
+          commit('getNeighborhoodsFromDatabase', neighborhoods)
+        })
     } catch (error) {
       throw new Error(`NEIGHBORHOOD ACTION ${error}`)
     }

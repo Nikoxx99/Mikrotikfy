@@ -21,18 +21,19 @@ export const mutations = {
   setAuth (state, auth) {
     state.auth = auth
   },
-  setLocalStorage (state, { cities, plans, technologies, neighborhoods, deviceBrands, activeClients, activeClientsList, clientCount, clientCountActive, clientCountDisable, clientCountRetired }) {
+  setLocalStorage (state, { cities, plans, technologies, neighborhoods, deviceBrands, role }) {
     state.cities = JSON.parse(cities)
     state.plans = JSON.parse(plans)
     state.technologies = JSON.parse(technologies)
     state.neighborhoods = JSON.parse(neighborhoods)
     state.devicebrands = JSON.parse(deviceBrands)
-    state.activeClients = JSON.parse(activeClients)
-    state.activeClientsList = JSON.parse(activeClientsList)
-    state.clientCount = JSON.parse(clientCount)
-    state.clientCountActive = JSON.parse(clientCountActive)
-    state.clientCountDisable = JSON.parse(clientCountDisable)
-    state.clientCountRetired = JSON.parse(clientCountRetired)
+    state.role = JSON.parse(role)
+    // state.activeClients = JSON.parse(activeClients)
+    // state.activeClientsList = JSON.parse(activeClientsList)
+    // state.clientCount = JSON.parse(clientCount)
+    // state.clientCountActive = JSON.parse(clientCountActive)
+    // state.clientCountDisable = JSON.parse(clientCountDisable)
+    // state.clientCountRetired = JSON.parse(clientCountRetired)
   },
   setTicketsFromLocalStorage (state, tickets) {
     state.tickets = JSON.parse(tickets)
@@ -72,16 +73,17 @@ export const actions = {
   loadLocalStorage ({ commit }) {
     const plans = localStorage.getItem('plans')
     const cities = localStorage.getItem('cities')
-    const clientCount = localStorage.getItem('clientCount')
     const technologies = localStorage.getItem('technologies')
     const deviceBrands = localStorage.getItem('devicebrands')
     const neighborhoods = localStorage.getItem('neighborhoods')
-    const activeClients = localStorage.getItem('activeClients')
-    const activeClientsList = localStorage.getItem('activeClientsList')
-    const clientCountActive = localStorage.getItem('clientCountActive')
-    const clientCountDisable = localStorage.getItem('clientCountDisable')
-    const clientCountRetired = localStorage.getItem('clientCountRetired')
-    commit('setLocalStorage', { cities, plans, technologies, neighborhoods, deviceBrands, activeClients, activeClientsList, clientCount, clientCountActive, clientCountDisable, clientCountRetired })
+    const role = localStorage.getItem('role')
+    // const clientCount = localStorage.getItem('clientCount')
+    // const activeClients = localStorage.getItem('activeClients')
+    // const activeClientsList = localStorage.getItem('activeClientsList')
+    // const clientCountActive = localStorage.getItem('clientCountActive')
+    // const clientCountDisable = localStorage.getItem('clientCountDisable')
+    // const clientCountRetired = localStorage.getItem('clientCountRetired')
+    commit('setLocalStorage', { cities, plans, technologies, neighborhoods, deviceBrands, role })
   },
   getTicketsFromLocalStorage ({ commit }) {
     const tickets = localStorage.getItem('tickets')

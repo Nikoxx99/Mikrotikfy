@@ -13,9 +13,16 @@ export const mutations = {
 export const actions = {
   async getDeviceBrandsFromDatabase ({ commit }) {
     try {
-      const devicebrands = await this.$strapi.find('devicebrands')
-      localStorage.setItem('devicebrands', JSON.stringify(devicebrands))
-      commit('getDeviceBrandsFromDatabase', devicebrands)
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}devicebrands`)
+        .then(res => res.json())
+        .then((res) => {
+          const devicebrands = res.data.map((devicebrand) => {
+            devicebrand = devicebrand.attributes
+            return devicebrand
+          })
+          localStorage.setItem('devicebrands', JSON.stringify(devicebrands))
+          commit('getDeviceBrandsFromDatabase', devicebrands)
+        })
     } catch (error) {
       throw new Error(`DEVICE BRANDS ACTION ${error}`)
     }

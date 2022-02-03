@@ -212,7 +212,7 @@ export default {
       return this.$store.state.cities ? this.$store.state.cities.find(c => c.id == this.$route.query.city) : ''
     },
     role () {
-      return this.$store.state.auth.rolename
+      return this.$store.state.role.role.name
     },
     setCityTitle () {
       return this.currentCity ? `${this.$route.name.toUpperCase()} ${this.currentCity.name}` : this.title
@@ -270,13 +270,13 @@ export default {
     setLocalStorage () {
       localStorage.setItem('currentCity', this.$route.query.city)
     },
-    comprobeCity () {
-      const recordedCity = localStorage.getItem('currentCity')
-      const currentCity = this.$route.query.city
-      if (currentCity !== recordedCity) {
-        this.$store.dispatch('refreshActiveClients', currentCity)
-      }
-    },
+    // comprobeCity () {
+    //   const recordedCity = localStorage.getItem('currentCity')
+    //   const currentCity = this.$route.query.city
+    //   if (currentCity !== recordedCity) {
+    //     this.$store.dispatch('refreshActiveClients', currentCity)
+    //   }
+    // },
     comprobeDateToSetChristmasTheme () {
       const date = new Date()
       const month = date.getMonth()

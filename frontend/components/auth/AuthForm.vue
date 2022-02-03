@@ -83,7 +83,7 @@
 </template>
 
 <script>
-// import Cookie from 'js-cookie'
+import Cookie from 'js-cookie'
 
 export default {
   data: () => ({
@@ -174,6 +174,7 @@ export default {
           const userData = cities.data[0].attributes.users.data[0].attributes
           userData.id = userId
           cities = cities.data.map((city) => {
+            city.attributes.id = city.id
             city = city.attributes
             return city
           })
@@ -188,18 +189,17 @@ export default {
               username: userData.username,
               cities
             }
-            // Cookie.set('auth', auth, { expires: 7 })
-            // Cookie.set('token', response.jwt, { expires: 7 })
+            Cookie.set('auth', auth, { expires: 7 })
+            Cookie.set('token', response.jwt, { expires: 7 })
             await Promise.all([
               this.$store.dispatch('plan/getPlansFromDatabase'),
               this.$store.dispatch('technology/getTechnologiesFromDatabase'),
               this.$store.dispatch('device/getDeviceBrandsFromDatabase'),
               this.$store.dispatch('city/getCitiesFromDatabase'),
               this.$store.dispatch('neighborhood/getNeighborhoodsFromDatabase'),
-              this.$store.dispatch('count/activeClients')
+              this.$store.dispatch('role/getRoleFromUserData', { token: response.jwt })
             ]).then(() => {
-              // window.location.href = `/clients?city=${cities[0].id}`
-              console.log('finish', auth)
+              window.location.href = `/clients?city=${cities[0].name}`
             }).catch((e) => {
               this.errorMessages = e
               this.loginFailed = true
