@@ -73,7 +73,7 @@
                   <v-spacer />
                   <h3>Uptime: {{ clientData.uptime }}</h3>
                   <v-spacer />
-                  <h3 v-if="can('access_password')">Clave: 4Rn0P{{ code }}</h3>
+                  <h3>Clave: 4Rn0P{{ code }}</h3>
                 </v-col>
                 <v-col>
                   <h3>Descarga: <strong>{{ formatBytes(clientData.download) }}</strong></h3>
@@ -86,7 +86,7 @@
         </div>
         <v-card-actions>
           <EditForm
-            v-if="can('EditForm') && item"
+            v-if="item"
             :client="item"
             :index="index"
             :role="$store.state.auth.allowed_components"
@@ -192,13 +192,6 @@ export default {
       const i = Math.floor(Math.log(bytes) / Math.log(k))
 
       return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
-    },
-    can (component) {
-      // eslint-disable-next-line camelcase
-      const allowed_components = this.role
-      // eslint-disable-next-line camelcase
-      const current_component = component
-      return allowed_components.includes(current_component)
     }
   }
 }

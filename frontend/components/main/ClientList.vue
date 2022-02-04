@@ -7,7 +7,6 @@
       <v-row class="justify-center">
         <v-fab-transition>
           <v-btn
-            v-if="can('CreateForm')"
             color="blue darken-4"
             fab
             large
@@ -62,7 +61,6 @@
                 <template v-slot:top>
                   <div class="mb-4">
                     <v-btn
-                      v-if="can('CreateForm')"
                       color="blue darken-4 white--text"
                       dark
                       elevation="0"
@@ -147,7 +145,7 @@
                 </template>
                 <template v-slot:[`item.active`]="props">
                   <div style="white-space:nowrap;display:inline-flex">
-                    <v-tooltip v-if="can('CreateForm')" left>
+                    <v-tooltip left>
                       <template v-slot:activator="{ on, attrs }">
                         <v-btn
                           :color="props.item.active ? 'green darken-3' : 'red darken-3'"
@@ -174,7 +172,6 @@
                 <template v-slot:[`item.actions`]="{ item }">
                   <div style="white-space:nowrap">
                     <CreateTicket
-                      v-if="can('CreateTicket')"
                       :client="item"
                       :assignated="$store.state.auth.id"
                       :role="$store.state.auth.allowed_components"
@@ -184,7 +181,6 @@
                       :name="item.name"
                     />
                     <ClientStatus
-                      v-if="can('ClientStatus')"
                       :name="item.name"
                       :clientid="item._id"
                       :code="item.code"
@@ -197,13 +193,12 @@
                       :clientid="item._id"
                     />
                     <EditForm
-                      v-if="can('EditForm')"
                       :client="item"
                       :index="clients.indexOf(item)"
                       :role="$store.state.auth.allowed_components"
                       @updateSuccess="getClientBySearch()"
                     />
-                    <DeleteClient v-if="can('DeleteClient')" :name="item.name" :clientid="item._id" />
+                    <DeleteClient :name="item.name" :clientid="item._id" />
                   </div>
                 </template>
               </v-data-table>
@@ -335,7 +330,7 @@ export default {
     },
     currentCity () {
       // eslint-disable-next-line eqeqeq
-      return this.$store.state.cities ? this.$store.state.cities.find(c => c.id == this.$route.query.city) : ''
+      return this.$store.state.cities ? this.$store.state.cities.find(c => c.name == this.$route.query.city) : ''
     },
     plans () {
       return this.$store.state.plans
@@ -393,7 +388,7 @@ export default {
       const city = this.$route.query.city
       this.result = 'Buscando...'
       if (search) {
-        await this.$store.dispatch('client/getUsersFromDatabaseBySearch', { search, city })
+        await this.$store.dispatch('client/getUsersFromDatabaseBySearch', { search, city, token: this.$store.state.auth.token })
         await this.getClientStatusOnMikrotik()
         this.showPagintation = false
         this.loadingDataTable = false
@@ -440,12 +435,6 @@ export default {
       this.snack = value
       this.snackText = 'Cliente creado con éxito!'
       this.snackColor = 'info'
-    },
-    can (component) {
-      const allowedcomponents = this.$store.state.auth.allowed_components
-      const currentComponent = component
-      const res = allowedcomponents.includes(currentComponent)
-      return res
     },
     updateStatus (client, index) {
       if (client.active === true) {

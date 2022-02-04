@@ -11,9 +11,9 @@ export const mutations = {
   },
   getUsersFromDatabase (state, clientsList) {
     try {
-      state.clients = clientsList
+      state.clients = clientsList.data.results
     } catch (error) {
-      throw new Error(`MUTATE ${error}`)
+      throw new Error(`MUTATE SEARCH CLIENT${error}`)
     }
   },
   updateFromModal (state, client) {
@@ -105,12 +105,17 @@ export const actions = {
   },
   async getUsersFromDatabaseBySearch ({ commit }, payload) {
     try {
-      const clients = await this.$strapi.find('searchClient', {
-        search: payload.search,
-        limit: payload.limit,
-        city: payload.city
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}searchclient?search=${payload.search}&city=${payload.city}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${payload.token}`
+        }
       })
-      commit('getUsersFromDatabase', clients)
+        .then(res => res.json())
+        .then((clients) => {
+          commit('getUsersFromDatabase', clients)
+        })
     } catch (error) {
       throw new Error(`ACTION ${error}`)
     }
