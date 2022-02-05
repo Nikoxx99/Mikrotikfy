@@ -198,7 +198,7 @@
                       :role="$store.state.auth.allowed_components"
                       @updateSuccess="getClientBySearch()"
                     />
-                    <DeleteClient :name="item.name" :clientid="item._id" />
+                    <DeleteClient :name="item.name" :clientid="String(item.id)" />
                   </div>
                 </template>
               </v-data-table>

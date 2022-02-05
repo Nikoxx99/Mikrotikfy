@@ -17,6 +17,7 @@ export const actions = {
         .then(res => res.json())
         .then((res) => {
           const devicebrands = res.data.map((devicebrand) => {
+            devicebrand.attributes.id = devicebrand.id
             devicebrand = devicebrand.attributes
             return devicebrand
           })
