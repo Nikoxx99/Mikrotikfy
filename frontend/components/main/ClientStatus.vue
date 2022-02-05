@@ -157,30 +157,18 @@ export default {
       this.loading = true
       this.modal = true
       this.online = false
-      const data = await this.$strapi.graphql({
-        query: `
-          query($id: ID) {
-            ClientStatus(id: $id){
-              online
-              exists
-              address
-              mikrotik
-              mac_address
-              offlineTime
-              disconnectReason
-              lastCallerId
-              uptime
-              download
-              upload
-            }
-          }
-        `,
-        variables: {
-          id: this.clientid
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}clientstatus?id=${this.clientid}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.$store.state.auth.token}`
         }
       })
-      this.loading = false
-      this.clientData = data.ClientStatus
+        .then(res => res.json())
+        .then((clientstatus) => {
+          this.loading = false
+          this.clientData = clientstatus
+        })
     },
     formatBytes (bytes, decimals = 2) {
       if (bytes === 0) { return '0 Bytes' }

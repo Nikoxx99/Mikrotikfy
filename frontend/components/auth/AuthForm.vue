@@ -198,7 +198,7 @@ export default {
               this.$store.dispatch('device/getDeviceBrandsFromDatabase'),
               this.$store.dispatch('city/getCitiesFromDatabase'),
               this.$store.dispatch('neighborhood/getNeighborhoodsFromDatabase'),
-              this.$store.dispatch('count/activeClients'),
+              this.$store.dispatch('count/activeClients', { token: response.jwt, city: cities[0].id }),
               this.$store.dispatch('role/getRoleFromUserData', { token: response.jwt })
             ]).then(() => {
               window.location.href = `/clients?city=${cities[0].name}`

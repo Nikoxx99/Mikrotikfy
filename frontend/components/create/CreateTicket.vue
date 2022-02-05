@@ -189,18 +189,6 @@
 import gqlt from 'graphql-tag'
 export default {
   name: 'CreateTicket',
-  apollo: {
-    tickettypes () {
-      return {
-        query: gqlt`query{
-          tickettypes{
-            id
-            name
-          }
-        }`
-      }
-    }
-  },
   props: {
     client: {
       type: Object,
@@ -221,6 +209,7 @@ export default {
     alertBox: false,
     alertBoxColor: '',
     createdMessage: '',
+    tickettypes: [],
     errors: {
       type: false,
       details: false
@@ -269,6 +258,23 @@ export default {
     }
   },
   methods: {
+    async getTickettypes () {
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}tickettypes`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.$store.state.auth.token}`
+        }
+      })
+        .then(res => res.json())
+        .then((tickettypes) => {
+          const tt = tickettypes.data.map((tickettype) => {
+            tickettype = tickettype.attributes
+            return tickettype
+          })
+          this.tickettypes = tt
+        })
+    },
     isEmpty (obj) {
       return Object.keys(obj).length === 0
     },
@@ -280,6 +286,7 @@ export default {
       this.ticketPayload.client = this.client.id
       this.ticketPayload.city = this.client.city.id
       this.ticketPayload.assignated = this.assignated
+      this.getTickettypes()
     },
     createTicket () {
       this.loading = true

@@ -202,7 +202,7 @@ module.exports.mkClientStatus = async function (
   const conn = new RouterOSAPI({
     host: mikrotikHost,
     user: "API_ARNOP",
-    password: strapi.config.get("server.admin.mikrotik.secret", "null"),
+    password: process.env.MIKROTIK_API_SECRET,
     port: 8087,
   });
 

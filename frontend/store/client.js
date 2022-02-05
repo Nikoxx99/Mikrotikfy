@@ -70,7 +70,8 @@ export const actions = {
     }
   },
   async calculateClientStatus ({ state, commit }, payload) {
-    const newState = await state.clients.map((client) => {
+    const shallowState = JSON.parse(JSON.stringify(state.clients))
+    const newState = await shallowState.map((client) => {
       // eslint-disable-next-line eqeqeq
       const ac = payload.find(c => c == client.code)
       if (ac) {

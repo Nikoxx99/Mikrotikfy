@@ -50,7 +50,7 @@
               >
                 <template v-slot:[`item.actions`]="props">
                   <TicketAdvanceHistory
-                    :ticketid="props.item.id"
+                    :ticketid="String(props.item.id)"
                     :name="props.item.client.name"
                   />
                 </template>
@@ -86,47 +86,11 @@
 </template>
 
 <script>
-import gqlt from 'graphql-tag'
 import TicketAdvanceHistory from '../misc/TicketAdvanceHistory'
 export default {
   name: 'TicketHistory',
   components: {
     TicketAdvanceHistory
-  },
-  apollo: {
-    tickets () {
-      return {
-        query: gqlt`
-          query($id: ID!){
-            tickets(where: {
-              client: $id
-            }){
-              id
-              active
-              client{
-                code
-                name
-                phone
-              }
-              tickettype{
-                name
-              }
-              assiganted{
-                username
-              }
-              details
-              createdAt
-            }
-          }
-        `,
-        variables: {
-          id: this.clientid
-        },
-        skip () {
-          return true
-        }
-      }
-    }
   },
   props: {
     clientid: {
@@ -156,7 +120,7 @@ export default {
       { text: 'Estado', sortable: true, value: 'active' },
       { text: 'Cliente', sortable: true, value: 'client.name' },
       { text: 'Tipo', sortable: true, value: 'tickettype.name' },
-      { text: 'Operador', sortable: false, value: 'assiganted.username' },
+      { text: 'Operador', sortable: false, value: 'assignated.username' },
       { text: 'Detalles', sortable: true, value: 'details' },
       { text: 'Creado', sortable: true, value: 'createdAt' },
       { text: 'Acciones', sortable: true, value: 'actions' }
@@ -166,16 +130,46 @@ export default {
     async initComponent () {
       this.modal = true
       this.loading = false
-      this.$apollo.queries.tickets.skip = false
-      await this.$apollo.queries.tickets.fetchMore({
-        variables: {
-          id: this.clientid
+      const qs = require('qs')
+      const query = qs.stringify({
+        filters: {
+          client: {
+            id: {
+              $eq: this.clientid
+            }
+          }
         },
-        updateQuery: (_, { fetchMoreResult }) => {
-          const newInfo = fetchMoreResult.tickets
-          this.tickets = newInfo
+        populate: [
+          'client',
+          'tickettype',
+          'assignated'
+        ]
+      },
+      {
+        encodeValuesOnly: true
+      })
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}tickets?${query}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.$store.state.auth.token}`
         }
       })
+        .then(res => res.json())
+        .then((tickets) => {
+          const ticketRes = tickets.data.map((ticket) => {
+            ticket.attributes.client.data.attributes.id = ticket.attributes.client.data.id
+            ticket.attributes.client = ticket.attributes.client.data.attributes
+            ticket.attributes.tickettype.data.attributes.id = ticket.attributes.tickettype.data.id
+            ticket.attributes.tickettype = ticket.attributes.tickettype.data.attributes
+            ticket.attributes.assignated.data.attributes.id = ticket.attributes.assignated.data.id
+            ticket.attributes.assignated = ticket.attributes.assignated.data.attributes
+            ticket.attributes.id = ticket.id
+            ticket = ticket.attributes
+            return ticket
+          })
+          this.tickets = ticketRes
+        })
     },
     getDate (date) {
       const dateObject = new Date(date)
@@ -195,13 +189,6 @@ export default {
       } else {
         return 'Cerrado'
       }
-    },
-    can (component) {
-      // eslint-disable-next-line camelcase
-      const allowed_components = this.role
-      // eslint-disable-next-line camelcase
-      const current_component = component
-      return allowed_components.includes(current_component)
     }
   }
 }

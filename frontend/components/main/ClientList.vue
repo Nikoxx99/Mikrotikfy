@@ -173,16 +173,16 @@
                   <div style="white-space:nowrap">
                     <CreateTicket
                       :client="item"
-                      :assignated="$store.state.auth.id"
+                      :assignated="String($store.state.auth.id)"
                       :role="$store.state.auth.allowed_components"
                     />
                     <TicketHistory
-                      :clientid="item._id"
+                      :clientid="String(item.id)"
                       :name="item.name"
                     />
                     <ClientStatus
                       :name="item.name"
-                      :clientid="item._id"
+                      :clientid="String(item.id)"
                       :code="item.code"
                       :item="item"
                       :index="clients.indexOf(item)"
@@ -190,7 +190,7 @@
                     />
                     <MainDevices
                       :name="item.name"
-                      :clientid="item._id"
+                      :clientid="String(item.id)"
                     />
                     <EditForm
                       :client="item"
