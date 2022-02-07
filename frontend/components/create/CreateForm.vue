@@ -289,7 +289,6 @@ export default {
         },
         wifi_ssid: '',
         wifi_password: '',
-        technology: {},
         mac_address: '',
         comment: '',
         newModel: 1,
