@@ -17,6 +17,7 @@ export const actions = {
         .then(res => res.json())
         .then((res) => {
           const technologies = res.data.map((technology) => {
+            technology.attributes.id = technology.id
             technology = technology.attributes
             return technology
           })

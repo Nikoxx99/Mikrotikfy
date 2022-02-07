@@ -18,7 +18,7 @@ module.exports = {
             $or: [
               { 'city': city, 'code': { $regex: new RegExp(search, 'i') } }
             ],
-            populate: '*'
+            populate: ['city', 'plan', 'neighborhood', 'technology', 'clienttype']
           })
           const sanitizedEntity = await sanitize.contentAPI.output(res);
           return { data: sanitizedEntity };
@@ -33,7 +33,8 @@ module.exports = {
                 { 'city': city, 'neighborhood': neighborhood[0]._id },
                 { 'city': city, 'dni': { $regex: new RegExp(search, 'i') } },
                 { 'city': city, 'phone': { $regex: new RegExp(search, 'i') } }
-              ]
+              ],
+              populate: ['city', 'plan', 'neighborhood', 'technology', 'clienttype']
             })
             const sanitizedEntity = await sanitize.contentAPI.output(res);
           return { data: sanitizedEntity };
@@ -45,7 +46,8 @@ module.exports = {
                 { 'city': city, 'address': { $regex: new RegExp(search, 'i') } },
                 { 'city': city, 'dni': { $regex: new RegExp(search, 'i') } },
                 { 'city': city, 'phone': { $regex: new RegExp(search, 'i') } }
-              ]
+              ],
+              populate: ['city', 'plan', 'neighborhood', 'technology', 'clienttype']
             })
             const sanitizedEntity = await sanitize.contentAPI.output(res);
             return { data: sanitizedEntity };
@@ -62,7 +64,8 @@ module.exports = {
               { 'city': city, 'neighborhood': neighborhood[0]._id },
               { 'city': city, 'dni': { $regex: new RegExp(search, 'i') } },
               { 'city': city, 'phone': { $regex: new RegExp(search, 'i') } }
-            ]
+            ],
+            populate: ['city', 'plan', 'neighborhood', 'technology', 'clienttype']
           })
           const sanitizedEntity = await sanitize.contentAPI.output(res);
           return { data: sanitizedEntity };
@@ -75,6 +78,7 @@ module.exports = {
               { 'city': city, 'dni': { $regex: new RegExp(search, 'i') } },
               { 'city': city, 'phone': { $regex: new RegExp(search, 'i') } }
             ],
+            populate: ['city', 'plan', 'neighborhood', 'technology', 'clienttype'],
             orderBy: { code: 'asc' }})
           const sanitizedEntity = await sanitize.contentAPI.output(res);
           return { data: sanitizedEntity };

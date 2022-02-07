@@ -378,7 +378,8 @@ export default {
     },
     async refreshActiveClients () {
       this.refreshLoading = true
-      await this.$store.dispatch('refreshActiveClients', this.$route.query.city)
+      const city = this.$store.state.auth.cities.find(city => city.name === this.$route.query.city)
+      await this.$store.dispatch('refreshActiveClients', { city, token: this.$store.state.auth.token })
       await this.getClientStatusOnMikrotik()
       this.refreshLoading = false
     },

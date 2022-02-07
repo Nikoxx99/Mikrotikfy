@@ -17,6 +17,7 @@ export const actions = {
         .then(res => res.json())
         .then((res) => {
           const neighborhoods = res.data.map((neighborhood) => {
+            neighborhood.attributes.id = neighborhood.id
             neighborhood = neighborhood.attributes
             return neighborhood
           })

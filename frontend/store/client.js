@@ -197,48 +197,25 @@ export const actions = {
       throw new Error(`ADMINDELETE ACTION ${error}`)
     }
   },
-  updateClient ({ commit }, { client, index, operator }) {
-    const apollo = this.app.apolloProvider.defaultClient
-    try {
-      apollo.mutate({
-        mutation: gqlt`mutation ($input: updateClientInput){
-          updateClient(input: $input){
-            client{
-              id
-            }
-          }
-        }`,
-        variables: {
-          input: {
-            where: {
-              id: client._id
-            },
-            data: {
-              code: client.code,
-              name: client.name,
-              dni: client.dni,
-              address: client.address,
-              neighborhood: client.neighborhood.id,
-              phone: client.phone,
-              plan: client.plan.id,
-              technology: client.technology ? client.technology.id : null,
-              wifi_ssid: client.wifi_ssid,
-              wifi_password: client.wifi_password,
-              comment: client.comment,
-              hasRepeater: client.hasRepeater,
-              nap_onu_address: client.nap_onu_address,
-              opticalPower: client.opticalPower,
-              operator,
-              newModel: client.newModel
-            }
-          }
-        }
-      }).then((_) => {
-        commit('updateClient', { client, index })
+  async updateClient ({ commit }, { client, index, operator, token }) {
+    await fetch(`${this.$config.API_STRAPI_ENDPOINT}clients/${client.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        data: { operator, ...client }
       })
-    } catch (error) {
+    }).then((input) => {
+      if (input.status === 200) {
+        commit('updateClient', { client, index })
+      }
+    }).catch((error) => {
+      // eslint-disable-next-line no-console
+      console.error(error)
       throw new Error(`UPDATE USER ACTION ${error}`)
-    }
+    })
   },
   updateClientDevices ({ commit }, { device, index }) {
     commit('updateClientDevices', { device, index })

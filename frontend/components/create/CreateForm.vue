@@ -116,7 +116,6 @@
             outlined
             dense
             hide-details
-            return-object
           />
         </v-col>
         <v-col>
@@ -154,7 +153,6 @@
             outlined
             dense
             hide-details
-            return-object
           />
         </v-col>
       </v-row>
@@ -259,7 +257,6 @@
 </template>
 
 <script>
-import gqlt from 'graphql-tag'
 export default {
   name: 'CreateForm',
   props: {
@@ -355,60 +352,61 @@ export default {
   },
   mounted () {
     if (this.$route.query.city) {
-      this.Client.city = this.$route.query.city
+      const city = this.$store.state.auth.cities.find(city => city.name === this.$route.query.city)
+      this.Client.city = city.id
     }
   },
   methods: {
     async testCodeForDuplicated (code) {
-      const clients = await this.$strapi.find('clients', {
-        code,
-        city: this.$route.query.city
-      })
-      if (clients.length > 0) {
-        this.codeError = true
-        this.d00pHint = 'Error. El codigo ya existe.'
-        this.hideD00pHint = false
-      } else {
-        this.codeError = false
-        this.d00pHint = ''
-        this.hideD00pHint = true
-        this.codeSuccess = true
-      }
-    },
-    createClient () {
-      this.isSubmitting = !this.isSubmitting
-      this.$apollo.mutate({
-        mutation: gqlt`mutation ($input: createClientInput){
-          createClient(input: $input){
-            client {
-              code
-            }
-          }
-        }`,
-        variables: {
-          input: {
-            data: {
-              code: this.Client.code,
-              name: this.Client.name,
-              dni: this.Client.dni,
-              address: this.Client.address,
-              neighborhood: this.Client.neighborhood.id,
-              city: this.Client.city,
-              phone: this.Client.phone,
-              plan: this.Client.plan.id,
-              wifi_ssid: this.Client.wifi_ssid,
-              wifi_password: this.Client.wifi_password,
-              comment: this.Client.comment,
-              newModel: this.Client.newModel,
-              sendToMikrotik: this.Client.sendToMikrotik,
-              hasRepeater: this.Client.hasRepeater,
-              operator: this.$store.state.auth.id,
-              operator_role: this.role
+      const qs = require('qs')
+      const query = qs.stringify({
+        filters: {
+          code: {
+            $eq: code
+          },
+          city: {
+            name: {
+              $eq: this.$route.query.city
             }
           }
         }
+      },
+      {
+        encodeValuesOnly: true
+      })
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}clients?${query}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.$store.state.auth.token}`
+        }
+      })
+        .then(res => res.json())
+        .then((clients) => {
+          if (clients.data.length > 0) {
+            this.codeError = true
+            this.d00pHint = 'Error. El codigo ya existe.'
+            this.hideD00pHint = false
+          } else {
+            this.codeError = false
+            this.d00pHint = ''
+            this.hideD00pHint = true
+            this.codeSuccess = true
+          }
+        })
+    },
+    async createClient () {
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}clients`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.$store.state.auth.token}`
+        },
+        body: JSON.stringify({
+          data: { ...this.Client, operator: this.$store.state.auth.id, operator_role: this.role }
+        })
       }).then((input) => {
-        if (input.data.createClient.code !== '0') {
+        if (input.status === 200) {
           this.$emit('createClientDialog', false)
           this.$emit('createClientSnack', true)
         } else {
@@ -416,12 +414,11 @@ export default {
           this.alertBoxColor = 'red darken-4'
           this.createdMessage = 'Error al crear el cliente. Reporta esto al gestor web'
           this.isSubmitting = false
+          throw new Error('Error creating serie')
         }
       }).catch((error) => {
-        this.alertBox = true
-        this.alertBoxColor = 'red darken-4'
-        this.createdMessage = error
-        this.isSubmitting = false
+        // eslint-disable-next-line no-console
+        console.error(error)
       })
     },
     genAddress () {

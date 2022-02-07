@@ -89,18 +89,25 @@ export const actions = {
     const tickets = localStorage.getItem('tickets')
     commit('setTicketsFromLocalStorage', tickets)
   },
-  async refreshActiveClients ({ commit }, city) {
+  async refreshActiveClients ({ commit }, payload) {
     try {
-      const res = await this.$strapi.find('getactiveclients', {
-        city
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}activeclients?city=${payload.city.id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${payload.token}`
+        }
       })
-      const count = res.length
-      localStorage.setItem('activeClients', res.length)
-      const clientActiveList = await res.map((c) => {
-        return c.name
-      })
-      localStorage.setItem('activeClientsList', JSON.stringify(clientActiveList))
-      commit('refreshActiveClients', { count, clientActiveList })
+        .then(res => res.json())
+        .then(async (clients) => {
+          localStorage.setItem('activeClients', clients.length)
+          const count = clients.length
+          const clientActiveList = await clients.map((c) => {
+            return c.name
+          })
+          localStorage.setItem('activeClientsList', JSON.stringify(clientActiveList))
+          commit('refreshActiveClients', { count, clientActiveList })
+        })
     } catch (error) {
       throw new Error(`ACTIVECOUNT ACTION ${error}`)
     }

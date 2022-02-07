@@ -17,6 +17,7 @@ export const actions = {
         .then(res => res.json())
         .then((res) => {
           const plans = res.data.map((plan) => {
+            plan.attributes.id = plan.id
             plan = plan.attributes
             return plan
           })
