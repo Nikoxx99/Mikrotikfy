@@ -145,7 +145,7 @@
                 </template>
                 <template v-slot:[`item.active`]="props">
                   <div style="white-space:nowrap;display:inline-flex">
-                    <v-tooltip left>
+                    <v-tooltip v-if="$isAdmin()" left>
                       <template v-slot:activator="{ on, attrs }">
                         <v-btn
                           :color="props.item.active ? 'green darken-3' : 'red darken-3'"
@@ -162,7 +162,7 @@
                       </template>
                       <span>Activar Cliente</span>
                     </v-tooltip>
-                    <ActivationRequest
+                    <MiscActivationRequest
                       :item="props.item"
                       :index="clients.indexOf(props.item)"
                       :allowedcomponents="$store.state.auth.allowed_components"
@@ -270,7 +270,6 @@ import ClientStatus from '../main/ClientStatus'
 import CreateTicket from '../create/CreateTicket'
 import TicketHistory from '../misc/TicketHistory'
 import CreateForm from '../create/CreateForm'
-import ActivationRequest from '../misc/ActivationRequest'
 export default {
   name: 'ClientList',
   components: {
@@ -279,8 +278,7 @@ export default {
     DeleteClient,
     ClientStatus,
     CreateTicket,
-    TicketHistory,
-    ActivationRequest
+    TicketHistory
   },
   props: {
     search: {

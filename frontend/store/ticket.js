@@ -1,4 +1,3 @@
-import gqlt from 'graphql-tag'
 export const state = () => ({
   tickets: []
 })
@@ -12,48 +11,66 @@ export const mutations = {
   }
 }
 export const actions = {
-  async getTicketsFromDatabase ({ commit }, { city, limit }) {
+  async getTicketsFromDatabase ({ commit }, { city, token, active, retired }) {
     try {
-      const apollo = this.app.apolloProvider.defaultClient
-      await apollo.query({
-        query: gqlt`query($limit: Int, $city: String){
-          tickets(limit: $limit, sort:"createdAt:desc",where: {
-            city:$city
-          }){
-            id
-            active
-            client{
-              id
-              code
-              name
-              address
-              neighborhood{
-                name
-              }
-              phone
-              technology{
-                name
-              }
+      let filters = null
+      if (retired) {
+        filters = {
+          city: {
+            name: {
+              $eq: city
             }
-            tickettype{
-              name
+          },
+          active: {
+            $eq: !active
+          },
+          tickettype: {
+            name: {
+              $eq: 'RETIRADO'
             }
-            assiganted{
-              username
-            }
-            details
-            createdAt
           }
         }
-      `,
-        variables: {
-          limit,
-          city
+      } else {
+        filters = {
+          city: {
+            name: {
+              $eq: city
+            }
+          },
+          active: {
+            $eq: !active
+          }
         }
-      }).then((input) => {
-        localStorage.setItem('tickets', JSON.stringify(input.data.tickets))
-        commit('getTicketsFromDatabase', input.data.tickets)
+      }
+      const qs = require('qs')
+      const query = qs.stringify({
+        filters,
+        populate: [
+          'client',
+          'city',
+          'tickettype',
+          'assignated',
+          'ticketdetails'
+        ]
+      },
+      {
+        encodeValuesOnly: true
       })
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}tickets?${query}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      })
+        .then(res => res.json())
+        .then((tickets) => {
+          const ticketList = tickets.data.map((ticket) => {
+            ticket.attributes.id = ticket.id
+            return ticket.attributes
+          })
+          localStorage.setItem('tickets', JSON.stringify(ticketList))
+          commit('getTicketsFromDatabase', ticketList)
+        })
     } catch (error) {
       throw new Error(`TICKET ACTION ${error}`)
     }

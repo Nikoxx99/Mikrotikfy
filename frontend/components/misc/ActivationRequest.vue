@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-tooltip v-if="can('CreateActivationRequest') && !item.active" left>
+    <v-tooltip v-if="!item.active" left>
       <template v-slot:activator="{ on, attrs }">
         <v-btn
           :color="item.active ? 'green darken-4' : 'red darken-3'"

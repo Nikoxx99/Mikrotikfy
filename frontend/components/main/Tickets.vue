@@ -89,7 +89,6 @@
                     :name="props.item.client.name"
                   />
                   <ClientStatus
-                      v-if="can('ClientStatus')"
                       :name="props.item.client.name"
                       :clientid="props.item.client.id"
                       :code="props.item.client.code"
@@ -212,7 +211,6 @@
             <v-list-item>
               <v-list-item-content v-if="editModalData.client !== undefined">
                 <ClientStatus
-                    v-if="can('ClientStatus')"
                     :block="true"
                     :name="editModalData.client.name"
                     :clientid="editModalData.client.id"
@@ -321,7 +319,6 @@ export default {
       snack: false,
       snackColor: '',
       snackText: '',
-      ticketList: [],
       allowed_components: []
     }
   },
@@ -329,6 +326,9 @@ export default {
     currentCity () {
       // eslint-disable-next-line eqeqeq
       return this.$store.state.cities ? this.$store.state.cities.find(c => c.id == this.$route.query.city) : ''
+    },
+    ticketList () {
+      return this.$store.state.tickets
     }
   },
   mounted () {
@@ -338,38 +338,7 @@ export default {
   methods: {
     async refreshTickets () {
       this.initialLoading = true
-      let query = {}
-      query = {
-        active: !this.showClosedValue,
-        city: this.$route.query.city,
-        'tickettype.name_ncontains': 'RETIRO',
-        _limit: this.$route.query.limit ? parseInt(this.$route.query.limit) : 50,
-        _sort: this.$route.query.sort ? this.$route.query.sort : 'createdAt:asc'
-      }
-      if (this.showClosedValue) {
-        query = {
-          active: !this.showClosedValue,
-          city: this.$route.query.city,
-          _limit: this.$route.query.limit ? parseInt(this.$route.query.limit) : 50,
-          _sort: this.$route.query.sort ? this.$route.query.sort : 'createdAt:asc'
-        }
-      }
-      if (this.showRetired) {
-        query = {
-          active: !this.showClosedValue,
-          'tickettype.name_contains': 'RETIRO',
-          city: this.$route.query.city,
-          _limit: this.$route.query.limit ? parseInt(this.$route.query.limit) : 50,
-          _sort: this.$route.query.sort ? this.$route.query.sort : 'createdAt:asc'
-        }
-      }
-      const tickets = await this.$strapi.find('tickets', query)
-      this.ticketList = tickets.map((t) => {
-        if (t.ticketdetails.length > 0) {
-          t.details = t.ticketdetails.slice(-1)[0].operator.username + ': ' + t.ticketdetails.slice(-1)[0].details
-        }
-        return t
-      })
+      await this.$store.dispatch('ticket/getTicketsFromDatabase', { city: this.$route.query.city, token: this.$store.state.auth.token, active: this.showClosedValue, retired: this.showRetired })
       this.initialLoading = false
     },
     updateTicketStatus ({ editindex, closeTicket }) {
@@ -430,12 +399,6 @@ export default {
     showTicketInfo (value) {
       Object.assign(this.editModalData, value)
       this.infoModal = true
-    },
-    can (component) {
-      const allowedcomponents = this.$store.state.auth.allowed_components
-      const currentComponent = component
-      const res = allowedcomponents.includes(currentComponent)
-      return res
     },
     comprobeCity () {
       const recordedCity = localStorage.getItem('currentCity')
