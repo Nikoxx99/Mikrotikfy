@@ -146,37 +146,25 @@ export const actions = {
       throw new Error(`CLIENT ACTION ${error}`)
     }
   },
-  adminCreate ({ commit }, { client, index }) {
-    const apollo = this.app.apolloProvider.defaultClient
-    try {
-      apollo.mutate({
-        mutation: gqlt`mutation ($input: adminCreateInput){
-          adminCreate(input: $input)
-        }`,
-        variables: {
-          input: {
-            id: client._id,
-            code: client.code,
-            name: client.name,
-            dni: client.dni,
-            address: client.address,
-            neighborhood: client.neighborhood.id,
-            city: client.city.id,
-            phone: client.phone,
-            plan: client.plan.id,
-            wifi_ssid: client.wifi_ssid,
-            wifi_password: client.wifi_password,
-            technology: client.technology.id,
-            mac_address: client.mac_address,
-            comment: client.comment
-          }
-        }
-      }).then((client) => {
-        commit('adminToggle', { client, index })
+  async adminCreate ({ commit }, { client, index, token, operator }) {
+    await fetch(`${this.$config.API_STRAPI_ENDPOINT}admincreate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        data: { ...client, operator }
       })
-    } catch (error) {
+    }).then((input) => {
+      if (input.status === 200) {
+        commit('adminToggle', { client, index })
+      }
+    }).catch((error) => {
+      // eslint-disable-next-line no-console
+      console.error(error)
       throw new Error(`ADMINCREATE ACTION ${error}`)
-    }
+    })
   },
   adminDelete ({ commit }, { client, index }) {
     const apollo = this.app.apolloProvider.defaultClient

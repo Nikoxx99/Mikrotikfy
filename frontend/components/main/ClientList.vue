@@ -155,7 +155,7 @@
                           v-bind="attrs"
                           text
                           v-on="on"
-                          @click="updateStatus(props.item, clients.map(function(x) {return x._id; }).indexOf(props.item._id))"
+                          @click="updateStatus(props.item, clients.map(function(x) {return x.id; }).indexOf(props.item.id))"
                         >
                           <v-icon>mdi-{{ props.item.active ? 'check' : 'close' }} {{ props.index }}</v-icon>
                         </v-btn>
@@ -439,9 +439,9 @@ export default {
     },
     updateStatus (client, index) {
       if (client.active === true) {
-        this.$store.dispatch('client/adminDelete', { client, index })
+        this.$store.dispatch('client/adminDelete', { client, index, token: this.$store.state.auth.token, operator: this.$store.state.auth.username })
       } else {
-        this.$store.dispatch('client/adminCreate', { client, index })
+        this.$store.dispatch('client/adminCreate', { client, index, token: this.$store.state.auth.token, operator: this.$store.state.auth.username })
       }
     }
   }
