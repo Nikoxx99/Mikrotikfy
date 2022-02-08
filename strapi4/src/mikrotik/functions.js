@@ -1,41 +1,5 @@
 /* eslint-disable no-undef */
 const RouterOSAPI = require("node-routeros").RouterOSAPI;
-module.exports.mkDeleteClient = async function (
-  mikrotikHost,
-  dni,
-  code,
-  model
-) {
-  const conn = new RouterOSAPI({
-    host: mikrotikHost,
-    user: "API_ARNOP",
-    password: strapi.config.get("server.admin.mikrotik.secret", "null"),
-    port: 8087,
-  });
-  try {
-    await conn.connect();
-    if (model === 1) {
-      var com1 = await conn.write("/ppp/secret/getall", [
-        "=.proplist=.id",
-        "?=name=" + code,
-      ]);
-      await conn.write("/ppp/secret/remove", ["=.id=" + com1[0][".id"]]);
-      conn.close();
-      return true;
-    } else {
-      var com1 = await conn.write("/ppp/secret/getall", [
-        "=.proplist=.id",
-        "?=name=" + dni,
-      ]);
-      await conn.write("/ppp/secret/remove", ["=.id=" + com1[0][".id"]]);
-      conn.close();
-      return true;
-    }
-  } catch (error) {
-    conn.close();
-    return false;
-  }
-};
 module.exports.mkSetClientPlanInformation = async function (
   mikrotikHost,
   input

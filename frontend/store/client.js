@@ -166,24 +166,25 @@ export const actions = {
       throw new Error(`ADMINCREATE ACTION ${error}`)
     })
   },
-  adminDelete ({ commit }, { client, index }) {
-    const apollo = this.app.apolloProvider.defaultClient
-    try {
-      apollo.mutate({
-        mutation: gqlt`mutation ($input: adminDeleteInput){
-          adminDelete(input: $input)
-        }`,
-        variables: {
-          input: {
-            id: client._id
-          }
-        }
-      }).then(() => {
-        commit('adminToggle', { client, index })
+  async adminDelete ({ commit }, { client, index, token, operator }) {
+    await fetch(`${this.$config.API_STRAPI_ENDPOINT}admindelete`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        data: { ...client, operator }
       })
-    } catch (error) {
+    }).then((input) => {
+      if (input.status === 200) {
+        commit('adminToggle', { client, index })
+      }
+    }).catch((error) => {
+      // eslint-disable-next-line no-console
+      console.error(error)
       throw new Error(`ADMINDELETE ACTION ${error}`)
-    }
+    })
   },
   async updateClient ({ commit }, { client, index, operator, token }) {
     await fetch(`${this.$config.API_STRAPI_ENDPOINT}clients/${client.id}`, {
