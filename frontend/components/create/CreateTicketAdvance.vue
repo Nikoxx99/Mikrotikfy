@@ -98,8 +98,8 @@ export default {
       default: -1
     },
     ticketid: {
-      type: String,
-      default: ''
+      type: Number,
+      default: -1
     },
     name: {
       type: String,

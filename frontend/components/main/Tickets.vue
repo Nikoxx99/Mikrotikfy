@@ -310,7 +310,7 @@ export default {
         { text: 'Telefono', sortable: true, value: 'client.phone', align: ' d-none d-lg-table-cell' },
         { text: 'Tec.', sortable: true, value: 'client.technology.name', align: ' d-none d-lg-table-cell' },
         { text: 'Tipo', sortable: true, value: 'tickettype.name' },
-        { text: 'Operador', sortable: false, value: 'assiganted.username', align: ' d-none d-lg-table-cell' },
+        { text: 'Operador', sortable: false, value: 'assignated.username', align: ' d-none d-lg-table-cell' },
         { text: 'Detalles', sortable: true, value: 'details', width: 400, align: ' d-none d-lg-table-cell' },
         { text: 'Creado', sortable: true, value: 'createdAt', align: ' d-none d-lg-table-cell' },
         { text: 'Acciones', sortable: true, value: 'actions', align: ' d-none d-lg-table-cell' }

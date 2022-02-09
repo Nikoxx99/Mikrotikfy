@@ -47,6 +47,8 @@ export const actions = {
         filters,
         populate: [
           'client',
+          'client.neighborhood',
+          'client.technology',
           'city',
           'tickettype',
           'assignated',
@@ -64,12 +66,31 @@ export const actions = {
       })
         .then(res => res.json())
         .then((tickets) => {
-          const ticketList = tickets.data.map((ticket) => {
-            ticket.attributes.id = ticket.id
-            return ticket.attributes
-          })
-          localStorage.setItem('tickets', JSON.stringify(ticketList))
-          commit('getTicketsFromDatabase', ticketList)
+          console.log('no flat', tickets)
+          const res = this.$flatten(tickets)
+          console.log('flat', res)
+          // const ticketList = tickets.data.map((ticket) => {
+          //   ticket.attributes.id = ticket.id
+          //   ticket.attributes.client.data.attributes.id = ticket.attributes.client.data.id
+          //   ticket.attributes.client = ticket.attributes.client.data.attributes
+          //   ticket.attributes.city.data.attributes.id = ticket.attributes.city.data.id
+          //   ticket.attributes.city = ticket.attributes.city.data.attributes
+          //   ticket.attributes.client.neighborhood.data.attributes.id = ticket.attributes.client.neighborhood.data.id
+          //   ticket.attributes.client.neighborhood = ticket.attributes.client.neighborhood.data.attributes
+          //   ticket.attributes.client.technology.data.attributes.id = ticket.attributes.client.technology.data.id
+          //   ticket.attributes.client.technology = ticket.attributes.client.technology.data.attributes
+          //   ticket.attributes.tickettype.data.attributes.id = ticket.attributes.tickettype.data.id
+          //   ticket.attributes.tickettype = ticket.attributes.tickettype.data.attributes
+          //   ticket.attributes.assignated.data.attributes.id = ticket.attributes.assignated.data.id
+          //   ticket.attributes.assignated = ticket.attributes.assignated.data.attributes
+          //   ticket.attributes.ticketdetails.data.forEach((ticketdetail) => {
+          //     ticketdetail.attributes.id = ticketdetail.id
+          //     ticketdetail = ticketdetail.attributes
+          //   })
+          //   return ticket.attributes
+          // })
+          // localStorage.setItem('tickets', JSON.stringify(ticketList))
+          // commit('getTicketsFromDatabase', ticketList)
         })
     } catch (error) {
       throw new Error(`TICKET ACTION ${error}`)

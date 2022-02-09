@@ -115,8 +115,8 @@ export default {
   },
   props: {
     clientid: {
-      type: String,
-      default: ''
+      type: Number,
+      default: -1
     },
     name: {
       type: String,
