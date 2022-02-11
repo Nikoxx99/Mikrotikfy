@@ -186,7 +186,6 @@
 </template>
 
 <script>
-import gqlt from 'graphql-tag'
 export default {
   name: 'CreateTicket',
   props: {
@@ -195,8 +194,8 @@ export default {
       default: () => {}
     },
     assignated: {
-      type: String,
-      default: ''
+      type: Number,
+      default: -1
     },
     role: {
       type: Array,
@@ -269,6 +268,7 @@ export default {
         .then(res => res.json())
         .then((tickettypes) => {
           const tt = tickettypes.data.map((tickettype) => {
+            tickettype.attributes.id = tickettype.id
             tickettype = tickettype.attributes
             return tickettype
           })
@@ -288,7 +288,7 @@ export default {
       this.ticketPayload.assignated = this.assignated
       this.getTickettypes()
     },
-    createTicket () {
+    async createTicket () {
       this.loading = true
       if (this.ticketPayload.type.name === 'TRASLADO') {
         this.ticketPayload.details = `DX: ${this.client.address} ${this.client.neighborhood.name} \n CX: ${this.cx.finalAddress}`
@@ -309,37 +309,35 @@ export default {
         this.errors.details = true
         return
       }
-      this.$apollo.mutate({
-        mutation: gqlt`mutation ($input: createTicketInput){
-          createTicket(input: $input){
-            ticket{
-              id
-              client{
-                code
-              }
-            }
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}tickets`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.$store.state.auth.token}`
+        },
+        body: JSON.stringify({
+          data: {
+            active: true,
+            client: this.ticketPayload.client,
+            city: this.ticketPayload.city,
+            tickettype: this.ticketPayload.type.id,
+            assignated: this.ticketPayload.assignated,
+            details: this.ticketPayload.details
           }
-        }`,
-        variables: {
-          input: {
-            data: {
-              active: true,
-              client: this.ticketPayload.client,
-              city: this.ticketPayload.city,
-              tickettype: this.ticketPayload.type.id,
-              assiganted: this.ticketPayload.assignated,
-              details: this.ticketPayload.details
-            }
-          }
+        })
+      }).then((input) => {
+        if (input.status === 200) {
+          this.modal = false
+          this.loading = false
+        } else {
+          this.alertBox = true
+          this.alertBoxColor = 'red darken-4'
+          this.createdMessage = 'Error al crear el ticket'
+          this.loading = false
         }
-      }).then((_) => {
-        this.modal = false
-        this.loading = false
       }).catch((error) => {
-        this.alertBox = true
-        this.alertBoxColor = 'red darken-4'
-        this.createdMessage = error
-        this.loading = false
+        // eslint-disable-next-line no-console
+        console.error(error)
       })
     },
     can (component) {

@@ -69,43 +69,8 @@
 </template>
 
 <script>
-import gqlt from 'graphql-tag'
 export default {
   name: 'TicketAdvanceHistory',
-  apollo: {
-    ticketdetails () {
-      return {
-        query: gqlt`
-          query($id: ID!){
-            ticketdetails(where: {
-              ticket: $id
-            }){
-              ticket{
-                client{
-                  name
-                }
-                tickettype{
-                  name
-                }
-                createdAt
-              }
-              operator {
-                username
-              }
-              details
-              createdAt
-            }
-          }
-        `,
-        variables: {
-          id: this.ticketid
-        },
-        skip () {
-          return true
-        }
-      }
-    }
-  },
   props: {
     ticketid: {
       type: Number,

@@ -41,7 +41,7 @@
                 calculate-widths
                 sort-desc
                 :page.sync="page"
-                no-data-text="No hay tickets para mostrar aun..."
+                no-data-text="No hay tickets para mostrar aún..."
                 loading-text="Cargando información de tickets..."
                 dense
                 hide-default-footer
@@ -50,7 +50,7 @@
               >
                 <template v-slot:[`item.actions`]="props">
                   <TicketAdvanceHistory
-                    :ticketid="String(props.item.id)"
+                    :ticketid="props.item.id"
                     :name="props.item.client.name"
                   />
                 </template>

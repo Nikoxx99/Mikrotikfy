@@ -39,7 +39,7 @@ export default {
   plugins: [
     '~/plugins/axios',
     '~/plugins/role',
-    '~/plugins/utils'
+    // '~/plugins/utils'
   ],
   /*
   ** Auto import components

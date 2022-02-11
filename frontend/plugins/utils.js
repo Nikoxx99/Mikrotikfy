@@ -3,12 +3,11 @@ function flatten (obj) {
 
   Object.keys(obj).forEach((key) => {
     const value = obj[key]
-
     if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
       if (key === 'attributes') {
         Object.assign(flattened, flatten(value))
       } else {
-        Object.assign(flattened[key], flatten(value))
+        flattened[parent] = flatten(value, key)
       }
     } else if (Array.isArray(value) && key === 'data') {
       value.forEach((item) => {

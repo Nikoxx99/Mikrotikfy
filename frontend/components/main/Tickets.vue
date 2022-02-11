@@ -328,7 +328,7 @@ export default {
       return this.$store.state.cities ? this.$store.state.cities.find(c => c.id == this.$route.query.city) : ''
     },
     ticketList () {
-      return this.$store.state.tickets
+      return this.$store.state.ticket.tickets
     }
   },
   mounted () {
@@ -342,9 +342,7 @@ export default {
       this.initialLoading = false
     },
     updateTicketStatus ({ editindex, closeTicket }) {
-      if (editindex > -1) {
-        this.ticketList[editindex].active = !closeTicket
-      }
+      this.$store.commit('ticket/updateTicketStatus', { editindex, closeTicket })
       this.refreshTickets()
       this.infoModal = false
     },

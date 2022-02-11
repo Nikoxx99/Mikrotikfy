@@ -95,8 +95,8 @@ export default {
       default: 'Devices'
     },
     clientid: {
-      type: String,
-      default: ''
+      type: Number,
+      default: -1
     },
     block: {
       type: Boolean,

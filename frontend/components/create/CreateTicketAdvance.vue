@@ -39,7 +39,7 @@
               label="Detalles adicionales"
             />
             <v-checkbox
-              v-if="$store.state.auth.rolename === 'superadmin'"
+              v-if="$isAdmin()"
               v-model="ticketAdvance.escalated"
               color="red"
               label="Escalar caso?"
@@ -89,7 +89,6 @@
 </template>
 
 <script>
-import gqlt from 'graphql-tag'
 export default {
   name: 'CreateTicketAdvance',
   props: {
@@ -130,69 +129,49 @@ export default {
       this.ticketAdvance.id = this.ticketid
       this.ticketAdvance.editindex = this.editindex
     },
-    CreateTicketAdvance () {
+    async CreateTicketAdvance () {
       this.loading = true
-      this.$apollo.mutate({
-        mutation: gqlt`mutation ($id: ID!, $status: Boolean, $escalated: Boolean){
-          updateTicket(input: {
-          where: {
-            id: $id
-          }
-          data: {
-            active: $status
-            answered: true
-            escalated: $escalated
-          }
-        }){
-          ticket{
-            id
-          }
-        }
-        }`,
-        variables: {
-          id: this.ticketAdvance.id,
-          status: !this.ticketAdvance.closeTicket,
-          escalated: this.ticketAdvance.escalated
-        }
-      }).then(() => {
-        this.$apollo.mutate({
-          mutation: gqlt`mutation ($id: ID!, $details: String, $operator: ID!){
-            createTicketdetail(input: {
-              data: {
-                ticket: $id
-                details: $details
-                operator: $operator
-              }
-            }) {
-              ticketdetail{
-                ticket{
-                  id
-                }
-              }
-            }
-          }`,
-          variables: {
-            id: this.ticketAdvance.id,
-            details: this.ticketAdvance.details,
-            operator: this.$store.state.auth.id
-          }
-        }).then((_) => {
-          this.modal = false
-          this.$emit('updateTicketStatus', this.ticketAdvance)
-          this.snack = true
-          this.snackColor = 'info'
-          this.snackText = 'Ticket actualizado con éxito.'
-          this.loading = false
-        }).catch((error) => {
-          this.snack = true
-          this.snackColor = 'red'
-          this.snackText = error
-          this.loading = false
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}tickets/${this.ticketid}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.$store.state.auth.token}`
+        },
+        body: JSON.stringify({
+          data: { active: !this.ticketAdvance.closeTicket, escalated: this.ticketAdvance.escalated }
         })
+      }).then(async (input) => {
+        if (input.status === 200) {
+          await fetch(`${this.$config.API_STRAPI_ENDPOINT}ticketdetails`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${this.$store.state.auth.token}`
+            },
+            body: JSON.stringify({
+              data: {
+                ticket: this.ticketAdvance.id,
+                details: this.ticketAdvance.details,
+                operator: this.$store.state.auth.id
+              }
+            })
+          }).then((input) => {
+            if (input.status === 200) {
+              this.modal = false
+              this.$emit('updateTicketStatus', this.ticketAdvance)
+              this.snack = true
+              this.snackColor = 'info'
+              this.snackText = 'Ticket actualizado con éxito.'
+              this.loading = false
+            }
+          }).catch((error) => {
+            // eslint-disable-next-line no-console
+            console.error(error)
+          })
+        }
       }).catch((error) => {
-        this.snack = true
-        this.snackColor = 'red'
-        this.snackText = error
+        // eslint-disable-next-line no-console
+        console.error(error)
       })
     },
     can (component) {
