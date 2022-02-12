@@ -32,6 +32,7 @@
     </v-navigation-drawer>
     <v-app-bar
       app
+      class="elevation-0"
     >
       <div v-if="hasPendingChanges">
         <svg height="13" width="20" style="position:absolute;top:12px;left:43px;">
@@ -104,7 +105,6 @@
     </v-main>
     <v-footer
       app
-      dark
       inset
       absolute
     >

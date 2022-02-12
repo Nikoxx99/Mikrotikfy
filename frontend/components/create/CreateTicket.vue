@@ -34,9 +34,6 @@
         </v-card-title>
         <div v-if="!loading">
           <v-card-text>
-            <h2> {{ client.name }} </h2>
-          </v-card-text>
-          <v-card-text>
             <v-select
               v-model="ticketPayload.type"
               :items="tickettypes"

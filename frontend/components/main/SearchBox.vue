@@ -8,7 +8,7 @@
       lg="6"
       xl="6"
     >
-      <v-card class="rounded-xl">
+      <v-card class="rounded-xl elevation-0">
         <v-card-title
           outline
           class="text-center justify-center"
@@ -23,7 +23,7 @@
             class="mx-1 mt-4 mb-1 justify-center d-flex"
           >
             <v-btn
-              color="white black--text"
+              color="grey lighten-4 black--text elevation-0"
               dark
               :loading="loadingDataTable"
               tile

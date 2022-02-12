@@ -64,7 +64,8 @@ export const actions = {
           'city',
           'tickettype',
           'assignated',
-          'ticketdetails'
+          'ticketdetails',
+          'ticketdetails.operator'
         ]
       },
       {
@@ -96,6 +97,9 @@ export const actions = {
               ticketdetail.attributes.id = ticketdetail.id
               ticketdetail = ticketdetail.attributes
             })
+            if (ticket.attributes.ticketdetails.data.length > 0) {
+              ticket.attributes.details = ticket.attributes.ticketdetails.data.slice(-1)[0].attributes.operator.data.attributes.username + ': ' + ticket.attributes.ticketdetails.data.slice(-1)[0].attributes.details
+            }
             return ticket.attributes
           })
           localStorage.setItem('tickets', JSON.stringify(ticketList))

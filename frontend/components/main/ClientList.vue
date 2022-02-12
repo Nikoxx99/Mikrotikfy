@@ -7,7 +7,7 @@
       <v-row class="justify-center">
         <v-fab-transition>
           <v-btn
-            color="blue darken-4"
+            color="blue darken-4 elevation-0"
             fab
             large
             dark

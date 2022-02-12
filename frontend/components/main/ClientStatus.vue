@@ -28,11 +28,10 @@
         :class="clientData ? clientData.online ? 'teal darken-4' : '' : ''"
       >
         <v-card-title class="headline">
-          Estatus en Mikrotik
+          Estatus en Mikrotik de {{ name }}
         </v-card-title>
         <div v-if="!loading">
           <v-card-text>
-            <h2> {{ name }} </h2>
             <v-alert
               v-if="clientData && clientData.online && clientData.exists"
               dense

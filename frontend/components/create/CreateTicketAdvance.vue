@@ -31,7 +31,6 @@
         </v-card-title>
         <div v-if="!loading">
           <v-card-text>
-            <h2> {{ name }} </h2>
             <v-textarea
               v-model="ticketAdvance.details"
               outlined

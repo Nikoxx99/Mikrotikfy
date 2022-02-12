@@ -60,23 +60,6 @@
               @page-count="pageCount = $event"
               @click:row="showTicketInfo"
             >
-              <template v-slot:top>
-                <v-row class="mx-1 my-1">
-                  <v-spacer class="d-none d-xs-none d-sm-block d-md-block d-lg-block d-lx-block" />
-                  <v-text-field
-                    ref="searchTicket"
-                    v-model="search"
-                    prepend-icon="mdi-magnify"
-                    label="Buscar Tickets"
-                    single-line
-                    hide-details
-                    outlined
-                    dense
-                    style="max-width: 1000px"
-                    class="white--text"
-                  />
-                </v-row>
-              </template>
               <template v-slot:[`item.tickettype.name`]="props">
                 <v-chip small :color="getTicketTypeColor(props.item.tickettype.name)" class="white--text">
                   {{ props.item.tickettype.name }}
@@ -301,19 +284,19 @@ export default {
       editModalData: {},
       infoModal: false,
       headers: [
-        { text: 'Estado', sortable: true, value: 'active', width: '5%' },
-        { text: 'Codigo', sortable: true, value: 'client.code', width: 60, align: ' d-none d-lg-table-cell' },
-        { text: 'Cedula', sortable: true, value: 'client.dni', width: 60, align: ' d-none d-lg-table-cell' },
-        { text: 'Cliente', sortable: true, value: 'client.name' },
-        { text: 'Dirección', sortable: true, value: 'client.address', align: ' d-none d-lg-table-cell' },
-        { text: 'Barrio', sortable: true, value: 'client.neighborhood.name' },
-        { text: 'Telefono', sortable: true, value: 'client.phone', align: ' d-none d-lg-table-cell' },
-        { text: 'Tec.', sortable: true, value: 'client.technology.name', align: ' d-none d-lg-table-cell' },
-        { text: 'Tipo', sortable: true, value: 'tickettype.name' },
+        { text: 'Estado', sortable: false, value: 'active', width: '5%' },
+        { text: 'Codigo', sortable: false, value: 'client.code', width: 60, align: ' d-none d-lg-table-cell' },
+        { text: 'Cédula', sortable: false, value: 'client.dni', width: 60, align: ' d-none d-lg-table-cell' },
+        { text: 'Cliente', sortable: false, value: 'client.name' },
+        { text: 'Dirección', sortable: false, value: 'client.address', align: ' d-none d-lg-table-cell' },
+        { text: 'Barrio', sortable: false, value: 'client.neighborhood.name' },
+        { text: 'Telefono', sortable: false, value: 'client.phone', align: ' d-none d-lg-table-cell' },
+        { text: 'Tec.', sortable: false, value: 'client.technology.name', align: ' d-none d-lg-table-cell' },
+        { text: 'Tipo', sortable: false, value: 'tickettype.name' },
         { text: 'Operador', sortable: false, value: 'assignated.username', align: ' d-none d-lg-table-cell' },
-        { text: 'Detalles', sortable: true, value: 'details', width: 400, align: ' d-none d-lg-table-cell' },
-        { text: 'Creado', sortable: true, value: 'createdAt', align: ' d-none d-lg-table-cell' },
-        { text: 'Acciones', sortable: true, value: 'actions', align: ' d-none d-lg-table-cell' }
+        { text: 'Detalles', sortable: false, value: 'details', width: 400, align: ' d-none d-lg-table-cell' },
+        { text: 'Creado', sortable: false, value: 'createdAt', align: ' d-none d-lg-table-cell' },
+        { text: 'Acciones', sortable: false, value: 'actions', align: ' d-none d-lg-table-cell' }
       ],
       States: [{ name: 'Abierto', value: true }, { name: 'Cerrado', value: false }],
       snack: false,

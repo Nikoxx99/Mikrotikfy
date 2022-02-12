@@ -27,11 +27,10 @@
         :loading="loading"
       >
         <v-card-title class="headline">
-          Historial de Tickets
+          Historial de Tickets de {{ name }}
         </v-card-title>
         <div v-if="!loading">
           <v-card-text>
-            <h2> {{ name }} </h2>
             <client-only>
               <v-data-table
                 :headers="headers"
