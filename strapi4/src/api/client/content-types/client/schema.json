@@ -131,9 +131,9 @@
       "target": "api::history.history",
       "mappedBy": "client"
     },
-    "clienttype": {
+    "clienttypes": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "manyToMany",
       "target": "api::clienttype.clienttype",
       "inversedBy": "clients"
     }

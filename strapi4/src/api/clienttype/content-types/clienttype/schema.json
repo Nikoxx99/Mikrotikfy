@@ -4,7 +4,8 @@
   "info": {
     "singularName": "clienttype",
     "pluralName": "clienttypes",
-    "displayName": "clienttype"
+    "displayName": "clienttype",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -16,9 +17,9 @@
     },
     "clients": {
       "type": "relation",
-      "relation": "oneToMany",
+      "relation": "manyToMany",
       "target": "api::client.client",
-      "mappedBy": "clienttype"
+      "mappedBy": "clienttypes"
     }
   }
 }
