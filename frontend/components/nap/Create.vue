@@ -46,6 +46,7 @@
                   item-value="id"
                   class="mb-3"
                   :items="cities"
+                  :disabled="true"
                   label="Ciudad"
                   outlined
                   dense
@@ -121,20 +122,22 @@ export default {
     }
   },
   mounted () {
-    this.nap.city = this.$route.query.city
+    this.nap.city = this.$store.state.cities.find(c => c.name === this.$route.query.city).id
     this.getNapTypes()
   },
   methods: {
     createNap () {
       this.isSubmitting = !this.isSubmitting
-      this.$store.dispatch('nap/createNap', this.nap)
+      this.$store.dispatch('nap/createNap', { nap: this.nap, token: this.$store.state.auth.token })
         .then(() => {
+          this.$store.dispatch('nap/getNaps', { city: this.$route.query.city, token: this.$store.state.auth.token })
           this.isSubmitting = !this.isSubmitting
           this.alertBox = true
           this.alertBoxColor = 'info darken-4'
           this.createdMessage = 'NAP creada correctamente.'
         })
-        .catch(() => {
+        .catch((err) => {
+          console.log(err)
           this.isSubmitting = !this.isSubmitting
           this.alertBox = true
           this.alertBoxColor = 'red darken-4'
@@ -142,7 +145,7 @@ export default {
         })
     },
     getNapTypes () {
-      this.$store.dispatch('nap/getNapTypes')
+      this.$store.dispatch('nap/getNapTypes', this.$store.state.auth.token)
         .then(() => {
           this.napTypes = this.$store.state.nap.napTypes
         })

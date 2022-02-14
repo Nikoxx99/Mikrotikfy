@@ -77,14 +77,14 @@ export default {
   computed: {
     currentCity () {
       // eslint-disable-next-line eqeqeq
-      return this.$store.state.cities ? this.$store.state.cities.find(c => c.id == this.$route.query.city) : ''
+      return this.$store.state.cities ? this.$store.state.cities.find(c => c.name == this.$route.query.city) : ''
     },
     napList () {
       return this.$store.state.nap.naps
     }
   },
   mounted () {
-    this.$store.dispatch('nap/getNaps', this.$route.query.city)
+    this.$store.dispatch('nap/getNaps', { city: this.$route.query.city, token: this.$store.state.auth.token })
   },
   methods: {
     showNapInfo (nap) {

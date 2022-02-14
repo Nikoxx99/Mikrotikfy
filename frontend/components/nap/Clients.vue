@@ -135,28 +135,90 @@ export default {
   methods: {
     async getNapClients () {
       this.loading = true
-      await this.$strapi.findOne('naps', this.napdata.id).then((response) => {
-        this.napClientsList = response.clients
-        this.loading = false
+      const qs = require('qs')
+      const query = qs.stringify({
+        populate: ['clients']
+      },
+      {
+        encodeValuesOnly: true
       })
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}naps/${this.napdata.id}?${query}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.$store.state.auth.token}`
+        }
+      })
+        .then(res => res.json())
+        .then((naps) => {
+          const clients = naps.data.attributes.clients.data.map((client) => {
+            client.attributes.id = client.id
+            client = client.attributes
+            return client
+          })
+          this.napClientsList = clients
+          this.loading = false
+        })
     },
     async searchClient () {
       this.showSearchResult = true
       this.alertBox = false
       if (this.codeSearch) {
-        await this.$strapi.find('clients', { city: this.$route.query.city, code: this.codeSearch }).then((response) => {
-          this.clientList = response
+        const qs = require('qs')
+        const query = qs.stringify({
+          filters: {
+            code: this.codeSearch,
+            city: {
+              name: this.$route.query.city
+            }
+          },
+          populate: ['neighborhood']
+        },
+        {
+          encodeValuesOnly: true
         })
+        await fetch(`${this.$config.API_STRAPI_ENDPOINT}clients?${query}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${this.$store.state.auth.token}`
+          }
+        })
+          .then(res => res.json())
+          .then((clients) => {
+            clients = clients.data.map((client) => {
+              client.attributes.neighborhood.data.attributes.id = client.attributes.neighborhood.data.id
+              client.attributes.neighborhood = client.attributes.neighborhood.data.attributes
+              client.attributes.id = client.id
+              client = client.attributes
+              return client
+            })
+            this.clientList = clients
+          })
       }
     },
     async addClient (client) {
       this.loading = true
       const clientExist = this.napClientsList.find(item => item.id === client.id)
       if (!clientExist) {
-        await this.$strapi.update('naps', this.napdata.id, { clients: [...this.napClientsList, client] }).then(() => {
-          this.getNapClients()
-          this.napClientsList.push(client)
-          this.loading = false
+        await fetch(`${this.$config.API_STRAPI_ENDPOINT}naps/${this.napdata.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${this.$store.state.auth.token}`
+          },
+          body: JSON.stringify({
+            data: {
+              clients: [
+                ...this.napClientsList,
+                client
+              ]
+            }
+          })
+        }).then((input) => {
+          if (input.status === 200) {
+            this.getNapClients()
+            this.napClientsList.push(client)
+            this.loading = false
+          }
         })
       } else {
         this.loading = false
@@ -167,9 +229,22 @@ export default {
     },
     removeClient (client) {
       this.loading = true
-      this.$strapi.update('naps', this.napdata.id, { clients: this.napClientsList.filter(item => item.id !== client.id) }).then(() => {
-        this.getNapClients()
-        this.loading = false
+      fetch(`${this.$config.API_STRAPI_ENDPOINT}naps/${this.napdata.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.$store.state.auth.token}`
+        },
+        body: JSON.stringify({
+          data: {
+            clients: this.napClientsList.filter(item => item.id !== client.id)
+          }
+        })
+      }).then((input) => {
+        if (input.status === 200) {
+          this.getNapClients()
+          this.loading = false
+        }
       })
     }
   }
