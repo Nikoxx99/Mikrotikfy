@@ -156,12 +156,6 @@ export default {
           role: 'admin'
         },
         {
-          icon: 'mdi-cog',
-          title: 'Ajustes',
-          to: '/config',
-          role: 'admin'
-        },
-        {
           icon: 'mdi-key',
           title: 'Cambios de Clave',
           to: '/password',

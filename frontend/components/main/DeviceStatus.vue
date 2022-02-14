@@ -139,62 +139,38 @@ export default {
   },
   methods: {
     async countClientData () {
-      const data = await this.$strapi.graphql({
-        query: `
-          query($city: ID!) {
-            city(id: $city) {
-              active
-              count
-              countActive
-              countDisable
-              countRetired
-            }
-          }
-        `,
-        variables: {
-          city: this.$route.query.city
-        }
-      })
-      this.active = data.city.active
-      this.count = data.city.count
-      this.countActive = data.city.countActive
-      this.countDisable = data.city.countDisable
-      this.countRetired = data.city.countRetired
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}cities?filters[name][$eq]=${this.$route.query.city}`)
+        .then(res => res.json())
+        .then((res) => {
+          const cities = res.data.map((city) => {
+            city.attributes.id = city.id
+            city = city.attributes
+            return city
+          })[0]
+          this.active = cities.active
+          this.count = cities.count
+          this.countActive = cities.countActive
+          this.countDisable = cities.countDisable
+          this.countRetired = cities.countRetired
+        })
     },
     async getMikrotikStatus () {
-      const data = await this.$strapi.graphql({
-        query: `
-          query($city: String) {
-            mikrotiks(where:{
-              city:$city
-            }) {
-              name
-              city{
-                name
-              }
-              ip
-              uptime
-              cpu
-              memory
-              version
-              buildtime
-              factorysoftware
-              totalmemory
-              cpucount
-              cpufrequency
-              freehddspace
-              totalhddspace
-              architecturename
-              platform
-              boardname
-            }
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}mikrotiks?filters[city][name][$eq]=${this.$route.query.city}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${this.$store.state.auth.token}`
           }
-        `,
-        variables: {
-          city: this.$route.query.city
-        }
-      })
-      this.mikrotikData = data.mikrotiks
+        })
+        .then(res => res.json())
+        .then((mikrotiks) => {
+          mikrotiks = mikrotiks.data.map((mikrotik) => {
+            mikrotik.attributes.id = mikrotik.id
+            mikrotik = mikrotik.attributes
+            return mikrotik
+          })
+          this.mikrotikData = mikrotiks
+        })
     }
   }
   // computed: {

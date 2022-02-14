@@ -19,7 +19,7 @@
       "type": "relation",
       "relation": "manyToMany",
       "target": "api::client.client",
-      "mappedBy": "clienttypes"
+      "inversedBy": "clienttypes"
     }
   }
 }
