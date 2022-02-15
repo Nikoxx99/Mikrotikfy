@@ -33,7 +33,7 @@
     <v-app-bar
       app
       dense
-      class="elevation-0"
+      class="elevation-0 transparent"
     >
       <v-app-bar-nav-icon v-if="isMobile" @click.stop="drawer = !drawer" />
       <v-spacer />
