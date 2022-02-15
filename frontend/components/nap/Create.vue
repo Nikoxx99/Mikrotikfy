@@ -1,95 +1,93 @@
 <template>
-  <v-card>
+  <div>
     <v-card-title>
       Crear NAP
     </v-card-title>
-    <v-card-text>
-      <client-only>
-        <form v-if="cities">
-          <v-container>
-            <v-alert
-              v-if="alertBox"
-              type="info"
-              :class="alertBoxColor"
-              tile
-              dismissible
-            >
-              {{ createdMessage }}
-            </v-alert>
-            <v-row>
-              <v-container>
-                <v-text-field
-                  v-model="nap.code"
-                  label="Codigo"
-                  required
-                  outlined
-                  @click="alertBox = false"
-                />
-                <v-select
-                  v-model="nap.naptype"
-                  :items="napTypes"
-                  item-text="name"
-                  item-value="id"
-                  label="Tipo de Nap"
-                  outlined
-                  chips
-                />
-                <v-text-field
-                  v-model="nap.address"
-                  label="Direccion"
-                  required
-                  outlined
-                />
-                <v-select
-                  v-model="nap.city"
-                  item-text="name"
-                  item-value="id"
-                  class="mb-3"
-                  :items="cities"
-                  :disabled="true"
-                  label="Ciudad"
-                  outlined
-                  dense
-                  hide-details
-                />
-                <v-autocomplete
-                  v-model="nap.neighborhood"
-                  item-text="name"
-                  item-value="id"
-                  class="mb-3"
-                  :items="neighborhoods"
-                  label="Barrio"
-                  outlined
-                  dense
-                  hide-details
-                />
-                <v-select
-                  v-model="nap.technology"
-                  item-text="name"
-                  item-value="id"
-                  class="mb-3"
-                  :items="technologies"
-                  label="Tecnología"
-                  outlined
-                  dense
-                  required
-                  hide-details
-                />
-                <v-btn
-                  class="mr-4 blue darken-4"
-                  :loading="isSubmitting"
-                  :disabled="isSubmitting"
-                  @click="createNap"
-                >
-                  Crear NAP
-                </v-btn>
-              </v-container>
-            </v-row>
-          </v-container>
-        </form>
-      </client-only>
-    </v-card-text>
-  </v-card>
+    <client-only>
+      <form v-if="cities">
+        <v-container>
+          <v-alert
+            v-if="alertBox"
+            type="info"
+            :class="alertBoxColor"
+            tile
+            dismissible
+          >
+            {{ createdMessage }}
+          </v-alert>
+          <v-row>
+            <v-container>
+              <v-text-field
+                v-model="nap.code"
+                label="Codigo"
+                required
+                outlined
+                @click="alertBox = false"
+              />
+              <v-select
+                v-model="nap.naptype"
+                :items="napTypes"
+                item-text="name"
+                item-value="id"
+                label="Tipo de Nap"
+                outlined
+                chips
+              />
+              <v-text-field
+                v-model="nap.address"
+                label="Direccion"
+                required
+                outlined
+              />
+              <v-select
+                v-model="nap.city"
+                item-text="name"
+                item-value="id"
+                class="mb-3"
+                :items="cities"
+                :disabled="true"
+                label="Ciudad"
+                outlined
+                dense
+                hide-details
+              />
+              <v-autocomplete
+                v-model="nap.neighborhood"
+                item-text="name"
+                item-value="id"
+                class="mb-3"
+                :items="neighborhoods"
+                label="Barrio"
+                outlined
+                dense
+                hide-details
+              />
+              <v-select
+                v-model="nap.technology"
+                item-text="name"
+                item-value="id"
+                class="mb-3"
+                :items="technologies"
+                label="Tecnología"
+                outlined
+                dense
+                required
+                hide-details
+              />
+              <v-btn
+                class="mr-4 blue darken-4"
+                :loading="isSubmitting"
+                :disabled="isSubmitting"
+                @click="createNap"
+              >
+                Crear NAP
+              </v-btn>
+            </v-container>
+          </v-row>
+        </v-container>
+      </form>
+    </client-only>
+  </div>
 </template>
 
 <script>

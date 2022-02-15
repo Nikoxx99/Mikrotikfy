@@ -32,7 +32,7 @@
             >
               <v-icon>mdi-close</v-icon>
             </v-btn>
-            <v-toolbar-title>Editar Cliente <span class="text--disabled text-caption">// {{ editClient ? editClient.id : '' }}</span></v-toolbar-title>
+            <v-toolbar-title>Editar Cliente <span class="text--disabled text-caption"> // ID: {{ editClient ? editClient.id : '' }}</span></v-toolbar-title>
           </v-toolbar>
         </v-card-title>
         <v-card-text>

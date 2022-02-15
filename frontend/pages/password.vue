@@ -135,15 +135,6 @@ export default {
     async getPasswordChanges () {
       const qs = require('qs')
       const query = qs.stringify({
-        filters: {
-          client: {
-            city: {
-              name: {
-                $eq: this.$route.query.city
-              }
-            }
-          }
-        },
         populate: [
           'client',
           'client.city'
@@ -162,10 +153,12 @@ export default {
         .then(res => res.json())
         .then((passwordchanges) => {
           passwordchanges = passwordchanges.data.map((passwordchange) => {
-            passwordchange.attributes.client.data.attributes.id = passwordchange.attributes.client.data.id
-            passwordchange.attributes.client = passwordchange.attributes.client.data.attributes
-            passwordchange.attributes.client.city.data.attributes.id = passwordchange.attributes.client.city.data.id
-            passwordchange.attributes.client.city = passwordchange.attributes.client.city.data.attributes
+            if (passwordchange.attributes.client.data) {
+              passwordchange.attributes.client.data.attributes.id = passwordchange.attributes.client.data.id
+              passwordchange.attributes.client = passwordchange.attributes.client.data.attributes
+              passwordchange.attributes.client.city.data.attributes.id = passwordchange.attributes.client.city.data.id
+              passwordchange.attributes.client.city = passwordchange.attributes.client.city.data.attributes
+            }
             passwordchange.attributes.id = passwordchange.id
             passwordchange = passwordchange.attributes
             return passwordchange

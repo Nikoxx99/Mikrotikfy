@@ -1,56 +1,50 @@
 <template>
-  <v-card>
-    <form>
-      <v-container>
-        <v-alert
-          v-if="alertBox"
-          type="info"
-          :class="alertBoxColor"
-          tile
-          dismissible
-        >
-          {{ createdMessage }}
-        </v-alert>
-        <v-card
-          tile
-        >
-          <v-card-title>
-            {{ $store.state.nap.naps.length }} Naps en {{ currentCity.name }}
-          </v-card-title>
-          <v-card-text>
-            <v-text-field
-              v-model="search"
-              append-icon="mdi-magnify"
-              label="Buscar Naps"
-              single-line
-              hide-details
-            />
-          </v-card-text>
-          <v-card-text>
-            <client-only>
-              <v-data-table
-                :headers="headers"
-                :items="napList"
-                :item-class="itemRowBackground"
-                :page.sync="page"
-                :search="search"
-                sort-by="calories"
-                mobile-breakpoint="100"
-                class="elevation-1"
-                hide-default-footer
-                @page-count="pageCount = $event"
-                @click:row="showNapInfo"
-              />
-            </client-only>
-          </v-card-text>
-          <v-pagination
-            v-model="page"
-            :length="pageCount"
+  <form>
+    <v-container>
+      <v-alert
+        v-if="alertBox"
+        type="info"
+        :class="alertBoxColor"
+        tile
+        dismissible
+      >
+        {{ createdMessage }}
+      </v-alert>
+      <v-card-title>
+        {{ $store.state.nap.naps.length }} Naps en {{ currentCity.name }}
+      </v-card-title>
+      <v-card-text>
+        <v-text-field
+          v-model="search"
+          append-icon="mdi-magnify"
+          label="Buscar Naps"
+          single-line
+          hide-details
+        />
+      </v-card-text>
+      <v-card-text>
+        <client-only>
+          <v-data-table
+            :headers="headers"
+            :items="napList"
+            :item-class="itemRowBackground"
+            :page.sync="page"
+            :search="search"
+            sort-by="calories"
+            mobile-breakpoint="100"
+            class="elevation-1"
+            hide-default-footer
+            @page-count="pageCount = $event"
+            @click:row="showNapInfo"
           />
-        </v-card>
-      </v-container>
-    </form>
-  </v-card>
+        </client-only>
+      </v-card-text>
+      <v-pagination
+        v-model="page"
+        :length="pageCount"
+      />
+    </v-container>
+  </form>
 </template>
 
 <script>

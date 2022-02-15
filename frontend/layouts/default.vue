@@ -1,5 +1,5 @@
 <template>
-  <v-app class="text-body-2">
+  <v-app class="text-body-2" style="background-color:#1e1e1e91;">
     <v-navigation-drawer
       v-model="drawer"
       app
@@ -32,13 +32,9 @@
     </v-navigation-drawer>
     <v-app-bar
       app
+      dense
       class="elevation-0"
     >
-      <div v-if="hasPendingChanges">
-        <svg height="13" width="20" style="position:absolute;top:12px;left:43px;">
-          <circle cx="10" cy="8" r="5" fill="red" />
-        </svg>
-      </div>
       <v-app-bar-nav-icon v-if="isMobile" @click.stop="drawer = !drawer" />
       <v-spacer />
       <v-switch
@@ -174,18 +170,18 @@ export default {
           to: '/cortes',
           role: 'admin'
         },
-        {
-          icon: 'mdi-comment',
-          title: 'Comentarios Mikrotik',
-          to: '/comments',
-          role: 'admin'
-        },
-        {
-          icon: 'mdi-routes',
-          title: 'Rutas OLT',
-          to: '/olt',
-          role: 'admin'
-        },
+        // {
+        //   icon: 'mdi-comment',
+        //   title: 'Comentarios Mikrotik',
+        //   to: '/comments',
+        //   role: 'admin'
+        // },
+        // {
+        //   icon: 'mdi-routes',
+        //   title: 'Rutas OLT',
+        //   to: '/olt',
+        //   role: 'admin'
+        // },
         {
           icon: 'mdi-speedometer',
           title: 'Test de Velocidad',
@@ -296,9 +292,38 @@ export default {
   }
 }
 </script>
-<style scoped>
+<style>
 .secondary-city {
     background: #16312d;
     color: #fff;
+}
+body {
+    color: rgba(255,255,255,0.65);
+    background-color: #24292e;
+    background-image: url('http://localhost:3000/star-bg.svg'),linear-gradient(#191c20, #1e1e1e 15%);
+    background-repeat: no-repeat;
+    background-position: center 0, 0 0, 0 0;
+    background-size: cover;
+}
+/* width */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey;
+  border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgb(60, 60, 60);
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(41, 41, 41)
 }
 </style>

@@ -1,92 +1,88 @@
 <template>
   <div v-if="Object.keys(napdata).length > 0">
-    <v-card :loading="loading" class="mb-4">
-      <v-card-title>
-        {{ napClientsList.length }} Clientes en Nap {{ napdata.code }}
-      </v-card-title>
-      <v-card-text>
-        <v-alert
-          v-if="alertBox"
-          :type="alertBoxColor"
-          :class="alertBoxColor"
-          tile
-          dismissible
+    <v-card-title>
+      {{ napClientsList.length }} Clientes en Nap {{ napdata.code }}
+    </v-card-title>
+    <v-card-text>
+      <v-alert
+        v-if="alertBox"
+        :type="alertBoxColor"
+        :class="alertBoxColor"
+        tile
+        dismissible
+      >
+        {{ createdMessage }}
+      </v-alert>
+      <client-only>
+        <v-data-table
+          :headers="headersNapClientList"
+          :items="napClientsList"
+          :page.sync="page"
+          class="elevation-1"
+          no-data-text="No hay clientes que mostrar"
+          mobile-breakpoint="100"
+          hide-default-footer
+          @page-count="pageCount = $event"
         >
-          {{ createdMessage }}
-        </v-alert>
+          <template v-slot:[`item.actions`]="{ item }">
+            <div style="white-space:nowrap">
+              <v-btn
+                icon
+                small
+                @click="removeClient(item)"
+              >
+                <v-icon>mdi-arrow-down</v-icon>
+              </v-btn>
+            </div>
+          </template>
+        </v-data-table>
+      </client-only>
+      <v-pagination
+        v-model="page"
+        :length="pageCount"
+      />
+    </v-card-text>
+    <v-card-text>
+      <v-text-field
+        v-model="codeSearch"
+        label="Buscar codigo para agregar a Nap"
+        prepend-icon="mdi-magnify"
+        filled
+        rounded
+        @keyup.enter="searchClient"
+      />
+      <div v-if="showSearchResult">
         <client-only>
           <v-data-table
-            :headers="headersNapClientList"
-            :items="napClientsList"
-            :page.sync="page"
-            class="elevation-1"
-            no-data-text="No hay clientes que mostrar"
+            :headers="headersClientList"
+            :items="clientList"
+            :page.sync="page2"
+            no-data-text="No han cargando los clientes"
+            no-results-text="Error al cargar los clientes"
             mobile-breakpoint="100"
+            class="elevation-1"
             hide-default-footer
-            @page-count="pageCount = $event"
+            @page-count="pageCount2 = $event"
           >
             <template v-slot:[`item.actions`]="{ item }">
               <div style="white-space:nowrap">
                 <v-btn
                   icon
                   small
-                  @click="removeClient(item)"
+                  @click="addClient(item)"
                 >
-                  <v-icon>mdi-arrow-down</v-icon>
+                  <v-icon>mdi-arrow-up</v-icon>
                 </v-btn>
               </div>
             </template>
           </v-data-table>
+          <v-pagination
+            v-model="page2"
+            :length="pageCount2"
+          />
         </client-only>
-        <v-pagination
-          v-model="page"
-          :length="pageCount"
-        />
-      </v-card-text>
-    </v-card>
-    <v-card class="rounded-xl">
-      <v-card-text>
-        <v-text-field
-          v-model="codeSearch"
-          label="Buscar codigo para agregar a Nap"
-          prepend-icon="mdi-magnify"
-          filled
-          rounded
-          @keyup.enter="searchClient"
-        />
-        <div v-if="showSearchResult">
-          <client-only>
-            <v-data-table
-              :headers="headersClientList"
-              :items="clientList"
-              :page.sync="page2"
-              no-data-text="No han cargando los clientes"
-              no-results-text="Error al cargar los clientes"
-              mobile-breakpoint="100"
-              class="elevation-1"
-              hide-default-footer
-              @page-count="pageCount2 = $event"
-            >
-              <template v-slot:[`item.actions`]="{ item }">
-                <div style="white-space:nowrap">
-                  <v-btn
-                    icon
-                    small
-                    @click="addClient(item)"
-                  >
-                    <v-icon>mdi-arrow-up</v-icon>
-                  </v-btn>
-                </div>
-              </template>
-            </v-data-table>
-            <v-pagination
-              v-model="page2"
-              :length="pageCount2"
-            />
-          </client-only>
-        </div>
-      </v-card-text>
-    </v-card>
+      </div>
+    </v-card-text>
   </div>
 </template>
 <script>
