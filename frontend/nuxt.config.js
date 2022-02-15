@@ -26,6 +26,7 @@ export default {
   ** Global CSS
   */
   css: [
+    '~/assets/main.css'
   ],
 
   publicRuntimeConfig: {
@@ -38,7 +39,7 @@ export default {
   */
   plugins: [
     '~/plugins/axios',
-    '~/plugins/role',
+    '~/plugins/role'
     // '~/plugins/utils'
   ],
   /*
