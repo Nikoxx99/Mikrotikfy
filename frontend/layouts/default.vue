@@ -1,5 +1,8 @@
 <template>
-  <v-app class="text-body-2" style="background-color:#1e1e1e91;">
+  <v-app
+    class="text-body-2"
+    :style="this.$vuetify.theme.dark ? 'background-color:#1e1e1e91;' : 'background-color:rgb(255 255 255 / 86%);'"
+  >
     <v-navigation-drawer
       v-model="drawer"
       app
