@@ -40,7 +40,6 @@
         </svg>
       </div>
       <v-app-bar-nav-icon v-if="isMobile" @click.stop="drawer = !drawer" />
-      <v-toolbar-title class="d-none d-md-flex d-lg-flex d-xl-flex" v-text="setCityTitle" />
       <v-spacer />
       <v-switch
         v-model="light"
@@ -108,7 +107,7 @@
       inset
       absolute
     >
-      <span>&copy; {{ new Date().getFullYear() }} Base de Datos interactiva - Desarrollada para ARNOProducciones por Nicolas Echeverry - Todos los derechos reservados.</span>
+      <span>&copy; 2019 - {{ new Date().getFullYear() }} Base de Datos interactiva - Desarrollada para ARNOProducciones por Nicolas Echeverry - Todos los derechos reservados.</span>
     </v-footer>
   </v-app>
 </template>
