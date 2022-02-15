@@ -365,8 +365,13 @@ export default {
       }
       const tickets = await this.$strapi.find('tickets', query)
       this.ticketList = tickets.map((t) => {
+        console.log(t)
         if (t.ticketdetails.length > 0) {
-          t.details = t.ticketdetails.slice(-1)[0].operator.username + ': ' + t.ticketdetails.slice(-1)[0].details
+          if (t.ticketdetails.slice(-1)[0].operator) {
+            t.details = t.ticketdetails.slice(-1)[0].operator.username + ': ' + t.ticketdetails.slice(-1)[0].details
+          } else {
+            return t
+          }
         }
         return t
       })
