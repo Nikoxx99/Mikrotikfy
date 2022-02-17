@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card v-if="dataTable.length > 0">
     <v-card-title>Desconectar clientes por mora en {{ cityName }}</v-card-title>
     <v-card-text>
       <v-container>
@@ -124,25 +124,7 @@
 </template>
 
 <script>
-import gqlt from 'graphql-tag'
 export default {
-  apollo: {
-    plans () {
-      return {
-        query: gqlt`
-        query{
-          plans{
-            _id
-            name
-            mikrotik_name
-          }
-        }
-      `
-      }
-    }
-  },
-  components: {
-  },
   middleware: ['defaultCity', 'authenticated'],
   data () {
     return {
@@ -181,74 +163,49 @@ export default {
       loading: false
     }
   },
-  created () {
+  computed: {
+    plans () {
+      return this.$store.state.plans
+    }
+  },
+  mounted () {
     this.getInitialData()
   },
   methods: {
-    getInitialData () {
+    async getInitialData () {
       this.initialLoading = true
-      this.dataTable = []
-      this.$apollo.query({
-        query: gqlt`
-        query dataClient ($city: ID!) {
-          city(id: $city){
-            name
-            clients{
-              _id
-              code
-              name
-              dni
-              plan{
-                id
-                name
-              }
-              technology{
-                id
-                name
-              }
-              wifi_ssid
-              wifi_password
-              comment
-              createdAt
-              newModel
-            }
+      const qs = require('qs')
+      const query = qs.stringify({
+        filters: {
+          city: {
+            name: this.$route.query.city
           }
-        }
-      `,
-        variables: {
-          city: this.$route.query.city
-        }
-      }).then((input) => {
-        this.cityName = input.data.city.name
-        for (let i = 0; i < input.data.city.clients.length; i++) {
-          const dataTable = {}
-          dataTable._id = input.data.city.clients[i]._id
-          dataTable.status = '#777'
-          dataTable.code = input.data.city.clients[i].code
-          dataTable.name = input.data.city.clients[i].name
-          dataTable.dni = input.data.city.clients[i].dni
-          dataTable.address = input.data.city.clients[i].address
-          dataTable.neighborhood = input.data.city.clients[i].neighborhood
-          dataTable.city = input.data.city.clients[i].city
-          dataTable.phone = input.data.city.clients[i].phone
-          dataTable.plan = input.data.city.clients[i].plan
-          dataTable.technology = input.data.city.clients[i].technology
-          dataTable.wifi_ssid = input.data.city.clients[i].wifi_ssid
-          dataTable.wifi_password = input.data.city.clients[i].wifi_password
-          dataTable.mac_address = input.data.city.clients[i].mac_address
-          dataTable.comment = input.data.city.clients[i].comment
-          dataTable.operator = input.data.city.clients[i].operator
-          dataTable.created_at = input.data.city.clients[i].created_at
-          dataTable.newModel = input.data.city.clients[i].newModel
-          dataTable.citycolor = input.data.city.color
-          this.dataTable.push(dataTable)
-        }
-        this.initialLoading = false
-      }).catch((error) => {
-        // eslint-disable-next-line no-console
-        console.error(error)
-        this.initialLoading = false
+        },
+        populate: ['plan', 'technology']
+      },
+      {
+        encodeValuesOnly: true
       })
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}clients?${query}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.$store.state.auth.token}`
+        }
+      })
+        .then(res => res.json())
+        .then((clients) => {
+          clients = clients.data.map((client) => {
+            client.attributes.plan.data.attributes.id = client.attributes.plan.data.id
+            client.attributes.plan = client.attributes.plan.data.attributes
+            client.attributes.technology.data.attributes.id = client.attributes.technology.data.id
+            client.attributes.technology = client.attributes.technology.data.attributes
+            return client.attributes
+          })
+          this.dataTable = clients
+          this.cityName = this.$route.query.city
+          this.initialLoading = false
+        })
     },
     prepare () {
       const input = this.input.split('\n')
@@ -282,7 +239,7 @@ export default {
               name: ''
             }
           }
-          inputObject.code = 0
+          inputObject.code = input[i].code
           inputObject.name = 'NO ENCONTRADO EN LA DB'
           inputObject.plan.id = 0
           inputObject.plan.name = 'NO ENCONTRADO'
@@ -304,34 +261,35 @@ export default {
         this.snackColor = 'info'
         this.snackText = 'El proceso ha comenzado...'
         for (let i = 0; i < pendingDx.length; i++) {
-          this.$apollo.mutate({
-            mutation: gqlt`mutation ($input: DxInfoInput){
-              dxClient(input: $input){
-                code
-                name
-                success
-              }
-            }`,
-            variables: {
+          await fetch(`${this.$config.API_STRAPI_ENDPOINT}dxclient`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${this.$store.state.auth.token}`
+            },
+            body: JSON.stringify({
               input: {
                 dx: pendingDx[i],
                 dxPlan: {
-                  id: this.setPlan._id,
+                  id: this.setPlan.id,
                   name: this.setPlan.mikrotik_name
                 },
                 dxKick: this.kickStat.id,
                 dxCity: city
               }
-            }
-          }).then((input) => {
-            this.successfulCuts.push(input.data.dxClient[0])
-          }).catch((error) => {
-            this.snack = true
-            this.snackColor = 'red'
-            this.snackText = error
-            this.loading = false
+            })
           })
-          await this.sleep(1000)
+            .then((res) => {
+              if (res.status === 200) {
+                this.successfulCuts.push({ ...pendingDx[i], success: true })
+              } else {
+                this.errorCount++
+                this.snack = true
+                this.snackColor = 'red'
+                this.snackText = 'Error'
+                this.loading = false
+              }
+            })
         }
         this.loading = false
       }
