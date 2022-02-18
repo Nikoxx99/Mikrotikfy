@@ -37,7 +37,7 @@
           Solicitar Activación de {{ item.name }}
         </v-card-title>
         <v-card-text>
-          <EditForm
+          <EditEditForm
             v-if="showControls"
             :client="item"
             :index="index"
@@ -86,12 +86,7 @@
 </template>
 
 <script>
-import gqlt from 'graphql-tag'
-import EditForm from '../edit/EditForm'
 export default {
-  components: {
-    EditForm
-  },
   props: {
     item: {
       type: Object,
@@ -108,6 +103,8 @@ export default {
   },
   data () {
     return {
+      flag1: false,
+      flag2: false,
       modal: false,
       showControls: false,
       snack: false,
@@ -121,86 +118,134 @@ export default {
       ]
     }
   },
+  computed: {
+    currentCity () {
+      return this.$store.state.cities.find(city => city.name === this.$route.query.city)
+    }
+  },
   methods: {
     async createActivationrequest () {
       this.loading = true
-      const clientData = await this.$strapi.find('clients', {
-        id: this.item.id
-      })
-      if (clientData[0].mac_addresses.length < 1 || clientData[0].technology.length < 1 || !('nap_onu_address' in clientData[0]) || !('opticalPower' in clientData[0])) {
-        this.loading = false
-        this.error = true
-        this.errorMessage = 'No puedes enviar una solicitud de activacion hasta no haber llenado los campos de NAP, Potencia Optica y haber registrado la MAC correspondiente al cliente'
-        this.showControls = true
-        return
-      }
-      const activationRequestExists = await this.$strapi.find('activationrequests', {
-        active: true,
-        'client.id': this.item.id
-      })
-      if (activationRequestExists.length > 0) {
-        this.loading = false
-        this.snack = true
-        this.snackColor = 'error'
-        this.snackText = 'Ya existe una solicitud de activación'
-        return
-      }
-      await this.$apollo.mutate({
-        mutation: gqlt`mutation ($input: createActivationrequestInput){
-          createActivationrequest(input: $input){
-            activationrequest{
-              client{
-                _id
+      await this.testFields()
+      await this.testDuplicates()
+      try {
+        if (this.flag1 && this.flag2) {
+          console.log('here')
+          await fetch(`${this.$config.API_STRAPI_ENDPOINT}activationrequests`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${this.$store.state.auth.token}`
+            },
+            body: JSON.stringify({
+              data: {
+                active: true,
+                operator: this.$store.state.auth.id,
+                client: this.item.id,
+                city: this.currentCity.id
               }
-            }
-          }
-        }`,
-        variables: {
-          input: {
-            data: {
-              active: true,
-              operator: this.$store.state.auth.id,
-              client: this.item._id,
-              city: this.$route.query.city
-            }
-          }
+            })
+          })
+            .then(res => res.json())
+            .then((activationrequest) => {
+              console.log('here2')
+              if (activationrequest.data) {
+                this.modal = false
+                this.error = false
+                this.loading = false
+                this.snack = true
+                this.snackText = 'Solicitud enviada correctamente!'
+                this.snackColor = 'cyan'
+              } else {
+                this.snack = true
+                this.loading = false
+                this.snackText = 'Error desconocido, reporta esto a nico'
+                this.snackColor = 'red'
+              }
+            })
         }
-      }).then((input) => {
-        if (input.data.createActivationrequest.activationrequest.client._id) {
-          this.modal = false
-          this.error = false
-          this.loading = false
-          this.snack = true
-          this.snackText = 'Solicitud enviada correctamente!'
-          this.snackColor = 'cyan'
-        } else {
-          this.snack = true
-          this.loading = false
-          this.snackText = 'Error desconocido, reporta esto a nico'
-          this.snackColor = 'red'
-        }
-      }).catch((error) => {
+      } catch (error) {
         this.snack = true
         this.loading = false
-        this.snackText = 'Error de conexion, recarga la pagina o verifica que tienes internet' + error
+        this.snackText = error
         this.snackColor = 'red'
-      })
+      }
     },
     resetErrorFields () {
       this.error = false
       this.errorMessage = ''
       this.showControls = false
     },
-    can (component) {
-      const allowedComponents = this.allowedcomponents
-      // eslint-disable-next-line camelcase
-      const current_component = component
-      return allowedComponents.includes(current_component)
+    async testFields () {
+      const qs = require('qs')
+      const query = qs.stringify({
+        populate: [
+          'technology',
+          'mac_addresses'
+        ]
+      },
+      {
+        encodeValuesOnly: true
+      })
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}clients/${this.item.id}?${query}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.$store.state.auth.token}`
+        }
+      })
+        .then(res => res.json())
+        .then((clients) => {
+          clients.data.attributes.id = clients.data.id
+          clients.data.attributes.technology.data.attributes.id = clients.data.attributes.technology.data.id
+          clients.data.attributes.technology = clients.data.attributes.technology.data.attributes
+          clients.data.attributes.mac_addresses = clients.data.attributes.mac_addresses.data.map((mac) => {
+            mac.attributes.id = mac.id
+            return mac.attributes
+          })
+          clients = clients.data.attributes
+          if (clients.mac_addresses.length < 1 || Object.keys(clients.technology).length === 0 || !clients.nap_onu_address || !clients.opticalPower) {
+            this.loading = false
+            this.error = true
+            this.errorMessage = 'No puedes enviar una solicitud de activacion hasta no haber llenado los campos de NAP, Potencia Optica y haber registrado la MAC correspondiente al cliente'
+            this.showControls = true
+          } else {
+            this.flag1 = true
+          }
+        })
+    },
+    async testDuplicates () {
+      const qs = require('qs')
+      const query = qs.stringify({
+        filters: {
+          active: true,
+          client: {
+            id: this.item.id
+          }
+        }
+      },
+      {
+        encodeValuesOnly: true
+      })
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}activationrequests?${query}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.$store.state.auth.token}`
+        }
+      })
+        .then((res) => { return res.json() })
+        .then((activationRequestExists) => {
+          if (activationRequestExists.data.length > 0) {
+            this.loading = false
+            this.snack = true
+            this.snackColor = 'error'
+            this.snackText = 'Ya existe una solicitud de activación'
+          } else {
+            this.flag2 = true
+          }
+        })
     }
   }
 }
 </script>
-
-<style>
-
-</style>
