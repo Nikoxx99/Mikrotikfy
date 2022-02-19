@@ -7,6 +7,7 @@
 
 <script>
 export default {
+  transition: 'none',
   data () {
     return {
       search: ''

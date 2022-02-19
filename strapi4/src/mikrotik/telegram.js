@@ -7,7 +7,6 @@ module.exports.simpleTelegramCreate = async function (input, telegrambot) {
   const fetch = require("node-fetch");
   require("dotenv").config();
   try {
-    console.log("functions.js", input);
     const bot = telegrambot.token;
     const chatid = telegrambot.log;
     var message = `CREADO\n${input.code}\n${input.name}\n${input.dni}\n${input.address}\n${input.neighborhood.name}\n${input.phone}\n${input.city.name}\n${input.plan.name}\n${input.wifi_ssid}\n${input.wifi_password}\n${input.operator.username}\n${input.createdAt}`;

@@ -7,7 +7,6 @@ const RouterOSAPI = require('node-routeros').RouterOSAPI
 module.exports = {
   async refreshclientdata (ctx) {
     const cityQuery = await strapi.service('api::city.city').findOne(ctx.query.city,{ populate: ['mikrotiks'] });
-    console.log(cityQuery)
     const cityIpArray = cityQuery.mikrotiks
     if (cityIpArray.length > 1) {
       const cityActiveClients = []

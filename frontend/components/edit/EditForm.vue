@@ -417,7 +417,7 @@ export default {
                 this.device = {}
               })
           } else {
-            throw new Error('Error creating serie')
+            throw new Error('Error updating client')
           }
         }).catch((error) => {
           // eslint-disable-next-line no-console

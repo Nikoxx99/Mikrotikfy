@@ -214,6 +214,7 @@
 <script>
 import Logo from '../components/main/Logo'
 export default {
+  name: 'ChangePassword',
   layout: 'outuser',
   components: {
     Logo
@@ -228,6 +229,7 @@ export default {
       user_old_password: '',
       user_new_password: '',
       user_address: '',
+      clientid: null,
       valid_dni: [
         value => !!value || 'Este campo no puede estar vacío'
       ],
@@ -265,6 +267,35 @@ export default {
               this.error = true
               this.errorMessage = 'Ya existe un proceso activo para el cambio de tu clave. Será realizado hasta 3 días hábiles luego de tu solicitud.'
             } else {
+              this.testClient()
+            }
+          })
+      } else {
+        this.error = true
+        this.errorMessage = 'No puedes dejar este campo en blanco.'
+      }
+    },
+    async testClient () {
+      this.error = false
+      if (this.user_dni.length > 0) {
+        const qs = require('qs')
+        const query = qs.stringify({
+          filters: {
+            dni: this.user_dni
+          },
+          populate: ['city']
+        },
+        {
+          encodeValuesOnly: true
+        })
+        await fetch(`${this.$config.API_STRAPI_ENDPOINT}clients?${query}`)
+          .then(res => res.json())
+          .then((clients) => {
+            if (clients.data.length < 1) {
+              this.error = true
+              this.errorMessage = 'La CEDULA no se encuentra en nuestro sistema. Ingresa la cedula del titular o comunicate con nosotros nuevamente dando el siguiente codigo de error (CEDULA NO ENCONTRADA).'
+            } else {
+              this.clientid = clients.data[0].id
               this.error = false
               this.e1 = 2
             }
@@ -309,6 +340,7 @@ export default {
           body: JSON.stringify({
             data: {
               dni: this.user_dni,
+              client: this.clientid,
               old_password: this.user_old_password,
               new_password: this.user_new_password,
               address: this.user_address,

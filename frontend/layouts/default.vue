@@ -39,6 +39,21 @@
       class="elevation-0 transparent"
     >
       <v-app-bar-nav-icon v-if="isMobile" @click.stop="drawer = !drawer" />
+      <v-btn
+        v-for="clienttype in $store.state.clienttypes"
+        :key="clienttype.name"
+        class="ml-2"
+        :color="clienttype.name === $route.query.clienttype ? $vuetify.theme.dark ? 'primary white--text' : 'primary' : 'white black--text'"
+        elevation="0"
+        rounded
+        small
+        :to="`/clients?city=${$route.query.city}&clienttype=${clienttype.name}`"
+      >
+        <v-icon class="mr-2">
+          {{ clienttype.icon }}
+        </v-icon>
+        {{ clienttype.name }}
+      </v-btn>
       <v-spacer />
       <v-switch
         v-model="light"
@@ -63,12 +78,12 @@
         <span class="mr-1 d-none d-xs-none d-sm-none d-md-inline d-lg-inline" style="font-size:0.7rem">{{ $store.state.auth.username.charAt(0).toUpperCase() + $store.state.auth.username.slice(1) }}</span>
         <v-btn
           v-for="city in $store.state.auth.cities"
-          :key="city.id"
+          :key="city.name"
           class="ml-2"
           small
           outlined
           :color="city.color"
-          :href="`/clients?city=${city.id}`"
+          :to="`/clients?city=${city.name}`"
         >
           {{ city.name }}
         </v-btn>

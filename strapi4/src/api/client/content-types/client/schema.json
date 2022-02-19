@@ -135,7 +135,7 @@
       "type": "relation",
       "relation": "manyToMany",
       "target": "api::clienttype.clienttype",
-      "inversedBy": "clients"
+      "mappedBy": "clients"
     }
   }
 }

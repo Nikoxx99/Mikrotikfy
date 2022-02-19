@@ -78,16 +78,9 @@
                       :role="$store.state.auth.allowed_components"
                     />
                   <CreateTicketAdvance
-                    v-if="props.item.tickettype.name !== 'TRASLADO'"
                     :editindex="ticketList.indexOf(props.item)"
                     :ticketid="props.item.id"
                     :name="props.item.client.name"
-                    @updateTicketStatus="updateTicketStatus($event)"
-                  />
-                  <CreateTicketAdvanceTraslate
-                    v-else
-                    :ticket="props.item"
-                    :editindex="ticketList.indexOf(props.item)"
                     @updateTicketStatus="updateTicketStatus($event)"
                   />
                   <TicketAdvanceHistory
@@ -254,15 +247,13 @@ import CreateTicketAdvance from '../create/CreateTicketAdvance'
 import TicketAdvanceHistory from '../misc/TicketAdvanceHistory'
 import TicketHistory from '../misc/TicketHistory'
 import ClientStatus from '../main/ClientStatus'
-import CreateTicketAdvanceTraslate from '../create/CreateTicketAdvanceTraslate.vue'
 export default {
   name: 'Tickets',
   components: {
     CreateTicketAdvance,
     TicketAdvanceHistory,
     TicketHistory,
-    ClientStatus,
-    CreateTicketAdvanceTraslate
+    ClientStatus
   },
   data () {
     return {

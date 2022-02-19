@@ -9,11 +9,11 @@ export const mutations = {
   clearClientsFromDatatable (state) {
     state.clients = []
   },
-  getUsersFromDatabase (state, clientsList) {
+  getClientTypesFromDatabase (state, clienttypesList) {
     try {
-      state.clients = clientsList.data.results
+      state.clienttypes = clienttypesList
     } catch (error) {
-      throw new Error(`MUTATE SEARCH CLIENT${error}`)
+      throw new Error(`MUTATE CLIENT TYPES${error}`)
     }
   },
   updateFromModal (state, client) {
@@ -91,22 +91,30 @@ export const actions = {
     })
     commit('calculateClientStatus', newState)
   },
-  async getUsersFromDatabase ({ commit }, payload) {
+  async getClientTypesFromDatabase ({ commit }, token) {
     try {
-      const clients = await this.$strapi.find('clients', {
-        city: payload.city,
-        _limit: payload.limit,
-        _start: payload.start,
-        _sort: payload.sort ? payload.sort : 'createdAt:desc'
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}clienttypes`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        }
       })
-      commit('getUsersFromDatabase', clients)
+        .then(res => res.json())
+        .then((clienttypes) => {
+          clienttypes = clienttypes.data.map((clienttype) => {
+            return clienttype.attributes
+          })
+          localStorage.setItem('clienttypes', JSON.stringify(clienttypes))
+          commit('getClientTypesFromDatabase', clienttypes)
+        })
     } catch (error) {
       throw new Error(`ACTION ${error}`)
     }
   },
   async getUsersFromDatabaseBySearch ({ commit }, payload) {
     try {
-      await fetch(`${this.$config.API_STRAPI_ENDPOINT}searchclient?search=${payload.search}&city=${payload.city}`, {
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}searchclient?search=${payload.search}&city=${payload.city}&clienttype=${payload.clienttype}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -187,6 +195,7 @@ export const actions = {
     })
   },
   async updateClient ({ commit }, { client, index, operator, token }) {
+    delete client.active
     await fetch(`${this.$config.API_STRAPI_ENDPOINT}clients/${client.id}`, {
       method: 'PUT',
       headers: {

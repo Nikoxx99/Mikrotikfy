@@ -197,6 +197,7 @@ export default {
               this.$store.dispatch('technology/getTechnologiesFromDatabase'),
               this.$store.dispatch('device/getDeviceBrandsFromDatabase'),
               this.$store.dispatch('city/getCitiesFromDatabase'),
+              this.$store.dispatch('client/getClientTypesFromDatabase', response.jwt),
               this.$store.dispatch('neighborhood/getNeighborhoodsFromDatabase'),
               this.$store.dispatch('count/activeClients', { token: response.jwt, city: cities[0].id }),
               this.$store.dispatch('role/getRoleFromUserData', { token: response.jwt })

@@ -377,7 +377,8 @@ export default {
     async refreshActiveClients () {
       this.refreshLoading = true
       const city = this.$store.state.auth.cities.find(city => city.name === this.$route.query.city)
-      await this.$store.dispatch('refreshActiveClients', { city, token: this.$store.state.auth.token })
+      const clienttype = this.$route.query.clienttype
+      await this.$store.dispatch('refreshActiveClients', { city, clienttype, token: this.$store.state.auth.token })
       await this.getClientStatusOnMikrotik()
       this.refreshLoading = false
     },
@@ -385,9 +386,10 @@ export default {
       this.loadingDataTable = true
       const search = this.searchClientInput.trim()
       const city = this.$route.query.city
+      const clienttype = this.$route.query.clienttype
       this.result = 'Buscando...'
       if (search) {
-        await this.$store.dispatch('client/getUsersFromDatabaseBySearch', { search, city, token: this.$store.state.auth.token })
+        await this.$store.dispatch('client/getUsersFromDatabaseBySearch', { search, city, clienttype, token: this.$store.state.auth.token })
         await this.getClientStatusOnMikrotik()
         this.showPagintation = false
         this.loadingDataTable = false

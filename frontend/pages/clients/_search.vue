@@ -7,6 +7,7 @@
 
 <script>
 export default {
+  transition: 'none',
   asyncData ({ params }) {
     const search = params.search // When calling /abc the slug will be "abc"
     return { search }

@@ -8,7 +8,6 @@ module.exports = {
   async dxclient(ctx) {
     const process = []
     const input = ctx.request.body.input
-    console.log(input)
     const search = await strapi.service('api::client.client').find({
       filters: {
         code: input.dx.code,
@@ -28,7 +27,6 @@ module.exports = {
     const dni = clientObj.dni
     const model = clientObj.newModel
     const planDx = input.dxPlan.id
-    console.log(planDx)
     const planDxMk = input.dxPlan.name
     const kick = input.dxKick
     if (searchCity.mikrotiks.length > 1) {
@@ -42,7 +40,6 @@ module.exports = {
           process.push({ code: code, name: clientObj.name, success: false })
         }
       }
-      console.log(1, process)
       return process
     } else {
       const cityIp = searchCity.mikrotiks[0].ip
@@ -53,7 +50,6 @@ module.exports = {
       } else {
         process.push({ code: code, name: clientObj.name, success: false })
       }
-      console.log(2, process)
       return process
     }
   },

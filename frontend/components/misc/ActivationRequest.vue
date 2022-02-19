@@ -130,7 +130,6 @@ export default {
       await this.testDuplicates()
       try {
         if (this.flag1 && this.flag2) {
-          console.log('here')
           await fetch(`${this.$config.API_STRAPI_ENDPOINT}activationrequests`, {
             method: 'POST',
             headers: {
@@ -139,7 +138,7 @@ export default {
             },
             body: JSON.stringify({
               data: {
-                active: true,
+                active: false,
                 operator: this.$store.state.auth.id,
                 client: this.item.id,
                 city: this.currentCity.id
@@ -148,7 +147,6 @@ export default {
           })
             .then(res => res.json())
             .then((activationrequest) => {
-              console.log('here2')
               if (activationrequest.data) {
                 this.modal = false
                 this.error = false

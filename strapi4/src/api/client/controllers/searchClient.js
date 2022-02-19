@@ -11,7 +11,6 @@ module.exports = {
   async searchclient(ctx) {
     const {city, search } = ctx.query;
     if (search) { // SI LA BUSQUEDA NO ES NULA
-      console.log(city)
           const res = await strapi.service('api::client.client').find({
             filters: {
               $and: [
@@ -64,7 +63,6 @@ module.exports = {
             },
             populate: ['city', 'plan', 'neighborhood', 'technology', 'clienttype'],
             orderBy: { code: 'asc' }})
-            console.log(res)
           const sanitizedEntity = await sanitize.contentAPI.output(res);
           return { data: sanitizedEntity };
     } else {
