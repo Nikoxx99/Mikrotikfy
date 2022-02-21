@@ -18,7 +18,7 @@ export const mutations = {
   }
 }
 export const actions = {
-  async getTicketsFromDatabase ({ commit }, { city, token, active, retired }) {
+  async getTicketsFromDatabase ({ commit }, { city, clienttype, token, active, retired }) {
     try {
       let filters = null
       if (retired) {
@@ -34,6 +34,11 @@ export const actions = {
           tickettype: {
             name: {
               $eq: 'RETIRO'
+            }
+          },
+          clienttype: {
+            name: {
+              $eq: clienttype
             }
           }
         }
@@ -51,6 +56,11 @@ export const actions = {
             name: {
               $ne: 'RETIRO'
             }
+          },
+          clienttype: {
+            name: {
+              $eq: clienttype
+            }
           }
         }
       }
@@ -63,6 +73,7 @@ export const actions = {
           'client.technology',
           'city',
           'tickettype',
+          'clienttype',
           'assignated',
           'ticketdetails',
           'ticketdetails.operator'
@@ -91,6 +102,8 @@ export const actions = {
             ticket.attributes.client.technology = ticket.attributes.client.technology.data.attributes
             ticket.attributes.tickettype.data.attributes.id = ticket.attributes.tickettype.data.id
             ticket.attributes.tickettype = ticket.attributes.tickettype.data.attributes
+            ticket.attributes.clienttype.data.attributes.id = ticket.attributes.clienttype.data.id
+            ticket.attributes.clienttype = ticket.attributes.clienttype.data.attributes
             ticket.attributes.assignated.data.attributes.id = ticket.attributes.assignated.data.id
             ticket.attributes.assignated = ticket.attributes.assignated.data.attributes
             ticket.attributes.ticketdetails.data.forEach((ticketdetail) => {

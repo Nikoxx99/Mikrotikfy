@@ -55,6 +55,12 @@
       "relation": "oneToMany",
       "target": "api::ticketdetail.ticketdetail",
       "mappedBy": "ticket"
+    },
+    "clienttype": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::clienttype.clienttype",
+      "inversedBy": "tickets"
     }
   }
 }

@@ -305,6 +305,11 @@ export default {
       return this.$store.state.ticket.tickets
     }
   },
+  watch: {
+    $route () {
+      this.refreshTickets()
+    }
+  },
   mounted () {
     this.getResolution()
     this.refreshTickets()
@@ -312,7 +317,7 @@ export default {
   methods: {
     async refreshTickets () {
       this.initialLoading = true
-      await this.$store.dispatch('ticket/getTicketsFromDatabase', { city: this.$route.query.city, token: this.$store.state.auth.token, active: this.showClosedValue, retired: this.showRetired })
+      await this.$store.dispatch('ticket/getTicketsFromDatabase', { city: this.$route.query.city, clienttype: this.$route.query.clienttype, token: this.$store.state.auth.token, active: this.showClosedValue, retired: this.showRetired })
       this.initialLoading = false
     },
     updateTicketStatus ({ editindex, closeTicket }) {

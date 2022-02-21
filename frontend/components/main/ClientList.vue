@@ -43,6 +43,7 @@
           <v-card-text>
             <client-only>
               <v-data-table
+                v-if="headers"
                 :headers="headers"
                 :items.sync="clients"
                 :server-items-length="clientCount()"
@@ -165,7 +166,6 @@
                     <MiscActivationRequest
                       :item="props.item"
                       :index="clients.indexOf(props.item)"
-                      :allowedcomponents="$store.state.auth.allowed_components"
                     />
                   </div>
                 </template>
@@ -174,7 +174,6 @@
                     <CreateTicket
                       :client="item"
                       :assignated="$store.state.auth.id"
-                      :role="$store.state.auth.allowed_components"
                     />
                     <TicketHistory
                       :clientid="item.id"
@@ -186,7 +185,6 @@
                       :code="item.code"
                       :item="item"
                       :index="clients.indexOf(item)"
-                      :role="$store.state.auth.allowed_components"
                     />
                     <MainDevices
                       :name="item.name"
@@ -195,7 +193,6 @@
                     <EditForm
                       :client="item"
                       :index="clients.indexOf(item)"
-                      :role="$store.state.auth.allowed_components"
                       @updateSuccess="getClientBySearch()"
                     />
                     <DeleteClient :name="item.name" :clientid="String(item.id)" />
@@ -294,19 +291,6 @@ export default {
     return {
       allowedcomponents: [],
       createDialog: false,
-      headers: [
-        { text: 'Codigo', value: 'code', sortable: false },
-        { text: 'Nombre', value: 'name', sortable: false },
-        { text: 'Cedula', value: 'dni', sortable: false },
-        { text: 'Direccion', sortable: false, value: 'address' },
-        { text: 'Barrio', value: 'neighborhood.name', sortable: false },
-        { text: 'Telefono', sortable: false, value: 'phone' },
-        { text: 'Plan', value: 'plan.name', sortable: false },
-        { text: 'Tecnologia', value: 'technology.name', sortable: false },
-        { text: 'Tipo', value: 'newModel', sortable: false },
-        { text: 'Activo', value: 'active', sortable: false },
-        { text: 'Acciones', value: 'actions', sortable: false }
-      ],
       isRx: true,
       itemsPerPage: 15,
       loadingDataTable: false,
@@ -325,6 +309,9 @@ export default {
   computed: {
     clients () {
       return this.$store.state.client.clients
+    },
+    headers () {
+      return this.$store.state.client.headers
     },
     currentCity () {
       // eslint-disable-next-line eqeqeq
@@ -391,6 +378,7 @@ export default {
       if (search) {
         await this.$store.dispatch('client/getUsersFromDatabaseBySearch', { search, city, clienttype, token: this.$store.state.auth.token })
         await this.getClientStatusOnMikrotik()
+        await this.getHeadersByClientType()
         this.showPagintation = false
         this.loadingDataTable = false
         this.result = 'No se han encontrado resultados.'
@@ -443,6 +431,11 @@ export default {
       } else {
         this.$store.dispatch('client/adminCreate', { client, index, token: this.$store.state.auth.token, operator: this.$store.state.auth.username })
       }
+    },
+    async getHeadersByClientType () {
+      const city = this.$route.query.city
+      const clienttype = this.$route.query.clienttype
+      await this.$store.dispatch('client/getHeadersByClientType', { city, clienttype, token: this.$store.state.auth.token })
     }
   }
 }

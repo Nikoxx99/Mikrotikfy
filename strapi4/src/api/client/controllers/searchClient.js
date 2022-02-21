@@ -9,7 +9,8 @@ module.exports = {
 
   /* BUSCAR CLIENTE CUSTOM ACTION */
   async searchclient(ctx) {
-    const {city, search } = ctx.query;
+    const {city, search, clienttype } = ctx.query;
+    console.log(clienttype)
     if (search) { // SI LA BUSQUEDA NO ES NULA
           const res = await strapi.service('api::client.client').find({
             filters: {
@@ -18,6 +19,13 @@ module.exports = {
                   city: {
                     name: {
                       $eq: city
+                    }
+                  },
+                },
+                {
+                  clienttypes: {
+                    name: {
+                      $eq: clienttype
                     }
                   },
                 },
@@ -61,8 +69,10 @@ module.exports = {
                 }
               ],  
             },
-            populate: ['city', 'plan', 'neighborhood', 'technology', 'clienttype'],
-            orderBy: { code: 'asc' }})
+            populate: ['city', 'plan', 'neighborhood', 'technology', 'clienttypes'],
+            orderBy: { code: 'asc' }
+          })
+          console.log(res)
           const sanitizedEntity = await sanitize.contentAPI.output(res);
           return { data: sanitizedEntity };
     } else {

@@ -23,6 +23,12 @@
     },
     "icon": {
       "type": "string"
+    },
+    "tickets": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::ticket.ticket",
+      "mappedBy": "clienttype"
     }
   }
 }

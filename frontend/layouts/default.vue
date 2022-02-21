@@ -14,7 +14,7 @@
         <v-list-item
           v-for="(item, i) in items"
           :key="i"
-          :to="`${item.to}?city=${$route.query.city}`"
+          :to="`${item.to}?city=${$route.query.city}&clienttype=${$route.query.clienttype}`"
           router
           :class="role === 'admin' || role === 'superadmin' ? item.role === 'admin' ? 'd-flex' : 'd-flex' : item.role === 'user' ? 'd-flex' : 'd-none'"
           exact
@@ -47,7 +47,7 @@
         elevation="0"
         rounded
         small
-        :to="`/clients?city=${$route.query.city}&clienttype=${clienttype.name}`"
+        :to="`${$route.path}?city=${$route.query.city}&clienttype=${clienttype.name}`"
       >
         <v-icon class="mr-2">
           {{ clienttype.icon }}
@@ -83,7 +83,7 @@
           small
           outlined
           :color="city.color"
-          :to="`/clients?city=${city.name}`"
+          :to="`/clients?city=${city.name}&clienttype=${$route.query.clienttype}`"
         >
           {{ city.name }}
         </v-btn>

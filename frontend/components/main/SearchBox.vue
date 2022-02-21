@@ -62,7 +62,7 @@ export default {
       if (this.searchClientInput) {
         this.loadingDataTable = true
         this.$router.push({
-          path: '/clients/' + this.searchClientInput + '?city=' + this.$route.query.city
+          path: `/clients/${this.searchClientInput}?city=${this.$route.query.city}&clienttype=${this.$route.query.clienttype}`
         })
         this.$emit('search', this.searchClientInput)
         this.loadingDataTable = false

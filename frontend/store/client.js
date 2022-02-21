@@ -1,6 +1,7 @@
 import gqlt from 'graphql-tag'
 export const state = () => ({
-  clients: []
+  clients: [],
+  headers: null
 })
 export const mutations = {
   calculateClientStatus (state, newState) {
@@ -8,6 +9,13 @@ export const mutations = {
   },
   clearClientsFromDatatable (state) {
     state.clients = []
+  },
+  getUsersFromDatabase (state, clientsList) {
+    try {
+      state.clients = clientsList.data.results
+    } catch (error) {
+      throw new Error(`MUTATE SEARCH CLIENT${error}`)
+    }
   },
   getClientTypesFromDatabase (state, clienttypesList) {
     try {
@@ -50,6 +58,13 @@ export const mutations = {
       state.clients.unshift(client)
     } catch (error) {
       throw new Error(`INSERT CLIENT MUTATE ${error}`)
+    }
+  },
+  getHeadersByClientType (state, headers) {
+    try {
+      state.headers = headers
+    } catch (error) {
+      throw new Error(`GET HEADERS BY CLIENT TYPE MUTATE ${error}`)
     }
   }
 }
@@ -217,5 +232,35 @@ export const actions = {
   },
   updateClientDevices ({ commit }, { device, index }) {
     commit('updateClientDevices', { device, index })
+  },
+  getHeadersByClientType ({ commit }, { city, clienttype }) {
+    const internet = [
+      { text: 'Codigo', value: 'code', sortable: false },
+      { text: 'Nombre', value: 'name', sortable: false },
+      { text: 'Cedula', value: 'dni', sortable: false },
+      { text: 'Direccion', sortable: false, value: 'address' },
+      { text: 'Barrio', value: 'neighborhood.name', sortable: false },
+      { text: 'Telefono', sortable: false, value: 'phone' },
+      { text: 'Plan', value: 'plan.name', sortable: false },
+      { text: 'Tecnologia', value: 'technology.name', sortable: false },
+      { text: 'Tipo', value: 'newModel', sortable: false },
+      { text: 'Activo', value: 'active', sortable: false },
+      { text: 'Acciones', value: 'actions', sortable: false }
+    ]
+    const television = [
+      { text: 'Codigo', value: 'code', sortable: false },
+      { text: 'Nombre', value: 'name', sortable: false },
+      { text: 'Cedula', value: 'dni', sortable: false },
+      { text: 'Direccion', sortable: false, value: 'address' },
+      { text: 'Barrio', value: 'neighborhood.name', sortable: false },
+      { text: 'Telefono', sortable: false, value: 'phone' },
+      { text: 'Acciones', value: 'actions', sortable: false }
+    ]
+
+    if (clienttype === 'INTERNET') {
+      commit('getHeadersByClientType', internet)
+    } else if (clienttype === 'TELEVISION') {
+      commit('getHeadersByClientType', television)
+    }
   }
 }
