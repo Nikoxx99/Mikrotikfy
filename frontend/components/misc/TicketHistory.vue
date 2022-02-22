@@ -136,6 +136,9 @@ export default {
             id: {
               $eq: this.clientid
             }
+          },
+          clienttype: {
+            name: this.$route.query.clienttype
           }
         },
         populate: [

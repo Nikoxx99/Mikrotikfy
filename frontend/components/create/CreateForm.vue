@@ -55,7 +55,7 @@
             outlined
             dense
             hide-details
-            @keyup="calculateSsid"
+            @keyup="clienttype.name === 'INTERNET' ? calculateSsid : null"
             @input="Client.name = $event.toUpperCase()"
           />
         </v-col>
@@ -143,7 +143,7 @@
             hide-details
           />
         </v-col>
-        <v-col>
+        <v-col v-if="clienttype.name === 'INTERNET'">
           <v-select
             v-model="Client.plan"
             item-text="name"
@@ -156,7 +156,7 @@
           />
         </v-col>
       </v-row>
-      <v-row>
+      <v-row v-if="clienttype.name === 'INTERNET'">
         <v-col>
           <v-text-field
             v-model="Client.wifi_ssid"
@@ -226,7 +226,7 @@
           />
         </v-col>
       </v-row> -->
-      <v-row>
+      <v-row v-if="clienttype.name === 'INTERNET'">
         <v-col>
           <v-select
             v-model="Client.newModel"
@@ -241,16 +241,16 @@
           />
         </v-col>
       </v-row>
-      <v-switch v-model="Client.hasRepeater" hide-details input-value="false" label="Tiene repetidor?" />
-      <v-switch v-model="Client.sendToMikrotik" input-value="true" label="Crear en Mikrotik?" />
+      <v-switch v-if="clienttype.name === 'INTERNET'" v-model="Client.hasRepeater" hide-details input-value="false" label="Tiene repetidor?" />
+      <v-switch v-if="clienttype.name === 'INTERNET'" v-model="Client.sendToMikrotik" input-value="true" label="Crear en Mikrotik?" />
       <v-btn
-        class="mr-4"
+        class="mr-4 mt-4"
         :color="citycolor"
         :loading="isSubmitting"
         :disabled="isSubmitting"
         @click="createClient"
       >
-        Crear Cliente
+        Crear Cliente de {{ clienttype.name }}
       </v-btn>
     </v-form>
   </div>
@@ -350,6 +350,9 @@ export default {
     },
     telegramBots () {
       return this.$store.state.telegramBots.find(bot => bot.city.name === this.$route.query.city)
+    },
+    clienttype () {
+      return this.$store.state.clienttypes.find(ct => ct.name === this.$route.query.clienttype)
     }
   },
   mounted () {

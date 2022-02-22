@@ -30,7 +30,7 @@
           {{ createdMessage }}
         </v-alert>
         <v-card-title class="headline">
-          Crear Ticket
+          Crear Ticket de {{ clienttype.name }} <v-icon class="ml-2">{{ clienttype.icon }}</v-icon>
         </v-card-title>
         <div v-if="!loading">
           <v-card-text>
@@ -251,6 +251,9 @@ export default {
   computed: {
     neighborhoods () {
       return this.$store.state.neighborhoods
+    },
+    clienttype () {
+      return this.$store.state.clienttypes.find(ct => ct.name === this.$route.query.clienttype)
     }
   },
   methods: {
@@ -318,6 +321,7 @@ export default {
             client: this.ticketPayload.client,
             city: this.ticketPayload.city,
             tickettype: this.ticketPayload.type.id,
+            clienttype: this.clienttype.id,
             assignated: this.ticketPayload.assignated,
             details: this.ticketPayload.details
           }

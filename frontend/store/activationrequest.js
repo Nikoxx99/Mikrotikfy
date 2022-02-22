@@ -105,7 +105,6 @@ export const actions = {
         client.data.attributes.city.data.attributes.id = client.data.attributes.city.data.id
         client.data.attributes.city = client.data.attributes.city.data.attributes
         client = client.data.attributes
-        console.log(client)
         await fetch(`${this.$config.API_STRAPI_ENDPOINT}admincreate`, {
           method: 'POST',
           headers: {
@@ -115,10 +114,6 @@ export const actions = {
           body: JSON.stringify({
             data: { ...client, operator: payload.operator }
           })
-        }).then((input) => {
-          if (input.status === 200) {
-            console.log('success')
-          }
         }).catch((error) => {
           // eslint-disable-next-line no-console
           console.error(error)

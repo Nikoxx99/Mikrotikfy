@@ -51,7 +51,7 @@
                 :page.sync="page"
                 :options.sync="options"
                 :loading="loadingDataTable"
-                :item-class="itemRowBackground"
+                :item-class="clienttype.name === 'INTERNET' ? itemRowBackground : ''"
                 no-data-text="No hay resultados a la busqueda..."
                 loading-text="Cargando información de clientes..."
                 dense
@@ -180,6 +180,7 @@
                       :name="item.name"
                     />
                     <ClientStatus
+                      v-if="clienttype.name === 'INTERNET'"
                       :name="item.name"
                       :clientid="item.id"
                       :code="item.code"
@@ -187,6 +188,7 @@
                       :index="clients.indexOf(item)"
                     />
                     <MainDevices
+                      v-if="clienttype.name === 'INTERNET'"
                       :name="item.name"
                       :clientid="item.id"
                     />
@@ -240,7 +242,7 @@
             >
               <v-icon>mdi-close</v-icon>
             </v-btn>
-            <v-toolbar-title><span class="headline">Crear Cliente en {{ currentCity.name }}</span></v-toolbar-title>
+            <v-toolbar-title><span class="headline">Crear Cliente de {{ clienttype.name }} en {{ currentCity.name }}</span></v-toolbar-title>
           </v-toolbar>
         </v-card-title>
         <v-card-text>
@@ -331,6 +333,14 @@ export default {
     },
     telegramBots () {
       return this.$store.state.telegramBots.find(bot => bot.city.name === this.$route.query.city)
+    },
+    clienttype () {
+      return this.$store.state.clienttypes.find(type => type.name === this.$route.query.clienttype)
+    }
+  },
+  watch: {
+    $route () {
+      this.getClientBySearch()
     }
   },
   // watch: {
@@ -374,6 +384,8 @@ export default {
     },
     async getClientBySearch () {
       this.loadingDataTable = true
+      await this.$store.dispatch('client/clearClientsFromDatatable')
+      await this.getHeadersByClientType()
       const search = this.searchClientInput.trim()
       const city = this.$route.query.city
       const clienttype = this.$route.query.clienttype
@@ -381,7 +393,6 @@ export default {
       if (search) {
         await this.$store.dispatch('client/getUsersFromDatabaseBySearch', { search, city, clienttype, token: this.$store.state.auth.token })
         await this.getClientStatusOnMikrotik()
-        await this.getHeadersByClientType()
         this.showPagintation = false
         this.loadingDataTable = false
         this.result = 'No se han encontrado resultados.'
@@ -394,7 +405,9 @@ export default {
       this.loadingDataTable = false
     },
     async getClientStatusOnMikrotik () {
-      await this.$store.dispatch('client/calculateClientStatus', this.activeClientsList)
+      if (this.$route.query.clienttype === 'INTERNET') {
+        await this.$store.dispatch('client/calculateClientStatus', this.activeClientsList)
+      }
     },
     savePlanFromModal (clientId, newPlan, isRx, operator, client) {
       // set plan by callback after the update
