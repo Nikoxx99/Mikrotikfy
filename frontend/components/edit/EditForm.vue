@@ -389,6 +389,9 @@ export default {
     },
     clientType () {
       return this.$route.query.clienttype
+    },
+    telegramBots () {
+      return this.$store.state.telegramBots.find(bot => bot.city.name === this.$route.query.city)
     }
   },
   watch: {
@@ -433,6 +436,7 @@ export default {
       }
       await this.$store.dispatch('client/updateClient', { client, index, operator, token: this.$store.state.auth.token })
       this.$emit('updateSuccess')
+      this.$simpleTelegramUpdate({ client: this.client, operator: this.$store.state.auth.username, telegramBots: this.telegramBots })
       this.dialogEdit = false
     },
     genAddress () {

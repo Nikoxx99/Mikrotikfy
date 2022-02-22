@@ -39,8 +39,8 @@ export default {
   */
   plugins: [
     '~/plugins/axios',
-    '~/plugins/role'
-    // '~/plugins/utils'
+    '~/plugins/role',
+    '~/plugins/telegram'
   ],
   /*
   ** Auto import components

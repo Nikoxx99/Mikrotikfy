@@ -347,6 +347,9 @@ export default {
     },
     technologies () {
       return this.$store.state.technologies
+    },
+    telegramBots () {
+      return this.$store.state.telegramBots.find(bot => bot.city.name === this.$route.query.city)
     }
   },
   mounted () {
@@ -408,6 +411,7 @@ export default {
         if (input.status === 200) {
           this.$emit('createClientDialog', false)
           this.$emit('createClientSnack', true)
+          this.$simpleTelegramCreate({ client: this.Client, operator: this.$store.state.auth.username, telegramBots: this.telegramBots })
         } else {
           this.alertBox = true
           this.alertBoxColor = 'red darken-4'

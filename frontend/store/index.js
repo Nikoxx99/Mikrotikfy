@@ -5,6 +5,7 @@ export const state = () => {
     auth: null,
     cities: null,
     clienttypes: null,
+    telegramBots: null,
     plans: null,
     technologies: null,
     devicebrands: null,
@@ -21,7 +22,7 @@ export const mutations = {
   setAuth (state, auth) {
     state.auth = auth
   },
-  setLocalStorage (state, { cities, plans, technologies, neighborhoods, deviceBrands, activeClients, activeClientsList, role, clienttypes }) {
+  setLocalStorage (state, { cities, plans, technologies, neighborhoods, deviceBrands, activeClients, activeClientsList, role, clienttypes, telegramBots }) {
     state.cities = JSON.parse(cities)
     state.plans = JSON.parse(plans)
     state.technologies = JSON.parse(technologies)
@@ -31,6 +32,7 @@ export const mutations = {
     state.activeClients = JSON.parse(activeClients)
     state.activeClientsList = JSON.parse(activeClientsList)
     state.clienttypes = JSON.parse(clienttypes)
+    state.telegramBots = JSON.parse(telegramBots)
     // state.clientCount = JSON.parse(clientCount)
     // state.clientCountActive = JSON.parse(clientCountActive)
     // state.clientCountDisable = JSON.parse(clientCountDisable)
@@ -81,11 +83,12 @@ export const actions = {
     const role = localStorage.getItem('role')
     const clienttypes = localStorage.getItem('clienttypes')
     const activeClientsList = localStorage.getItem('activeClientsList')
+    const telegramBots = localStorage.getItem('telegramBots')
     // const clientCount = localStorage.getItem('clientCount')
     // const clientCountActive = localStorage.getItem('clientCountActive')
     // const clientCountDisable = localStorage.getItem('clientCountDisable')
     // const clientCountRetired = localStorage.getItem('clientCountRetired')
-    commit('setLocalStorage', { cities, plans, technologies, neighborhoods, deviceBrands, activeClients, activeClientsList, role, clienttypes })
+    commit('setLocalStorage', { cities, plans, technologies, neighborhoods, deviceBrands, activeClients, activeClientsList, role, clienttypes, telegramBots })
   },
   getTicketsFromLocalStorage ({ commit }) {
     const tickets = localStorage.getItem('tickets')

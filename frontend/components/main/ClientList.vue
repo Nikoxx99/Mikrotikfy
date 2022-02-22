@@ -104,7 +104,7 @@
                     large
                     cancel-text="Cancelar"
                     save-text="Guardar"
-                    @save="savePlanFromModal(props.item._id, props.item.plan, isRx, $store.state.auth.username)"
+                    @save="savePlanFromModal(props.item.id, props.item.plan, isRx, $store.state.auth.username, props.item)"
                     @cancel="cancel()"
                   >
                     <v-chip small class="white black--text">
@@ -124,7 +124,7 @@
                         single-line
                         label="Plan"
                         dense
-                        @change="updatePlanFromModal(props.item._id, $event, clients.map(function(x) {return x._id; }).indexOf(props.item._id))"
+                        @change="updatePlanFromModal(props.item.id, $event, clients.map(function(x) {return x.id; }).indexOf(props.item.id))"
                       />
                     </template>
                   </v-edit-dialog>
@@ -328,6 +328,9 @@ export default {
     },
     activeClientsList () {
       return this.$store.state.activeClientsList
+    },
+    telegramBots () {
+      return this.$store.state.telegramBots.find(bot => bot.city.name === this.$route.query.city)
     }
   },
   // watch: {
@@ -393,9 +396,10 @@ export default {
     async getClientStatusOnMikrotik () {
       await this.$store.dispatch('client/calculateClientStatus', this.activeClientsList)
     },
-    savePlanFromModal (clientId, newPlan, isRx, operator, index) {
+    savePlanFromModal (clientId, newPlan, isRx, operator, client) {
       // set plan by callback after the update
-      this.$store.dispatch('client/setPlanFromModal', { clientId, newPlan, isRx, operator, index })
+      this.$store.dispatch('client/setPlanFromModal', { clientId, newPlan, isRx, operator, token: this.$store.state.auth.token })
+      this.$simpleTelegramUpdatePlan({ client, operator, isRx, telegramBots: this.telegramBots })
     },
     updatePlanFromModal (clientid, newPlan, index) {
       this.$store.dispatch('client/updateFromModal', { clientid, newPlan, index })

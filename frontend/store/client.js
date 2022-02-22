@@ -1,4 +1,3 @@
-import gqlt from 'graphql-tag'
 export const state = () => ({
   clients: [],
   headers: null
@@ -152,21 +151,32 @@ export const actions = {
     }
   },
   async setPlanFromModal (_, payload) {
-    const apollo = this.app.apolloProvider.defaultClient
     try {
-      await apollo.mutate({
-        mutation: gqlt`mutation ($id: String, $plan: String, $isRx: Boolean, $operator: String){
-          editClientPlan(id: $id, plan: $plan, isRx: $isRx, operator: $operator)
-        }`,
-        variables: {
-          id: payload.clientId,
-          plan: payload.newPlan.id,
-          isRx: payload.isRx,
-          operator: payload.operator
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}editclientplan`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${payload.token}`
+        },
+        body: JSON.stringify({
+          data: {
+            id: payload.clientId,
+            plan: payload.newPlan.id,
+            isRx: payload.isRx,
+            operator: payload.operator
+          }
+        })
+      }).then((input) => {
+        if (input.status === 200) {
+          return true
         }
+      }).catch((error) => {
+        // eslint-disable-next-line no-console
+        console.error(error)
+        throw new Error(`EDIT CLIENT PLAN ACTION ${error}`)
       })
     } catch (error) {
-      throw new Error(`CLIENT ACTION ${error}`)
+      throw new Error(`EDIT CLIENT PLAN ACTION ${error}`)
     }
   },
   async adminCreate ({ commit }, { client, index, token, operator }) {
