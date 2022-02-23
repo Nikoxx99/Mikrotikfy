@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="clients.length < 1 && !$route.params.search">
+    <div v-if="clients.length < 1 && !$route.params.search && clienttype">
       <v-row class="justify-center">
         <h4>Crea un cliente</h4>
       </v-row>
@@ -335,7 +335,7 @@ export default {
       return this.$store.state.telegramBots.find(bot => bot.city.name === this.$route.query.city)
     },
     clienttype () {
-      return this.$store.state.clienttypes.find(type => type.name === this.$route.query.clienttype)
+      return this.$store.state.clienttypes ? this.$store.state.clienttypes.find(type => type.name === this.$route.query.clienttype) : ''
     }
   },
   watch: {

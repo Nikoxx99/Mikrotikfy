@@ -13,9 +13,6 @@ export default {
       return this.$store.state.cities ? this.$store.state.cities.find(c => c.name == this.$route.query.city) : ''
     }
   },
-  mounted () {
-    this.getLocalStorage()
-  },
   methods: {
     getLocalStorage () {
       this.$store.dispatch('loadLocalStorage')

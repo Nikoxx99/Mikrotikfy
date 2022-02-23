@@ -17,9 +17,9 @@
     },
     "clients": {
       "type": "relation",
-      "relation": "manyToMany",
+      "relation": "oneToMany",
       "target": "api::client.client",
-      "inversedBy": "clienttypes"
+      "mappedBy": "clienttype"
     },
     "icon": {
       "type": "string"

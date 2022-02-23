@@ -277,16 +277,10 @@ export default {
         name: '',
         dni: '',
         address: '',
-        neighborhood: {
-          id: 0,
-          name: ''
-        },
+        neighborhood: null,
         city: '',
         phone: '',
-        plan: {
-          id: 0,
-          name: ''
-        },
+        plan: null,
         wifi_ssid: '',
         wifi_password: '',
         mac_address: '',
@@ -408,7 +402,7 @@ export default {
           Authorization: `Bearer ${this.$store.state.auth.token}`
         },
         body: JSON.stringify({
-          data: { ...this.Client, operator: this.$store.state.auth.id, operator_role: this.role }
+          data: { ...this.Client, operator: this.$store.state.auth.id, operator_role: this.role, clienttype: [this.clienttype.id] }
         })
       }).then((input) => {
         if (input.status === 200) {

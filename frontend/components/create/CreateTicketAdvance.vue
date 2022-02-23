@@ -137,7 +137,7 @@ export default {
           Authorization: `Bearer ${this.$store.state.auth.token}`
         },
         body: JSON.stringify({
-          data: { active: !this.ticketAdvance.closeTicket, escalated: this.ticketAdvance.escalated }
+          data: { active: !this.ticketAdvance.closeTicket, escalated: this.ticketAdvance.escalated, answered: true }
         })
       }).then(async (input) => {
         if (input.status === 200) {

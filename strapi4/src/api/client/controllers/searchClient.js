@@ -23,7 +23,7 @@ module.exports = {
                   },
                 },
                 {
-                  clienttypes: {
+                  clienttype: {
                     name: {
                       $eq: clienttype
                     }
@@ -69,7 +69,7 @@ module.exports = {
                 }
               ],  
             },
-            populate: ['city', 'plan', 'neighborhood', 'technology', 'clienttypes'],
+            populate: ['city', 'plan', 'neighborhood', 'technology', 'clienttype'],
             orderBy: { code: 'asc' }
           })
           console.log(res)

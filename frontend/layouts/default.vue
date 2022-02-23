@@ -233,8 +233,8 @@ export default {
     this.isMobileScreen()
   },
   methods: {
-    getLocalStorage () {
-      this.$store.dispatch('loadLocalStorage')
+    async getLocalStorage () {
+      await this.$store.dispatch('loadLocalStorage')
     },
     loadThemeFromVuetifyThemeManager () {
       const currentTheme = localStorage.getItem('currentTheme')

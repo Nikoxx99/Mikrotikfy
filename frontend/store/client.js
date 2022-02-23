@@ -1,5 +1,6 @@
 export const state = () => ({
   clients: [],
+  clienttypes: [],
   headers: null
 })
 export const mutations = {
@@ -16,13 +17,13 @@ export const mutations = {
       throw new Error(`MUTATE SEARCH CLIENT${error}`)
     }
   },
-  getClientTypesFromDatabase (state, clienttypesList) {
-    try {
-      state.clienttypes = clienttypesList
-    } catch (error) {
-      throw new Error(`MUTATE CLIENT TYPES${error}`)
-    }
-  },
+  // getClientTypesFromDatabase (state, clienttypesList) {
+  //   try {
+  //     state.clienttypes = clienttypesList
+  //   } catch (error) {
+  //     throw new Error(`MUTATE CLIENT TYPES${error}`)
+  //   }
+  // },
   updateFromModal (state, client) {
     try {
       state.clients[client.index].plan = client.newPlan
@@ -105,7 +106,7 @@ export const actions = {
     })
     commit('calculateClientStatus', newState)
   },
-  async getClientTypesFromDatabase ({ commit }, token) {
+  async getClientTypesFromDatabase (_, token) {
     try {
       await fetch(`${this.$config.API_STRAPI_ENDPOINT}clienttypes`, {
         method: 'GET',
@@ -121,7 +122,6 @@ export const actions = {
             return clienttype.attributes
           })
           localStorage.setItem('clienttypes', JSON.stringify(clienttypes))
-          commit('getClientTypesFromDatabase', clienttypes)
         })
     } catch (error) {
       throw new Error(`ACTION ${error}`)

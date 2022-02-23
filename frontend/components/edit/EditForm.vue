@@ -136,7 +136,7 @@
                   />
                 </v-col>
               </v-row>
-              <v-row v-if="clienttype === 'INTERNET'">
+              <v-row v-if="clienttype.name === 'INTERNET'">
                 <v-col cols="12" lg="4" md="4">
                   <v-select
                     v-model="editClient.plan"
@@ -175,7 +175,7 @@
                   />
                 </v-col>
               </v-row>
-              <v-row v-if="clienttype === 'INTERNET'">
+              <v-row v-if="clienttype.name === 'INTERNET'">
                 <v-col>
                   <CreateDevice :clientid="editClient.id" />
                 </v-col>
@@ -183,7 +183,7 @@
               <v-row>
                 <v-col cols="12" xs="12" sm="12" md="4" lg="4">
                   <v-select
-                    v-if="clienttype === 'INTERNET'"
+                    v-if="clienttype.name === 'INTERNET'"
                     v-model="editClient.technology"
                     :disabled="!(!$isAdmin() || !$isBiller() || !$isTechnician())"
                     item-text="name"
@@ -200,7 +200,7 @@
                 </v-col>
                 <v-col cols="12" xs="12" sm="12" md="4" lg="4">
                   <v-text-field
-                    v-if="clienttype === 'INTERNET'"
+                    v-if="clienttype.name === 'INTERNET'"
                     :value="editClient.nap_onu_address ? editClient.nap_onu_address.toUpperCase() : ''"
                     label="Direccion NAP/ONU"
                     outlined
@@ -211,7 +211,7 @@
                 </v-col>
                 <v-col cols="12" xs="12" sm="12" md="4" lg="4">
                   <v-text-field
-                    v-if="clienttype === 'INTERNET'"
+                    v-if="clienttype.name === 'INTERNET'"
                     v-model="editClient.opticalPower"
                     label="Potencia Óptica (Solo numeros)"
                     outlined
@@ -248,7 +248,7 @@
                 </v-col>
                 <v-col>
                   <v-select
-                    v-if="clienttype === 'INTERNET'"
+                    v-if="clienttype.name === 'INTERNET'"
                     v-model="editClient.newModel"
                     :disabled="!$isAdmin()"
                     :items="idwith"
@@ -286,7 +286,7 @@
                   disabled
                 />
               </div> -->
-              <v-checkbox v-if="clienttype === 'INTERNET'" v-model="editClient.hasRepeater" hide-details label="Tiene repetidor?" />
+              <v-checkbox v-if="clienttype.name === 'INTERNET'" v-model="editClient.hasRepeater" hide-details label="Tiene repetidor?" />
             </v-form>
           </v-container>
         </v-card-text>
