@@ -233,11 +233,10 @@
       <v-card>
         <v-card-title>
           <v-toolbar
-            dark
+            elevation="0"
           >
             <v-btn
               icon
-              dark
               @click="createDialog = false"
             >
               <v-icon>mdi-close</v-icon>

@@ -43,16 +43,17 @@
         v-for="clienttype in $store.state.clienttypes"
         :key="clienttype.name"
         class="ml-2"
-        :color="clienttype.name === $route.query.clienttype ? $vuetify.theme.dark ? 'primary white--text' : 'primary' : 'white black--text'"
+        :color="clienttype.name === $route.query.clienttype ? $vuetify.theme.dark ? 'blue darken-4 white--text' : 'blue darken-4' : 'white black--text'"
         elevation="0"
         rounded
         small
         :to="`${$route.path}?city=${$route.query.city}&clienttype=${clienttype.name}`"
+        @click="setSavedClientType(clienttype.name)"
       >
-        <v-icon class="mr-2">
+        <v-icon :class="isMobile ? '' : 'mr-2'">
           {{ clienttype.icon }}
         </v-icon>
-        {{ clienttype.name }}
+        {{ isMobile ? null : clienttype.name }}
       </v-btn>
       <v-spacer />
       <v-switch
@@ -83,9 +84,9 @@
           small
           outlined
           :color="city.color"
-          :to="`/clients?city=${city.name}&clienttype=${$route.query.clienttype}`"
+          :to="`${$route.path}?city=${city.name}&clienttype=${$route.query.clienttype}`"
         >
-          {{ city.name }}
+          {{ isMobile ? city.name.charAt(0) : city.name }}
         </v-btn>
       </div>
       <v-tooltip bottom>
@@ -112,9 +113,7 @@
       >
         Estas sin acceso a internet. Verifica la conexión WIFI o de datos.
       </v-alert>
-      <v-container fluid>
-        <nuxt />
-      </v-container>
+      <nuxt />
     </v-main>
     <v-footer
       app
@@ -231,6 +230,7 @@ export default {
     this.loadThemeFromVuetifyThemeManager()
     this.comprobeSessionResetStatus()
     this.isMobileScreen()
+    this.getSavedClientType()
   },
   methods: {
     async getLocalStorage () {
@@ -276,6 +276,19 @@ export default {
     },
     setLocalStorage () {
       localStorage.setItem('currentCity', this.$route.query.city)
+    },
+    getSavedClientType () {
+      const currentClientType = localStorage.getItem('clienttype')
+      if (currentClientType !== this.$route.query.clienttype) {
+        this.$router.push({
+          query: {
+            currentClientType
+          }
+        })
+      }
+    },
+    setSavedClientType (clienttype) {
+      localStorage.setItem('clienttype', clienttype)
     },
     // comprobeCity () {
     //   const recordedCity = localStorage.getItem('currentCity')
