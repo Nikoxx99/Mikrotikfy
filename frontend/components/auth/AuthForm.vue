@@ -145,41 +145,25 @@ export default {
     },
     async logininfo (response) {
       this.loginSuccessful = true
-      const qs = require('qs')
-      const query = qs.stringify({
-        filters: {
-          users: {
-            id: {
-              $eq: response.user.id
-            }
-          }
-        },
-        populate: {
-          users: {
-            filters: {
-              id: {
-                $eq: response.user.id
-              }
-            }
-          }
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}users/me`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${response.jwt}`
         }
-      },
-      {
-        encodeValuesOnly: true
       })
-      await fetch(`${this.$config.API_STRAPI_ENDPOINT}cities?${query}`)
         .then(res => res.json())
-        .then(async (cities) => {
-          const userId = cities.data[0].attributes.users.data[0].id
-          const userData = cities.data[0].attributes.users.data[0].attributes
-          userData.id = userId
-          cities = cities.data.map((city) => {
-            city.attributes.id = city.id
-            city = city.attributes
-            return city
-          })
-          if (!cities) {
+        .then(async (userResponse) => {
+          const userData = userResponse
+          const userCities = userResponse.cities
+          const userClienttypes = userResponse.clienttypes
+          if (!userCities) {
             this.errorMessages = 'Ciudad no especificada para el usuario'
+            this.loginFailed = true
+            this.loginSuccessful = false
+            this.isLoading = false
+          } else if (!userClienttypes) {
+            this.errorMessages = 'Tipo de clientes no especificada para el usuario'
             this.loginFailed = true
             this.loginSuccessful = false
             this.isLoading = false
@@ -188,7 +172,8 @@ export default {
               id: userData.id,
               token: response.jwt,
               username: userData.username,
-              cities
+              cities: userCities,
+              clienttypes: userClienttypes
             }
             Cookie.set('auth', auth, { expires: 7 })
             Cookie.set('token', response.jwt, { expires: 7 })
@@ -199,11 +184,11 @@ export default {
               this.$store.dispatch('city/getCitiesFromDatabase'),
               this.$store.dispatch('client/getClientTypesFromDatabase', response.jwt),
               this.$store.dispatch('neighborhood/getNeighborhoodsFromDatabase'),
-              this.$store.dispatch('count/activeClients', { token: response.jwt, city: cities[0].id }),
-              this.$store.dispatch('telegram/getTelegramBotsFromDatabase', { token: response.jwt, city: cities[0].name }),
+              this.$store.dispatch('count/activeClients', { token: response.jwt, city: userCities[0].id }),
+              this.$store.dispatch('telegram/getTelegramBotsFromDatabase', { token: response.jwt, city: userCities[0].name }),
               this.$store.dispatch('role/getRoleFromUserData', { token: response.jwt })
             ]).then(() => {
-              window.location.href = `/clients?city=${cities[0].name}`
+              window.location.href = `/clients?city=${userCities[0].name}&clienttype=${userClienttypes[0].name}`
             }).catch((e) => {
               this.errorMessages = e
               this.loginFailed = true

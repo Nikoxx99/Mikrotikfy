@@ -48,6 +48,7 @@ export default {
         locate: true
       }, function (err) {
         if (err) {
+          // eslint-disable-next-line no-console
           console.log(err)
         }
         Quagga.start()

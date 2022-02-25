@@ -80,6 +80,8 @@
                   <CreateTicketAdvance
                     :editindex="ticketList.indexOf(props.item)"
                     :ticketid="props.item.id"
+                    :ticket="props.item"
+                    :client="props.item.client"
                     :name="props.item.client.name"
                     @updateTicketStatus="updateTicketStatus($event)"
                   />
@@ -194,18 +196,12 @@
                     :role="allowed_components"
                   />
                 <CreateTicketAdvance
-                  v-if="editModalData.tickettype.name !== 'TRASLADO'"
                   :block="true"
                   :editindex="ticketList ? ticketList.indexOf(editModalData.id) : ''"
                   :ticketid="editModalData.id"
-                  :name="editModalData.client.name"
-                  @updateTicketStatus="updateTicketStatus($event)"
-                />
-                <CreateTicketAdvanceTraslate
-                  v-else
-                  :block="true"
-                  :editindex="ticketList ? ticketList.indexOf(editModalData.id) : ''"
                   :ticket="editModalData"
+                  :client="editModalData.client"
+                  :name="editModalData.client.name"
                   @updateTicketStatus="updateTicketStatus($event)"
                 />
                 <TicketAdvanceHistory

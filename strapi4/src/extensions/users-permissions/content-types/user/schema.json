@@ -85,6 +85,12 @@
       "relation": "oneToMany",
       "target": "api::activationrequest.activationrequest",
       "mappedBy": "operator"
+    },
+    "clienttypes": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::clienttype.clienttype",
+      "inversedBy": "users"
     }
   }
 }

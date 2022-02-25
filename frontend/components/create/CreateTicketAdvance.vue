@@ -99,6 +99,14 @@ export default {
       type: Number,
       default: -1
     },
+    ticket: {
+      type: Object,
+      default: () => ({})
+    },
+    client: {
+      type: Object,
+      default: () => ({})
+    },
     name: {
       type: String,
       default: ''
@@ -122,6 +130,11 @@ export default {
       editindex: -1
     }
   }),
+  computed: {
+    telegramBots () {
+      return this.$store.state.telegramBots.find(bot => bot.city.name === this.$route.query.city)
+    }
+  },
   methods: {
     initComponent () {
       this.modal = true
@@ -149,15 +162,23 @@ export default {
             },
             body: JSON.stringify({
               data: {
-                ticket: this.ticketAdvance.id,
+                ticketype: this.ticketAdvance.id,
                 details: this.ticketAdvance.details,
-                operator: this.$store.state.auth.id
+                operator: this.$store.state.auth.id,
+                telegramBots: this.telegramBots
               }
             })
           }).then((input) => {
             if (input.status === 200) {
               this.modal = false
               this.$emit('updateTicketStatus', this.ticketAdvance)
+              this.$simpleTelegramCreateTicketAdvance({
+                client: this.client,
+                ticket: this.ticket,
+                details: this.ticketAdvance.details,
+                operator: this.$store.state.auth.username,
+                telegramBots: this.telegramBots
+              })
               this.snack = true
               this.snackColor = 'info'
               this.snackText = 'Ticket actualizado con éxito.'

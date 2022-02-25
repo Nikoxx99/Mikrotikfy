@@ -254,6 +254,9 @@ export default {
     },
     clienttype () {
       return this.$store.state.clienttypes.find(ct => ct.name === this.$route.query.clienttype)
+    },
+    telegramBots () {
+      return this.$store.state.telegramBots.find(bot => bot.city.name === this.$route.query.city)
     }
   },
   methods: {
@@ -330,6 +333,7 @@ export default {
         if (input.status === 200) {
           this.modal = false
           this.loading = false
+          this.$simpleTelegramCreateTicket({ client: this.client, tickettype: this.ticketPayload.type.name, details: this.ticketPayload.details, neighborhood: this.client.neighborhood, operator: this.$store.state.auth.username, telegramBots: this.telegramBots })
         } else {
           this.alertBox = true
           this.alertBoxColor = 'red darken-4'

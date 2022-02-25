@@ -2,6 +2,8 @@ export default (_, inject) => {
   inject('simpleTelegramCreate', input => simpleTelegramCreate(input))
   inject('simpleTelegramUpdate', input => simpleTelegramUpdate(input))
   inject('simpleTelegramUpdatePlan', input => simpleTelegramUpdatePlan(input))
+  inject('simpleTelegramCreateTicket', input => simpleTelegramCreateTicket(input))
+  inject('simpleTelegramCreateTicketAdvance', input => simpleTelegramCreateTicketAdvance(input))
 }
 
 function simpleTelegramCreate ({ client, operator, telegramBots }) {
@@ -71,6 +73,66 @@ function simpleTelegramUpdatePlan ({ client, operator, isRx, telegramBots }) {
       return err
     })
 };
+
+function simpleTelegramCreateTicket ({ client, tickettype, details, neighborhood, operator, telegramBots }) {
+  const fetch = require('node-fetch')
+  const bot = telegramBots.token
+  const chatid = telegramBots.chat
+  const line1 = 'ℹ NUEVO TICKET ℹ️'
+  const line2 = client.code
+  const line3 = sanitizeString(client.name)
+  const line4 = sanitizeString(client.address)
+  const line5 = neighborhood.name
+  const line6 = client.phone
+  const line7 = tickettype
+  const line8 = sanitizeString(details)
+  const line9 = operator
+  const message = `${line1}\n${line2}\n${line3}\n${line4}\n${line5}\n${line6}\n${line7}\n\n${line8}\nInforma: ${line9}`
+  const req =
+    'https://api.telegram.org/bot' +
+    bot +
+    '/sendMessage?chat_id=' +
+    chatid +
+    '&text=' +
+    encodeURIComponent(message)
+  fetch(req)
+    .catch(function (err) {
+      return err
+    })
+};
+function simpleTelegramCreateTicketAdvance ({ client, ticket, details, operator, telegramBots }) {
+  const fetch = require('node-fetch')
+  const bot = telegramBots.token
+  const chatid = telegramBots.chat
+  let line1 = ''
+  if (!ticket.active) {
+    line1 = '✅ CIERRE DE TICKET ✅'
+  } else {
+    line1 = 'AVANCE DE TICKET'
+  }
+  const line2 = sanitizeString(client.name)
+  const line3 = sanitizeString(ticket.tickettype.name)
+  const line4 = sanitizeString(details)
+  let line5 = ''
+  if (!ticket.active) {
+    line5 = 'CASO CERRADO'
+  } else {
+    line5 = 'CASO ACTIVO'
+  }
+  const line6 = operator
+  const message = `${line1}\n${line2}\n${line3}\n${line4}\n\n${line5}\n${line6}`
+  const req =
+    'https://api.telegram.org/bot' +
+    bot +
+    '/sendMessage?chat_id=' +
+    chatid +
+    '&text=' +
+    encodeURIComponent(message)
+  fetch(req)
+    .catch(function (err) {
+      return err
+    })
+}
 
 function sanitizeString (str) {
   const res1 = str.normalize('NFD').replace(/[\u0300-\u036F]/g, '')

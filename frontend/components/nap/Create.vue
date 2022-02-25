@@ -135,11 +135,10 @@ export default {
           this.createdMessage = 'NAP creada correctamente.'
         })
         .catch((err) => {
-          console.log(err)
           this.isSubmitting = !this.isSubmitting
           this.alertBox = true
           this.alertBoxColor = 'red darken-4'
-          this.createdMessage = 'Error al crear la NAP.'
+          this.createdMessage = 'Error al crear la NAP.' + err
         })
     },
     getNapTypes () {

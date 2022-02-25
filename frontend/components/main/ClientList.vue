@@ -197,7 +197,6 @@
                       :index="clients.indexOf(item)"
                       @updateSuccess="getClientBySearch()"
                     />
-                    <DeleteClient :name="item.name" :clientid="String(item.id)" />
                   </div>
                 </template>
               </v-data-table>
@@ -263,7 +262,6 @@
 
 <script>
 import EditForm from '../edit/EditForm'
-import DeleteClient from '../delete/DeleteClient'
 import ClientStatus from '../main/ClientStatus'
 import CreateTicket from '../create/CreateTicket'
 import TicketHistory from '../misc/TicketHistory'
@@ -273,7 +271,6 @@ export default {
   components: {
     CreateForm,
     EditForm,
-    DeleteClient,
     ClientStatus,
     CreateTicket,
     TicketHistory

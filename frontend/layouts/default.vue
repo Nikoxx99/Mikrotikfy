@@ -40,7 +40,7 @@
     >
       <v-app-bar-nav-icon v-if="isMobile" @click.stop="drawer = !drawer" />
       <v-btn
-        v-for="clienttype in $store.state.clienttypes"
+        v-for="clienttype in $store.state.auth.clienttypes"
         :key="clienttype.name"
         class="ml-2"
         :color="clienttype.name === $route.query.clienttype ? $vuetify.theme.dark ? 'blue darken-4 white--text' : 'blue darken-4' : 'white black--text'"
@@ -48,7 +48,6 @@
         rounded
         small
         :to="`${$route.path}?city=${$route.query.city}&clienttype=${clienttype.name}`"
-        @click="setSavedClientType(clienttype.name)"
       >
         <v-icon :class="isMobile ? '' : 'mr-2'">
           {{ clienttype.icon }}
@@ -126,7 +125,6 @@
 </template>
 
 <script>
-// import gqlt from 'graphql-tag'
 import Cookie from 'js-cookie'
 export default {
   middleware: ['defaultCity', 'authenticated'],
@@ -230,7 +228,6 @@ export default {
     this.loadThemeFromVuetifyThemeManager()
     this.comprobeSessionResetStatus()
     this.isMobileScreen()
-    this.getSavedClientType()
   },
   methods: {
     async getLocalStorage () {
@@ -277,26 +274,6 @@ export default {
     setLocalStorage () {
       localStorage.setItem('currentCity', this.$route.query.city)
     },
-    getSavedClientType () {
-      const currentClientType = localStorage.getItem('clienttype')
-      if (currentClientType !== this.$route.query.clienttype) {
-        this.$router.push({
-          query: {
-            currentClientType
-          }
-        })
-      }
-    },
-    setSavedClientType (clienttype) {
-      localStorage.setItem('clienttype', clienttype)
-    },
-    // comprobeCity () {
-    //   const recordedCity = localStorage.getItem('currentCity')
-    //   const currentCity = this.$route.query.city
-    //   if (currentCity !== recordedCity) {
-    //     this.$store.dispatch('refreshActiveClients', currentCity)
-    //   }
-    // },
     comprobeDateToSetChristmasTheme () {
       const date = new Date()
       const month = date.getMonth()

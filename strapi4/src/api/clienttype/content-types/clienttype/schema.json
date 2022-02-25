@@ -29,6 +29,12 @@
       "relation": "oneToMany",
       "target": "api::ticket.ticket",
       "mappedBy": "clienttype"
+    },
+    "users": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "plugin::users-permissions.user",
+      "mappedBy": "clienttypes"
     }
   }
 }
