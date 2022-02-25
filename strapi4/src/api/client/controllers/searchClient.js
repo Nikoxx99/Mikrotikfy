@@ -10,7 +10,6 @@ module.exports = {
   /* BUSCAR CLIENTE CUSTOM ACTION */
   async searchclient(ctx) {
     const {city, search, clienttype } = ctx.query;
-    console.log(clienttype)
     if (search) { // SI LA BUSQUEDA NO ES NULA
           const res = await strapi.service('api::client.client').find({
             filters: {
@@ -32,7 +31,9 @@ module.exports = {
                 {
                   $or: [
                     {
-                      code: search
+                      code: {
+                        $contains: search
+                      }
                     },
                     {
                       neighborhood: {
@@ -72,7 +73,6 @@ module.exports = {
             populate: ['city', 'plan', 'neighborhood', 'technology', 'clienttype'],
             orderBy: { code: 'asc' }
           })
-          console.log(res)
           const sanitizedEntity = await sanitize.contentAPI.output(res);
           return { data: sanitizedEntity };
     } else {

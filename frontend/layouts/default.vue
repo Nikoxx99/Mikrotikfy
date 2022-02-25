@@ -1,7 +1,7 @@
 <template>
   <v-app
     class="text-body-2"
-    :style="this.$vuetify.theme.dark ? 'background-color:rgb(30 30 30 / 88%);' : 'background-color:rgb(255 255 255 / 86%);'"
+    :style="this.$vuetify.theme.dark ? 'background-color:rgb(20 20 20 / 88%);' : 'background-color:rgb(255 255 255 / 86%);'"
   >
     <v-navigation-drawer
       v-model="drawer"
@@ -79,9 +79,8 @@
         <v-btn
           v-for="city in $store.state.auth.cities"
           :key="city.name"
-          class="ml-2"
+          class="ml-2 black--text"
           small
-          outlined
           :color="city.color"
           :to="`${$route.path}?city=${city.name}&clienttype=${$route.query.clienttype}`"
         >
