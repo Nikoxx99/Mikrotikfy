@@ -13,6 +13,7 @@ export const mutations = {
   getUsersFromDatabase (state, clientsList) {
     try {
       state.clients = clientsList.data.results
+      state.pagination = clientsList.data.pagination
     } catch (error) {
       throw new Error(`MUTATE SEARCH CLIENT${error}`)
     }
@@ -128,8 +129,15 @@ export const actions = {
     }
   },
   async getUsersFromDatabaseBySearch ({ commit }, payload) {
+    const qs = require('qs')
+    const pagination = qs.stringify({
+      pagination: payload.pagination
+    },
+    {
+      encodeValuesOnly: true
+    })
     try {
-      await fetch(`${this.$config.API_STRAPI_ENDPOINT}searchclient?search=${payload.search}&city=${payload.city}&clienttype=${payload.clienttype}`, {
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}searchclient?search=${payload.search}&city=${payload.city}&clienttype=${payload.clienttype}&${pagination}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

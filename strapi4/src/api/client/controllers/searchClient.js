@@ -9,9 +9,10 @@ module.exports = {
 
   /* BUSCAR CLIENTE CUSTOM ACTION */
   async searchclient(ctx) {
-    const {city, search, clienttype } = ctx.query;
+    const {city, search, clienttype, pagination } = ctx.query;
     if (search) { // SI LA BUSQUEDA NO ES NULA
           const res = await strapi.service('api::client.client').find({
+            pagination,
             filters: {
               $and: [
                 {
@@ -74,6 +75,7 @@ module.exports = {
             orderBy: { code: 'asc' }
           })
           const sanitizedEntity = await sanitize.contentAPI.output(res);
+          console.log(sanitizedEntity)
           return { data: sanitizedEntity };
     } else {
       return [{ init: 'initial request' }]

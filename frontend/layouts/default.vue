@@ -79,7 +79,7 @@
         <v-btn
           v-for="city in $store.state.auth.cities"
           :key="city.name"
-          class="ml-2 black--text"
+          class="ml-2"
           small
           :color="city.color"
           :to="`${$route.path}?city=${city.name}&clienttype=${$route.query.clienttype}`"

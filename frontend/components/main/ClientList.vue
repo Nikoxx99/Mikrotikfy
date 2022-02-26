@@ -201,11 +201,12 @@
                 </template>
               </v-data-table>
             </client-only>
-            <v-row v-if="showPagintation">
+            <v-row>
               <v-col cols="12" sm="8" md="10" lg="11" style="max-width:90%;margin:auto;">
                 <v-pagination
-                  v-model="page"
-                  :length="pageCount"
+                  v-model="pagination.page"
+                  :length="pagination.pageCount"
+                  :total-visible="6"
                 />
               </v-col>
             </v-row>
@@ -295,12 +296,15 @@ export default {
       options: {},
       page: 1,
       pageCount: 0,
+      pagination: {
+        page: 1,
+        pageSize: 24
+      },
       refreshLoading: false,
       searchClientInput: '',
       snack: false,
       snackColor: '',
       snackText: '',
-      showPagintation: true,
       result: ''
     }
   },
@@ -337,21 +341,14 @@ export default {
   watch: {
     $route () {
       this.getClientBySearch()
+    },
+    'pagination.page': {
+      handler () {
+        this.getClientBySearch()
+      },
+      deep: false
     }
   },
-  // watch: {
-  //   itemsPerPage () {
-  //     const city = this.$route.query.city
-  //     this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: this.itemsPerPage, city })
-  //   },
-  //   async page () {
-  //     const start = (this.page - 1) * this.itemsPerPage
-  //     const limit = this.itemsPerPage
-  //     const city = this.$route.query.city
-  //     await this.$store.dispatch('client/getUsersFromDatabase', { start, limit, city })
-  //     await this.getClientStatusOnMikrotik()
-  //   }
-  // },
   mounted () {
     if (this.search) {
       this.searchClientInput = this.search
@@ -387,9 +384,9 @@ export default {
       const clienttype = this.$route.query.clienttype
       this.result = 'Buscando...'
       if (search) {
-        await this.$store.dispatch('client/getUsersFromDatabaseBySearch', { search, city, clienttype, token: this.$store.state.auth.token })
+        await this.$store.dispatch('client/getUsersFromDatabaseBySearch', { search, city, clienttype, token: this.$store.state.auth.token, pagination: this.pagination })
+        this.pagination = { ...this.$store.state.client.pagination }
         await this.getClientStatusOnMikrotik()
-        this.showPagintation = false
         this.loadingDataTable = false
         this.result = 'No se han encontrado resultados.'
       }
@@ -397,7 +394,6 @@ export default {
     async resetsearchfn () {
       await this.$store.dispatch('client/clearClientsFromDatatable')
       await this.getClientStatusOnMikrotik()
-      this.showPagintation = true
       this.loadingDataTable = false
     },
     async getClientStatusOnMikrotik () {
