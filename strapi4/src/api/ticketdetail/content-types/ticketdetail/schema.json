@@ -13,7 +13,7 @@
   "pluginOptions": {},
   "attributes": {
     "details": {
-      "type": "string"
+      "type": "text"
     },
     "ticket": {
       "type": "relation",

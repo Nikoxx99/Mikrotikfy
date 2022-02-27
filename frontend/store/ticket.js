@@ -77,7 +77,8 @@ export const actions = {
           'assignated',
           'ticketdetails',
           'ticketdetails.operator'
-        ]
+        ],
+        sort: ['createdAt:desc']
       },
       {
         encodeValuesOnly: true

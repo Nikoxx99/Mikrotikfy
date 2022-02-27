@@ -92,8 +92,8 @@
                 </div>
               </template>
               <template v-slot:[`item.active`]="props">
-                <v-chip small :color="getColor(props.item.active, props.item.answered, props.item.escalated)" class="white--text">
-                  {{ getState(props.item.active, props.item.answered, props.item.escalated) }}
+                <v-chip small :color="getColor(props.item.active, props.item.answered, props.item.escalated, props.item.escalatedoffice)" class="white--text">
+                  {{ getState(props.item.active, props.item.answered, props.item.escalated, props.item.escalatedoffice) }}
                 </v-chip>
               </template>
               <template v-slot:[`item.createdAt`]="{ item }">
@@ -337,24 +337,28 @@ export default {
         return 'primary'
       }
     },
-    getColor (state, answered, escalated) {
+    getColor (state, answered, escalated, escalatedoffice) {
       if (state && !answered) {
         return 'blue darken-4'
-      } else if (answered && state && !escalated) {
+      } else if (answered && state && !escalated && !escalatedoffice) {
         return 'orange darken-4'
       } else if (answered && state && escalated) {
         return 'purple darken-4'
+      } else if (answered && state && !escalated && escalatedoffice) {
+        return 'green darken-4'
       } else {
         return 'red'
       }
     },
-    getState (state, answered, escalated) {
+    getState (state, answered, escalated, escalatedoffice) {
       if (state && !answered) {
         return 'Abierto'
-      } else if (answered && state && !escalated) {
+      } else if (answered && state && !escalated && !escalatedoffice) {
         return 'Respondido'
       } else if (answered && state && escalated) {
         return 'Escalado a Tecnico'
+      } else if (answered && state && !escalated && escalatedoffice) {
+        return 'Escalado a Oficina'
       } else {
         return 'Cerrado'
       }

@@ -201,7 +201,7 @@
                 </template>
               </v-data-table>
             </client-only>
-            <v-row>
+            <!-- <v-row>
               <v-col cols="12" sm="8" md="10" lg="11" style="max-width:90%;margin:auto;">
                 <v-pagination
                   v-model="pagination.page"
@@ -209,7 +209,7 @@
                   :total-visible="6"
                 />
               </v-col>
-            </v-row>
+            </v-row> -->
           </v-card-text>
           <v-snackbar
             v-model="snack"
@@ -298,7 +298,7 @@ export default {
       pageCount: 0,
       pagination: {
         page: 1,
-        pageSize: 24
+        pageSize: 500
       },
       refreshLoading: false,
       searchClientInput: '',

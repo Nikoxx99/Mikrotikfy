@@ -44,6 +44,12 @@
               label="Escalar caso?"
             />
             <v-checkbox
+              v-if="$isAdmin()"
+              v-model="ticketAdvance.escalatedoffice"
+              color="red"
+              label="Escalar a oficina?"
+            />
+            <v-checkbox
               v-model="ticketAdvance.closeTicket"
               color="red"
               label="Cerrar Ticket?"
@@ -127,6 +133,7 @@ export default {
       details: '',
       closeTicket: false,
       escalated: false,
+      escalatedoffice: false,
       editindex: -1
     }
   }),
@@ -150,7 +157,7 @@ export default {
           Authorization: `Bearer ${this.$store.state.auth.token}`
         },
         body: JSON.stringify({
-          data: { active: !this.ticketAdvance.closeTicket, escalated: this.ticketAdvance.escalated, answered: true }
+          data: { active: !this.ticketAdvance.closeTicket, escalated: this.ticketAdvance.escalated, escalatedoffice: this.ticketAdvance.escalatedoffice, answered: true }
         })
       }).then(async (input) => {
         if (input.status === 200) {
@@ -162,6 +169,7 @@ export default {
             },
             body: JSON.stringify({
               data: {
+                ticket: this.ticketid,
                 ticketype: this.ticketAdvance.id,
                 details: this.ticketAdvance.details,
                 operator: this.$store.state.auth.id,
