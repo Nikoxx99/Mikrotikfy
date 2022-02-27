@@ -12,8 +12,9 @@ module.exports = {
       const res = await strapi.query('ticket').find(params, ["client","client.neighborhood", "tickettype","ticketdetails","assiganted"])
       const resdetails = await Promise.all(
         res.map(async (item) => {
+          console.log(item)
           if (item.ticketdetails.length > 0) {
-            const detailsquery = await strapi.query('ticketdetail').find({_id: item.ticketdetails[0]._id})
+            const detailsquery = await strapi.query('ticketdetail').find({_id: item.ticketdetails.slice(-1)[0]._id})
             item.ticketdetails = detailsquery
             return item
           } else {
@@ -24,7 +25,6 @@ module.exports = {
       const resclient = await Promise.all(
         resdetails.map(async (item) => {
           const clientquery = await strapi.query('client').findOne({_id: item.client._id})
-          console.log(clientquery)
           item.client = clientquery
           return item
         })

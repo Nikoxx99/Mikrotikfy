@@ -41,7 +41,13 @@
               v-if="$isAdmin()"
               v-model="ticketAdvance.escalated"
               color="red"
-              label="Escalar caso?"
+              label="Escalar a tecnico?"
+            />
+            <v-checkbox
+              v-if="$store.state.auth.rolename === 'superadmin'"
+              v-model="ticketAdvance.escalatedoffice"
+              color="red"
+              label="Escalar a oficina?"
             />
             <v-checkbox
               v-if="$isAdmin()"
