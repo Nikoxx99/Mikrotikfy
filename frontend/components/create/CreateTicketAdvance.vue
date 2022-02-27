@@ -31,7 +31,6 @@
         </v-card-title>
         <div v-if="!loading">
           <v-card-text>
-            <h2> {{ name }} </h2>
             <v-textarea
               v-model="ticketAdvance.details"
               outlined
@@ -39,13 +38,19 @@
               label="Detalles adicionales"
             />
             <v-checkbox
-              v-if="$store.state.auth.rolename === 'superadmin'"
+              v-if="$isAdmin()"
               v-model="ticketAdvance.escalated"
               color="red"
               label="Escalar a tecnico?"
             />
             <v-checkbox
               v-if="$store.state.auth.rolename === 'superadmin'"
+              v-model="ticketAdvance.escalatedoffice"
+              color="red"
+              label="Escalar a oficina?"
+            />
+            <v-checkbox
+              v-if="$isAdmin()"
               v-model="ticketAdvance.escalatedoffice"
               color="red"
               label="Escalar a oficina?"
@@ -95,7 +100,6 @@
 </template>
 
 <script>
-import gqlt from 'graphql-tag'
 export default {
   name: 'CreateTicketAdvance',
   props: {
@@ -104,8 +108,16 @@ export default {
       default: -1
     },
     ticketid: {
-      type: String,
-      default: ''
+      type: Number,
+      default: -1
+    },
+    ticket: {
+      type: Object,
+      default: () => ({})
+    },
+    client: {
+      type: Object,
+      default: () => ({})
     },
     name: {
       type: String,
@@ -131,77 +143,69 @@ export default {
       editindex: -1
     }
   }),
+  computed: {
+    telegramBots () {
+      return this.$store.state.telegramBots.find(bot => bot.city.name === this.$route.query.city)
+    }
+  },
   methods: {
     initComponent () {
       this.modal = true
       this.ticketAdvance.id = this.ticketid
       this.ticketAdvance.editindex = this.editindex
     },
-    CreateTicketAdvance () {
+    async CreateTicketAdvance () {
       this.loading = true
-      this.$apollo.mutate({
-        mutation: gqlt`mutation ($id: ID!, $status: Boolean, $escalated: Boolean, $escalatedoffice: Boolean){
-          updateTicket(input: {
-          where: {
-            id: $id
-          }
-          data: {
-            active: $status
-            answered: true
-            escalated: $escalated
-            escalatedoffice: $escalatedoffice
-          }
-        }){
-          ticket{
-            id
-          }
-        }
-        }`,
-        variables: {
-          id: this.ticketAdvance.id,
-          status: !this.ticketAdvance.closeTicket,
-          escalated: this.ticketAdvance.escalated,
-          escalatedoffice: this.ticketAdvance.escalatedoffice
-        }
-      }).then(() => {
-        this.$apollo.mutate({
-          mutation: gqlt`mutation ($id: ID!, $details: String, $operator: ID!){
-            createTicketdetail(input: {
-              data: {
-                ticket: $id
-                details: $details
-                operator: $operator
-              }
-            }) {
-              ticketdetail{
-                ticket{
-                  id
-                }
-              }
-            }
-          }`,
-          variables: {
-            id: this.ticketAdvance.id,
-            details: this.ticketAdvance.details,
-            operator: this.$store.state.auth.id
-          }
-        }).then((_) => {
-          this.modal = false
-          this.$emit('updateTicketStatus', this.ticketAdvance)
-          this.snack = true
-          this.snackColor = 'info'
-          this.snackText = 'Ticket actualizado con éxito.'
-          this.loading = false
-        }).catch((error) => {
-          this.snack = true
-          this.snackColor = 'red'
-          this.snackText = error
-          this.loading = false
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}tickets/${this.ticketid}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.$store.state.auth.token}`
+        },
+        body: JSON.stringify({
+          data: { active: !this.ticketAdvance.closeTicket, escalated: this.ticketAdvance.escalated, escalatedoffice: this.ticketAdvance.escalatedoffice, answered: true }
         })
+      }).then(async (input) => {
+        if (input.status === 200) {
+          await fetch(`${this.$config.API_STRAPI_ENDPOINT}ticketdetails`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${this.$store.state.auth.token}`
+            },
+            body: JSON.stringify({
+              data: {
+                ticket: this.ticketid,
+                ticketype: this.ticketAdvance.id,
+                details: this.ticketAdvance.details,
+                operator: this.$store.state.auth.id,
+                telegramBots: this.telegramBots
+              }
+            })
+          }).then((input) => {
+            if (input.status === 200) {
+              this.modal = false
+              this.$emit('updateTicketStatus', this.ticketAdvance)
+              this.$simpleTelegramCreateTicketAdvance({
+                client: this.client,
+                ticket: this.ticket,
+                details: this.ticketAdvance.details,
+                operator: this.$store.state.auth.username,
+                telegramBots: this.telegramBots
+              })
+              this.snack = true
+              this.snackColor = 'info'
+              this.snackText = 'Ticket actualizado con éxito.'
+              this.loading = false
+            }
+          }).catch((error) => {
+            // eslint-disable-next-line no-console
+            console.error(error)
+          })
+        }
       }).catch((error) => {
-        this.snack = true
-        this.snackColor = 'red'
-        this.snackText = error
+        // eslint-disable-next-line no-console
+        console.error(error)
       })
     },
     can (component) {

@@ -23,16 +23,15 @@
       <v-card>
         <v-card-title>
           <v-toolbar
-            dark
+            elevation="0"
           >
             <v-btn
               icon
-              dark
               @click="dialogEdit = false"
             >
               <v-icon>mdi-close</v-icon>
             </v-btn>
-            <v-toolbar-title>Editar Cliente <span class="text--disabled text-caption">// {{ editClient ? editClient.id : '' }}</span></v-toolbar-title>
+            <v-toolbar-title>Editar Cliente <span class="text--disabled text-caption"> // ID: {{ editClient ? editClient.id : '' }}</span></v-toolbar-title>
           </v-toolbar>
         </v-card-title>
         <v-card-text>
@@ -51,7 +50,7 @@
                 <v-col>
                   <v-text-field
                     v-model="editClient.code"
-                    :disabled="!can('EditFormCode')"
+                    :disabled="!$isAdmin()"
                     type="number"
                     label="Codigo"
                     required
@@ -63,7 +62,7 @@
                 <v-col>
                   <v-text-field
                     v-model="editClient.dni"
-                    :disabled="!can('EditFormDni')"
+                    :disabled="!$isAdmin()"
                     type="number"
                     label="Cedula"
                     required
@@ -75,7 +74,7 @@
               </v-row>
               <v-text-field
                 :value="editClient.name ? editClient.name.toUpperCase() : ''"
-                :disabled="!can('EditFormName')"
+                :disabled="!(!$isAdmin() || !$isBiller())"
                 label="Nombre Completo"
                 required
                 outlined
@@ -88,7 +87,7 @@
                 <v-col cols="6" lg="3" md="3">
                   <v-text-field
                     :value="editClient.address ? editClient.address.toUpperCase() : ''"
-                    :disabled="!can('EditFormAddress')"
+                    :disabled="!(!$isAdmin() || !$isBiller())"
                     label="Direccion"
                     outlined
                     dense
@@ -99,7 +98,7 @@
                 <v-col cols="6" lg="3" md="3">
                   <v-autocomplete
                     v-model="editClient.neighborhood"
-                    :disabled="!can('EditFormNeighborhood')"
+                    :disabled="!(!$isAdmin() || !$isBiller())"
                     item-text="name"
                     item-value="id"
                     :items="neighborhoods"
@@ -127,7 +126,7 @@
                 <v-col cols="6" lg="3" md="3">
                   <v-text-field
                     v-model="editClient.phone"
-                    :disabled="!can('EditFormPhone')"
+                    :disabled="!(!$isAdmin() || !$isBiller())"
                     label="Telefono"
                     required
                     outlined
@@ -136,11 +135,11 @@
                   />
                 </v-col>
               </v-row>
-              <v-row>
+              <v-row v-if="clienttype.name === 'INTERNET'">
                 <v-col cols="12" lg="4" md="4">
                   <v-select
                     v-model="editClient.plan"
-                    :disabled="!can('EditFormPlan')"
+                    :disabled="!(!$isAdmin() || !$isBiller())"
                     item-text="name"
                     item-value="id"
                     :items="plans"
@@ -154,7 +153,7 @@
                 <v-col cols="6" lg="4" md="4">
                   <v-text-field
                     v-model="editClient.wifi_ssid"
-                    :disabled="!can('EditFormWifiSsid')"
+                    :disabled="!$isAdmin()"
                     label="Nombre de Red"
                     required
                     outlined
@@ -165,8 +164,8 @@
                 <v-col cols="6" lg="4" md="4">
                   <v-text-field
                     v-model="editClient.wifi_password"
-                    :disabled="!can('EditFormWifiPassword')"
-                    :type="!can('EditFormWifiPasswordVisibility') ? 'password' : 'text'"
+                    :disabled="!$isAdmin()"
+                    :type="!(!$isAdmin() || !$isBiller()) ? 'password' : 'text'"
                     label="Clave de Red"
                     required
                     outlined
@@ -175,7 +174,7 @@
                   />
                 </v-col>
               </v-row>
-              <v-row>
+              <v-row v-if="clienttype.name === 'INTERNET'">
                 <v-col>
                   <CreateDevice :clientid="editClient.id" />
                 </v-col>
@@ -183,8 +182,9 @@
               <v-row>
                 <v-col cols="12" xs="12" sm="12" md="4" lg="4">
                   <v-select
+                    v-if="clienttype.name === 'INTERNET'"
                     v-model="editClient.technology"
-                    :disabled="!can('EditFormTechnology')"
+                    :disabled="!(!$isAdmin() || !$isBiller() || !$isTechnician())"
                     item-text="name"
                     item-value="id"
                     :items="technologies"
@@ -199,6 +199,7 @@
                 </v-col>
                 <v-col cols="12" xs="12" sm="12" md="4" lg="4">
                   <v-text-field
+                    v-if="clienttype.name === 'INTERNET'"
                     :value="editClient.nap_onu_address ? editClient.nap_onu_address.toUpperCase() : ''"
                     label="Direccion NAP/ONU"
                     outlined
@@ -209,6 +210,7 @@
                 </v-col>
                 <v-col cols="12" xs="12" sm="12" md="4" lg="4">
                   <v-text-field
+                    v-if="clienttype.name === 'INTERNET'"
                     v-model="editClient.opticalPower"
                     label="Potencia Óptica (Solo numeros)"
                     outlined
@@ -245,8 +247,9 @@
                 </v-col>
                 <v-col>
                   <v-select
+                    v-if="clienttype.name === 'INTERNET'"
                     v-model="editClient.newModel"
-                    :disabled="!can('EditFormNewModel')"
+                    :disabled="!$isAdmin()"
                     :items="idwith"
                     item-text="name"
                     item-value="id"
@@ -282,7 +285,7 @@
                   disabled
                 />
               </div> -->
-              <v-checkbox v-model="editClient.hasRepeater" hide-details label="Tiene repetidor?" />
+              <v-checkbox v-if="clienttype.name === 'INTERNET'" v-model="editClient.hasRepeater" hide-details label="Tiene repetidor?" />
             </v-form>
           </v-container>
         </v-card-text>
@@ -382,6 +385,12 @@ export default {
     },
     devicebrands () {
       return this.$store.state.devicebrands
+    },
+    clienttype () {
+      return this.$store.state.clienttypes.find(ct => ct.name === this.$route.query.clienttype)
+    },
+    telegramBots () {
+      return this.$store.state.telegramBots.find(bot => bot.city.name === this.$route.query.city)
     }
   },
   watch: {
@@ -399,13 +408,34 @@ export default {
     async updateClient (client, index) {
       const operator = this.$store.state.auth.id
       if (this.addDevice) {
-        const device = await this.$strapi.create('devices', { mac_address: this.device.mac_address, devicebrand: this.device.devicebrand.id, clients: [this.editClient._id] })
-        await this.$store.dispatch('client/updateClientDevices', { device, index })
-        this.$emit('updateSuccess')
-        this.device = {}
+        await fetch(`${this.$config.API_STRAPI_ENDPOINT}devices`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${this.$store.state.auth.token}`
+          },
+          body: JSON.stringify({
+            data: { mac_address: this.device.mac_address, devicebrand: this.device.devicebrand.id, clients: [this.editClient.id] }
+          })
+        }).then((input) => {
+          if (input.status === 200) {
+            Promise.resolve(input.json())
+              .then((device) => {
+                this.$store.dispatch('client/updateClientDevices', { device, index })
+                this.$emit('updateSuccess')
+                this.device = {}
+              })
+          } else {
+            throw new Error('Error updating client')
+          }
+        }).catch((error) => {
+          // eslint-disable-next-line no-console
+          console.error(error)
+        })
       }
-      await this.$store.dispatch('client/updateClient', { client, index, operator })
+      await this.$store.dispatch('client/updateClient', { client, index, operator, token: this.$store.state.auth.token })
       this.$emit('updateSuccess')
+      this.$simpleTelegramUpdate({ client: this.client, operator: this.$store.state.auth.username, telegramBots: this.telegramBots })
       this.dialogEdit = false
     },
     genAddress () {
@@ -424,14 +454,6 @@ export default {
       } else {
         const isMobile = false
         return isMobile
-      }
-    },
-    can (component) {
-      if (this.role) {
-        const allowedcomponents = this.role
-        const currentComponent = component
-        const res = allowedcomponents.includes(currentComponent)
-        return res
       }
     }
   }

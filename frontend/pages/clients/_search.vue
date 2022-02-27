@@ -7,6 +7,7 @@
 
 <script>
 export default {
+  transition: 'none',
   asyncData ({ params }) {
     const search = params.search // When calling /abc the slug will be "abc"
     return { search }
@@ -22,11 +23,8 @@ export default {
     },
     currentCity () {
       // eslint-disable-next-line eqeqeq
-      return this.$store.state.cities ? this.$store.state.cities.find(c => c.id == this.$route.query.city) : ''
+      return this.$store.state.cities ? this.$store.state.cities.find(c => c.name == this.$route.query.city) : ''
     }
-  },
-  mounted () {
-    this.getLocalStorage()
   },
   methods: {
     can (component) {

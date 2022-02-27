@@ -28,11 +28,10 @@
         :class="clientData ? clientData.online ? 'teal darken-4' : '' : ''"
       >
         <v-card-title class="headline">
-          Estatus en Mikrotik
+          Estatus en Mikrotik de {{ name }}
         </v-card-title>
         <div v-if="!loading">
           <v-card-text>
-            <h2> {{ name }} </h2>
             <v-alert
               v-if="clientData && clientData.online && clientData.exists"
               dense
@@ -73,7 +72,7 @@
                   <v-spacer />
                   <h3>Uptime: {{ clientData.uptime }}</h3>
                   <v-spacer />
-                  <h3 v-if="can('access_password')">Clave: 4Rn0P{{ code }}</h3>
+                  <h3>Clave: 4Rn0P{{ code }}</h3>
                 </v-col>
                 <v-col>
                   <h3>Descarga: <strong>{{ formatBytes(clientData.download) }}</strong></h3>
@@ -86,7 +85,7 @@
         </div>
         <v-card-actions>
           <EditForm
-            v-if="can('EditForm') && item"
+            v-if="item"
             :client="item"
             :index="index"
             :role="$store.state.auth.allowed_components"
@@ -115,8 +114,8 @@ export default {
   },
   props: {
     clientid: {
-      type: String,
-      default: ''
+      type: Number,
+      default: -1
     },
     name: {
       type: String,
@@ -157,30 +156,18 @@ export default {
       this.loading = true
       this.modal = true
       this.online = false
-      const data = await this.$strapi.graphql({
-        query: `
-          query($id: ID) {
-            ClientStatus(id: $id){
-              online
-              exists
-              address
-              mikrotik
-              mac_address
-              offlineTime
-              disconnectReason
-              lastCallerId
-              uptime
-              download
-              upload
-            }
-          }
-        `,
-        variables: {
-          id: this.clientid
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}clientstatus?id=${this.clientid}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.$store.state.auth.token}`
         }
       })
-      this.loading = false
-      this.clientData = data.ClientStatus
+        .then(res => res.json())
+        .then((clientstatus) => {
+          this.loading = false
+          this.clientData = clientstatus
+        })
     },
     formatBytes (bytes, decimals = 2) {
       if (bytes === 0) { return '0 Bytes' }
@@ -192,13 +179,6 @@ export default {
       const i = Math.floor(Math.log(bytes) / Math.log(k))
 
       return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
-    },
-    can (component) {
-      // eslint-disable-next-line camelcase
-      const allowed_components = this.role
-      // eslint-disable-next-line camelcase
-      const current_component = component
-      return allowed_components.includes(current_component)
     }
   }
 }

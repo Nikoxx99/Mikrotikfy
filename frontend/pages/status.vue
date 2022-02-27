@@ -8,25 +8,12 @@
 export default {
   middleware: ['defaultCity', 'authenticated'],
   computed: {
-    role () {
-      return this.$store.state.auth.allowed_components
-    },
     currentCity () {
       // eslint-disable-next-line eqeqeq
-      return this.$store.state.cities ? this.$store.state.cities.find(c => c.id == this.$route.query.city) : ''
+      return this.$store.state.cities ? this.$store.state.cities.find(c => c.name == this.$route.query.city) : ''
     }
   },
-  mounted () {
-    this.getLocalStorage()
-  },
   methods: {
-    can (component) {
-      // eslint-disable-next-line camelcase
-      const allowed_components = this.role
-      // eslint-disable-next-line camelcase
-      const current_component = component
-      return allowed_components.includes(current_component)
-    },
     getLocalStorage () {
       this.$store.dispatch('loadLocalStorage')
     }

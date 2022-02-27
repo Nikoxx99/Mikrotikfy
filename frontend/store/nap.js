@@ -2,13 +2,6 @@ export const state = () => ({
   naps: []
 })
 export const mutations = {
-  createNap (state, napPayload) {
-    try {
-      state.naps.push(napPayload)
-    } catch (error) {
-      throw new Error(`NAPS CREATE MUTATE ${error}`)
-    }
-  },
   napList (state, napPayload) {
     try {
       state.naps = napPayload
@@ -25,26 +18,80 @@ export const mutations = {
   }
 }
 export const actions = {
-  async createNap ({ commit }, napPayload) {
+  async createNap (_, napPayload) {
     try {
-      const createNap = await this.$strapi.create('naps', napPayload)
-      commit('createNap', createNap)
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}naps`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${napPayload.token}`
+        },
+        body: JSON.stringify({
+          data: napPayload.nap
+        })
+      })
     } catch (error) {
       throw new Error(`NAPS CREATE ACTION ${error}`)
     }
   },
-  async getNaps ({ commit }, city) {
+  async getNaps ({ commit }, payload) {
+    const qs = require('qs')
+    const query = qs.stringify({
+      filters: {
+        city: {
+          name: {
+            $eq: payload.city
+          }
+        }
+      },
+      populate: ['city', 'naptype', 'neighborhood', 'technology']
+    },
+    {
+      encodeValuesOnly: true
+    })
     try {
-      const napList = await this.$strapi.find('naps', { city })
-      commit('napList', napList)
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}naps?${query}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${payload.token}`
+        }
+      })
+        .then(res => res.json())
+        .then((naps) => {
+          naps = naps.data.map((nap) => {
+            nap.attributes.neighborhood.data.attributes.id = nap.attributes.neighborhood.data.id
+            nap.attributes.neighborhood = nap.attributes.neighborhood.data.attributes
+            nap.attributes.technology.data.attributes.id = nap.attributes.technology.data.id
+            nap.attributes.technology = nap.attributes.technology.data.attributes
+            nap.attributes.naptype.data.attributes.id = nap.attributes.naptype.data.id
+            nap.attributes.naptype = nap.attributes.naptype.data.attributes
+            nap.attributes.id = nap.id
+            nap = nap.attributes
+            return nap
+          })
+          commit('napList', naps)
+        })
     } catch (error) {
       throw new Error(`NAPS GET ACTION ${error}`)
     }
   },
-  async getNapTypes ({ commit }) {
+  async getNapTypes ({ commit }, token) {
     try {
-      const napTypes = await this.$strapi.find('naptypes')
-      commit('napTypes', napTypes)
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}naptypes`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      })
+        .then(res => res.json())
+        .then((naptypes) => {
+          naptypes = naptypes.data.map((naptype) => {
+            naptype.attributes.id = naptype.id
+            naptype = naptype.attributes
+            return naptype
+          })
+          commit('napTypes', naptypes)
+        })
     } catch (error) {
       throw new Error(`NAPSTYPES GET ACTION ${error}`)
     }

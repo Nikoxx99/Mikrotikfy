@@ -30,7 +30,7 @@
           Equipos asociados
         </v-card-title>
         <v-card-text>
-          <CreateDevice :clientid="clientid" @createDevice="updateDeviceList($event)" />
+          <CreateDevice :clientid="String(clientid)" @createDevice="updateDeviceList($event)" />
         </v-card-text>
         <div v-if="!loading">
           <v-card-text>
@@ -95,8 +95,8 @@ export default {
       default: 'Devices'
     },
     clientid: {
-      type: String,
-      default: ''
+      type: Number,
+      default: -1
     },
     block: {
       type: Boolean,
@@ -128,25 +128,39 @@ export default {
     async initComponent () {
       this.modal = true
       this.loading = false
-      // eslint-disable-next-line camelcase
-      const devices = await this.$strapi.graphql({
-        query: `query($client: ID!) {
-          client(id: $client) {
-            mac_addresses{
-              mac_address
-              devicebrand{
-                name
-              }
-              createdAt
+      const qs = require('qs')
+      const query = qs.stringify({
+        filters: {
+          clients: {
+            id: {
+              $eq: this.clientid
             }
           }
-        }`,
-        variables: {
-          client: this.clientid
+        },
+        populate: [
+          'devicebrand'
+        ]
+      },
+      {
+        encodeValuesOnly: true
+      })
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}devices?${query}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.$store.state.auth.token}`
         }
       })
-      // eslint-disable-next-line camelcase
-      this.devices = devices.client.mac_addresses
+        .then(res => res.json())
+        .then((devices) => {
+          const deviceRes = devices.data.map((device) => {
+            device.attributes.devicebrand = device.attributes.devicebrand.data.attributes
+            device.attributes.id = device.id
+            device = device.attributes
+            return device
+          })
+          this.devices = deviceRes
+        })
     },
     getDate (date) {
       const dateObject = new Date(date)
@@ -166,13 +180,6 @@ export default {
       } else {
         return 'Cerrado'
       }
-    },
-    can (component) {
-      // eslint-disable-next-line camelcase
-      const allowed_components = this.role
-      // eslint-disable-next-line camelcase
-      const current_component = component
-      return allowed_components.includes(current_component)
     }
   }
 }

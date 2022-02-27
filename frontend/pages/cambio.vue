@@ -4,7 +4,7 @@
     <v-row justify="center">
       <v-col lg="6" md="6" sm="12" xs="12">
         <v-card>
-          <v-card-title> Solicitar Cambio de Clave </v-card-title>
+          <v-card-title> Solicitar Cambio de Clave Wi-Fi </v-card-title>
           <v-card-text>
             El plazo para que el cambio se haga efectivo es de 12 a 72 horas
             luego de solicitar el cambio mediante este formulario. Recuerda
@@ -55,7 +55,7 @@
                         type="number"
                         required
                         :rules="valid_dni"
-                        label="Ingresa tu Cedula o NIT del titular de la red"
+                        label="Cedula o NIT del TITULAR de la red"
                         hide-details
                         outlined
                       />
@@ -72,7 +72,7 @@
                     >
                       <v-text-field
                         v-model="user_old_password"
-                        label="Ingresa nombre del titular"
+                        label="Nombre del titular del servicio"
                         hint="Obligatorio"
                         persistent-hint
                         outlined
@@ -212,9 +212,9 @@
 </template>
 
 <script>
-import gqlt from 'graphql-tag'
 import Logo from '../components/main/Logo'
 export default {
+  name: 'ChangePassword',
   layout: 'outuser',
   components: {
     Logo
@@ -229,6 +229,7 @@ export default {
       user_old_password: '',
       user_new_password: '',
       user_address: '',
+      clientid: null,
       valid_dni: [
         value => !!value || 'Este campo no puede estar vacío'
       ],
@@ -247,30 +248,58 @@ export default {
     }
   },
   methods: {
-    testDni () {
+    async testDni () {
+      this.error = false
       if (this.user_dni.length > 0) {
-        this.$apollo.query({
-          query: gqlt`
-          query($dni: String) {
-            TestPasswordChange(dni: $dni)
-          }
-        `,
-          variables: {
+        const qs = require('qs')
+        const query = qs.stringify({
+          filters: {
             dni: this.user_dni
           }
-        }).then((input) => {
-          if (input.data.TestPasswordChange === true) {
-            this.error = false
-            this.e1 = 2
-          } else {
-            this.error = true
-            this.errorMessage = 'Ya existe un proceso activo para el cambio de tu clave. Será realizado hasta 3 días hábiles luego de tu solicitud.'
-          }
-        }).catch((error) => {
-          // eslint-disable-next-line no-console
-          console.error(error)
-          this.initialLoading = false
+        },
+        {
+          encodeValuesOnly: true
         })
+        await fetch(`${this.$config.API_STRAPI_ENDPOINT}passwordchanges?${query}`)
+          .then(res => res.json())
+          .then((passwordchanges) => {
+            if (passwordchanges.data.length > 0) {
+              this.error = true
+              this.errorMessage = 'Ya existe un proceso activo para el cambio de tu clave. Será realizado hasta 3 días hábiles luego de tu solicitud.'
+            } else {
+              this.testClient()
+            }
+          })
+      } else {
+        this.error = true
+        this.errorMessage = 'No puedes dejar este campo en blanco.'
+      }
+    },
+    async testClient () {
+      this.error = false
+      if (this.user_dni.length > 0) {
+        const qs = require('qs')
+        const query = qs.stringify({
+          filters: {
+            dni: this.user_dni
+          },
+          populate: ['city']
+        },
+        {
+          encodeValuesOnly: true
+        })
+        await fetch(`${this.$config.API_STRAPI_ENDPOINT}clients?${query}`)
+          .then(res => res.json())
+          .then((clients) => {
+            if (clients.data.length < 1) {
+              this.error = true
+              this.errorMessage = 'La CEDULA no se encuentra en nuestro sistema. Ingresa la cedula del titular o comunicate con nosotros nuevamente dando el siguiente codigo de error (CEDULA NO ENCONTRADA).'
+            } else {
+              this.clientid = clients.data[0].id
+              this.error = false
+              this.e1 = 2
+            }
+          })
       } else {
         this.error = true
         this.errorMessage = 'No puedes dejar este campo en blanco.'
@@ -299,16 +328,19 @@ export default {
         this.confirmation = true
       }
     },
-    sendRequest () {
-      const date = Date.now()
+    async sendRequest () {
       if (this.valid) {
-        this.$apollo.mutate({
-          mutation: gqlt`mutation ($input: PasswordChangeInput){
-          createPasswordChangeRequest(input: $input)
-        }`,
-          variables: {
-            input: {
+        const date = Date.now()
+        await fetch(`${this.$config.API_STRAPI_ENDPOINT}passwordchanges`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${this.$store.state.auth.token}`
+          },
+          body: JSON.stringify({
+            data: {
               dni: this.user_dni,
+              client: this.clientid,
               old_password: this.user_old_password,
               new_password: this.user_new_password,
               address: this.user_address,
@@ -316,21 +348,20 @@ export default {
                 name: 'Cerrado',
                 value: false
               },
-              created_at: String(date)
+              createdAt: String(date)
             }
-          }
+          })
         }).then((input) => {
-          if (input.data.createPasswordChangeRequest) {
+          if (input.status === 200) {
             this.done = true
           } else {
             this.error = true
-            this.errorMessage = 'Se ha producido un error, intentalo mas tarde o contecta nuevamente con la empresa.'
+            this.errorMessage = 'Se ha producido un error, intentalo mas tarde o contacta nuevamente con la empresa al 310 343 25 99.'
             this.isSubmitting = false
           }
         }).catch((error) => {
-          this.error = true
-          this.errorMessage = error
-          this.isSubmitting = false
+          // eslint-disable-next-line no-console
+          console.error(error)
         })
       }
     }

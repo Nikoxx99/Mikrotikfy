@@ -31,7 +31,6 @@
         </v-card-title>
         <div v-if="!loading">
           <v-card-text>
-            <h2> {{ name }} </h2>
             <client-only>
               <v-data-table
                 :headers="headers"
@@ -69,47 +68,12 @@
 </template>
 
 <script>
-import gqlt from 'graphql-tag'
 export default {
   name: 'TicketAdvanceHistory',
-  apollo: {
-    ticketdetails () {
-      return {
-        query: gqlt`
-          query($id: ID!){
-            ticketdetails(where: {
-              ticket: $id
-            }){
-              ticket{
-                client{
-                  name
-                }
-                tickettype{
-                  name
-                }
-                createdAt
-              }
-              operator {
-                username
-              }
-              details
-              createdAt
-            }
-          }
-        `,
-        variables: {
-          id: this.ticketid
-        },
-        skip () {
-          return true
-        }
-      }
-    }
-  },
   props: {
     ticketid: {
-      type: String,
-      default: ''
+      type: Number,
+      default: -1
     },
     name: {
       type: String,
@@ -142,23 +106,49 @@ export default {
     async initComponent () {
       this.modal = true
       this.loading = false
-      this.$apollo.queries.ticketdetails.skip = false
-      await this.$apollo.queries.ticketdetails.fetchMore({
-        variables: {
-          id: this.ticketid
+      const qs = require('qs')
+      const query = qs.stringify({
+        filters: {
+          ticket: {
+            id: {
+              $eq: this.ticketid
+            }
+          }
         },
-        updateQuery: (_, { fetchMoreResult }) => {
-          const newInfo = fetchMoreResult.ticketdetails
-          this.ticketdetails = newInfo
+        populate: [
+          'ticket',
+          'ticket.client',
+          'ticket.tickettype',
+          'operator'
+        ]
+      },
+      {
+        encodeValuesOnly: true
+      })
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}ticketdetails?${query}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.$store.state.auth.token}`
         }
       })
-    },
-    can (component) {
-      // eslint-disable-next-line camelcase
-      const allowed_components = this.role
-      // eslint-disable-next-line camelcase
-      const current_component = component
-      return allowed_components.includes(current_component)
+        .then(res => res.json())
+        .then((ticketdetails) => {
+          const ticketdetailsRes = ticketdetails.data.map((ticketdetails) => {
+            ticketdetails.attributes.ticket.data.attributes.id = ticketdetails.attributes.ticket.data.id
+            ticketdetails.attributes.ticket = ticketdetails.attributes.ticket.data.attributes
+            ticketdetails.attributes.ticket.client.data.attributes.id = ticketdetails.attributes.ticket.client.data.id
+            ticketdetails.attributes.ticket.client = ticketdetails.attributes.ticket.client.data.attributes
+            ticketdetails.attributes.ticket.tickettype.data.attributes.id = ticketdetails.attributes.ticket.tickettype.data.id
+            ticketdetails.attributes.ticket.tickettype = ticketdetails.attributes.ticket.tickettype.data.attributes
+            ticketdetails.attributes.operator.data.attributes.id = ticketdetails.attributes.operator.data.id
+            ticketdetails.attributes.operator = ticketdetails.attributes.operator.data.attributes
+            ticketdetails.attributes.id = ticketdetails.id
+            ticketdetails = ticketdetails.attributes
+            return ticketdetails
+          })
+          this.ticketdetails = ticketdetailsRes
+        })
     },
     getDate (date) {
       const dateObject = new Date(date)

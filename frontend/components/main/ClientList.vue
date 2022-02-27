@@ -1,14 +1,13 @@
 <template>
   <div>
-    <div v-if="clients.length < 1 && !$route.params.search">
+    <div v-if="clients.length < 1 && !$route.params.search && clienttype">
       <v-row class="justify-center">
         <h4>Crea un cliente</h4>
       </v-row>
       <v-row class="justify-center">
         <v-fab-transition>
           <v-btn
-            v-if="can('CreateForm')"
-            color="blue darken-4"
+            color="blue darken-4 elevation-0"
             fab
             large
             dark
@@ -40,10 +39,11 @@
     </v-row>
     <v-row v-if="clients.length > 0" class="mt-0">
       <v-col class="pt-0">
-        <v-card>
+        <v-card class="elevation-0">
           <v-card-text>
             <client-only>
               <v-data-table
+                v-if="headers"
                 :headers="headers"
                 :items.sync="clients"
                 :server-items-length="clientCount()"
@@ -51,7 +51,7 @@
                 :page.sync="page"
                 :options.sync="options"
                 :loading="loadingDataTable"
-                :item-class="itemRowBackground"
+                :item-class="clienttype.name === 'INTERNET' ? itemRowBackground : ''"
                 no-data-text="No hay resultados a la busqueda..."
                 loading-text="Cargando información de clientes..."
                 dense
@@ -62,7 +62,6 @@
                 <template v-slot:top>
                   <div class="mb-4">
                     <v-btn
-                      v-if="can('CreateForm')"
                       color="blue darken-4 white--text"
                       dark
                       elevation="0"
@@ -105,7 +104,7 @@
                     large
                     cancel-text="Cancelar"
                     save-text="Guardar"
-                    @save="savePlanFromModal(props.item._id, props.item.plan, isRx, $store.state.auth.username)"
+                    @save="savePlanFromModal(props.item.id, props.item.plan, isRx, $store.state.auth.username, props.item)"
                     @cancel="cancel()"
                   >
                     <v-chip small class="white black--text">
@@ -125,7 +124,7 @@
                         single-line
                         label="Plan"
                         dense
-                        @change="updatePlanFromModal(props.item._id, $event, clients.map(function(x) {return x._id; }).indexOf(props.item._id))"
+                        @change="updatePlanFromModal(props.item.id, $event, clients.map(function(x) {return x.id; }).indexOf(props.item.id))"
                       />
                     </template>
                   </v-edit-dialog>
@@ -147,7 +146,7 @@
                 </template>
                 <template v-slot:[`item.active`]="props">
                   <div style="white-space:nowrap;display:inline-flex">
-                    <v-tooltip v-if="can('CreateForm')" left>
+                    <v-tooltip v-if="$isAdmin()" left>
                       <template v-slot:activator="{ on, attrs }">
                         <v-btn
                           :color="props.item.active ? 'green darken-3' : 'red darken-3'"
@@ -157,65 +156,60 @@
                           v-bind="attrs"
                           text
                           v-on="on"
-                          @click="updateStatus(props.item, clients.map(function(x) {return x._id; }).indexOf(props.item._id))"
+                          @click="updateStatus(props.item, clients.map(function(x) {return x.id; }).indexOf(props.item.id))"
                         >
                           <v-icon>mdi-{{ props.item.active ? 'check' : 'close' }} {{ props.index }}</v-icon>
                         </v-btn>
                       </template>
                       <span>Activar Cliente</span>
                     </v-tooltip>
-                    <ActivationRequest
+                    <MiscActivationRequest
                       :item="props.item"
                       :index="clients.indexOf(props.item)"
-                      :allowedcomponents="$store.state.auth.allowed_components"
                     />
                   </div>
                 </template>
                 <template v-slot:[`item.actions`]="{ item }">
                   <div style="white-space:nowrap">
                     <CreateTicket
-                      v-if="can('CreateTicket')"
                       :client="item"
                       :assignated="$store.state.auth.id"
-                      :role="$store.state.auth.allowed_components"
                     />
                     <TicketHistory
-                      :clientid="item._id"
+                      :clientid="item.id"
                       :name="item.name"
                     />
                     <ClientStatus
-                      v-if="can('ClientStatus')"
+                      v-if="clienttype.name === 'INTERNET'"
                       :name="item.name"
-                      :clientid="item._id"
+                      :clientid="item.id"
                       :code="item.code"
                       :item="item"
                       :index="clients.indexOf(item)"
-                      :role="$store.state.auth.allowed_components"
                     />
                     <MainDevices
+                      v-if="clienttype.name === 'INTERNET'"
                       :name="item.name"
-                      :clientid="item._id"
+                      :clientid="item.id"
                     />
                     <EditForm
-                      v-if="can('EditForm')"
                       :client="item"
                       :index="clients.indexOf(item)"
-                      :role="$store.state.auth.allowed_components"
                       @updateSuccess="getClientBySearch()"
                     />
-                    <DeleteClient v-if="can('DeleteClient')" :name="item.name" :clientid="item._id" />
                   </div>
                 </template>
               </v-data-table>
             </client-only>
-            <v-row v-if="showPagintation">
+            <!-- <v-row>
               <v-col cols="12" sm="8" md="10" lg="11" style="max-width:90%;margin:auto;">
                 <v-pagination
-                  v-model="page"
-                  :length="pageCount"
+                  v-model="pagination.page"
+                  :length="pagination.pageCount"
+                  :total-visible="6"
                 />
               </v-col>
-            </v-row>
+            </v-row> -->
           </v-card-text>
           <v-snackbar
             v-model="snack"
@@ -239,16 +233,15 @@
       <v-card>
         <v-card-title>
           <v-toolbar
-            dark
+            elevation="0"
           >
             <v-btn
               icon
-              dark
               @click="createDialog = false"
             >
               <v-icon>mdi-close</v-icon>
             </v-btn>
-            <v-toolbar-title><span class="headline">Crear Cliente en {{ currentCity.name }}</span></v-toolbar-title>
+            <v-toolbar-title><span class="headline">Crear Cliente de {{ clienttype.name }} en {{ currentCity.name }}</span></v-toolbar-title>
           </v-toolbar>
         </v-card-title>
         <v-card-text>
@@ -270,22 +263,18 @@
 
 <script>
 import EditForm from '../edit/EditForm'
-import DeleteClient from '../delete/DeleteClient'
 import ClientStatus from '../main/ClientStatus'
 import CreateTicket from '../create/CreateTicket'
 import TicketHistory from '../misc/TicketHistory'
 import CreateForm from '../create/CreateForm'
-import ActivationRequest from '../misc/ActivationRequest'
 export default {
   name: 'ClientList',
   components: {
     CreateForm,
     EditForm,
-    DeleteClient,
     ClientStatus,
     CreateTicket,
-    TicketHistory,
-    ActivationRequest
+    TicketHistory
   },
   props: {
     search: {
@@ -301,31 +290,21 @@ export default {
     return {
       allowedcomponents: [],
       createDialog: false,
-      headers: [
-        { text: 'Codigo', value: 'code', sortable: false },
-        { text: 'Nombre', value: 'name', sortable: false },
-        { text: 'Cedula', value: 'dni', sortable: false },
-        { text: 'Direccion', sortable: false, value: 'address' },
-        { text: 'Barrio', value: 'neighborhood.name', sortable: false },
-        { text: 'Telefono', sortable: false, value: 'phone' },
-        { text: 'Plan', value: 'plan.name', sortable: false },
-        { text: 'Tecnologia', value: 'technology.name', sortable: false },
-        { text: 'Tipo', value: 'newModel', sortable: false },
-        { text: 'Activo', value: 'active', sortable: false },
-        { text: 'Acciones', value: 'actions', sortable: false }
-      ],
       isRx: true,
       itemsPerPage: 15,
       loadingDataTable: false,
       options: {},
       page: 1,
       pageCount: 0,
+      pagination: {
+        page: 1,
+        pageSize: 500
+      },
       refreshLoading: false,
       searchClientInput: '',
       snack: false,
       snackColor: '',
       snackText: '',
-      showPagintation: true,
       result: ''
     }
   },
@@ -333,9 +312,12 @@ export default {
     clients () {
       return this.$store.state.client.clients
     },
+    headers () {
+      return this.$store.state.client.headers
+    },
     currentCity () {
       // eslint-disable-next-line eqeqeq
-      return this.$store.state.cities ? this.$store.state.cities.find(c => c.id == this.$route.query.city) : ''
+      return this.$store.state.cities ? this.$store.state.cities.find(c => c.name == this.$route.query.city) : ''
     },
     plans () {
       return this.$store.state.plans
@@ -348,21 +330,25 @@ export default {
     },
     activeClientsList () {
       return this.$store.state.activeClientsList
+    },
+    telegramBots () {
+      return this.$store.state.telegramBots.find(bot => bot.city.name === this.$route.query.city)
+    },
+    clienttype () {
+      return this.$store.state.clienttypes ? this.$store.state.clienttypes.find(type => type.name === this.$route.query.clienttype) : ''
     }
   },
-  // watch: {
-  //   itemsPerPage () {
-  //     const city = this.$route.query.city
-  //     this.$store.dispatch('client/getUsersFromDatabase', { start: 0, limit: this.itemsPerPage, city })
-  //   },
-  //   async page () {
-  //     const start = (this.page - 1) * this.itemsPerPage
-  //     const limit = this.itemsPerPage
-  //     const city = this.$route.query.city
-  //     await this.$store.dispatch('client/getUsersFromDatabase', { start, limit, city })
-  //     await this.getClientStatusOnMikrotik()
-  //   }
-  // },
+  watch: {
+    $route () {
+      this.getClientBySearch()
+    },
+    'pagination.page': {
+      handler () {
+        this.getClientBySearch()
+      },
+      deep: false
+    }
+  },
   mounted () {
     if (this.search) {
       this.searchClientInput = this.search
@@ -383,19 +369,24 @@ export default {
     },
     async refreshActiveClients () {
       this.refreshLoading = true
-      await this.$store.dispatch('refreshActiveClients', this.$route.query.city)
+      const city = this.$store.state.auth.cities.find(city => city.name === this.$route.query.city)
+      const clienttype = this.$route.query.clienttype
+      await this.$store.dispatch('refreshActiveClients', { city, clienttype, token: this.$store.state.auth.token })
       await this.getClientStatusOnMikrotik()
       this.refreshLoading = false
     },
     async getClientBySearch () {
       this.loadingDataTable = true
+      await this.$store.dispatch('client/clearClientsFromDatatable')
+      await this.getHeadersByClientType()
       const search = this.searchClientInput.trim()
       const city = this.$route.query.city
+      const clienttype = this.$route.query.clienttype
       this.result = 'Buscando...'
       if (search) {
-        await this.$store.dispatch('client/getUsersFromDatabaseBySearch', { search, city })
+        await this.$store.dispatch('client/getUsersFromDatabaseBySearch', { search, city, clienttype, token: this.$store.state.auth.token, pagination: this.pagination })
+        this.pagination = { ...this.$store.state.client.pagination }
         await this.getClientStatusOnMikrotik()
-        this.showPagintation = false
         this.loadingDataTable = false
         this.result = 'No se han encontrado resultados.'
       }
@@ -403,15 +394,17 @@ export default {
     async resetsearchfn () {
       await this.$store.dispatch('client/clearClientsFromDatatable')
       await this.getClientStatusOnMikrotik()
-      this.showPagintation = true
       this.loadingDataTable = false
     },
     async getClientStatusOnMikrotik () {
-      await this.$store.dispatch('client/calculateClientStatus', this.activeClientsList)
+      if (this.$route.query.clienttype === 'INTERNET') {
+        await this.$store.dispatch('client/calculateClientStatus', this.activeClientsList)
+      }
     },
-    savePlanFromModal (clientId, newPlan, isRx, operator, index) {
+    savePlanFromModal (clientId, newPlan, isRx, operator, client) {
       // set plan by callback after the update
-      this.$store.dispatch('client/setPlanFromModal', { clientId, newPlan, isRx, operator, index })
+      this.$store.dispatch('client/setPlanFromModal', { clientId, newPlan, isRx, operator, token: this.$store.state.auth.token })
+      this.$simpleTelegramUpdatePlan({ client, operator, isRx, telegramBots: this.telegramBots })
     },
     updatePlanFromModal (clientid, newPlan, index) {
       this.$store.dispatch('client/updateFromModal', { clientid, newPlan, index })
@@ -441,18 +434,17 @@ export default {
       this.snackText = 'Cliente creado con éxito!'
       this.snackColor = 'info'
     },
-    can (component) {
-      const allowedcomponents = this.$store.state.auth.allowed_components
-      const currentComponent = component
-      const res = allowedcomponents.includes(currentComponent)
-      return res
-    },
     updateStatus (client, index) {
       if (client.active === true) {
-        this.$store.dispatch('client/adminDelete', { client, index })
+        this.$store.dispatch('client/adminDelete', { client, index, token: this.$store.state.auth.token, operator: this.$store.state.auth.username })
       } else {
-        this.$store.dispatch('client/adminCreate', { client, index })
+        this.$store.dispatch('client/adminCreate', { client, index, token: this.$store.state.auth.token, operator: this.$store.state.auth.username })
       }
+    },
+    async getHeadersByClientType () {
+      const city = this.$route.query.city
+      const clienttype = this.$route.query.clienttype
+      await this.$store.dispatch('client/getHeadersByClientType', { city, clienttype, token: this.$store.state.auth.token })
     }
   }
 }

@@ -27,11 +27,10 @@
         :loading="loading"
       >
         <v-card-title class="headline">
-          Historial de Tickets
+          Historial de Tickets de {{ name }}
         </v-card-title>
         <div v-if="!loading">
           <v-card-text>
-            <h2> {{ name }} </h2>
             <client-only>
               <v-data-table
                 :headers="headers"
@@ -41,7 +40,7 @@
                 calculate-widths
                 sort-desc
                 :page.sync="page"
-                no-data-text="No hay tickets para mostrar aun..."
+                no-data-text="No hay tickets para mostrar aún..."
                 loading-text="Cargando información de tickets..."
                 dense
                 hide-default-footer
@@ -86,52 +85,16 @@
 </template>
 
 <script>
-import gqlt from 'graphql-tag'
 import TicketAdvanceHistory from '../misc/TicketAdvanceHistory'
 export default {
   name: 'TicketHistory',
   components: {
     TicketAdvanceHistory
   },
-  apollo: {
-    tickets () {
-      return {
-        query: gqlt`
-          query($id: ID!){
-            tickets(where: {
-              client: $id
-            }){
-              id
-              active
-              client{
-                code
-                name
-                phone
-              }
-              tickettype{
-                name
-              }
-              assiganted{
-                username
-              }
-              details
-              createdAt
-            }
-          }
-        `,
-        variables: {
-          id: this.clientid
-        },
-        skip () {
-          return true
-        }
-      }
-    }
-  },
   props: {
     clientid: {
-      type: String,
-      default: ''
+      type: Number,
+      default: -1
     },
     name: {
       type: String,
@@ -156,7 +119,7 @@ export default {
       { text: 'Estado', sortable: true, value: 'active' },
       { text: 'Cliente', sortable: true, value: 'client.name' },
       { text: 'Tipo', sortable: true, value: 'tickettype.name' },
-      { text: 'Operador', sortable: false, value: 'assiganted.username' },
+      { text: 'Operador', sortable: false, value: 'assignated.username' },
       { text: 'Detalles', sortable: true, value: 'details' },
       { text: 'Creado', sortable: true, value: 'createdAt' },
       { text: 'Acciones', sortable: true, value: 'actions' }
@@ -166,16 +129,49 @@ export default {
     async initComponent () {
       this.modal = true
       this.loading = false
-      this.$apollo.queries.tickets.skip = false
-      await this.$apollo.queries.tickets.fetchMore({
-        variables: {
-          id: this.clientid
+      const qs = require('qs')
+      const query = qs.stringify({
+        filters: {
+          client: {
+            id: {
+              $eq: this.clientid
+            }
+          },
+          clienttype: {
+            name: this.$route.query.clienttype
+          }
         },
-        updateQuery: (_, { fetchMoreResult }) => {
-          const newInfo = fetchMoreResult.tickets
-          this.tickets = newInfo
+        populate: [
+          'client',
+          'tickettype',
+          'assignated'
+        ]
+      },
+      {
+        encodeValuesOnly: true
+      })
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}tickets?${query}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.$store.state.auth.token}`
         }
       })
+        .then(res => res.json())
+        .then((tickets) => {
+          const ticketRes = tickets.data.map((ticket) => {
+            ticket.attributes.client.data.attributes.id = ticket.attributes.client.data.id
+            ticket.attributes.client = ticket.attributes.client.data.attributes
+            ticket.attributes.tickettype.data.attributes.id = ticket.attributes.tickettype.data.id
+            ticket.attributes.tickettype = ticket.attributes.tickettype.data.attributes
+            ticket.attributes.assignated.data.attributes.id = ticket.attributes.assignated.data.id
+            ticket.attributes.assignated = ticket.attributes.assignated.data.attributes
+            ticket.attributes.id = ticket.id
+            ticket = ticket.attributes
+            return ticket
+          })
+          this.tickets = ticketRes
+        })
     },
     getDate (date) {
       const dateObject = new Date(date)
@@ -195,13 +191,6 @@ export default {
       } else {
         return 'Cerrado'
       }
-    },
-    can (component) {
-      // eslint-disable-next-line camelcase
-      const allowed_components = this.role
-      // eslint-disable-next-line camelcase
-      const current_component = component
-      return allowed_components.includes(current_component)
     }
   }
 }

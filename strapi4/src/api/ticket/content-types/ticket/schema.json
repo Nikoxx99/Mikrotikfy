@@ -17,9 +17,9 @@
       "default": true
     },
     "details": {
-      "type": "string"
+      "type": "text"
     },
-    "aswered": {
+    "answered": {
       "type": "boolean",
       "default": false
     },
@@ -55,6 +55,15 @@
       "relation": "oneToMany",
       "target": "api::ticketdetail.ticketdetail",
       "mappedBy": "ticket"
+    },
+    "clienttype": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::clienttype.clienttype",
+      "inversedBy": "tickets"
+    },
+    "escalatedoffice": {
+      "type": "boolean"
     }
   }
 }

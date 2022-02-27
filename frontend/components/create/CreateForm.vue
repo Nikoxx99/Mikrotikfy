@@ -55,7 +55,7 @@
             outlined
             dense
             hide-details
-            @keyup="calculateSsid"
+            @keyup="clienttype.name === 'INTERNET' ? calculateSsid : null"
             @input="Client.name = $event.toUpperCase()"
           />
         </v-col>
@@ -116,7 +116,6 @@
             outlined
             dense
             hide-details
-            return-object
           />
         </v-col>
         <v-col>
@@ -144,7 +143,7 @@
             hide-details
           />
         </v-col>
-        <v-col>
+        <v-col v-if="clienttype.name === 'INTERNET'">
           <v-select
             v-model="Client.plan"
             item-text="name"
@@ -154,11 +153,10 @@
             outlined
             dense
             hide-details
-            return-object
           />
         </v-col>
       </v-row>
-      <v-row>
+      <v-row v-if="clienttype.name === 'INTERNET'">
         <v-col>
           <v-text-field
             v-model="Client.wifi_ssid"
@@ -228,7 +226,7 @@
           />
         </v-col>
       </v-row> -->
-      <v-row>
+      <v-row v-if="clienttype.name === 'INTERNET'">
         <v-col>
           <v-select
             v-model="Client.newModel"
@@ -243,23 +241,22 @@
           />
         </v-col>
       </v-row>
-      <v-switch v-model="Client.hasRepeater" hide-details input-value="false" label="Tiene repetidor?" />
-      <v-switch v-model="Client.sendToMikrotik" input-value="true" label="Crear en Mikrotik?" />
+      <v-switch v-if="clienttype.name === 'INTERNET'" v-model="Client.hasRepeater" hide-details input-value="false" label="Tiene repetidor?" />
+      <v-switch v-if="clienttype.name === 'INTERNET'" v-model="Client.sendToMikrotik" input-value="true" label="Crear en Mikrotik?" />
       <v-btn
-        class="mr-4"
+        class="mr-4 mt-4"
         :color="citycolor"
         :loading="isSubmitting"
         :disabled="isSubmitting"
         @click="createClient"
       >
-        Crear Cliente
+        Crear Cliente de {{ clienttype.name }}
       </v-btn>
     </v-form>
   </div>
 </template>
 
 <script>
-import gqlt from 'graphql-tag'
 export default {
   name: 'CreateForm',
   props: {
@@ -280,19 +277,12 @@ export default {
         name: '',
         dni: '',
         address: '',
-        neighborhood: {
-          id: 0,
-          name: ''
-        },
+        neighborhood: null,
         city: '',
         phone: '',
-        plan: {
-          id: 0,
-          name: ''
-        },
+        plan: null,
         wifi_ssid: '',
         wifi_password: '',
-        technology: {},
         mac_address: '',
         comment: '',
         newModel: 1,
@@ -351,77 +341,84 @@ export default {
     },
     technologies () {
       return this.$store.state.technologies
+    },
+    telegramBots () {
+      return this.$store.state.telegramBots.find(bot => bot.city.name === this.$route.query.city)
+    },
+    clienttype () {
+      return this.$store.state.clienttypes.find(ct => ct.name === this.$route.query.clienttype)
     }
   },
   mounted () {
     if (this.$route.query.city) {
-      this.Client.city = this.$route.query.city
+      const city = this.$store.state.auth.cities.find(city => city.name === this.$route.query.city)
+      this.Client.city = city.id
     }
   },
   methods: {
     async testCodeForDuplicated (code) {
-      const clients = await this.$strapi.find('clients', {
-        code,
-        city: this.$route.query.city
-      })
-      if (clients.length > 0) {
-        this.codeError = true
-        this.d00pHint = 'Error. El codigo ya existe.'
-        this.hideD00pHint = false
-      } else {
-        this.codeError = false
-        this.d00pHint = ''
-        this.hideD00pHint = true
-        this.codeSuccess = true
-      }
-    },
-    createClient () {
-      this.isSubmitting = !this.isSubmitting
-      this.$apollo.mutate({
-        mutation: gqlt`mutation ($input: createClientInput){
-          createClient(input: $input){
-            client {
-              code
-            }
-          }
-        }`,
-        variables: {
-          input: {
-            data: {
-              code: this.Client.code,
-              name: this.Client.name,
-              dni: this.Client.dni,
-              address: this.Client.address,
-              neighborhood: this.Client.neighborhood.id,
-              city: this.Client.city,
-              phone: this.Client.phone,
-              plan: this.Client.plan.id,
-              wifi_ssid: this.Client.wifi_ssid,
-              wifi_password: this.Client.wifi_password,
-              comment: this.Client.comment,
-              newModel: this.Client.newModel,
-              sendToMikrotik: this.Client.sendToMikrotik,
-              hasRepeater: this.Client.hasRepeater,
-              operator: this.$store.state.auth.id,
-              operator_role: this.role
+      const qs = require('qs')
+      const query = qs.stringify({
+        filters: {
+          code: {
+            $eq: code
+          },
+          city: {
+            name: {
+              $eq: this.$route.query.city
             }
           }
         }
+      },
+      {
+        encodeValuesOnly: true
+      })
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}clients?${query}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.$store.state.auth.token}`
+        }
+      })
+        .then(res => res.json())
+        .then((clients) => {
+          if (clients.data.length > 0) {
+            this.codeError = true
+            this.d00pHint = 'Error. El codigo ya existe.'
+            this.hideD00pHint = false
+          } else {
+            this.codeError = false
+            this.d00pHint = ''
+            this.hideD00pHint = true
+            this.codeSuccess = true
+          }
+        })
+    },
+    async createClient () {
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}clients`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.$store.state.auth.token}`
+        },
+        body: JSON.stringify({
+          data: { ...this.Client, operator: this.$store.state.auth.id, operator_role: this.role, clienttype: [this.clienttype.id] }
+        })
       }).then((input) => {
-        if (input.data.createClient.code !== '0') {
+        if (input.status === 200) {
           this.$emit('createClientDialog', false)
           this.$emit('createClientSnack', true)
+          this.$simpleTelegramCreate({ client: this.Client, operator: this.$store.state.auth.username, telegramBots: this.telegramBots })
         } else {
           this.alertBox = true
           this.alertBoxColor = 'red darken-4'
           this.createdMessage = 'Error al crear el cliente. Reporta esto al gestor web'
           this.isSubmitting = false
+          throw new Error('Error creating serie')
         }
       }).catch((error) => {
-        this.alertBox = true
-        this.alertBoxColor = 'red darken-4'
-        this.createdMessage = error
-        this.isSubmitting = false
+        // eslint-disable-next-line no-console
+        console.error(error)
       })
     },
     genAddress () {

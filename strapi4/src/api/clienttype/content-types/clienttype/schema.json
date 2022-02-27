@@ -4,7 +4,8 @@
   "info": {
     "singularName": "clienttype",
     "pluralName": "clienttypes",
-    "displayName": "clienttype"
+    "displayName": "clienttype",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -19,6 +20,21 @@
       "relation": "oneToMany",
       "target": "api::client.client",
       "mappedBy": "clienttype"
+    },
+    "icon": {
+      "type": "string"
+    },
+    "tickets": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::ticket.ticket",
+      "mappedBy": "clienttype"
+    },
+    "users": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "plugin::users-permissions.user",
+      "mappedBy": "clienttypes"
     }
   }
 }

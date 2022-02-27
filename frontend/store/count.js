@@ -9,9 +9,9 @@ export const state = () => ({
   }
 })
 export const mutations = {
-  activeClients (state, res) {
+  activeClients (state, clients) {
     try {
-      state.activeClients = res.data.ActiveClients.length
+      state.activeClients = clients.length
     } catch (error) {
       throw new Error(`ACTIVECOUNT MUTATE ${error}`)
     }
@@ -46,27 +46,24 @@ export const mutations = {
   }
 }
 export const actions = {
-  async activeClients ({ commit }, city) {
-    const apollo = this.app.apolloProvider.defaultClient
+  async activeClients ({ commit }, payload) {
     try {
-      await apollo.query({
-        query: gqlt`query ($city: String){
-          ActiveClients(city: $city){
-            name
-          }
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}activeclients?city=${payload.city}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${payload.token}`
         }
-      `,
-        variables: {
-          city
-        }
-      }).then(async (res) => {
-        localStorage.setItem('activeClients', res.data.ActiveClients.length)
-        const clientActiveList = await res.data.ActiveClients.map((c) => {
-          return c.name
-        })
-        localStorage.setItem('activeClientsList', JSON.stringify(clientActiveList))
-        commit('activeClients', res)
       })
+        .then(res => res.json())
+        .then(async (clients) => {
+          localStorage.setItem('activeClients', clients.length)
+          const clientActiveList = await clients.map((c) => {
+            return c.name
+          })
+          localStorage.setItem('activeClientsList', JSON.stringify(clientActiveList))
+          commit('activeClients', clients)
+        })
     } catch (error) {
       throw new Error(`ACTIVECOUNT ACTION ${error}`)
     }

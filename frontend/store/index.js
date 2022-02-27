@@ -3,8 +3,9 @@ const cookieparser = process.server ? require('cookieparser') : undefined
 export const state = () => {
   return {
     auth: null,
-    tickets: null,
     cities: null,
+    clienttypes: null,
+    telegramBots: null,
     plans: null,
     technologies: null,
     devicebrands: null,
@@ -21,18 +22,21 @@ export const mutations = {
   setAuth (state, auth) {
     state.auth = auth
   },
-  setLocalStorage (state, { cities, plans, technologies, neighborhoods, deviceBrands, activeClients, activeClientsList, clientCount, clientCountActive, clientCountDisable, clientCountRetired }) {
+  setLocalStorage (state, { cities, plans, technologies, neighborhoods, deviceBrands, activeClients, activeClientsList, role, clienttypes, telegramBots }) {
     state.cities = JSON.parse(cities)
     state.plans = JSON.parse(plans)
     state.technologies = JSON.parse(technologies)
     state.neighborhoods = JSON.parse(neighborhoods)
     state.devicebrands = JSON.parse(deviceBrands)
+    state.role = JSON.parse(role)
     state.activeClients = JSON.parse(activeClients)
     state.activeClientsList = JSON.parse(activeClientsList)
-    state.clientCount = JSON.parse(clientCount)
-    state.clientCountActive = JSON.parse(clientCountActive)
-    state.clientCountDisable = JSON.parse(clientCountDisable)
-    state.clientCountRetired = JSON.parse(clientCountRetired)
+    state.clienttypes = JSON.parse(clienttypes)
+    state.telegramBots = JSON.parse(telegramBots)
+    // state.clientCount = JSON.parse(clientCount)
+    // state.clientCountActive = JSON.parse(clientCountActive)
+    // state.clientCountDisable = JSON.parse(clientCountDisable)
+    // state.clientCountRetired = JSON.parse(clientCountRetired)
   },
   setTicketsFromLocalStorage (state, tickets) {
     state.tickets = JSON.parse(tickets)
@@ -72,33 +76,43 @@ export const actions = {
   loadLocalStorage ({ commit }) {
     const plans = localStorage.getItem('plans')
     const cities = localStorage.getItem('cities')
-    const clientCount = localStorage.getItem('clientCount')
     const technologies = localStorage.getItem('technologies')
     const deviceBrands = localStorage.getItem('devicebrands')
     const neighborhoods = localStorage.getItem('neighborhoods')
     const activeClients = localStorage.getItem('activeClients')
+    const role = localStorage.getItem('role')
     const activeClientsList = localStorage.getItem('activeClientsList')
-    const clientCountActive = localStorage.getItem('clientCountActive')
-    const clientCountDisable = localStorage.getItem('clientCountDisable')
-    const clientCountRetired = localStorage.getItem('clientCountRetired')
-    commit('setLocalStorage', { cities, plans, technologies, neighborhoods, deviceBrands, activeClients, activeClientsList, clientCount, clientCountActive, clientCountDisable, clientCountRetired })
+    const telegramBots = localStorage.getItem('telegramBots')
+    const clienttypes = localStorage.getItem('clienttypes')
+    // const clientCount = localStorage.getItem('clientCount')
+    // const clientCountActive = localStorage.getItem('clientCountActive')
+    // const clientCountDisable = localStorage.getItem('clientCountDisable')
+    // const clientCountRetired = localStorage.getItem('clientCountRetired')
+    commit('setLocalStorage', { cities, plans, technologies, neighborhoods, deviceBrands, activeClients, activeClientsList, role, clienttypes, telegramBots })
   },
   getTicketsFromLocalStorage ({ commit }) {
     const tickets = localStorage.getItem('tickets')
     commit('setTicketsFromLocalStorage', tickets)
   },
-  async refreshActiveClients ({ commit }, city) {
+  async refreshActiveClients ({ commit }, payload) {
     try {
-      const res = await this.$strapi.find('getactiveclients', {
-        city
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}activeclients?city=${payload.city.id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${payload.token}`
+        }
       })
-      const count = res.length
-      localStorage.setItem('activeClients', res.length)
-      const clientActiveList = await res.map((c) => {
-        return c.name
-      })
-      localStorage.setItem('activeClientsList', JSON.stringify(clientActiveList))
-      commit('refreshActiveClients', { count, clientActiveList })
+        .then(res => res.json())
+        .then(async (clients) => {
+          localStorage.setItem('activeClients', clients.length)
+          const count = clients.length
+          const clientActiveList = await clients.map((c) => {
+            return c.name
+          })
+          localStorage.setItem('activeClientsList', JSON.stringify(clientActiveList))
+          commit('refreshActiveClients', { count, clientActiveList })
+        })
     } catch (error) {
       throw new Error(`ACTIVECOUNT ACTION ${error}`)
     }

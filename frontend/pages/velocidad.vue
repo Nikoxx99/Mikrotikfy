@@ -8,7 +8,7 @@
             Recuerda realizar la prueba estando conectado por cable al router para obtener una medición correcta. Las mediciones por WiFi no representan adecuadamente la velocidad por intermitencias del ambiente.
           </v-card-subtitle>
           <v-card-text>
-            <iframe width="100%" height="650px" frameborder="0" src="https://arnoproducciones.speedtestcustom.com"></iframe>
+            <iframe width="100%" height="650px" frameborder="0" src="https://arnoproducciones.speedtestcustom.com" />
           </v-card-text>
         </v-card>
       </v-col>

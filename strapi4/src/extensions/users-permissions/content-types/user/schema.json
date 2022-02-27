@@ -60,8 +60,7 @@
       "type": "relation",
       "relation": "manyToOne",
       "target": "plugin::users-permissions.role",
-      "inversedBy": "users",
-      "configurable": false
+      "inversedBy": "users"
     },
     "cities": {
       "type": "relation",
@@ -86,6 +85,12 @@
       "relation": "oneToMany",
       "target": "api::activationrequest.activationrequest",
       "mappedBy": "operator"
+    },
+    "clienttypes": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::clienttype.clienttype",
+      "inversedBy": "users"
     }
   }
 }

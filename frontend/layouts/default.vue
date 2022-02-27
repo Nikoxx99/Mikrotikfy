@@ -1,5 +1,8 @@
 <template>
-  <v-app class="text-body-2">
+  <v-app
+    class="text-body-2"
+    :style="this.$vuetify.theme.dark ? 'background-color:rgb(20 20 20 / 88%);' : 'background-color:rgb(255 255 255 / 86%);'"
+  >
     <v-navigation-drawer
       v-model="drawer"
       app
@@ -11,7 +14,7 @@
         <v-list-item
           v-for="(item, i) in items"
           :key="i"
-          :to="`${item.to}?city=${$route.query.city}`"
+          :to="`${item.to}?city=${$route.query.city}&clienttype=${$route.query.clienttype}`"
           router
           :class="role === 'admin' || role === 'superadmin' ? item.role === 'admin' ? 'd-flex' : 'd-flex' : item.role === 'user' ? 'd-flex' : 'd-none'"
           exact
@@ -32,14 +35,25 @@
     </v-navigation-drawer>
     <v-app-bar
       app
+      dense
+      class="elevation-0 transparent"
     >
-      <div v-if="hasPendingChanges">
-        <svg height="13" width="20" style="position:absolute;top:12px;left:43px;">
-          <circle cx="10" cy="8" r="5" fill="red" />
-        </svg>
-      </div>
       <v-app-bar-nav-icon v-if="isMobile" @click.stop="drawer = !drawer" />
-      <v-toolbar-title class="d-none d-md-flex d-lg-flex d-xl-flex" v-text="setCityTitle" />
+      <v-btn
+        v-for="clienttype in $store.state.auth.clienttypes"
+        :key="clienttype.name"
+        class="ml-2"
+        :color="clienttype.name === $route.query.clienttype ? $vuetify.theme.dark ? 'blue darken-4 white--text' : 'blue darken-4' : 'white black--text'"
+        elevation="0"
+        rounded
+        small
+        :to="`${$route.path}?city=${$route.query.city}&clienttype=${clienttype.name}`"
+      >
+        <v-icon :class="isMobile ? '' : 'mr-2'">
+          {{ clienttype.icon }}
+        </v-icon>
+        {{ isMobile ? null : clienttype.name }}
+      </v-btn>
       <v-spacer />
       <v-switch
         v-model="light"
@@ -64,14 +78,13 @@
         <span class="mr-1 d-none d-xs-none d-sm-none d-md-inline d-lg-inline" style="font-size:0.7rem">{{ $store.state.auth.username.charAt(0).toUpperCase() + $store.state.auth.username.slice(1) }}</span>
         <v-btn
           v-for="city in $store.state.auth.cities"
-          :key="city.id"
+          :key="city.name"
           class="ml-2"
           small
-          outlined
           :color="city.color"
-          :href="`/clients?city=${city.id}`"
+          :to="`${$route.path}?city=${city.name}&clienttype=${$route.query.clienttype}`"
         >
-          {{ city.name }}
+          {{ isMobile ? city.name.charAt(0) : city.name }}
         </v-btn>
       </div>
       <v-tooltip bottom>
@@ -98,23 +111,19 @@
       >
         Estas sin acceso a internet. Verifica la conexión WIFI o de datos.
       </v-alert>
-      <v-container fluid>
-        <nuxt />
-      </v-container>
+      <nuxt />
     </v-main>
     <v-footer
       app
-      dark
       inset
       absolute
     >
-      <span>&copy; {{ new Date().getFullYear() }} Base de Datos interactiva - Desarrollada para ARNOProducciones por Nicolas Echeverry - Todos los derechos reservados.</span>
+      <span>&copy; 2019 - {{ new Date().getFullYear() }} Base de Datos interactiva - Desarrollada para ARNOProducciones por Nicolas Echeverry - Todos los derechos reservados.</span>
     </v-footer>
   </v-app>
 </template>
 
 <script>
-// import gqlt from 'graphql-tag'
 import Cookie from 'js-cookie'
 export default {
   middleware: ['defaultCity', 'authenticated'],
@@ -156,12 +165,6 @@ export default {
           role: 'admin'
         },
         {
-          icon: 'mdi-cog',
-          title: 'Ajustes',
-          to: '/config',
-          role: 'admin'
-        },
-        {
           icon: 'mdi-key',
           title: 'Cambios de Clave',
           to: '/password',
@@ -181,18 +184,18 @@ export default {
           to: '/cortes',
           role: 'admin'
         },
-        {
-          icon: 'mdi-comment',
-          title: 'Comentarios Mikrotik',
-          to: '/comments',
-          role: 'admin'
-        },
-        {
-          icon: 'mdi-routes',
-          title: 'Rutas OLT',
-          to: '/olt',
-          role: 'admin'
-        },
+        // {
+        //   icon: 'mdi-comment',
+        //   title: 'Comentarios Mikrotik',
+        //   to: '/comments',
+        //   role: 'admin'
+        // },
+        // {
+        //   icon: 'mdi-routes',
+        //   title: 'Rutas OLT',
+        //   to: '/olt',
+        //   role: 'admin'
+        // },
         {
           icon: 'mdi-speedometer',
           title: 'Test de Velocidad',
@@ -209,10 +212,10 @@ export default {
     },
     currentCity () {
       // eslint-disable-next-line eqeqeq
-      return this.$store.state.cities ? this.$store.state.cities.find(c => c.id == this.$route.query.city) : ''
+      return this.$store.state.cities ? this.$store.state.cities.find(c => c.name == this.$route.query.city) : ''
     },
     role () {
-      return this.$store.state.auth.rolename
+      return this.$store.state.role.name
     },
     setCityTitle () {
       return this.currentCity ? `${this.$route.name.toUpperCase()} ${this.currentCity.name}` : this.title
@@ -226,8 +229,8 @@ export default {
     this.isMobileScreen()
   },
   methods: {
-    getLocalStorage () {
-      this.$store.dispatch('loadLocalStorage')
+    async getLocalStorage () {
+      await this.$store.dispatch('loadLocalStorage')
     },
     loadThemeFromVuetifyThemeManager () {
       const currentTheme = localStorage.getItem('currentTheme')
@@ -270,13 +273,6 @@ export default {
     setLocalStorage () {
       localStorage.setItem('currentCity', this.$route.query.city)
     },
-    comprobeCity () {
-      const recordedCity = localStorage.getItem('currentCity')
-      const currentCity = this.$route.query.city
-      if (currentCity !== recordedCity) {
-        this.$store.dispatch('refreshActiveClients', currentCity)
-      }
-    },
     comprobeDateToSetChristmasTheme () {
       const date = new Date()
       const month = date.getMonth()
@@ -303,9 +299,38 @@ export default {
   }
 }
 </script>
-<style scoped>
+<style>
 .secondary-city {
     background: #16312d;
     color: #fff;
+}
+body {
+    color: rgba(255,255,255,0.65);
+    background-color: #24292e;
+    background-image: url('http://localhost:3000/star-bg.svg'),linear-gradient(#191c20, #1e1e1e 15%);
+    background-repeat: no-repeat;
+    background-position: center 0, 0 0, 0 0;
+    background-size: cover;
+}
+/* width */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey;
+  border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgb(60, 60, 60);
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(41, 41, 41)
 }
 </style>

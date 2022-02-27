@@ -83,17 +83,16 @@
 </template>
 
 <script>
-import gqlt from 'graphql-tag'
 import Cookie from 'js-cookie'
 
 export default {
   data: () => ({
-    username: '',
+    username: 'niko',
     usernameRules: [
       v => !!v || 'Usuario requerido',
       v => (v && v.length <= 32) || 'El nombre debe ser de menos de 32 caracteres de longitud.'
     ],
-    password: '',
+    password: 'Soy@Lolipop',
     passwordRules: [
       v => !!v || 'Debes ingresar una contraseña',
       v => (v && v.length >= 8) || 'La contraseña debe ser de almenos 8 caracteres.'
@@ -115,105 +114,89 @@ export default {
   },
   methods: {
     clear () {
-      this.username = ''
-      this.password = ''
+      this.username = 'niko'
+      this.password = 'Soy@Lolipop'
     },
     async login () {
       this.isLoading = true
       this.loginFailed = false
-      const first = await this.$apollo.mutate({
-        mutation: gqlt`mutation ($input: UsersPermissionsLoginInput!){
-          login(input: $input){
-            jwt
-            user{
-              id
-              username
-              role{
-                id
-                name
-              }
-            }
-          }
-        }`,
-        variables: {
-          input: {
-            identifier: this.username,
-            password: this.password,
-            provider: 'local'
-          }
-        }
-      }).catch((e) => {
-        this.errorMessages = e
-        this.loginFailed = true
-        this.isLoading = false
-      })
-      if (!this.loginFailed) {
-        this.loginSuccessful = true
-        const second = await this.$apollo.query({
-          query: gqlt`query ($id: ID!){
-            role(id: $id){
-              allowed_components{
-                name
-              }
-            }
-          }`,
-          variables: {
-            id: first.data.login.user.role.id
-          }
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}auth/local`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          identifier: this.username,
+          password: this.password
         })
-        const third = await this.$apollo.query({
-          query: gqlt`query ($id: ID!){
-            user(id: $id){
-              cities{
-                id
-                name
-                color
-              }
-            }
-          }`,
-          variables: {
-            id: first.data.login.user.id
-          }
-        })
-        if (third.data.user.cities.length < 1) {
-          this.errorMessages = 'Ciudad no especificada para el usuario'
+      }).then((login) => {
+        if (login.status === 200) {
+          Promise.resolve(login.json())
+            .then((res) => {
+              this.logininfo(res)
+            })
+        } else {
           this.loginFailed = true
-          this.loginSuccessful = false
-          this.isLoading = false
-        } else if (!first.errors) {
-          const ac = await second.data.role.allowed_components.map((c) => {
-            return c.name
-          })
-          const auth = {
-            id: first.data.login.user.id,
-            username: first.data.login.user.username,
-            role: first.data.login.user.role.id,
-            rolename: first.data.login.user.role.name,
-            allowed_components: ac,
-            cities: third.data.user.cities
-          }
-          Cookie.set('auth', auth, { expires: 7 })
-          Cookie.set('token', first.data.login.jwt, { expires: 7 })
-          await Promise.all([
-            this.$store.dispatch('plan/getPlansFromDatabase'),
-            this.$store.dispatch('technology/getTechnologiesFromDatabase'),
-            this.$store.dispatch('device/getDeviceBrandsFromDatabase'),
-            this.$store.dispatch('city/getCitiesFromDatabase'),
-            this.$store.dispatch('neighborhood/getNeighborhoodsFromDatabase'),
-            this.$store.dispatch('count/activeClients')
-          ]).then(() => {
-            window.location.href = `/clients?city=${third.data.user.cities[0].id}`
-          }).catch((e) => {
-            this.errorMessages = e
+        }
+      }).catch((error) => {
+        // eslint-disable-next-line no-console
+        console.error(error)
+      })
+    },
+    async logininfo (response) {
+      this.loginSuccessful = true
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}users/me`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${response.jwt}`
+        }
+      })
+        .then(res => res.json())
+        .then(async (userResponse) => {
+          const userData = userResponse
+          const userCities = userResponse.cities
+          const userClienttypes = userResponse.clienttypes
+          if (!userCities) {
+            this.errorMessages = 'Ciudad no especificada para el usuario'
             this.loginFailed = true
             this.loginSuccessful = false
             this.isLoading = false
-          })
-        } else {
-          this.loginFailed = true
-          this.isLoading = false
-        }
-      }
+          } else if (!userClienttypes) {
+            this.errorMessages = 'Tipo de clientes no especificada para el usuario'
+            this.loginFailed = true
+            this.loginSuccessful = false
+            this.isLoading = false
+          } else {
+            const auth = {
+              id: userData.id,
+              token: response.jwt,
+              username: userData.username,
+              cities: userCities,
+              clienttypes: userClienttypes
+            }
+            Cookie.set('auth', auth, { expires: 7 })
+            Cookie.set('token', response.jwt, { expires: 7 })
+            await Promise.all([
+              this.$store.dispatch('plan/getPlansFromDatabase'),
+              this.$store.dispatch('technology/getTechnologiesFromDatabase'),
+              this.$store.dispatch('device/getDeviceBrandsFromDatabase'),
+              this.$store.dispatch('city/getCitiesFromDatabase'),
+              this.$store.dispatch('client/getClientTypesFromDatabase', response.jwt),
+              this.$store.dispatch('neighborhood/getNeighborhoodsFromDatabase'),
+              this.$store.dispatch('count/activeClients', { token: response.jwt, city: userCities[0].id }),
+              this.$store.dispatch('telegram/getTelegramBotsFromDatabase', { token: response.jwt, city: userCities[0].name }),
+              this.$store.dispatch('role/getRoleFromUserData', { token: response.jwt })
+            ]).then(() => {
+              window.location.href = `/clients?city=${userCities[0].name}&clienttype=${userClienttypes[0].name}`
+            }).catch((e) => {
+              this.errorMessages = e
+              this.loginFailed = true
+              this.loginSuccessful = false
+              this.isLoading = false
+            })
+          }
+        })
     }
   }
 }

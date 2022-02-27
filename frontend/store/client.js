@@ -1,6 +1,7 @@
-import gqlt from 'graphql-tag'
 export const state = () => ({
-  clients: []
+  clients: [],
+  clienttypes: [],
+  headers: null
 })
 export const mutations = {
   calculateClientStatus (state, newState) {
@@ -11,11 +12,19 @@ export const mutations = {
   },
   getUsersFromDatabase (state, clientsList) {
     try {
-      state.clients = clientsList
+      state.clients = clientsList.data.results
+      state.pagination = clientsList.data.pagination
     } catch (error) {
-      throw new Error(`MUTATE ${error}`)
+      throw new Error(`MUTATE SEARCH CLIENT${error}`)
     }
   },
+  // getClientTypesFromDatabase (state, clienttypesList) {
+  //   try {
+  //     state.clienttypes = clienttypesList
+  //   } catch (error) {
+  //     throw new Error(`MUTATE CLIENT TYPES${error}`)
+  //   }
+  // },
   updateFromModal (state, client) {
     try {
       state.clients[client.index].plan = client.newPlan
@@ -51,6 +60,13 @@ export const mutations = {
     } catch (error) {
       throw new Error(`INSERT CLIENT MUTATE ${error}`)
     }
+  },
+  getHeadersByClientType (state, headers) {
+    try {
+      state.headers = headers
+    } catch (error) {
+      throw new Error(`GET HEADERS BY CLIENT TYPE MUTATE ${error}`)
+    }
   }
 }
 export const actions = {
@@ -70,7 +86,8 @@ export const actions = {
     }
   },
   async calculateClientStatus ({ state, commit }, payload) {
-    const newState = await state.clients.map((client) => {
+    const shallowState = JSON.parse(JSON.stringify(state.clients))
+    const newState = await shallowState.map((client) => {
       // eslint-disable-next-line eqeqeq
       const ac = payload.find(c => c == client.code)
       if (ac) {
@@ -90,27 +107,47 @@ export const actions = {
     })
     commit('calculateClientStatus', newState)
   },
-  async getUsersFromDatabase ({ commit }, payload) {
+  async getClientTypesFromDatabase (_, token) {
     try {
-      const clients = await this.$strapi.find('clients', {
-        city: payload.city,
-        _limit: payload.limit,
-        _start: payload.start,
-        _sort: payload.sort ? payload.sort : 'createdAt:desc'
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}clienttypes`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        }
       })
-      commit('getUsersFromDatabase', clients)
+        .then(res => res.json())
+        .then((clienttypes) => {
+          clienttypes = clienttypes.data.map((clienttype) => {
+            clienttype.attributes.id = clienttype.id
+            return clienttype.attributes
+          })
+          localStorage.setItem('clienttypes', JSON.stringify(clienttypes))
+        })
     } catch (error) {
       throw new Error(`ACTION ${error}`)
     }
   },
   async getUsersFromDatabaseBySearch ({ commit }, payload) {
+    const qs = require('qs')
+    const pagination = qs.stringify({
+      pagination: payload.pagination
+    },
+    {
+      encodeValuesOnly: true
+    })
     try {
-      const clients = await this.$strapi.find('searchClient', {
-        search: payload.search,
-        limit: payload.limit,
-        city: payload.city
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}searchclient?search=${payload.search}&city=${payload.city}&clienttype=${payload.clienttype}&${pagination}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${payload.token}`
+        }
       })
-      commit('getUsersFromDatabase', clients)
+        .then(res => res.json())
+        .then((clients) => {
+          commit('getUsersFromDatabase', clients)
+        })
     } catch (error) {
       throw new Error(`ACTION ${error}`)
     }
@@ -123,118 +160,126 @@ export const actions = {
     }
   },
   async setPlanFromModal (_, payload) {
-    const apollo = this.app.apolloProvider.defaultClient
     try {
-      await apollo.mutate({
-        mutation: gqlt`mutation ($id: String, $plan: String, $isRx: Boolean, $operator: String){
-          editClientPlan(id: $id, plan: $plan, isRx: $isRx, operator: $operator)
-        }`,
-        variables: {
-          id: payload.clientId,
-          plan: payload.newPlan.id,
-          isRx: payload.isRx,
-          operator: payload.operator
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}editclientplan`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${payload.token}`
+        },
+        body: JSON.stringify({
+          data: {
+            id: payload.clientId,
+            plan: payload.newPlan.id,
+            isRx: payload.isRx,
+            operator: payload.operator
+          }
+        })
+      }).then((input) => {
+        if (input.status === 200) {
+          return true
         }
+      }).catch((error) => {
+        // eslint-disable-next-line no-console
+        console.error(error)
+        throw new Error(`EDIT CLIENT PLAN ACTION ${error}`)
       })
     } catch (error) {
-      throw new Error(`CLIENT ACTION ${error}`)
+      throw new Error(`EDIT CLIENT PLAN ACTION ${error}`)
     }
   },
-  adminCreate ({ commit }, { client, index }) {
-    const apollo = this.app.apolloProvider.defaultClient
-    try {
-      apollo.mutate({
-        mutation: gqlt`mutation ($input: adminCreateInput){
-          adminCreate(input: $input)
-        }`,
-        variables: {
-          input: {
-            id: client._id,
-            code: client.code,
-            name: client.name,
-            dni: client.dni,
-            address: client.address,
-            neighborhood: client.neighborhood.id,
-            city: client.city.id,
-            phone: client.phone,
-            plan: client.plan.id,
-            wifi_ssid: client.wifi_ssid,
-            wifi_password: client.wifi_password,
-            technology: client.technology.id,
-            mac_address: client.mac_address,
-            comment: client.comment
-          }
-        }
-      }).then((client) => {
-        commit('adminToggle', { client, index })
+  async adminCreate ({ commit }, { client, index, token, operator }) {
+    await fetch(`${this.$config.API_STRAPI_ENDPOINT}admincreate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        data: { ...client, operator }
       })
-    } catch (error) {
+    }).then((input) => {
+      if (input.status === 200) {
+        commit('adminToggle', { client, index })
+      }
+    }).catch((error) => {
+      // eslint-disable-next-line no-console
+      console.error(error)
       throw new Error(`ADMINCREATE ACTION ${error}`)
-    }
+    })
   },
-  adminDelete ({ commit }, { client, index }) {
-    const apollo = this.app.apolloProvider.defaultClient
-    try {
-      apollo.mutate({
-        mutation: gqlt`mutation ($input: adminDeleteInput){
-          adminDelete(input: $input)
-        }`,
-        variables: {
-          input: {
-            id: client._id
-          }
-        }
-      }).then(() => {
+  async adminDelete ({ commit }, { client, index, token, operator }) {
+    await fetch(`${this.$config.API_STRAPI_ENDPOINT}admindelete`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        data: { ...client, operator }
+      })
+    }).then((input) => {
+      if (input.status === 200) {
         commit('adminToggle', { client, index })
-      })
-    } catch (error) {
+      }
+    }).catch((error) => {
+      // eslint-disable-next-line no-console
+      console.error(error)
       throw new Error(`ADMINDELETE ACTION ${error}`)
-    }
+    })
   },
-  updateClient ({ commit }, { client, index, operator }) {
-    const apollo = this.app.apolloProvider.defaultClient
-    try {
-      apollo.mutate({
-        mutation: gqlt`mutation ($input: updateClientInput){
-          updateClient(input: $input){
-            client{
-              id
-            }
-          }
-        }`,
-        variables: {
-          input: {
-            where: {
-              id: client._id
-            },
-            data: {
-              code: client.code,
-              name: client.name,
-              dni: client.dni,
-              address: client.address,
-              neighborhood: client.neighborhood.id,
-              phone: client.phone,
-              plan: client.plan.id,
-              technology: client.technology ? client.technology.id : null,
-              wifi_ssid: client.wifi_ssid,
-              wifi_password: client.wifi_password,
-              comment: client.comment,
-              hasRepeater: client.hasRepeater,
-              nap_onu_address: client.nap_onu_address,
-              opticalPower: client.opticalPower,
-              operator,
-              newModel: client.newModel
-            }
-          }
-        }
-      }).then((_) => {
-        commit('updateClient', { client, index })
+  async updateClient ({ commit }, { client, index, operator, token }) {
+    delete client.active
+    await fetch(`${this.$config.API_STRAPI_ENDPOINT}clients/${client.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        data: { operator, ...client }
       })
-    } catch (error) {
+    }).then((input) => {
+      if (input.status === 200) {
+        commit('updateClient', { client, index })
+      }
+    }).catch((error) => {
+      // eslint-disable-next-line no-console
+      console.error(error)
       throw new Error(`UPDATE USER ACTION ${error}`)
-    }
+    })
   },
   updateClientDevices ({ commit }, { device, index }) {
     commit('updateClientDevices', { device, index })
+  },
+  getHeadersByClientType ({ commit }, { city, clienttype }) {
+    const internet = [
+      { text: 'Codigo', value: 'code', sortable: false },
+      { text: 'Nombre', value: 'name', sortable: false },
+      { text: 'Cedula', value: 'dni', sortable: false },
+      { text: 'Direccion', sortable: false, value: 'address' },
+      { text: 'Barrio', value: 'neighborhood.name', sortable: false },
+      { text: 'Telefono', sortable: false, value: 'phone' },
+      { text: 'Plan', value: 'plan.name', sortable: false },
+      { text: 'Tecnologia', value: 'technology.name', sortable: false },
+      { text: 'Tipo', value: 'newModel', sortable: false },
+      { text: 'Activo', value: 'active', sortable: false },
+      { text: 'Acciones', value: 'actions', sortable: false }
+    ]
+    const television = [
+      { text: 'Codigo', value: 'code', sortable: false },
+      { text: 'Nombre', value: 'name', sortable: false },
+      { text: 'Cedula', value: 'dni', sortable: false },
+      { text: 'Direccion', sortable: false, value: 'address' },
+      { text: 'Barrio', value: 'neighborhood.name', sortable: false },
+      { text: 'Telefono', sortable: false, value: 'phone' },
+      { text: 'Acciones', value: 'actions', sortable: false }
+    ]
+
+    if (clienttype === 'INTERNET') {
+      commit('getHeadersByClientType', internet)
+    } else if (clienttype === 'TELEVISION') {
+      commit('getHeadersByClientType', television)
+    }
   }
 }

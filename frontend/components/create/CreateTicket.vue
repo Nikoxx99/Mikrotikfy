@@ -30,12 +30,9 @@
           {{ createdMessage }}
         </v-alert>
         <v-card-title class="headline">
-          Crear Ticket
+          Crear Ticket de {{ clienttype.name }} <v-icon class="ml-2">{{ clienttype.icon }}</v-icon>
         </v-card-title>
         <div v-if="!loading">
-          <v-card-text>
-            <h2> {{ client.name }} </h2>
-          </v-card-text>
           <v-card-text>
             <v-select
               v-model="ticketPayload.type"
@@ -186,29 +183,16 @@
 </template>
 
 <script>
-import gqlt from 'graphql-tag'
 export default {
   name: 'CreateTicket',
-  apollo: {
-    tickettypes () {
-      return {
-        query: gqlt`query{
-          tickettypes{
-            id
-            name
-          }
-        }`
-      }
-    }
-  },
   props: {
     client: {
       type: Object,
       default: () => {}
     },
     assignated: {
-      type: String,
-      default: ''
+      type: Number,
+      default: -1
     },
     role: {
       type: Array,
@@ -221,6 +205,7 @@ export default {
     alertBox: false,
     alertBoxColor: '',
     createdMessage: '',
+    tickettypes: [],
     errors: {
       type: false,
       details: false
@@ -266,9 +251,33 @@ export default {
   computed: {
     neighborhoods () {
       return this.$store.state.neighborhoods
+    },
+    clienttype () {
+      return this.$store.state.clienttypes.find(ct => ct.name === this.$route.query.clienttype)
+    },
+    telegramBots () {
+      return this.$store.state.telegramBots.find(bot => bot.city.name === this.$route.query.city)
     }
   },
   methods: {
+    async getTickettypes () {
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}tickettypes`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.$store.state.auth.token}`
+        }
+      })
+        .then(res => res.json())
+        .then((tickettypes) => {
+          const tt = tickettypes.data.map((tickettype) => {
+            tickettype.attributes.id = tickettype.id
+            tickettype = tickettype.attributes
+            return tickettype
+          })
+          this.tickettypes = tt
+        })
+    },
     isEmpty (obj) {
       return Object.keys(obj).length === 0
     },
@@ -280,8 +289,9 @@ export default {
       this.ticketPayload.client = this.client.id
       this.ticketPayload.city = this.client.city.id
       this.ticketPayload.assignated = this.assignated
+      this.getTickettypes()
     },
-    createTicket () {
+    async createTicket () {
       this.loading = true
       if (this.ticketPayload.type.name === 'TRASLADO') {
         this.ticketPayload.details = `DX: ${this.client.address} ${this.client.neighborhood.name} \n CX: ${this.cx.finalAddress}`
@@ -302,37 +312,37 @@ export default {
         this.errors.details = true
         return
       }
-      this.$apollo.mutate({
-        mutation: gqlt`mutation ($input: createTicketInput){
-          createTicket(input: $input){
-            ticket{
-              id
-              client{
-                code
-              }
-            }
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}tickets`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.$store.state.auth.token}`
+        },
+        body: JSON.stringify({
+          data: {
+            active: true,
+            client: this.ticketPayload.client,
+            city: this.ticketPayload.city,
+            tickettype: this.ticketPayload.type.id,
+            clienttype: this.clienttype.id,
+            assignated: this.ticketPayload.assignated,
+            details: this.ticketPayload.details
           }
-        }`,
-        variables: {
-          input: {
-            data: {
-              active: true,
-              client: this.ticketPayload.client,
-              city: this.ticketPayload.city,
-              tickettype: this.ticketPayload.type.id,
-              assiganted: this.ticketPayload.assignated,
-              details: this.ticketPayload.details
-            }
-          }
+        })
+      }).then((input) => {
+        if (input.status === 200) {
+          this.modal = false
+          this.loading = false
+          this.$simpleTelegramCreateTicket({ client: this.client, tickettype: this.ticketPayload.type.name, details: this.ticketPayload.details, neighborhood: this.client.neighborhood, operator: this.$store.state.auth.username, telegramBots: this.telegramBots })
+        } else {
+          this.alertBox = true
+          this.alertBoxColor = 'red darken-4'
+          this.createdMessage = 'Error al crear el ticket'
+          this.loading = false
         }
-      }).then((_) => {
-        this.modal = false
-        this.loading = false
       }).catch((error) => {
-        this.alertBox = true
-        this.alertBoxColor = 'red darken-4'
-        this.createdMessage = error
-        this.loading = false
+        // eslint-disable-next-line no-console
+        console.error(error)
       })
     },
     can (component) {

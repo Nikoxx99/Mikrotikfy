@@ -60,23 +60,6 @@
               @page-count="pageCount = $event"
               @click:row="showTicketInfo"
             >
-              <template v-slot:top>
-                <v-row class="mx-1 my-1">
-                  <v-spacer class="d-none d-xs-none d-sm-block d-md-block d-lg-block d-lx-block" />
-                  <v-text-field
-                    ref="searchTicket"
-                    v-model="search"
-                    prepend-icon="mdi-magnify"
-                    label="Buscar Tickets"
-                    single-line
-                    hide-details
-                    outlined
-                    dense
-                    style="max-width: 1000px"
-                    class="white--text"
-                  />
-                </v-row>
-              </template>
               <template v-slot:[`item.tickettype.name`]="props">
                 <v-chip small :color="getTicketTypeColor(props.item.tickettype.name)" class="white--text">
                   {{ props.item.tickettype.name }}
@@ -89,23 +72,17 @@
                     :name="props.item.client.name"
                   />
                   <ClientStatus
-                      v-if="can('ClientStatus')"
                       :name="props.item.client.name"
                       :clientid="props.item.client.id"
                       :code="props.item.client.code"
                       :role="$store.state.auth.allowed_components"
                     />
                   <CreateTicketAdvance
-                    v-if="props.item.tickettype.name !== 'TRASLADO'"
                     :editindex="ticketList.indexOf(props.item)"
                     :ticketid="props.item.id"
-                    :name="props.item.client.name"
-                    @updateTicketStatus="updateTicketStatus($event)"
-                  />
-                  <CreateTicketAdvanceTraslate
-                    v-else
                     :ticket="props.item"
-                    :editindex="ticketList.indexOf(props.item)"
+                    :client="props.item.client"
+                    :name="props.item.client.name"
                     @updateTicketStatus="updateTicketStatus($event)"
                   />
                   <TicketAdvanceHistory
@@ -212,7 +189,6 @@
             <v-list-item>
               <v-list-item-content v-if="editModalData.client !== undefined">
                 <ClientStatus
-                    v-if="can('ClientStatus')"
                     :block="true"
                     :name="editModalData.client.name"
                     :clientid="editModalData.client.id"
@@ -220,18 +196,12 @@
                     :role="allowed_components"
                   />
                 <CreateTicketAdvance
-                  v-if="editModalData.tickettype.name !== 'TRASLADO'"
                   :block="true"
                   :editindex="ticketList ? ticketList.indexOf(editModalData.id) : ''"
                   :ticketid="editModalData.id"
-                  :name="editModalData.client.name"
-                  @updateTicketStatus="updateTicketStatus($event)"
-                />
-                <CreateTicketAdvanceTraslate
-                  v-else
-                  :block="true"
-                  :editindex="ticketList ? ticketList.indexOf(editModalData.id) : ''"
                   :ticket="editModalData"
+                  :client="editModalData.client"
+                  :name="editModalData.client.name"
                   @updateTicketStatus="updateTicketStatus($event)"
                 />
                 <TicketAdvanceHistory
@@ -273,15 +243,13 @@ import CreateTicketAdvance from '../create/CreateTicketAdvance'
 import TicketAdvanceHistory from '../misc/TicketAdvanceHistory'
 import TicketHistory from '../misc/TicketHistory'
 import ClientStatus from '../main/ClientStatus'
-import CreateTicketAdvanceTraslate from '../create/CreateTicketAdvanceTraslate.vue'
 export default {
   name: 'Tickets',
   components: {
     CreateTicketAdvance,
     TicketAdvanceHistory,
     TicketHistory,
-    ClientStatus,
-    CreateTicketAdvanceTraslate
+    ClientStatus
   },
   data () {
     return {
@@ -303,25 +271,24 @@ export default {
       editModalData: {},
       infoModal: false,
       headers: [
-        { text: 'Estado', sortable: true, value: 'active', width: '5%' },
-        { text: 'Codigo', sortable: true, value: 'client.code', width: 60, align: ' d-none d-lg-table-cell' },
-        { text: 'Cedula', sortable: true, value: 'client.dni', width: 60, align: ' d-none d-lg-table-cell' },
-        { text: 'Cliente', sortable: true, value: 'client.name' },
-        { text: 'Dirección', sortable: true, value: 'client.address', align: ' d-none d-lg-table-cell' },
-        { text: 'Barrio', sortable: true, value: 'client.neighborhood.name' },
-        { text: 'Telefono', sortable: true, value: 'client.phone', align: ' d-none d-lg-table-cell' },
-        { text: 'Tec.', sortable: true, value: 'client.technology.name', align: ' d-none d-lg-table-cell' },
-        { text: 'Tipo', sortable: true, value: 'tickettype.name' },
-        { text: 'Operador', sortable: false, value: 'assiganted.username', align: ' d-none d-lg-table-cell' },
-        { text: 'Detalles', sortable: true, value: 'details', width: 400, align: ' d-none d-lg-table-cell' },
-        { text: 'Creado', sortable: true, value: 'createdAt', align: ' d-none d-lg-table-cell' },
-        { text: 'Acciones', sortable: true, value: 'actions', align: ' d-none d-lg-table-cell' }
+        { text: 'Estado', sortable: false, value: 'active', width: '5%' },
+        { text: 'Codigo', sortable: false, value: 'client.code', width: 60, align: ' d-none d-lg-table-cell' },
+        { text: 'Cédula', sortable: false, value: 'client.dni', width: 60, align: ' d-none d-lg-table-cell' },
+        { text: 'Cliente', sortable: false, value: 'client.name' },
+        { text: 'Dirección', sortable: false, value: 'client.address', align: ' d-none d-lg-table-cell' },
+        { text: 'Barrio', sortable: false, value: 'client.neighborhood.name' },
+        { text: 'Telefono', sortable: false, value: 'client.phone', align: ' d-none d-lg-table-cell' },
+        { text: 'Tec.', sortable: false, value: 'client.technology.name', align: ' d-none d-lg-table-cell' },
+        { text: 'Tipo', sortable: false, value: 'tickettype.name' },
+        { text: 'Operador', sortable: false, value: 'assignated.username', align: ' d-none d-lg-table-cell' },
+        { text: 'Detalles', sortable: false, value: 'details', width: 400, align: ' d-none d-lg-table-cell' },
+        { text: 'Creado', sortable: false, value: 'createdAt', align: ' d-none d-lg-table-cell' },
+        { text: 'Acciones', sortable: false, value: 'actions', align: ' d-none d-lg-table-cell' }
       ],
       States: [{ name: 'Abierto', value: true }, { name: 'Cerrado', value: false }],
       snack: false,
       snackColor: '',
       snackText: '',
-      ticketList: [],
       allowed_components: []
     }
   },
@@ -329,6 +296,14 @@ export default {
     currentCity () {
       // eslint-disable-next-line eqeqeq
       return this.$store.state.cities ? this.$store.state.cities.find(c => c.id == this.$route.query.city) : ''
+    },
+    ticketList () {
+      return this.$store.state.ticket.tickets
+    }
+  },
+  watch: {
+    $route () {
+      this.refreshTickets()
     }
   },
   mounted () {
@@ -338,49 +313,11 @@ export default {
   methods: {
     async refreshTickets () {
       this.initialLoading = true
-      let query = {}
-      query = {
-        active: !this.showClosedValue,
-        city: this.$route.query.city,
-        'tickettype.name_ncontains': 'RETIRO',
-        _limit: this.$route.query.limit ? parseInt(this.$route.query.limit) : 50,
-        _sort: this.$route.query.sort ? this.$route.query.sort : 'createdAt:asc'
-      }
-      if (this.showClosedValue) {
-        query = {
-          active: !this.showClosedValue,
-          city: this.$route.query.city,
-          _limit: this.$route.query.limit ? parseInt(this.$route.query.limit) : 50,
-          _sort: this.$route.query.sort ? this.$route.query.sort : 'createdAt:asc'
-        }
-      }
-      if (this.showRetired) {
-        query = {
-          active: !this.showClosedValue,
-          'tickettype.name_contains': 'RETIRO',
-          city: this.$route.query.city,
-          _limit: this.$route.query.limit ? parseInt(this.$route.query.limit) : 50,
-          _sort: this.$route.query.sort ? this.$route.query.sort : 'createdAt:asc'
-        }
-      }
-      const tickets = await this.$strapi.find('tickets', query)
-      this.ticketList = tickets.map((t) => {
-        console.log(t)
-        if (t.ticketdetails.length > 0) {
-          if (t.ticketdetails.slice(-1)[0].operator) {
-            t.details = t.ticketdetails[0].operator.username + ': ' + t.ticketdetails[0].details
-          } else {
-            return t
-          }
-        }
-        return t
-      })
+      await this.$store.dispatch('ticket/getTicketsFromDatabase', { city: this.$route.query.city, clienttype: this.$route.query.clienttype, token: this.$store.state.auth.token, active: this.showClosedValue, retired: this.showRetired })
       this.initialLoading = false
     },
     updateTicketStatus ({ editindex, closeTicket }) {
-      if (editindex > -1) {
-        this.ticketList[editindex].active = !closeTicket
-      }
+      this.$store.commit('ticket/updateTicketStatus', { editindex, closeTicket })
       this.refreshTickets()
       this.infoModal = false
     },
@@ -439,12 +376,6 @@ export default {
     showTicketInfo (value) {
       Object.assign(this.editModalData, value)
       this.infoModal = true
-    },
-    can (component) {
-      const allowedcomponents = this.$store.state.auth.allowed_components
-      const currentComponent = component
-      const res = allowedcomponents.includes(currentComponent)
-      return res
     },
     comprobeCity () {
       const recordedCity = localStorage.getItem('currentCity')

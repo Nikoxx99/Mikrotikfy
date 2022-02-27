@@ -99,8 +99,8 @@ export default {
   name: 'CreateDevice',
   props: {
     clientid: {
-      type: String,
-      default: ''
+      type: Number,
+      default: -1
     },
     block: {
       type: Boolean,
@@ -156,9 +156,29 @@ export default {
     },
     async createDeviceFn () {
       if (this.valid) {
-        const device = await this.$strapi.create('devices', { mac_address: this.device.mac_address, devicebrand: this.device.devicebrand.id, clients: [this.clientid] })
-        this.$emit('createDevice', device)
-        this.dialogDevice = false
+        await fetch(`${this.$config.API_STRAPI_ENDPOINT}devices`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${this.$store.state.auth.token}`
+          },
+          body: JSON.stringify({
+            data: { mac_address: this.device.mac_address, devicebrand: this.device.devicebrand.id, clients: [this.clientid] }
+          })
+        }).then((input) => {
+          if (input.status === 200) {
+            Promise.resolve(input.json())
+              .then((device) => {
+                this.$emit('createDevice', device)
+                this.dialogDevice = false
+              })
+          } else {
+            throw new Error('Error creating serie')
+          }
+        }).catch((error) => {
+          // eslint-disable-next-line no-console
+          console.error(error)
+        })
       } else {
         this.alertBox = true
         this.createdMessage = 'Debes completar todos los campos'
@@ -178,14 +198,6 @@ export default {
       } else {
         const isMobile = false
         return isMobile
-      }
-    },
-    can (component) {
-      if (this.role) {
-        const allowedcomponents = this.role
-        const currentComponent = component
-        const res = allowedcomponents.includes(currentComponent)
-        return res
       }
     }
   }

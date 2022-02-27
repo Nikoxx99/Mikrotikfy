@@ -5,23 +5,6 @@
         cols="12"
       >
         <v-card>
-          <v-card-title
-            :style="`color:${cityColor};`"
-          >
-            Cambios de Clave
-            <v-spacer />
-            <v-text-field
-              v-model="search"
-              prepend-icon="mdi-magnify"
-              label="Buscar Cambios por DNI"
-              single-line
-              hide-details
-              outlined
-              autofocus
-              dense
-              class="white--text"
-            />
-          </v-card-title>
           <client-only>
             <v-data-table
               :key="key"
@@ -31,11 +14,11 @@
               :items-per-page="itemsPerPage"
               :page.sync="page"
               :loading="initialLoading"
-              sort-by="created_at"
+              sort-by="createdAt"
               calculate-widths
               sort-desc
               no-data-text="No hay informacion para mostrar aun..."
-              loading-text="Cargando información de clientes..."
+              loading-text="Cargando información de cambios de clave..."
               dense
               hide-default-footer
               mobile-breakpoint="100"
@@ -46,7 +29,7 @@
                   small
                   :color="getColor(props.item.closed)"
                   class="white--text"
-                  @click="save(props.item._id, props.item.closed, props.item.client ? props.item.client.id : null, props.item.new_password, props.index)"
+                  @click="save(props.item.id, props.item.closed, props.item.client ? props.item.client.id : null, props.item.new_password, props.index)"
                 >
                   {{ getState(props.item.closed) }}
                 </v-chip>
@@ -57,14 +40,11 @@
                 </span>
               </template>
               <template v-slot:[`item.actions`]="{ item }">
-                <ClientStatus
+                <MainClientStatus
                   :name="item.client ? item.client.name : ''"
                   :clientid="item.client ? item.client.id : ''"
                   :code="item.client ? item.client.code : ''"
-                  :role="$store.state.auth.allowed_components"
-                >
-                  {{ item }}
-                </ClientStatus>
+                />
               </template>
             </v-data-table>
           </client-only>
@@ -93,40 +73,8 @@
 </template>
 
 <script>
-import gqlt from 'graphql-tag'
-import ClientStatus from '../components/main/ClientStatus'
 export default {
-  components: {
-    ClientStatus
-  },
   middleware: 'authenticated',
-  apollo: {
-    passwordchanges () {
-      return {
-        query: gqlt`
-        query{
-          passwordchanges(sort: "createdAt:desc"){
-            _id
-            dni
-            client {
-              id
-              code
-              name
-              city {
-                name
-              }
-            }
-            old_password
-            new_password
-            address
-            closed
-            createdAt
-          }
-        }
-      `
-      }
-    }
-  },
   data () {
     return {
       key: 0,
@@ -142,7 +90,8 @@ export default {
       dialogEdit: false,
       initialLoading: false,
       headers: [
-        { text: 'NOMBRE', sortable: true, value: 'client.name' },
+        { text: 'Codigo', sortable: true, value: 'client.code' },
+        { text: 'Nombre', sortable: true, value: 'client.name' },
         { text: 'Cedula', sortable: true, value: 'dni' },
         { text: 'Dirección', sortable: true, value: 'address' },
         { text: 'Clave Anterior', sortable: false, value: 'old_password' },
@@ -156,8 +105,12 @@ export default {
       States: [{ name: 'Abierto', value: false }, { name: 'Cerrado', value: true }],
       snack: false,
       snackColor: '',
-      snackText: ''
+      snackText: '',
+      passwordchanges: []
     }
+  },
+  mounted () {
+    this.getPasswordChanges()
   },
   methods: {
     getDate (date) {
@@ -179,15 +132,51 @@ export default {
         return 'Abierto'
       }
     },
-    save (id, status, clientid, password, index) {
+    async getPasswordChanges () {
+      const qs = require('qs')
+      const query = qs.stringify({
+        populate: [
+          'client',
+          'client.city'
+        ]
+      },
+      {
+        encodeValuesOnly: true
+      })
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}passwordchanges?${query}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.$store.state.auth.token}`
+        }
+      })
+        .then(res => res.json())
+        .then((passwordchanges) => {
+          passwordchanges = passwordchanges.data.map((passwordchange) => {
+            if (passwordchange.attributes.client.data) {
+              passwordchange.attributes.client.data.attributes.id = passwordchange.attributes.client.data.id
+              passwordchange.attributes.client = passwordchange.attributes.client.data.attributes
+              passwordchange.attributes.client.city.data.attributes.id = passwordchange.attributes.client.city.data.id
+              passwordchange.attributes.client.city = passwordchange.attributes.client.city.data.attributes
+            }
+            passwordchange.attributes.id = passwordchange.id
+            passwordchange = passwordchange.attributes
+            return passwordchange
+          })
+          this.passwordchanges = passwordchanges
+        })
+    },
+    async save (id, status, clientid, password, index) {
       this.passwordchanges[index].closed.value = !this.passwordchanges[index].closed.value
-      this.$apollo.mutate({
-        mutation: gqlt`mutation ($input: UpdatePasswordChangeInput){
-          updatePasswordChangeRequest(input: $input)
-        }`,
-        variables: {
-          input: {
-            _id: id,
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}passwordchanges/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.$store.state.auth.token}`
+        },
+        body: JSON.stringify({
+          data: {
+            id,
             closed: {
               name: status.name,
               value: status.value
@@ -195,16 +184,32 @@ export default {
             clientid,
             password
           }
-        }
-      }).then((_) => {
-        this.snack = true
-        this.snackColor = 'info'
-        this.snackText = 'Petición actualizada con éxito.'
-      }).catch((error) => {
-        this.snack = true
-        this.snackColor = 'red'
-        this.snackText = error
+        })
       })
+        .then(res => res.json())
+        .then((_) => {
+          this.updateClientPassword(clientid, password)
+        })
+    },
+    async updateClientPassword (id, password) {
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}clients/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.$store.state.auth.token}`
+        },
+        body: JSON.stringify({
+          data: {
+            wifi_password: password
+          }
+        })
+      })
+        .then(res => res.json())
+        .then((_) => {
+          this.snack = true
+          this.snackColor = 'info'
+          this.snackText = 'Petición actualizada con éxito.'
+        })
     },
     cancel () {
       this.snack = true
