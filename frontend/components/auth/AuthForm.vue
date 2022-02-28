@@ -87,12 +87,12 @@ import Cookie from 'js-cookie'
 
 export default {
   data: () => ({
-    username: 'niko',
+    username: '',
     usernameRules: [
       v => !!v || 'Usuario requerido',
       v => (v && v.length <= 32) || 'El nombre debe ser de menos de 32 caracteres de longitud.'
     ],
-    password: 'Soy@Lolipop',
+    password: '',
     passwordRules: [
       v => !!v || 'Debes ingresar una contraseña',
       v => (v && v.length >= 8) || 'La contraseña debe ser de almenos 8 caracteres.'
