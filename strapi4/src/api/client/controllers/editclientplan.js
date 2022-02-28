@@ -30,7 +30,7 @@ module.exports = {
     } else {
       //normal req
       const mikrotikHost = clientObj.city.mikrotiks[0].ip
-      const res = await mkSetClientPlanInformation(mikrotikHost, { newClientPlan, dni, code, model, removeActive })
+      const res = await mkSetClientPlanInformation(mikrotikHost, { newClientPlan, dni: clientObj.dni, code: clientObj.code, model: clientObj.newModel, removeActive })
       if (res) {
         return true
       } else {
