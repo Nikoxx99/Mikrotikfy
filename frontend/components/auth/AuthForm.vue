@@ -114,8 +114,8 @@ export default {
   },
   methods: {
     clear () {
-      this.username = 'niko'
-      this.password = 'Soy@Lolipop'
+      this.username = ''
+      this.password = ''
     },
     async login () {
       this.isLoading = true
