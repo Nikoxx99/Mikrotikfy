@@ -307,7 +307,7 @@ export default {
 body {
     color: rgba(255,255,255,0.65);
     background-color: #24292e;
-    background-image: url('http://localhost:3000/star-bg.svg'),linear-gradient(#191c20, #1e1e1e 15%);
+    background-image: url('/star-bg.svg'),linear-gradient(#191c20, #1e1e1e 50%);
     background-repeat: no-repeat;
     background-position: center 0, 0 0, 0 0;
     background-size: cover;

@@ -58,7 +58,7 @@
               hide-default-footer
               mobile-breakpoint="100"
               @page-count="pageCount = $event"
-              @click:row="showTicketInfo"
+              @click:row="showTicketInfo({ item: $event, index: ticketList.indexOf($event) })"
             >
               <template v-slot:[`item.tickettype.name`]="props">
                 <v-chip small :color="getTicketTypeColor(props.item.tickettype.name)" class="white--text">
@@ -197,7 +197,7 @@
                   />
                 <CreateTicketAdvance
                   :block="true"
-                  :editindex="ticketList ? ticketList.indexOf(editModalData.id) : ''"
+                  :editindex="editModalData.editindex"
                   :ticketid="editModalData.id"
                   :ticket="editModalData"
                   :client="editModalData.client"
@@ -373,8 +373,9 @@ export default {
         this.isDesktop = clientRes
       }
     },
-    showTicketInfo (value) {
-      Object.assign(this.editModalData, value)
+    showTicketInfo (event) {
+      event.item.editindex = event.index
+      Object.assign(this.editModalData, event.item)
       this.infoModal = true
     },
     comprobeCity () {

@@ -189,6 +189,7 @@ export default {
               this.$simpleTelegramCreateTicketAdvance({
                 client: this.client,
                 ticket: this.ticket,
+                status: this.ticketAdvance.closeTicket,
                 details: this.ticketAdvance.details,
                 operator: this.$store.state.auth.username,
                 telegramBots: this.telegramBots

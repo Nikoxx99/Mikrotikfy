@@ -100,12 +100,12 @@ function simpleTelegramCreateTicket ({ client, tickettype, details, neighborhood
       return err
     })
 };
-function simpleTelegramCreateTicketAdvance ({ client, ticket, details, operator, telegramBots }) {
+function simpleTelegramCreateTicketAdvance ({ client, ticket, status, details, operator, telegramBots }) {
   const fetch = require('node-fetch')
   const bot = telegramBots.token
   const chatid = telegramBots.chat
   let line1 = ''
-  if (!ticket.active) {
+  if (status) {
     line1 = '✅ CIERRE DE TICKET ✅'
   } else {
     line1 = 'AVANCE DE TICKET'
@@ -114,7 +114,7 @@ function simpleTelegramCreateTicketAdvance ({ client, ticket, details, operator,
   const line3 = sanitizeString(ticket.tickettype.name)
   const line4 = sanitizeString(details)
   let line5 = ''
-  if (!ticket.active) {
+  if (status) {
     line5 = 'CASO CERRADO'
   } else {
     line5 = 'CASO ACTIVO'

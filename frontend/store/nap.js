@@ -44,7 +44,12 @@ export const actions = {
           }
         }
       },
-      populate: ['city', 'naptype', 'neighborhood', 'technology']
+      populate: ['city', 'naptype', 'neighborhood', 'technology'],
+      pagination: {
+        page: 1,
+        pageSize: 10000
+      },
+      sort: ['createdAt:desc']
     },
     {
       encodeValuesOnly: true
