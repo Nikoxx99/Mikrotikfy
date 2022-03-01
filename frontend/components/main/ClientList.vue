@@ -211,21 +211,6 @@
               </v-col>
             </v-row> -->
           </v-card-text>
-          <v-snackbar
-            v-model="snack"
-            :timeout="1000"
-            :color="snackColor"
-            bottom
-            vertical
-          >
-            {{ snackText }}
-
-            <template v-slot:action="{ attrs }">
-              <v-btn v-bind="attrs" text @click="snack = false">
-                Cerrar
-              </v-btn>
-            </template>
-          </v-snackbar>
         </v-card>
       </v-col>
     </v-row>
@@ -302,9 +287,6 @@ export default {
       },
       refreshLoading: false,
       searchClientInput: '',
-      snack: false,
-      snackColor: '',
-      snackText: '',
       result: ''
     }
   },
@@ -430,9 +412,7 @@ export default {
       this.createDialog = false
     },
     createClientSnack (value) {
-      this.snack = value
-      this.snackText = 'Cliente creado con éxito!'
-      this.snackColor = 'info'
+      this.$toast.success('Cliente creado con exito', { duration: 4000, position: 'bottom-center' })
     },
     updateStatus (client, index) {
       if (client.active === true) {

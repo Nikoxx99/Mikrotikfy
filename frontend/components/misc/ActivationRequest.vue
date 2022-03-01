@@ -67,21 +67,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-snackbar
-      v-model="snack"
-      :timeout="3000"
-      :color="snackColor"
-      top
-      vertical
-    >
-      {{ snackText }}
-
-      <template v-slot:action="{ attrs }">
-        <v-btn v-bind="attrs" text @click="snack = false">
-          Cerrar
-        </v-btn>
-      </template>
-    </v-snackbar>
   </div>
 </template>
 
@@ -107,9 +92,6 @@ export default {
       flag2: false,
       modal: false,
       showControls: false,
-      snack: false,
-      snackColor: '',
-      snackText: '',
       error: false,
       errorMessage: '',
       loading: false,
@@ -151,22 +133,15 @@ export default {
                 this.modal = false
                 this.error = false
                 this.loading = false
-                this.snack = true
-                this.snackText = 'Solicitud enviada correctamente!'
-                this.snackColor = 'cyan'
+                this.$toast.success('Solicitud enviada con exito', { duration: 4000, position: 'bottom-center' })
               } else {
-                this.snack = true
                 this.loading = false
-                this.snackText = 'Error desconocido, reporta esto a nico'
-                this.snackColor = 'red'
+                this.$toast.error('Error de red, reporta esto a nico.', { position: 'bottom-center' })
               }
             })
         }
       } catch (error) {
-        this.snack = true
-        this.loading = false
-        this.snackText = error
-        this.snackColor = 'red'
+        this.$toast.error(error, { position: 'bottom-center' })
       }
     },
     resetErrorFields () {
@@ -236,9 +211,7 @@ export default {
         .then((activationRequestExists) => {
           if (activationRequestExists.data.length > 0) {
             this.loading = false
-            this.snack = true
-            this.snackColor = 'error'
-            this.snackText = 'Ya existe una solicitud de activación'
+            this.$toast.error('Ya existe una solicitud de activación', { position: 'bottom-center' })
           } else {
             this.flag2 = true
           }

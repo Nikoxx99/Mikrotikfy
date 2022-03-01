@@ -81,21 +81,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-snackbar
-      v-model="snack"
-      :timeout="1000"
-      :color="snackColor"
-      bottom
-      vertical
-    >
-      {{ snackText }}
-
-      <template v-slot:action="{ attrs }">
-        <v-btn v-bind="attrs" text @click="snack = false">
-          Cerrar
-        </v-btn>
-      </template>
-    </v-snackbar>
   </span>
 </template>
 
@@ -131,9 +116,6 @@ export default {
   data: () => ({
     modal: false,
     loading: false,
-    snack: false,
-    snackText: '',
-    snackColor: '',
     ticketAdvance: {
       id: '',
       details: '',
@@ -194,19 +176,15 @@ export default {
                 operator: this.$store.state.auth.username,
                 telegramBots: this.telegramBots
               })
-              this.snack = true
-              this.snackColor = 'info'
-              this.snackText = 'Ticket actualizado con éxito.'
+              this.$toast.success('Ticket Actualizado con Exito', { duration: 4000, position: 'bottom-center' })
               this.loading = false
             }
           }).catch((error) => {
-            // eslint-disable-next-line no-console
-            console.error(error)
+            this.$toast.error(error, { position: 'bottom-center' })
           })
         }
       }).catch((error) => {
-        // eslint-disable-next-line no-console
-        console.error(error)
+        this.$toast.error(error, { position: 'bottom-center' })
       })
     },
     can (component) {

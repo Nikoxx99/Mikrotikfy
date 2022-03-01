@@ -169,7 +169,7 @@ export default {
           if (input.status === 200) {
             Promise.resolve(input.json())
               .then((device) => {
-                this.$emit('createDevice', device)
+                this.$emit('createDevice', { device, devicebrand: this.device.devicebrand })
                 this.dialogDevice = false
               })
           } else {

@@ -30,7 +30,7 @@
           Equipos asociados
         </v-card-title>
         <v-card-text>
-          <CreateDevice :clientid="String(clientid)" @createDevice="updateDeviceList($event)" />
+          <CreateDevice :clientid="clientid" @createDevice="updateDeviceList($event)" />
         </v-card-text>
         <div v-if="!loading">
           <v-card-text>
@@ -50,7 +50,13 @@
                 hide-default-footer
                 mobile-breakpoint="100"
                 @page-count="pageCount = $event"
-              />
+              >
+                <template v-slot:[`item.createdAt`]="{ item }">
+                  <span>
+                    {{ getDate(item.createdAt) }}
+                  </span>
+                </template>
+              </v-data-table>
             </client-only>
             <div class="text-center pt-2">
               <v-pagination v-model="page" :length="pageCount" />
@@ -68,21 +74,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-snackbar
-      v-model="snack"
-      :timeout="4000"
-      :color="snackColor"
-      bottom
-      vertical
-    >
-      {{ snackText }}
-
-      <template v-slot:action="{ attrs }">
-        <v-btn v-bind="attrs" text @click="snack = false">
-          Cerrar
-        </v-btn>
-      </template>
-    </v-snackbar>
   </span>
 </template>
 
@@ -109,21 +100,22 @@ export default {
     page: 1,
     pageCount: 0,
     itemsPerPage: 10,
-    snack: false,
-    snackText: '',
-    snackColor: '',
     devices: [],
     headers: [
       { text: 'Mac', sortable: true, value: 'mac_address' },
-      { text: 'Marca', sortable: true, value: 'devicebrand.name' }
+      { text: 'Marca', sortable: true, value: 'devicebrand.name' },
+      { text: 'Fecha de Adicion', sortable: true, value: 'createdAt' }
     ]
   }),
   methods: {
     updateDeviceList (device) {
-      this.devices.push(device)
-      this.snack = true
-      this.snackText = 'Dispositivo agregado correctamente'
-      this.snackColor = 'info'
+      console.log(device)
+      this.devices.push({
+        mac_address: device.device.data.attributes.mac_address,
+        devicebrand: device.devicebrand,
+        createdAt: device.device.data.attributes.createdAt
+      })
+      this.$toast.success('Dispositivo creado correctamente', { duration: 4000, position: 'bottom-center' })
     },
     async initComponent () {
       this.modal = true

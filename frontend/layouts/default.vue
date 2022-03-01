@@ -8,6 +8,7 @@
       app
       :permanent="!isMobile"
       :expand-on-hover="!isMobile"
+      :mini-variant="mini"
       :bottom="isMobile"
     >
       <v-list>
@@ -131,6 +132,7 @@ export default {
     return {
       isMobile: false,
       light: null,
+      mini: true,
       hasPendingChanges: false,
       drawer: false,
       items: [
@@ -225,7 +227,6 @@ export default {
     this.getLocalStorage()
     this.comprobeDateToSetChristmasTheme()
     this.loadThemeFromVuetifyThemeManager()
-    this.comprobeSessionResetStatus()
     this.isMobileScreen()
   },
   methods: {
@@ -252,17 +253,6 @@ export default {
         localStorage.setItem('currentTheme', 'dark')
       } else {
         localStorage.setItem('currentTheme', 'light')
-      }
-    },
-    async comprobeSessionResetStatus () {
-      if (this.$store.state.auth) {
-        const session = await this.$strapi.find('users', {
-          id: this.$store.state.auth.id
-        })
-        if (session[0].resetSession) {
-          await this.restoreReset()
-          await this.logout(true)
-        }
       }
     },
     async restoreReset () {

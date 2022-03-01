@@ -112,42 +112,26 @@
         </v-stepper>
       </v-container>
     </v-card-text>
-    <v-snackbar
-      v-model="snack"
-      :timeout="3000"
-      :color="snackColor"
-      top
-      vertical
-    >
-      {{ snackText }}
-
-      <template v-slot:action="{ attrs }">
-        <v-btn v-bind="attrs" text @click="snack = false">
-          Cerrar
-        </v-btn>
-      </template>
-    </v-snackbar>
   </v-card>
 </template>
 
 <script>
-import gqlt from 'graphql-tag'
 export default {
-  apollo: {
-    plans () {
-      return {
-        query: gqlt`
-        query{
-          plans{
-            _id
-            name
-            mikrotik_name
-          }
-        }
-      `
-      }
-    }
-  },
+  // apollo: {
+  //   plans () {
+  //     return {
+  //       query: gqlt`
+  //       query{
+  //         plans{
+  //           _id
+  //           name
+  //           mikrotik_name
+  //         }
+  //       }
+  //     `
+  //     }
+  //   }
+  // },
   components: {
   },
   middleware: ['defaultCity', 'authenticated'],
@@ -180,9 +164,6 @@ export default {
         { text: 'Marca', sortable: true, value: 'brand.name' },
         { text: 'Aciones', value: 'actions', sortable: false }
       ],
-      snack: false,
-      snackColor: '',
-      snackText: '',
       loading: false
     }
   },
@@ -191,171 +172,171 @@ export default {
     this.getDatabaseClients()
     this.getDeviceBrands()
   },
-  methods: {
-    setBrand () {
-      this.loading = true
-      for (let i = 0; i < this.discoveredClients.length; i++) {
-        const mac = this.discoveredClients[i].searchedMac.split(':')
-        const macPart = mac[0] + mac[1] + mac[2]
-        this.$strapi.find('devicebrandparts', { mac_part: macPart }).then((response) => {
-          const brand = response[0].devicebrand
-          if (response.length > 0) {
-            this.$set(this.discoveredClients[i], 'brand', brand)
-          } else {
-            const brand = {
-              name: 'No reg.'
-            }
-            this.$set(this.discoveredClients[i], 'brand', brand)
-          }
-        })
-      }
-      this.loading = false
-    },
-    fixmac () {
-      this.loading = true
-      this.discoveredClients.forEach((client) => {
-        const newMacClients = {}
-        newMacClients.id = client._id
-        newMacClients.mac_address = client.searchedMac
-        this.fixmacList.push(newMacClients)
-      })
-      this.loading = false
-    },
-    executeFixMac () {
-      const fixedmacList = this.fixmacList
-      fixedmacList.forEach(async (fixedmac) => {
-        const device = await this.$strapi.create('devices', { mac_address: fixedmac.mac_address, clients: [fixedmac.id] })
-        if (device.id) {
-          this.successfulDevices++
-        }
-      })
-      this.loading = false
-    },
-    getSecretsFromMikrotik () {
-      this.secretList = []
-      this.$apollo.query({
-        query: gqlt`
-        query($city: String) {
-          getClientSecrets(city: $city){
-            name
-            mac_address
-          }
-        }
-      `,
-        variables: {
-          city: this.$route.query.city
-        }
-      }).then((input) => {
-        this.secretList = input.data.getClientSecrets
-        this.loading = false
-      }).catch((error) => {
-        // eslint-disable-next-line no-console
-        console.error(error)
-        this.initialLoading = false
-      })
-    },
-    async getDeviceBrands () {
-      this.devicebrands = await this.$strapi.graphql({
-        query: `query {
-          devicebrands{
-            id
-            name
-            devicebrandparts{
-              mac_part
-            }
-          }
-        }`
-      })
-    },
-    getDatabaseClients () {
-      this.initialLoading = true
-      this.dataTable = []
-      this.$apollo.query({
-        query: gqlt`
-        query($city: ID!) {
-          city(id: $city){
-            name
-            clients{
-              _id
-              code
-              name
-              address
-              neighborhood{
-                name
-              }
-              city{
-                name
-              }
-              technology{
-                id
-                name
-              }
-              mac_addresses{
-                mac_address
-              }
-            }
-          }
-        }
-      `,
-        variables: {
-          city: this.$route.query.city
-        }
-      }).then((input) => {
-        this.cityName = input.data.city.name
-        for (let i = 0; i < input.data.city.clients.length; i++) {
-          const dataTable = {}
-          dataTable._id = input.data.city.clients[i]._id
-          dataTable.status = '#777'
-          dataTable.code = input.data.city.clients[i].code
-          dataTable.name = input.data.city.clients[i].name
-          dataTable.address = input.data.city.clients[i].address
-          dataTable.neighborhood = input.data.city.clients[i].neighborhood
-          dataTable.city = input.data.city.clients[i].city
-          dataTable.technology = input.data.city.clients[i].technology
-          this.dataTable.push(dataTable)
-        }
-        this.initialLoading = false
-      }).catch((error) => {
-        // eslint-disable-next-line no-console
-        console.error(error)
-        this.initialLoading = false
-      })
-    },
-    searchInDatabaseFromMikrotik () {
-      const input = this.input.split('\n')
-      for (let i = 0; i < input.length; i++) {
-        // eslint-disable-next-line eqeqeq
-        const search = this.secretList.filter(c => c.mac_address == input[i])
-        if (search.length > 0) {
-          const macSearch = search[0].name
-          // eslint-disable-next-line eqeqeq
-          const clientDatabaseSearch = this.dataTable.filter(c => c.code == macSearch)
-          if (clientDatabaseSearch < 1) {
-            // eslint-disable-next-line eqeqeq
-            const clientDatabaseSearch2 = this.dataTable.filter(c => c.dni == macSearch)
-            if (clientDatabaseSearch2 < 1) {
-              // no existe como DNI
-              this.errorCount++
-            } else { // existe como DNI
-              clientDatabaseSearch2[0].searchedMac = input[i]
-              this.discoveredClients.push(clientDatabaseSearch2[0])
-              this.foundCount++
-            }
-          } else {
-            // existe como CODIGO
-            clientDatabaseSearch[0].searchedMac = input[i]
-            this.discoveredClients.push(clientDatabaseSearch[0])
-            this.foundCount++
-          }
-        } else { // no existe como CODIGO
-          this.errorCount++
-        }
-      }
-      if (input.length > 0) {
-        this.e1 = 2
-      }
-    }
-  },
+  // methods: {
+  //   setBrand () {
+  //     this.loading = true
+  //     for (let i = 0; i < this.discoveredClients.length; i++) {
+  //       const mac = this.discoveredClients[i].searchedMac.split(':')
+  //       const macPart = mac[0] + mac[1] + mac[2]
+  //       this.$strapi.find('devicebrandparts', { mac_part: macPart }).then((response) => {
+  //         const brand = response[0].devicebrand
+  //         if (response.length > 0) {
+  //           this.$set(this.discoveredClients[i], 'brand', brand)
+  //         } else {
+  //           const brand = {
+  //             name: 'No reg.'
+  //           }
+  //           this.$set(this.discoveredClients[i], 'brand', brand)
+  //         }
+  //       })
+  //     }
+  //     this.loading = false
+  //   },
+  //   fixmac () {
+  //     this.loading = true
+  //     this.discoveredClients.forEach((client) => {
+  //       const newMacClients = {}
+  //       newMacClients.id = client._id
+  //       newMacClients.mac_address = client.searchedMac
+  //       this.fixmacList.push(newMacClients)
+  //     })
+  //     this.loading = false
+  //   },
+  //   executeFixMac () {
+  //     const fixedmacList = this.fixmacList
+  //     fixedmacList.forEach(async (fixedmac) => {
+  //       const device = await this.$strapi.create('devices', { mac_address: fixedmac.mac_address, clients: [fixedmac.id] })
+  //       if (device.id) {
+  //         this.successfulDevices++
+  //       }
+  //     })
+  //     this.loading = false
+  //   },
+  //   getSecretsFromMikrotik () {
+  //     this.secretList = []
+  //     this.$apollo.query({
+  //       query: gqlt`
+  //       query($city: String) {
+  //         getClientSecrets(city: $city){
+  //           name
+  //           mac_address
+  //         }
+  //       }
+  //     `,
+  //       variables: {
+  //         city: this.$route.query.city
+  //       }
+  //     }).then((input) => {
+  //       this.secretList = input.data.getClientSecrets
+  //       this.loading = false
+  //     }).catch((error) => {
+  //       // eslint-disable-next-line no-console
+  //       console.error(error)
+  //       this.initialLoading = false
+  //     })
+  //   },
+  //   async getDeviceBrands () {
+  //     this.devicebrands = await this.$strapi.graphql({
+  //       query: `query {
+  //         devicebrands{
+  //           id
+  //           name
+  //           devicebrandparts{
+  //             mac_part
+  //           }
+  //         }
+  //       }`
+  //     })
+  //   },
+  //   getDatabaseClients () {
+  //     this.initialLoading = true
+  //     this.dataTable = []
+  //     this.$apollo.query({
+  //       query: gqlt`
+  //       query($city: ID!) {
+  //         city(id: $city){
+  //           name
+  //           clients{
+  //             _id
+  //             code
+  //             name
+  //             address
+  //             neighborhood{
+  //               name
+  //             }
+  //             city{
+  //               name
+  //             }
+  //             technology{
+  //               id
+  //               name
+  //             }
+  //             mac_addresses{
+  //               mac_address
+  //             }
+  //           }
+  //         }
+  //       }
+  //     `,
+  //       variables: {
+  //         city: this.$route.query.city
+  //       }
+  //     }).then((input) => {
+  //       this.cityName = input.data.city.name
+  //       for (let i = 0; i < input.data.city.clients.length; i++) {
+  //         const dataTable = {}
+  //         dataTable._id = input.data.city.clients[i]._id
+  //         dataTable.status = '#777'
+  //         dataTable.code = input.data.city.clients[i].code
+  //         dataTable.name = input.data.city.clients[i].name
+  //         dataTable.address = input.data.city.clients[i].address
+  //         dataTable.neighborhood = input.data.city.clients[i].neighborhood
+  //         dataTable.city = input.data.city.clients[i].city
+  //         dataTable.technology = input.data.city.clients[i].technology
+  //         this.dataTable.push(dataTable)
+  //       }
+  //       this.initialLoading = false
+  //     }).catch((error) => {
+  //       // eslint-disable-next-line no-console
+  //       console.error(error)
+  //       this.initialLoading = false
+  //     })
+  //   },
+  //   searchInDatabaseFromMikrotik () {
+  //     const input = this.input.split('\n')
+  //     for (let i = 0; i < input.length; i++) {
+  //       // eslint-disable-next-line eqeqeq
+  //       const search = this.secretList.filter(c => c.mac_address == input[i])
+  //       if (search.length > 0) {
+  //         const macSearch = search[0].name
+  //         // eslint-disable-next-line eqeqeq
+  //         const clientDatabaseSearch = this.dataTable.filter(c => c.code == macSearch)
+  //         if (clientDatabaseSearch < 1) {
+  //           // eslint-disable-next-line eqeqeq
+  //           const clientDatabaseSearch2 = this.dataTable.filter(c => c.dni == macSearch)
+  //           if (clientDatabaseSearch2 < 1) {
+  //             // no existe como DNI
+  //             this.errorCount++
+  //           } else { // existe como DNI
+  //             clientDatabaseSearch2[0].searchedMac = input[i]
+  //             this.discoveredClients.push(clientDatabaseSearch2[0])
+  //             this.foundCount++
+  //           }
+  //         } else {
+  //           // existe como CODIGO
+  //           clientDatabaseSearch[0].searchedMac = input[i]
+  //           this.discoveredClients.push(clientDatabaseSearch[0])
+  //           this.foundCount++
+  //         }
+  //       } else { // no existe como CODIGO
+  //         this.errorCount++
+  //       }
+  //     }
+  //     if (input.length > 0) {
+  //       this.e1 = 2
+  //     }
+  //   }
+  // },
   head () {
     return {
       title: this.title,

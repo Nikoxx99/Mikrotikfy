@@ -111,9 +111,6 @@ export default {
     page: 1,
     pageCount: 0,
     itemsPerPage: 10,
-    snack: false,
-    snackText: '',
-    snackColor: '',
     tickets: [],
     headers: [
       { text: 'Estado', sortable: true, value: 'active' },

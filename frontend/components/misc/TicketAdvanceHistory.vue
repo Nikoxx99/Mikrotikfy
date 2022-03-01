@@ -87,12 +87,9 @@ export default {
   data: () => ({
     modal: false,
     loading: true,
-    snack: false,
-    snackText: '',
     page: 1,
     pageCount: 0,
     itemsPerPage: 5,
-    snackColor: '',
     ticketdetails: [],
     headers: [
       { text: 'Cliente', sortable: true, value: 'ticket.client.name' },

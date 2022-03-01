@@ -54,21 +54,6 @@
         </v-card>
       </v-col>
     </v-row>
-    <v-snackbar
-      v-model="snack"
-      :timeout="3000"
-      :color="snackColor"
-      top
-      vertical
-    >
-      {{ snackText }}
-
-      <template v-slot:action="{ attrs }">
-        <v-btn v-bind="attrs" text @click="snack = false">
-          Cerrar
-        </v-btn>
-      </template>
-    </v-snackbar>
   </div>
 </template>
 
@@ -103,9 +88,6 @@ export default {
       ],
       title: 'Cambios de Clave',
       States: [{ name: 'Abierto', value: false }, { name: 'Cerrado', value: true }],
-      snack: false,
-      snackColor: '',
-      snackText: '',
       passwordchanges: []
     }
   },
@@ -206,15 +188,11 @@ export default {
       })
         .then(res => res.json())
         .then((_) => {
-          this.snack = true
-          this.snackColor = 'info'
-          this.snackText = 'Petición actualizada con éxito.'
+          this.$toast.success('Peticion Actualizada con Exito', { duration: 4000, position: 'bottom-center' })
         })
     },
     cancel () {
-      this.snack = true
-      this.snackColor = 'error'
-      this.snackText = 'Operacion cancelada'
+      this.$toast.error('Petición cancelada', { position: 'bottom-center' })
     },
     close () {
       // eslint-disable-next-line no-console

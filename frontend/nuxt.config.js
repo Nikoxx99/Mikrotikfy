@@ -38,7 +38,6 @@ export default {
   ** https://nuxtjs.org/guide/plugins
   */
   plugins: [
-    '~/plugins/axios',
     '~/plugins/role',
     '~/plugins/telegram'
   ],
@@ -53,7 +52,6 @@ export default {
   buildModules: [
     // Doc: https://github.com/nuxt-community/eslint-module
     '@nuxtjs/eslint-module',
-    '@nuxtjs/apollo',
     '@nuxtjs/vuetify',
     '@nuxtjs/pwa'
   ],
@@ -85,16 +83,10 @@ export default {
   ** Nuxt.js modules
   */
   modules: [
-    '@nuxtjs/axios',
-    '@nuxtjs/strapi'
+    '@nuxtjs/toast'
   ],
-  strapi: {
-    url: process.env.API_STRAPI_ENDPOINT,
-    key: 'token',
-    expires: '7d'
-  },
-  axios: {
-    baseURL: process.env.API_AXIOS_ENDPOINT
+  toast: {
+    position: 'top-center'
   },
   /*
   ** vuetify module configuration

@@ -105,21 +105,6 @@
         />
       </client-only>
     </v-card-text>
-    <v-snackbar
-      v-model="snack"
-      :timeout="3000"
-      :color="snackColor"
-      top
-      vertical
-    >
-      {{ snackText }}
-
-      <template v-slot:action="{ attrs }">
-        <v-btn v-bind="attrs" text @click="snack = false">
-          Cerrar
-        </v-btn>
-      </template>
-    </v-snackbar>
   </v-card>
 </template>
 
@@ -157,9 +142,6 @@ export default {
         { id: 1, name: 'No patear' },
         { id: 2, name: 'Patear' }
       ],
-      snack: false,
-      snackColor: '',
-      snackText: '',
       loading: false
     }
   },
@@ -252,14 +234,10 @@ export default {
       const city = this.$route.query.city
       const pendingDx = this.pendingCuts
       if (this.setPlan.id === 0 || this.pendingCuts.length < 1) {
-        this.snack = true
-        this.snackColor = 'red darken-4'
-        this.snackText = 'Debes ingresar datos antes de proceder.'
+        this.$toast.error('Porfavor ingresa datos antes de iniciar.', { position: 'bottom-center' })
         this.loading = false
       } else {
-        this.snack = true
-        this.snackColor = 'info'
-        this.snackText = 'El proceso ha comenzado...'
+        this.$toast.success('El proceso ha comenzado...', { duration: 7000, position: 'bottom-center' })
         for (let i = 0; i < pendingDx.length; i++) {
           await fetch(`${this.$config.API_STRAPI_ENDPOINT}dxclient`, {
             method: 'POST',
@@ -284,9 +262,7 @@ export default {
                 this.successfulCuts.push({ ...pendingDx[i], success: true })
               } else {
                 this.errorCount++
-                this.snack = true
-                this.snackColor = 'red'
-                this.snackText = 'Error'
+                this.$toast.error('Error', { position: 'bottom-center' })
                 this.loading = false
               }
             })

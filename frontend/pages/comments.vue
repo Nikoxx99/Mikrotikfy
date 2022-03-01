@@ -106,247 +106,231 @@
         </v-card>
       </v-col>
     </v-row>
-    <v-snackbar
-      v-model="snack"
-      :timeout="3000"
-      :color="snackColor"
-      top
-      vertical
-    >
-      {{ snackText }}
-
-      <template v-slot:action="{ attrs }">
-        <v-btn v-bind="attrs" text @click="snack = false">
-          Cerrar
-        </v-btn>
-      </template>
-    </v-snackbar>
   </div>
 </template>
 
 <script>
-import gqlt from 'graphql-tag'
 export default {
   name: 'CommentGenerator',
   components: {
   },
   middleware: 'authenticated',
-  apollo: {
-    clients () {
-      return {
-        query: gqlt`
-        query($city: ID!){
-          clients(where: {
-            city: $city
-          }){
-            _id
-            code
-            name
-            dni
-            address
-            neighborhood{
-              id
-              name
-            }
-            city{
-              id
-              name
-            }
-            phone
-            plan{
-              id
-              name
-            }
-            technology{
-              id
-              name
-            }
-            wifi_ssid
-            wifi_password
-            mac_address
-            comment
-            createdAt
-            updatedAt
-            operator {
-              id
-              username
-            }
-            hasRepeater
-            newModel
-            active
-          }
-        }
-      `,
-        variables: {
-          city: this.$route.query.city
-        },
-        skip () {
-          return true
-        }
-      }
-    },
-    MikrotikClient () {
-      return {
-        query: gqlt`
-        query($city: String){
-          MikrotikClient(city: $city){
-            name
-            comment
-          }
-        }
-      `,
-        variables: {
-          city: this.$route.query.city
-        },
-        skip () {
-          return true
-        }
-      }
-    }
-  },
-  data () {
-    return {
-      key: 0,
-      page: 1,
-      pageCount: 0,
-      itemsPerPage: 50,
-      search: '',
-      currentCity: 'Mariquita',
-      successChanges: 0,
-      errorChanges: 0,
-      cityName: '',
-      cityColor: '',
-      alertBox: false,
-      loading: false,
-      dialog: false,
-      dialogEdit: false,
-      initialLoading: false,
-      headers: [
-        { text: 'Nombre', sortable: true, value: 'name' },
-        { text: 'Modelo', sortable: true, value: 'newModel' },
-        { text: 'Comentario', sortable: true, value: 'comment' },
-        { text: 'Acciones', sortable: false, value: 'actions' }
-      ],
-      title: 'Cambios de Clave',
-      States: [{ name: 'Abierto', value: false }, { name: 'Cerrado', value: true }],
-      snack: false,
-      snackColor: '',
-      snackText: ''
-    }
-  },
-  mounted () {
-    this.populateClients()
-    this.populateMikrotikClient()
-  },
-  methods: {
-    generateComment (index) {
-      const client = this.clients
-      const newComment = `${client[index].code} ${client[index].technology.name} ${client[index].neighborhood.name} ${client[index].address} ${client[index].name} ${client[index].dni} ${client[index].phone} ${client[index].plan.name} ${client[index].mac_address} ${client[index].wifi_ssid} ${client[index].wifi_password}`
-      return newComment
-    },
-    async generateComments () {
-      this.loading = true
-      const length = this.clients.length
-      for (let i = 0; i < length; i++) {
-        this.$set(this.clients[i], 'comment', await this.generateComment(i))
-        if (length - 1 === i) {
-          this.loading = false
-        }
-      }
-    },
-    async applyComments () {
-      const newClientInfo = this.clients
-      for (let i = 0; i < newClientInfo.length; i++) {
-        this.$apollo.mutate({
-          mutation: gqlt`mutation ($clientid: ID, $comment: String){
-            setClientComment(clientid: $clientid, comment: $comment)
-          }`,
-          variables: {
-            clientid: newClientInfo[i]._id,
-            comment: newClientInfo[i].comment
-          }
-        }).then((input) => {
-          this.successChanges++
-        }).catch((error) => {
-          this.errorChanges++
-          this.snackText = error
-        })
-        await this.sleep(1000)
-      }
-    },
-    async populateClients () {
-      this.$apollo.queries.clients.skip = false
-      await this.$apollo.queries.clients.fetchMore({
-        updateQuery: () => {
-        }
-      })
-    },
-    async populateMikrotikClient () {
-      this.$apollo.queries.MikrotikClient.skip = false
-      await this.$apollo.queries.MikrotikClient.fetchMore({
-        updateQuery: (_, { fetchMore }) => {
-        }
-      })
-    },
-    removeItem (index) {
-      this.clients.splice(index, 1)
-    },
-    sleep (ms) {
-      return new Promise(resolve => setTimeout(resolve, ms))
-    },
-    getDate (date) {
-      const dateObject = new Date(date)
-      const humanDateFormat = dateObject.toLocaleString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric' })
-      return humanDateFormat
-    },
-    getColor (state) {
-      if (state.value) {
-        return 'red'
-      } else {
-        return 'blue'
-      }
-    },
-    getState (state) {
-      if (state.value) {
-        return 'Cerrado'
-      } else {
-        return 'Abierto'
-      }
-    },
-    save (id, status) {
-      this.$apollo.mutate({
-        mutation: gqlt`mutation ($input: UpdatePasswordChangeInput){
-          updatePasswordChangeRequest(input: $input)
-        }`,
-        variables: {
-          input: {
-            _id: id,
-            closed: {
-              name: status.name,
-              value: status.value
-            }
-          }
-        }
-      }).then((input) => {
-        this.snack = true
-        this.snackColor = 'info'
-        this.snackText = 'Petición actualizada con éxito.'
-      }).catch((error) => {
-        this.snack = true
-        this.snackColor = 'red'
-        this.snackText = error
-      })
-    },
-    cancel () {
-      this.snack = true
-      this.snackColor = 'error'
-      this.snackText = 'Operacion cancelada'
-    },
-    close () {
-      // eslint-disable-next-line no-console
-      console.log('Info closed')
-    }
-  },
+  // apollo: {
+  //   clients () {
+  //     return {
+  //       query: gqlt`
+  //       query($city: ID!){
+  //         clients(where: {
+  //           city: $city
+  //         }){
+  //           _id
+  //           code
+  //           name
+  //           dni
+  //           address
+  //           neighborhood{
+  //             id
+  //             name
+  //           }
+  //           city{
+  //             id
+  //             name
+  //           }
+  //           phone
+  //           plan{
+  //             id
+  //             name
+  //           }
+  //           technology{
+  //             id
+  //             name
+  //           }
+  //           wifi_ssid
+  //           wifi_password
+  //           mac_address
+  //           comment
+  //           createdAt
+  //           updatedAt
+  //           operator {
+  //             id
+  //             username
+  //           }
+  //           hasRepeater
+  //           newModel
+  //           active
+  //         }
+  //       }
+  //     `,
+  //       variables: {
+  //         city: this.$route.query.city
+  //       },
+  //       skip () {
+  //         return true
+  //       }
+  //     }
+  //   },
+  //   MikrotikClient () {
+  //     return {
+  //       query: gqlt`
+  //       query($city: String){
+  //         MikrotikClient(city: $city){
+  //           name
+  //           comment
+  //         }
+  //       }
+  //     `,
+  //       variables: {
+  //         city: this.$route.query.city
+  //       },
+  //       skip () {
+  //         return true
+  //       }
+  //     }
+  //   }
+  // },
+  // data () {
+  //   return {
+  //     key: 0,
+  //     page: 1,
+  //     pageCount: 0,
+  //     itemsPerPage: 50,
+  //     search: '',
+  //     currentCity: 'Mariquita',
+  //     successChanges: 0,
+  //     errorChanges: 0,
+  //     cityName: '',
+  //     cityColor: '',
+  //     alertBox: false,
+  //     loading: false,
+  //     dialog: false,
+  //     dialogEdit: false,
+  //     initialLoading: false,
+  //     headers: [
+  //       { text: 'Nombre', sortable: true, value: 'name' },
+  //       { text: 'Modelo', sortable: true, value: 'newModel' },
+  //       { text: 'Comentario', sortable: true, value: 'comment' },
+  //       { text: 'Acciones', sortable: false, value: 'actions' }
+  //     ],
+  //     title: 'Cambios de Clave',
+  //     States: [{ name: 'Abierto', value: false }, { name: 'Cerrado', value: true }],
+  //     snack: false,
+  //     snackColor: '',
+  //     snackText: ''
+  //   }
+  // },
+  // mounted () {
+  //   this.populateClients()
+  //   this.populateMikrotikClient()
+  // },
+  // methods: {
+  //   generateComment (index) {
+  //     const client = this.clients
+  //     const newComment = `${client[index].code} ${client[index].technology.name} ${client[index].neighborhood.name} ${client[index].address} ${client[index].name} ${client[index].dni} ${client[index].phone} ${client[index].plan.name} ${client[index].mac_address} ${client[index].wifi_ssid} ${client[index].wifi_password}`
+  //     return newComment
+  //   },
+  //   async generateComments () {
+  //     this.loading = true
+  //     const length = this.clients.length
+  //     for (let i = 0; i < length; i++) {
+  //       this.$set(this.clients[i], 'comment', await this.generateComment(i))
+  //       if (length - 1 === i) {
+  //         this.loading = false
+  //       }
+  //     }
+  //   },
+  //   async applyComments () {
+  //     const newClientInfo = this.clients
+  //     for (let i = 0; i < newClientInfo.length; i++) {
+  //       this.$apollo.mutate({
+  //         mutation: gqlt`mutation ($clientid: ID, $comment: String){
+  //           setClientComment(clientid: $clientid, comment: $comment)
+  //         }`,
+  //         variables: {
+  //           clientid: newClientInfo[i]._id,
+  //           comment: newClientInfo[i].comment
+  //         }
+  //       }).then((input) => {
+  //         this.successChanges++
+  //       }).catch((error) => {
+  //         this.errorChanges++
+  //         this.snackText = error
+  //       })
+  //       await this.sleep(1000)
+  //     }
+  //   },
+  //   async populateClients () {
+  //     this.$apollo.queries.clients.skip = false
+  //     await this.$apollo.queries.clients.fetchMore({
+  //       updateQuery: () => {
+  //       }
+  //     })
+  //   },
+  //   async populateMikrotikClient () {
+  //     this.$apollo.queries.MikrotikClient.skip = false
+  //     await this.$apollo.queries.MikrotikClient.fetchMore({
+  //       updateQuery: (_, { fetchMore }) => {
+  //       }
+  //     })
+  //   },
+  //   removeItem (index) {
+  //     this.clients.splice(index, 1)
+  //   },
+  //   sleep (ms) {
+  //     return new Promise(resolve => setTimeout(resolve, ms))
+  //   },
+  //   getDate (date) {
+  //     const dateObject = new Date(date)
+  //     const humanDateFormat = dateObject.toLocaleString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric' })
+  //     return humanDateFormat
+  //   },
+  //   getColor (state) {
+  //     if (state.value) {
+  //       return 'red'
+  //     } else {
+  //       return 'blue'
+  //     }
+  //   },
+  //   getState (state) {
+  //     if (state.value) {
+  //       return 'Cerrado'
+  //     } else {
+  //       return 'Abierto'
+  //     }
+  //   },
+  //   save (id, status) {
+  //     this.$apollo.mutate({
+  //       mutation: gqlt`mutation ($input: UpdatePasswordChangeInput){
+  //         updatePasswordChangeRequest(input: $input)
+  //       }`,
+  //       variables: {
+  //         input: {
+  //           _id: id,
+  //           closed: {
+  //             name: status.name,
+  //             value: status.value
+  //           }
+  //         }
+  //       }
+  //     }).then((input) => {
+  //       this.snack = true
+  //       this.snackColor = 'info'
+  //       this.snackText = 'Petición actualizada con éxito.'
+  //     }).catch((error) => {
+  //       this.snack = true
+  //       this.snackColor = 'red'
+  //       this.snackText = error
+  //     })
+  //   },
+  //   cancel () {
+  //     this.snack = true
+  //     this.snackColor = 'error'
+  //     this.snackText = 'Operacion cancelada'
+  //   },
+  //   close () {
+  //     // eslint-disable-next-line no-console
+  //     console.log('Info closed')
+  //   }
+  // },
   head () {
     return {
       title: this.title,

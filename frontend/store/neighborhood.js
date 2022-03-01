@@ -12,8 +12,17 @@ export const mutations = {
 }
 export const actions = {
   async getNeighborhoodsFromDatabase ({ commit }) {
+    const qs = require('qs')
+    const query = qs.stringify({
+      pagination: {
+        pageSize: 10000
+      }
+    },
+    {
+      encodeValuesOnly: true
+    })
     try {
-      await fetch(`${this.$config.API_STRAPI_ENDPOINT}neighborhoods`)
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}neighborhoods?${query}`)
         .then(res => res.json())
         .then((res) => {
           const neighborhoods = res.data.map((neighborhood) => {

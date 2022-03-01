@@ -90,21 +90,6 @@
         </v-card>
       </v-col>
     </v-row>
-    <v-snackbar
-      v-model="snack"
-      :timeout="3000"
-      :color="snackColor"
-      top
-      vertical
-    >
-      {{ snackText }}
-
-      <template v-slot:action="{ attrs }">
-        <v-btn v-bind="attrs" text @click="snack = false">
-          Cerrar
-        </v-btn>
-      </template>
-    </v-snackbar>
   </div>
 </template>
 
@@ -138,10 +123,7 @@ export default {
         { text: 'Creada Solicitud', sortable: false, value: 'createdAt' },
         { text: 'Acciones', sortable: false, value: 'actions' }
       ],
-      States: [{ name: 'Abierto', value: true }, { name: 'Cerrado', value: false }],
-      snack: false,
-      snackColor: '',
-      snackText: ''
+      States: [{ name: 'Abierto', value: true }, { name: 'Cerrado', value: false }]
     }
   },
   computed: {
