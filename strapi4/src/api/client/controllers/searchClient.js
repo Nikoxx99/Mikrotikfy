@@ -75,7 +75,6 @@ module.exports = {
             orderBy: { code: 'asc' }
           })
           const sanitizedEntity = await sanitize.contentAPI.output(res);
-          console.log(sanitizedEntity)
           return { data: sanitizedEntity };
     } else {
       return [{ init: 'initial request' }]

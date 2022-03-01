@@ -19,7 +19,7 @@ module.exports = {
         mkCreateClient(mikrotikHost, client)
       }
     } else {
-      const mikrotikHost = searchCity.mikrotiks[i].ip
+      const mikrotikHost = searchCity.mikrotiks[0].ip
       mkCreateClient(mikrotikHost, client)
       return true
     }
