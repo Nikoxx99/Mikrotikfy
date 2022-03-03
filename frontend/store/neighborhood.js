@@ -15,7 +15,8 @@ export const actions = {
     const qs = require('qs')
     const query = qs.stringify({
       pagination: {
-        pageSize: 10000
+        page: 1,
+        pageSize: 1000
       }
     },
     {

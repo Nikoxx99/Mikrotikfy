@@ -412,7 +412,7 @@ export default {
       this.createDialog = false
     },
     createClientSnack (value) {
-      this.$toast.success('Cliente creado con exito', { duration: 4000, position: 'bottom-center' })
+      this.$toast.success('Cliente creado con exito', { duration: 4000, position: 'top-center' })
     },
     updateStatus (client, index) {
       if (client.active === true) {

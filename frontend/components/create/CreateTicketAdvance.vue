@@ -176,15 +176,15 @@ export default {
                 operator: this.$store.state.auth.username,
                 telegramBots: this.telegramBots
               })
-              this.$toast.success('Ticket Actualizado con Exito', { duration: 4000, position: 'bottom-center' })
+              this.$toast.success('Ticket Actualizado con Exito', { duration: 4000, position: 'top-center' })
               this.loading = false
             }
           }).catch((error) => {
-            this.$toast.error(error, { position: 'bottom-center' })
+            this.$toast.error(error, { position: 'top-center' })
           })
         }
       }).catch((error) => {
-        this.$toast.error(error, { position: 'bottom-center' })
+        this.$toast.error(error, { position: 'top-center' })
       })
     },
     can (component) {

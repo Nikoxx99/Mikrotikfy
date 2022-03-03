@@ -188,11 +188,11 @@ export default {
       })
         .then(res => res.json())
         .then((_) => {
-          this.$toast.success('Peticion Actualizada con Exito', { duration: 4000, position: 'bottom-center' })
+          this.$toast.success('Peticion Actualizada con Exito', { duration: 4000, position: 'top-center' })
         })
     },
     cancel () {
-      this.$toast.error('Petición cancelada', { position: 'bottom-center' })
+      this.$toast.error('Petición cancelada', { position: 'top-center' })
     },
     close () {
       // eslint-disable-next-line no-console

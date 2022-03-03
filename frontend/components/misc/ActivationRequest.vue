@@ -36,16 +36,6 @@
         <v-card-title class="headline">
           Solicitar Activación de {{ item.name }}
         </v-card-title>
-        <v-card-text>
-          <EditEditForm
-            v-if="showControls"
-            :client="item"
-            :index="index"
-            :role="$store.state.auth.allowed_components"
-            @updateSuccess="resetErrorFields"
-          />
-          <span v-if="showControls">Editar cliente ahora</span>
-        </v-card-text>
         <v-card-actions>
           <v-btn
             color="blue darken-1"
@@ -133,15 +123,15 @@ export default {
                 this.modal = false
                 this.error = false
                 this.loading = false
-                this.$toast.success('Solicitud enviada con exito', { duration: 4000, position: 'bottom-center' })
+                this.$toast.success('Solicitud enviada con exito', { duration: 4000, position: 'top-center' })
               } else {
                 this.loading = false
-                this.$toast.error('Error de red, reporta esto a nico.', { position: 'bottom-center' })
+                this.$toast.error('Error de red, reporta esto a nico.', { position: 'top-center' })
               }
             })
         }
       } catch (error) {
-        this.$toast.error(error, { position: 'bottom-center' })
+        this.$toast.error(error, { position: 'top-center' })
       }
     },
     resetErrorFields () {
@@ -179,10 +169,10 @@ export default {
           clients = clients.data.attributes
           if (clients.mac_addresses.length < 1 || Object.keys(clients.technology).length === 0 || !clients.nap_onu_address || !clients.opticalPower) {
             this.loading = false
-            this.error = true
-            this.errorMessage = 'No puedes enviar una solicitud de activacion hasta no haber llenado los campos de NAP, Potencia Optica y haber registrado la MAC correspondiente al cliente'
+            this.$toast.error('No puedes enviar una solicitud de activacion hasta no haber llenado los campos de NAP, Potencia Optica y haber registrado la MAC correspondiente al cliente', { position: 'top-center' })
             this.showControls = true
           } else {
+            this.loading = false
             this.flag1 = true
           }
         })
@@ -211,8 +201,9 @@ export default {
         .then((activationRequestExists) => {
           if (activationRequestExists.data.length > 0) {
             this.loading = false
-            this.$toast.error('Ya existe una solicitud de activación', { position: 'bottom-center' })
+            this.$toast.error('Ya existe una solicitud de activación', { position: 'top-center' })
           } else {
+            this.loading = false
             this.flag2 = true
           }
         })
