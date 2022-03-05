@@ -93,6 +93,9 @@ export default {
   computed: {
     currentCity () {
       return this.$store.state.cities.find(city => city.name === this.$route.query.city)
+    },
+    telegramBots () {
+      return this.$store.state.telegramBots.find(bot => bot.city.name === this.$route.query.city)
     }
   },
   methods: {
@@ -124,6 +127,7 @@ export default {
                 this.error = false
                 this.loading = false
                 this.$toast.success('Solicitud enviada con exito', { duration: 4000, position: 'top-center' })
+                this.$simpleTelegramCreateRequest({ client: this.item, telegramBots: this.telegramBots, operator: this.$store.state.auth.username })
               } else {
                 this.loading = false
                 this.$toast.error('Error de red, reporta esto a nico.', { position: 'top-center' })

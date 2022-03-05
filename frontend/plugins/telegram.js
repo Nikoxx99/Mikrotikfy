@@ -4,6 +4,8 @@ export default (_, inject) => {
   inject('simpleTelegramUpdatePlan', input => simpleTelegramUpdatePlan(input))
   inject('simpleTelegramCreateTicket', input => simpleTelegramCreateTicket(input))
   inject('simpleTelegramCreateTicketAdvance', input => simpleTelegramCreateTicketAdvance(input))
+  inject('simpleTelegramCreateRequest', input => simpleTelegramCreateRequest(input))
+  inject('simpleTelegramAdminCreate', input => simpleTelegramAdminCreate(input))
 }
 
 function simpleTelegramCreate ({ client, operator, telegramBots }) {
@@ -128,6 +130,42 @@ function simpleTelegramCreateTicketAdvance ({ client, ticket, status, details, o
     chatid +
     '&text=' +
     encodeURIComponent(message)
+  fetch(req)
+    .catch(function (err) {
+      return err
+    })
+}
+
+function simpleTelegramCreateRequest ({ client, telegramBots, operator }) {
+  const fetch = require('node-fetch')
+  const bot = telegramBots.token
+  const chatid = telegramBots.binnacle
+  const message = `SOLICITUD DE ACTIVACION\n${client.code}\n${client.name}\n${client.dni}\n${client.address}\n${client.neighborhood.name}\n${client.phone}\n\n${operator}\n${client.createdAt}`
+  const req =
+    'https://api.telegram.org/bot' +
+    bot +
+    '/sendMessage?chat_id=' +
+    chatid +
+    '&text=' +
+    encodeURIComponent(sanitizeString(message))
+  fetch(req)
+    .catch(function (err) {
+      return err
+    })
+}
+
+function simpleTelegramAdminCreate ({ client, telegramBots, operator }) {
+  const fetch = require('node-fetch')
+  const bot = telegramBots.token
+  const chatid = telegramBots.binnacle
+  const message = `APROBADO\n${client.code}\n${client.name}\n${client.dni}\n${client.address}\n${client.neighborhood.name}\n${client.phone}\n\n${operator}\n${client.createdAt}`
+  const req =
+    'https://api.telegram.org/bot' +
+    bot +
+    '/sendMessage?chat_id=' +
+    chatid +
+    '&text=' +
+    encodeURIComponent(sanitizeString(message))
   fetch(req)
     .catch(function (err) {
       return err

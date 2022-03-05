@@ -133,6 +133,9 @@ export default {
     },
     activationRequestsList () {
       return this.$store.state.activationrequest.activationrequests
+    },
+    telegramBots () {
+      return this.$store.state.telegramBots.find(bot => bot.city.name === this.$route.query.city)
     }
   },
   mounted () {
@@ -147,6 +150,7 @@ export default {
     async updateStatus (index) {
       await this.$store.dispatch('activationrequest/updateActivationRequest', { token: this.$store.state.auth.token, activationrequest: this.activationRequestsList[index], index })
       await this.$store.dispatch('activationrequest/createClientOnMikrotikById', { token: this.$store.state.auth.token, clientid: this.activationRequestsList[index].client.id, operador: this.$store.state.auth.username })
+      this.$simpleTelegramAdminCreate({ client: this.activationRequestsList[index].client, telegramBots: this.telegramBots, operator: this.$store.state.auth.username })
     },
     getDate (date) {
       const dateObject = new Date(date)
