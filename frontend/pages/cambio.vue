@@ -334,8 +334,7 @@ export default {
         await fetch(`${this.$config.API_STRAPI_ENDPOINT}passwordchanges`, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${this.$store.state.auth.token}`
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             data: {
