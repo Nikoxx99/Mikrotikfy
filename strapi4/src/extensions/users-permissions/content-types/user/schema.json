@@ -91,6 +91,12 @@
       "relation": "manyToMany",
       "target": "api::clienttype.clienttype",
       "inversedBy": "users"
+    },
+    "materialhistories": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::materialhistory.materialhistory",
+      "mappedBy": "technician"
     }
   }
 }

@@ -80,6 +80,12 @@
       "relation": "oneToMany",
       "target": "api::nap.nap",
       "mappedBy": "city"
+    },
+    "material": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::material.material",
+      "inversedBy": "city"
     }
   }
 }
