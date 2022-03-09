@@ -261,7 +261,17 @@ export default {
   },
   methods: {
     async getTickettypes () {
-      await fetch(`${this.$config.API_STRAPI_ENDPOINT}tickettypes`, {
+      const qs = require('qs')
+      const query = qs.stringify({
+        pagination: {
+          page: 1,
+          pageSize: 1000
+        }
+      },
+      {
+        encodeValuesOnly: true
+      })
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}tickettypes?${query}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

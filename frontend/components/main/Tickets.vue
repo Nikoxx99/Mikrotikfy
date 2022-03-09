@@ -72,6 +72,7 @@
                     :name="props.item.client.name"
                   />
                   <ClientStatus
+                      v-if="clienttype === 'INTERNET'"
                       :name="props.item.client.name"
                       :clientid="props.item.client.id"
                       :code="props.item.client.code"
@@ -85,6 +86,7 @@
                     :name="props.item.client.name"
                     @updateTicketStatus="updateTicketStatus($event)"
                   />
+                  <MiscTvServiceStepper />
                   <TicketAdvanceHistory
                     :ticketid="props.item.id"
                     :name="props.item.client.name"
@@ -255,21 +257,6 @@ export default {
       isDesktop: false,
       editModalData: {},
       infoModal: false,
-      headers: [
-        { text: 'Estado', sortable: false, value: 'active', width: '5%' },
-        { text: 'Codigo', sortable: false, value: 'client.code', width: 60, align: ' d-none d-lg-table-cell' },
-        { text: 'Cédula', sortable: false, value: 'client.dni', width: 60, align: ' d-none d-lg-table-cell' },
-        { text: 'Cliente', sortable: false, value: 'client.name' },
-        { text: 'Dirección', sortable: false, value: 'client.address', align: ' d-none d-lg-table-cell' },
-        { text: 'Barrio', sortable: false, value: 'client.neighborhood.name' },
-        { text: 'Telefono', sortable: false, value: 'client.phone', align: ' d-none d-lg-table-cell' },
-        { text: 'Tec.', sortable: false, value: 'client.technology.name', align: ' d-none d-lg-table-cell' },
-        { text: 'Tipo', sortable: false, value: 'tickettype.name' },
-        { text: 'Operador', sortable: false, value: 'assignated.username', align: ' d-none d-lg-table-cell' },
-        { text: 'Detalles', sortable: false, value: 'details', width: 400, align: ' d-none d-lg-table-cell' },
-        { text: 'Creado', sortable: false, value: 'createdAt', align: ' d-none d-lg-table-cell' },
-        { text: 'Acciones', sortable: false, value: 'actions', align: ' d-none d-lg-table-cell' }
-      ],
       States: [{ name: 'Abierto', value: true }, { name: 'Cerrado', value: false }],
       allowed_components: []
     }
@@ -281,6 +268,12 @@ export default {
     },
     ticketList () {
       return this.$store.state.ticket.tickets
+    },
+    headers () {
+      return this.$store.state.ticket.headers
+    },
+    clienttype () {
+      return this.$route.query.clienttype
     }
   },
   watch: {
@@ -295,7 +288,7 @@ export default {
   methods: {
     async refreshTickets () {
       this.initialLoading = true
-      await this.$store.dispatch('ticket/getTicketsFromDatabase', { city: this.$route.query.city, clienttype: this.$route.query.clienttype, token: this.$store.state.auth.token, active: this.showClosedValue, retired: this.showRetired })
+      await this.$store.dispatch('ticket/getTicketsFromDatabase', { city: this.$route.query.city, clienttype: this.clienttype, token: this.$store.state.auth.token, active: this.showClosedValue, retired: this.showRetired })
       this.initialLoading = false
     },
     updateTicketStatus ({ editindex, closeTicket }) {
