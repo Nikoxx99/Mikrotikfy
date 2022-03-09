@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-card>
+    <v-card class="rounded-xl">
       <v-card-title class="text-center d-flex align-center justify-center">
         Inventario de materiales
       </v-card-title>
@@ -32,9 +32,6 @@
             <InventoryList />
           </v-tab-item>
           <v-tab-item>
-            <InventoryListInternet />
-          </v-tab-item>
-          <v-tab-item>
             <InventoryHistory />
           </v-tab-item>
         </v-tabs-items>
@@ -48,7 +45,7 @@ export default {
     return {
       tab: null,
       items: [
-        'Diario', 'Ingresar', 'Inventario', 'Inventario Internet', 'Historial'
+        'Diario', 'Ingresar', 'Inventario', 'Historial'
       ],
       text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
     }

@@ -32,7 +32,9 @@
           <v-row>
             <v-col>
               <v-btn
-                color="primary darken-4"
+                color="blue darken-4"
+                class="elevation-0"
+                rounded
               >
                 Agregar
               </v-btn>
@@ -60,6 +62,8 @@
             <v-col>
               <v-btn
                 color="success darken-4"
+                class="elevation-0"
+                rounded
               >
                 Agregar
               </v-btn>

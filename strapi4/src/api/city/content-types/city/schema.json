@@ -85,7 +85,7 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::material.material",
-      "inversedBy": "city"
+      "mappedBy": "city"
     }
   }
 }
