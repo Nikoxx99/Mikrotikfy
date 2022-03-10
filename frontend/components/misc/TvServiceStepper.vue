@@ -79,7 +79,7 @@ export default {
   data () {
     return {
       e6: 1,
-      dialog: true,
+      dialog: false,
       quality: [
         'Excelente',
         'Regular',
