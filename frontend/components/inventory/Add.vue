@@ -7,7 +7,7 @@
         </v-card-title>
         <v-card-text>
           <v-row>
-            <v-col cols="10">
+            <v-col cols="8">
               <v-autocomplete
                 v-model="add.material"
                 :disabled="!(!$isAdmin() || !$isBiller())"
@@ -21,7 +21,7 @@
                 hide-details
               />
             </v-col>
-            <v-col cols="2">
+            <v-col cols="4">
               <v-text-field
                 v-model.number="add.quantity"
                 label="Cantidad"
@@ -55,10 +55,19 @@
         </v-card-title>
         <v-card-text>
           <v-row>
-            <v-col cols="12">
+            <v-col cols="8">
               <v-text-field
                 v-model="item.name"
                 label="Item"
+                outlined
+                dense
+              />
+            </v-col>
+            <v-col cols="4">
+              <v-text-field
+                v-model.number="item.quantity"
+                label="Cantidad"
+                type="number"
                 outlined
                 dense
               />
@@ -93,7 +102,8 @@ export default {
         quantity: 0
       },
       item: {
-        name: null
+        name: null,
+        quantity: 0
       },
       loading: false
     }
@@ -141,6 +151,7 @@ export default {
       this.add.material = null
       this.add.quantity = 0
       this.item.name = null
+      this.item.quantity = 0
     }
   }
 }

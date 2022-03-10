@@ -72,7 +72,7 @@ export const actions = {
     const qs = require('qs')
     const query = qs.stringify({
       pagination: payload.pagination,
-      sort: 'createdAt:desc'
+      sort: 'updatedAt:desc'
     },
     {
       encodeValuesOnly: true
@@ -101,7 +101,7 @@ export const actions = {
     const qs = require('qs')
     const query = qs.stringify({
       pagination: payload.pagination,
-      populate: ['material', 'operator', 'technician'],
+      populate: ['material', 'materialhistorytype', 'operator', 'technician'],
       sort: 'createdAt:desc'
     },
     {
@@ -117,10 +117,11 @@ export const actions = {
       })
         .then(res => res.json())
         .then((res) => {
-          console.log(res)
           const materialHistories = res.data.map((material) => {
             material.attributes.material.data.attributes.id = material.attributes.material.data.id
             material.attributes.material = material.attributes.material.data.attributes
+            material.attributes.materialhistorytype.data.attributes.id = material.attributes.materialhistorytype.data.id
+            material.attributes.materialhistorytype = material.attributes.materialhistorytype.data.attributes
             material.attributes.operator.data.attributes.id = material.attributes.operator.data.id
             material.attributes.operator = material.attributes.operator.data.attributes
             material.attributes.technician.data.attributes.id = material.attributes.technician.data.id
@@ -190,6 +191,7 @@ export const actions = {
         body: JSON.stringify({
           data: {
             name: payload.data.name,
+            quantity: payload.data.quantity,
             city: payload.city.id
           }
         })

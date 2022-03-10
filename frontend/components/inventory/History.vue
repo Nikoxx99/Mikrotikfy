@@ -49,6 +49,7 @@ export default {
       headers: [
         { text: '#', value: 'id', sortable: false },
         { text: 'Material', value: 'material.name', sortable: false },
+        { text: 'Tipo Operacion', value: 'materialhistorytype.name', sortable: false },
         { text: 'Cantidad', value: 'quantity', sortable: false },
         { text: 'Entrego', value: 'operator.username', sortable: false },
         { text: 'Operario', value: 'technician.username', sortable: false },
