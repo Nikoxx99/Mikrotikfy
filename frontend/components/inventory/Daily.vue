@@ -1,7 +1,7 @@
 <template>
   <v-row>
     <v-col cols="6">
-      <v-card>
+      <v-card class="elevation-0">
         <v-card-title>
           Entregar
         </v-card-title>
@@ -36,7 +36,7 @@
             </v-col>
           </v-row>
           <v-row>
-            <v-col cols="10">
+            <v-col cols="8">
               <v-autocomplete
                 v-model="dispense.material"
                 :disabled="!(!$isAdmin() || !$isBiller())"
@@ -50,7 +50,7 @@
                 hide-details
               />
             </v-col>
-            <v-col cols="2">
+            <v-col cols="4">
               <v-text-field
                 v-model.number="dispense.quantity"
                 label="Cantidad"
@@ -89,7 +89,7 @@
       </v-card>
     </v-col>
     <v-col cols="6">
-      <v-card>
+      <v-card class="elevation-0">
         <v-card-title>
           Devolver
         </v-card-title>
@@ -108,9 +108,23 @@
                 hide-details
               />
             </v-col>
+            <v-col>
+              <v-select
+                v-model="returned.materialhistorytype"
+                :disabled="!(!$isAdmin() || !$isBiller())"
+                item-text="name"
+                item-value="id"
+                :items="materialHistoryTypeListReturn"
+                return-object
+                label="Tipo de Operacion"
+                outlined
+                dense
+                hide-details
+              />
+            </v-col>
           </v-row>
           <v-row>
-            <v-col cols="10">
+            <v-col cols="8">
               <v-autocomplete
                 v-model="returned.material"
                 :disabled="!(!$isAdmin() || !$isBiller())"
@@ -124,9 +138,9 @@
                 hide-details
               />
             </v-col>
-            <v-col cols="2">
+            <v-col cols="4">
               <v-text-field
-                v-model="returned.quantity"
+                v-model.number="returned.quantity"
                 label="Cantidad"
                 type="number"
                 outlined
@@ -140,6 +154,9 @@
                 color="blue darken-4"
                 class="elevation-0"
                 rounded
+                :loading="loading"
+                :disabled="loading"
+                @click="returnMaterial()"
               >
                 Devolver
               </v-btn>
@@ -181,6 +198,9 @@ export default {
     },
     materialHistoryTypeList () {
       return this.$store.state.inventory.materialHistoryTypeList
+    },
+    materialHistoryTypeListReturn () {
+      return this.$store.state.inventory.materialHistoryTypeListReturn
     }
   },
   mounted () {
@@ -193,7 +213,7 @@ export default {
       this.$store.dispatch('inventory/getOperatorList', { token: this.$store.state.auth.token, city: this.$route.query.city })
     },
     getMaterialList () {
-      this.$store.dispatch('inventory/getMaterialList', { token: this.$store.state.auth.token, city: this.$route.query.city })
+      this.$store.dispatch('inventory/getMaterialList', { token: this.$store.state.auth.token, city: this.$route.query.city, pagination: { page: 1, pageSize: 1000 } })
     },
     getMaterialHistoryTypeList () {
       this.$store.dispatch('inventory/getMaterialHistoryTypeList', { token: this.$store.state.auth.token, city: this.$route.query.city })
@@ -202,6 +222,7 @@ export default {
       this.loading = !this.loading
       if (!this.dispense.material || !this.dispense.materialhistorytype || !this.dispense.quantity || !this.dispense.technician) {
         this.$toast.error('Rellena todos los campos antes de continuar', { position: 'top-center' })
+        this.loading = !this.loading
         return
       }
       if (this.dispense.material.quantity < this.dispense.quantity) {
@@ -209,14 +230,24 @@ export default {
         this.loading = !this.loading
         return
       }
-      await this.$store.dispatch('inventory/createDispenseHistory', { token: this.$store.state.auth.token, city: this.$route.query.city, data: this.dispense }).catch((_) => { this.loading = !this.loading })
-      await this.$store.dispatch('inventory/updateCurrentMaterialQuantity', { token: this.$store.state.auth.token, city: this.$route.query.city, data: this.dispense }).catch((_) => { this.loading = !this.loading })
+      await this.$store.dispatch('inventory/createOperationHistory', { token: this.$store.state.auth.token, city: this.$route.query.city, data: this.dispense })
+      await this.$store.dispatch('inventory/updateCurrentMaterialQuantity', { token: this.$store.state.auth.token, city: this.$route.query.city, data: this.dispense, action: 'add' })
       this.getMaterialList()
       this.resetFields()
       this.loading = !this.loading
     },
-    returnMaterial () {
-      this.$store.dispatch('inventory/returnMaterial', { token: this.$store.state.auth.token, city: this.$route.query.city, data: this.returned })
+    async returnMaterial () {
+      this.loading = !this.loading
+      if (!this.returned.material || !this.returned.materialhistorytype || !this.returned.quantity || !this.returned.technician) {
+        this.$toast.error('Rellena todos los campos antes de continuar', { position: 'top-center' })
+        this.loading = !this.loading
+        return
+      }
+      await this.$store.dispatch('inventory/createOperationHistory', { token: this.$store.state.auth.token, city: this.$route.query.city, data: this.returned })
+      await this.$store.dispatch('inventory/updateCurrentMaterialQuantity', { token: this.$store.state.auth.token, city: this.$route.query.city, data: this.returned, action: 'return' })
+      this.getMaterialList()
+      this.resetFields()
+      this.loading = !this.loading
     },
     resetFields () {
       this.dispense.material = null

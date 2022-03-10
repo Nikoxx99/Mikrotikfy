@@ -1,6 +1,9 @@
 export const state = () => ({
   operatorList: [],
   materialList: [],
+  materialHistoryList: [],
+  paginationMaterialList: {},
+  paginationMaterialHistoryList: {},
   materialHistoryTypeList: [],
   materialHistoryTypeListReturn: []
 })
@@ -12,19 +15,28 @@ export const mutations = {
       throw new Error(`OPERATOR LIST MUTATE ${error}`)
     }
   },
-  getMaterialList (state, materialList) {
+  getMaterialList (state, { materials, pagination }) {
     try {
-      state.materialList = materialList
+      state.materialList = materials
+      state.paginationMaterialList = pagination
     } catch (error) {
       throw new Error(`MATERIAL LIST MUTATE ${error}`)
     }
   },
-  getMaterialHistoryTypeList (state, materialHistoryTypeList) {
+  getMaterialHistoryList (state, { materialHistories, pagination }) {
     try {
-      state.materialHistoryTypeList = materialHistoryTypeList.filter(item => item.name.includes('SALIDA'))
-      state.materialHistoryTypeListReturn = materialHistoryTypeList.filter(item => item.name.includes('ENTRADA'))
+      state.materialHistoryList = materialHistories
+      state.paginationMaterialHistoryList = pagination
     } catch (error) {
-      throw new Error(`MATERIAL LIST MUTATE ${error}`)
+      throw new Error(`MATERIAL HISTORY LIST MUTATE ${error}`)
+    }
+  },
+  getMaterialHistoryTypeList (state, materialhistorytypes) {
+    try {
+      state.materialHistoryTypeList = materialhistorytypes.filter(item => item.name.includes('SALIDA'))
+      state.materialHistoryTypeListReturn = materialhistorytypes.filter(item => item.name.includes('ENTRADA'))
+    } catch (error) {
+      throw new Error(`MATERIAL HISTORY TYPE LIST MUTATE ${error}`)
     }
   }
 }
@@ -59,10 +71,8 @@ export const actions = {
   async getMaterialList ({ commit }, payload) {
     const qs = require('qs')
     const query = qs.stringify({
-      pagination: {
-        page: 1,
-        pageSize: 1000
-      }
+      pagination: payload.pagination,
+      sort: 'createdAt:desc'
     },
     {
       encodeValuesOnly: true
@@ -81,10 +91,47 @@ export const actions = {
             material.attributes.id = material.id
             return material.attributes
           })
-          commit('getMaterialList', materials)
+          commit('getMaterialList', { materials, pagination: res.meta.pagination })
         })
     } catch (error) {
       throw new Error(`MATERIALS ACTION ${error}`)
+    }
+  },
+  async getMaterialHistoryList ({ commit }, payload) {
+    const qs = require('qs')
+    const query = qs.stringify({
+      pagination: payload.pagination,
+      populate: ['material', 'operator', 'technician'],
+      sort: 'createdAt:desc'
+    },
+    {
+      encodeValuesOnly: true
+    })
+    try {
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}materialhistories?${query}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${payload.token}`
+        }
+      })
+        .then(res => res.json())
+        .then((res) => {
+          console.log(res)
+          const materialHistories = res.data.map((material) => {
+            material.attributes.material.data.attributes.id = material.attributes.material.data.id
+            material.attributes.material = material.attributes.material.data.attributes
+            material.attributes.operator.data.attributes.id = material.attributes.operator.data.id
+            material.attributes.operator = material.attributes.operator.data.attributes
+            material.attributes.technician.data.attributes.id = material.attributes.technician.data.id
+            material.attributes.technician = material.attributes.technician.data.attributes
+            material.attributes.id = material.id
+            return material.attributes
+          })
+          commit('getMaterialHistoryList', { materialHistories, pagination: res.meta.pagination })
+        })
+    } catch (error) {
+      throw new Error(`MATERIALS HISTORY ACTION ${error}`)
     }
   },
   async getMaterialHistoryTypeList ({ commit }, payload) {
@@ -108,7 +155,7 @@ export const actions = {
       throw new Error(`MATERIALS ACTION ${error}`)
     }
   },
-  async createDispenseHistory (_, payload) {
+  async createOperationHistory (_, payload) {
     try {
       await fetch(`${this.$config.API_STRAPI_ENDPOINT}materialhistories`, {
         method: 'POST',
@@ -132,8 +179,34 @@ export const actions = {
       throw new Error(`MATERIALS ACTION ${error}`)
     }
   },
+  async createItem (_, payload) {
+    try {
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}materials`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${payload.token}`
+        },
+        body: JSON.stringify({
+          data: {
+            name: payload.data.name,
+            city: payload.city.id
+          }
+        })
+      }).then((res) => {
+        if (res.status === 200) {
+          this.$toast.success('Material creado con éxito', { duration: 3000, position: 'top-center' })
+        } else {
+          this.$toast.error(res.statusText, { position: 'top-center' })
+        }
+      })
+    } catch (error) {
+      this.$toast.error(error, { position: 'top-center' })
+      throw new Error(`CREATE ITEM ACTION ${error}`)
+    }
+  },
   async updateCurrentMaterialQuantity (_, payload) {
-    const finalQuantity = payload.data.material.quantity - payload.data.quantity
+    const finalQuantity = payload.action === 'add' ? payload.data.material.quantity - payload.data.quantity : payload.data.material.quantity + payload.data.quantity
     try {
       await fetch(`${this.$config.API_STRAPI_ENDPOINT}materials/${payload.data.material.id}`, {
         method: 'PUT',
@@ -149,7 +222,7 @@ export const actions = {
       })
         .then(res => res.json())
         .then((_) => {
-          this.$toast.success('OPREACION DE RETIRO DEL INVENTARIO EXITOSA', { position: 'top-center' })
+          this.$toast.success('OPERACION DE INVENTARIO EXITOSA, AHORA HAY ' + finalQuantity, { duration: 5000, position: 'top-center' })
         })
     } catch (error) {
       this.$toast.error(error, { position: 'top-center' })
