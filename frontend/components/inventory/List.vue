@@ -49,9 +49,7 @@ export default {
       headers: [
         { text: '#', value: 'id', sortable: false },
         { text: 'Material', value: 'name', sortable: false },
-        { text: 'Cantidad Disponible', value: 'quantity', sortable: false },
-        { text: 'Fecha de Adición', value: 'createdAt', sortable: false },
-        { text: 'Fecha ultimo movimiento', value: 'updatedAt', sortable: false }
+        { text: 'Cantidad Disponible', value: 'quantity', sortable: false }
       ]
     }
   },
