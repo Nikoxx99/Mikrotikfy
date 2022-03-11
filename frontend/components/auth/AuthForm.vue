@@ -155,15 +155,29 @@ export default {
         .then(res => res.json())
         .then(async (userResponse) => {
           const userData = userResponse
-          const userCities = userResponse.cities
-          const userClienttypes = userResponse.clienttypes
+          const userCities = userResponse.cities.map((city) => {
+            return {
+              id: city.id,
+              name: city.name,
+              color: city.color
+            }
+          })
+          const userClienttypes = userResponse.clienttypes.map((clienttype) => {
+            return {
+              id: clienttype.id,
+              name: clienttype.name
+            }
+          })
+          const userMenus = userResponse.menus.map((menu) => {
+            return {
+              id: menu.id,
+              name: menu.name,
+              icon: menu.icon,
+              url: menu.url
+            }
+          })
           if (!userCities) {
             this.errorMessages = 'Ciudad no especificada para el usuario'
-            this.loginFailed = true
-            this.loginSuccessful = false
-            this.isLoading = false
-          } else if (!userClienttypes) {
-            this.errorMessages = 'Tipo de clientes no especificada para el usuario'
             this.loginFailed = true
             this.loginSuccessful = false
             this.isLoading = false
@@ -173,7 +187,9 @@ export default {
               token: response.jwt,
               username: userData.username,
               cities: userCities,
-              clienttypes: userClienttypes
+              clienttypes: userClienttypes,
+              menu: userMenus,
+              role: userData.role
             }
             Cookie.set('auth', auth, { expires: 7 })
             Cookie.set('token', response.jwt, { expires: 7 })
@@ -188,7 +204,7 @@ export default {
               this.$store.dispatch('telegram/getTelegramBotsFromDatabase', { token: response.jwt, city: userCities[0].name }),
               this.$store.dispatch('role/getRoleFromUserData', { token: response.jwt })
             ]).then(() => {
-              window.location.href = `/clients?city=${userCities[0].name}&clienttype=${userClienttypes[0].name}`
+              window.location.href = '/clients'
             }).catch((e) => {
               this.errorMessages = e
               this.loginFailed = true

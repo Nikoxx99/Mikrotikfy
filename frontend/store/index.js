@@ -2,7 +2,7 @@
 const cookieparser = process.server ? require('cookieparser') : undefined
 export const state = () => {
   return {
-    auth: null,
+    auth: {},
     cities: null,
     clienttypes: null,
     telegramBots: null,
@@ -13,6 +13,7 @@ export const state = () => {
     activeClients: null,
     activeClientsList: null,
     clientCount: null,
+    role: {},
     clientCountActive: null,
     clientCountDisable: null,
     clientCountRetired: null

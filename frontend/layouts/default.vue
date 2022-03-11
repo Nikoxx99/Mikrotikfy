@@ -13,18 +13,17 @@
     >
       <v-list>
         <v-list-item
-          v-for="(item, i) in items"
+          v-for="(item, i) in menu"
           :key="i"
-          :to="`${item.to}?city=${$route.query.city}&clienttype=${$route.query.clienttype}`"
+          :to="`${item.url}?city=${$route.query.city}&clienttype=${$route.query.clienttype}`"
           router
-          :class="role === 'admin' || role === 'superadmin' ? item.role === 'admin' ? 'd-flex' : 'd-flex' : item.role === 'user' ? 'd-flex' : 'd-none'"
           exact
         >
           <v-list-item-action>
             <v-icon>{{ item.icon }}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title v-text="item.title" />
+            <v-list-item-title v-text="item.name" />
           </v-list-item-content>
           <v-list-item-action v-if="item.info">
             <v-chip color="red">
@@ -135,76 +134,6 @@ export default {
       mini: true,
       hasPendingChanges: false,
       drawer: false,
-      items: [
-        {
-          icon: 'mdi-tooltip-edit',
-          title: 'Tickets',
-          to: '/tickets',
-          role: 'user'
-        },
-        {
-          icon: 'mdi-account',
-          title: 'Clientes',
-          to: '/clients',
-          role: 'user'
-        },
-        {
-          icon: 'mdi-check-network-outline',
-          title: 'Activaciones',
-          to: '/activations',
-          role: 'admin'
-        },
-        {
-          icon: 'mdi-archive-edit',
-          title: 'Nap y Onus',
-          to: '/nap',
-          role: 'admin'
-        },
-        {
-          icon: 'mdi-server-network',
-          title: 'Estatus',
-          to: '/status',
-          role: 'admin'
-        },
-        {
-          icon: 'mdi-key',
-          title: 'Cambios de Clave',
-          to: '/password',
-          role: 'admin',
-          info: 0
-        },
-        {
-          icon: 'mdi-key',
-          title: 'Sol. Clave',
-          to: '/cambio',
-          role: 'admin',
-          info: 0
-        },
-        {
-          icon: 'mdi-close-network',
-          title: 'Suspencion por Mora',
-          to: '/cortes',
-          role: 'admin'
-        },
-        // {
-        //   icon: 'mdi-comment',
-        //   title: 'Comentarios Mikrotik',
-        //   to: '/comments',
-        //   role: 'admin'
-        // },
-        // {
-        //   icon: 'mdi-routes',
-        //   title: 'Rutas OLT',
-        //   to: '/olt',
-        //   role: 'admin'
-        // },
-        {
-          icon: 'mdi-speedometer',
-          title: 'Test de Velocidad',
-          to: '/velocidad',
-          role: 'user'
-        }
-      ],
       title: 'Aplicación de Gestión Dinámica ARNOP'
     }
   },
@@ -221,6 +150,9 @@ export default {
     },
     setCityTitle () {
       return this.currentCity ? `${this.$route.name.toUpperCase()} ${this.currentCity.name}` : this.title
+    },
+    menu () {
+      return this.$store.state.auth.menu
     }
   },
   mounted () {
