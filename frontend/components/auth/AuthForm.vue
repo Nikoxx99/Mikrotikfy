@@ -165,7 +165,8 @@ export default {
           const userClienttypes = userResponse.clienttypes.map((clienttype) => {
             return {
               id: clienttype.id,
-              name: clienttype.name
+              name: clienttype.name,
+              icon: clienttype.icon
             }
           })
           const userMenus = userResponse.menus.map((menu) => {

@@ -8,7 +8,7 @@
       app
       :permanent="!isMobile"
       :expand-on-hover="!isMobile"
-      :mini-variant="mini"
+      :mini-variant="!isMobile"
       :bottom="isMobile"
     >
       <v-list>
@@ -131,7 +131,6 @@ export default {
     return {
       isMobile: false,
       light: null,
-      mini: true,
       hasPendingChanges: false,
       drawer: false,
       title: 'Aplicación de Gestión Dinámica ARNOP'
