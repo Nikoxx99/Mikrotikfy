@@ -77,6 +77,7 @@ export const actions = {
         }
       } : {},
       pagination: payload.pagination,
+      populate: ['materialtype'],
       sort: payload.sort || payload.sort ? [`${payload.sort.sortBy}:${payload.sort.sortDesc ? 'desc' : 'asc'}`] : []
     },
     {
@@ -93,6 +94,8 @@ export const actions = {
         .then(res => res.json())
         .then((res) => {
           const materials = res.data.map((material) => {
+            material.attributes.materialtype.data.attributes.id = material.attributes.materialtype.data.id
+            material.attributes.materialtype = material.attributes.materialtype.data.attributes
             material.attributes.id = material.id
             return material.attributes
           })

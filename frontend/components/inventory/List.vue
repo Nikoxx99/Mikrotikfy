@@ -58,7 +58,7 @@ export default {
       search: null,
       sort: {
         sortBy: 'name',
-        sortDesc: true
+        sortDesc: false
       },
       pagination: {
         page: 1,
@@ -68,6 +68,7 @@ export default {
       headers: [
         { text: '#', value: 'id', sortable: true },
         { text: 'Material', value: 'name', sortable: true },
+        { text: 'Tipo de Material', value: 'materialtype.name', sortable: true },
         { text: 'Cantidad Disponible', value: 'quantity', sortable: true }
       ]
     }
@@ -95,7 +96,8 @@ export default {
     this.getMaterialList()
   },
   methods: {
-    getMaterialList (haveSearch) {
+    getMaterialList (haveSearch = false) {
+      console.log('exec')
       if (haveSearch) {
         this.pagination.page = 1
       }

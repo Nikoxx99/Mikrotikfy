@@ -61,7 +61,7 @@ export default {
       search: null,
       sort: {
         sortBy: 'material.name',
-        sortDesc: true
+        sortDesc: false
       },
       pagination: {
         page: 1,

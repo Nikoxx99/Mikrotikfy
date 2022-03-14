@@ -14,7 +14,7 @@
                 item-text="username"
                 item-value="id"
                 :items="operatorList"
-                label="Operario"
+                label="Entregar a"
                 outlined
                 dense
                 hide-details
@@ -102,7 +102,7 @@
                 item-text="username"
                 item-value="id"
                 :items="operatorList"
-                label="Operario"
+                label="Devolvio"
                 outlined
                 dense
                 hide-details
