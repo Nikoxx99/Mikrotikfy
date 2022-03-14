@@ -30,7 +30,7 @@
                   label="Busqueda de Historial"
                   class="mx-4"
                   prepend-icon="mdi-magnify"
-                  @keyup.enter="getMaterialHistoryList()"
+                  @keyup.enter="getMaterialHistoryList(true)"
                 />
               </div>
             </template>
@@ -96,7 +96,10 @@ export default {
     this.getMaterialHistoryList()
   },
   methods: {
-    getMaterialHistoryList () {
+    getMaterialHistoryList (haveSearch) {
+      if (haveSearch) {
+        this.pagination.page = 1
+      }
       this.$store.dispatch('inventory/getMaterialHistoryList', { token: this.$store.state.auth.token, city: this.$route.query.city, pagination: this.pagination, sort: this.sort, search: this.search }).then(() => {
         this.pagination = { ...this.$store.state.inventory.paginationMaterialHistoryList }
       })

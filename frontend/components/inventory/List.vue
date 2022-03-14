@@ -27,7 +27,7 @@
                   label="Busqueda de Material"
                   class="mx-4"
                   prepend-icon="mdi-magnify"
-                  @keyup.enter="getMaterialList()"
+                  @keyup.enter="getMaterialList(true)"
                 />
               </div>
             </template>
@@ -95,7 +95,10 @@ export default {
     this.getMaterialList()
   },
   methods: {
-    getMaterialList () {
+    getMaterialList (haveSearch) {
+      if (haveSearch) {
+        this.pagination.page = 1
+      }
       this.$store.dispatch('inventory/getMaterialList', { token: this.$store.state.auth.token, city: this.$route.query.city, pagination: this.pagination, sort: this.sort, search: this.search }).then(() => {
         this.pagination = { ...this.$store.state.inventory.paginationMaterialList }
       })
