@@ -11,12 +11,29 @@
             :items.sync="materialHistoryList"
             :page.sync="pagination.page"
             :items-per-page="pagination.pageSize"
+            :sort-by.sync="sort.sortBy"
+            :sort-desc.sync="sort.sortDesc"
             no-data-text="No hay nada para mostrar aún..."
             loading-text="Cargando información de historial inventario..."
             dense
             hide-default-footer
             @page-count="pagination.pageCount = $event"
           >
+            <template v-slot:top>
+              <div class="d-flex">
+                <h3>Inventario General</h3>
+                <v-spacer />
+                <v-text-field
+                  v-model="search"
+                  outlined
+                  dense
+                  label="Busqueda de Historial"
+                  class="mx-4"
+                  prepend-icon="mdi-magnify"
+                  @keyup.enter="getMaterialHistoryList()"
+                />
+              </div>
+            </template>
             <template v-slot:[`item.createdAt`]="{ item }">
               <span>
                 {{ getDate(item.createdAt) }}
@@ -41,19 +58,24 @@
 export default {
   data () {
     return {
+      search: null,
+      sort: {
+        sortBy: 'material.name',
+        sortDesc: true
+      },
       pagination: {
         page: 1,
         pageCount: 1,
         pageSize: 10
       },
       headers: [
-        { text: '#', value: 'id', sortable: false },
-        { text: 'Material', value: 'material.name', sortable: false },
+        { text: '#', value: 'id', sortable: true },
+        { text: 'Material', value: 'material.name', sortable: true },
         { text: 'Tipo Operacion', value: 'materialhistorytype.name', sortable: false },
         { text: 'Cantidad', value: 'quantity', sortable: false },
-        { text: 'Entrego', value: 'operator.username', sortable: false },
-        { text: 'Operario', value: 'technician.username', sortable: false },
-        { text: 'Fecha', value: 'createdAt', sortable: false }
+        { text: 'Entrego', value: 'operator.username', sortable: true },
+        { text: 'Operario', value: 'technician.username', sortable: true },
+        { text: 'Fecha', value: 'createdAt', sortable: true }
       ]
     }
   },
@@ -65,17 +87,17 @@ export default {
   watch: {
     'pagination.page': {
       handler () {
-        this.getMaterialHistoryList(this.pagination)
+        this.getMaterialHistoryList()
       },
       deep: false
     }
   },
   mounted () {
-    this.getMaterialHistoryList(this.pagination)
+    this.getMaterialHistoryList()
   },
   methods: {
-    getMaterialHistoryList (pagination) {
-      this.$store.dispatch('inventory/getMaterialHistoryList', { token: this.$store.state.auth.token, city: this.$route.query.city, pagination }).then(() => {
+    getMaterialHistoryList () {
+      this.$store.dispatch('inventory/getMaterialHistoryList', { token: this.$store.state.auth.token, city: this.$route.query.city, pagination: this.pagination, sort: this.sort, search: this.search }).then(() => {
         this.pagination = { ...this.$store.state.inventory.paginationMaterialHistoryList }
       })
     },

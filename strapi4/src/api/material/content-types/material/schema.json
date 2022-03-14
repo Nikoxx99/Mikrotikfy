@@ -29,6 +29,12 @@
       "relation": "oneToOne",
       "target": "api::city.city",
       "inversedBy": "material"
+    },
+    "materialtype": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::materialtype.materialtype",
+      "inversedBy": "materials"
     }
   }
 }

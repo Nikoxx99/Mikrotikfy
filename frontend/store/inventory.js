@@ -71,8 +71,13 @@ export const actions = {
   async getMaterialList ({ commit }, payload) {
     const qs = require('qs')
     const query = qs.stringify({
+      filters: payload.search ? {
+        name: {
+          $contains: payload.search
+        }
+      } : {},
       pagination: payload.pagination,
-      sort: 'updatedAt:desc'
+      sort: payload.sort || payload.sort ? [`${payload.sort.sortBy}:${payload.sort.sortDesc ? 'desc' : 'asc'}`] : []
     },
     {
       encodeValuesOnly: true
@@ -100,9 +105,27 @@ export const actions = {
   async getMaterialHistoryList ({ commit }, payload) {
     const qs = require('qs')
     const query = qs.stringify({
+      filters: payload.search ? {
+        $or: [
+          {
+            material: {
+              name: {
+                $contains: payload.search
+              }
+            }
+          },
+          {
+            technician: {
+              username: {
+                $contains: payload.search
+              }
+            }
+          }
+        ]
+      } : {},
       pagination: payload.pagination,
       populate: ['material', 'materialhistorytype', 'operator', 'technician'],
-      sort: 'createdAt:desc'
+      sort: payload.sort || payload.sort ? [`${payload.sort.sortBy}:${payload.sort.sortDesc ? 'desc' : 'asc'}`] : []
     },
     {
       encodeValuesOnly: true

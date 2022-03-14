@@ -2,21 +2,35 @@
   <v-row>
     <v-col>
       <v-card>
-        <v-card-title>
-          Inventario General
-        </v-card-title>
         <v-card-text>
           <v-data-table
             :headers="headers"
             :items="materialList"
             :page.sync="pagination.page"
             :items-per-page="pagination.pageSize"
+            :sort-by.sync="sort.sortBy"
+            :sort-desc.sync="sort.sortDesc"
             no-data-text="No hay nada para mostrar aún..."
             loading-text="Cargando información de inventario..."
             dense
             hide-default-footer
             @page-count="pagination.pageCount = $event"
           >
+            <template v-slot:top>
+              <div class="d-flex">
+                <h3>Inventario General</h3>
+                <v-spacer />
+                <v-text-field
+                  v-model="search"
+                  outlined
+                  dense
+                  label="Busqueda de Material"
+                  class="mx-4"
+                  prepend-icon="mdi-magnify"
+                  @keyup.enter="getMaterialList()"
+                />
+              </div>
+            </template>
             <template v-slot:[`item.createdAt`]="{ item }">
               <span>
                 {{ getDate(item.createdAt) }}
@@ -41,15 +55,20 @@
 export default {
   data () {
     return {
+      search: null,
+      sort: {
+        sortBy: 'name',
+        sortDesc: true
+      },
       pagination: {
         page: 1,
         pageCount: 1,
         pageSize: 24
       },
       headers: [
-        { text: '#', value: 'id', sortable: false },
-        { text: 'Material', value: 'name', sortable: false },
-        { text: 'Cantidad Disponible', value: 'quantity', sortable: false }
+        { text: '#', value: 'id', sortable: true },
+        { text: 'Material', value: 'name', sortable: true },
+        { text: 'Cantidad Disponible', value: 'quantity', sortable: true }
       ]
     }
   },
@@ -61,17 +80,23 @@ export default {
   watch: {
     'pagination.page': {
       handler () {
-        this.getMaterialList(this.pagination)
+        this.getMaterialList()
+      },
+      deep: false
+    },
+    'sort.sortBy': {
+      handler () {
+        this.getMaterialList()
       },
       deep: false
     }
   },
   mounted () {
-    this.getMaterialList(this.pagination)
+    this.getMaterialList()
   },
   methods: {
-    getMaterialList (pagination) {
-      this.$store.dispatch('inventory/getMaterialList', { token: this.$store.state.auth.token, city: this.$route.query.city, pagination }).then(() => {
+    getMaterialList () {
+      this.$store.dispatch('inventory/getMaterialList', { token: this.$store.state.auth.token, city: this.$route.query.city, pagination: this.pagination, sort: this.sort, search: this.search }).then(() => {
         this.pagination = { ...this.$store.state.inventory.paginationMaterialList }
       })
     },
