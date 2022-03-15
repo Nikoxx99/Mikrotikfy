@@ -7,7 +7,7 @@
         </v-card-title>
         <v-card-text>
           <v-row>
-            <v-col cols="4">
+            <v-col cols="8">
               <v-autocomplete
                 v-model="add.material"
                 :disabled="!(!$isAdmin() || !$isBiller())"
@@ -25,18 +25,6 @@
               <v-text-field
                 v-model.number="add.quantity"
                 label="Cantidad"
-                type="number"
-                outlined
-                dense
-              />
-            </v-col>
-            <v-col cols="4">
-              <v-select
-                v-model.number="add.materialtype"
-                label="Tipo"
-                :items="materialTypes"
-                item-text="name"
-                item-value="id"
                 type="number"
                 outlined
                 dense
@@ -67,7 +55,7 @@
         </v-card-title>
         <v-card-text>
           <v-row>
-            <v-col cols="4">
+            <v-col cols="8">
               <v-text-field
                 v-model="item.name"
                 label="Item"
@@ -84,7 +72,9 @@
                 dense
               />
             </v-col>
-            <v-col cols="4">
+          </v-row>
+          <v-row>
+            <v-col cols="12">
               <v-select
                 v-model.number="item.materialtype"
                 label="Tipo"
@@ -170,7 +160,7 @@ export default {
     },
     async addItem () {
       this.loading = !this.loading
-      if (!this.item.name) {
+      if (!this.item.name || !this.item.quantity || !this.item.materialtype) {
         this.$toast.error('Rellena todos los campos antes de continuar', { position: 'top-center' })
         this.loading = !this.loading
         return
@@ -185,6 +175,7 @@ export default {
       this.add.quantity = 0
       this.item.name = null
       this.item.quantity = 0
+      this.item.materialtype = null
     }
   }
 }
