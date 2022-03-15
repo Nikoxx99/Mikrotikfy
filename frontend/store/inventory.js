@@ -1,6 +1,7 @@
 export const state = () => ({
   operatorList: [],
   materialList: [],
+  materialTypes: [],
   materialHistoryList: [],
   paginationMaterialList: {},
   paginationMaterialHistoryList: {},
@@ -21,6 +22,13 @@ export const mutations = {
       state.paginationMaterialList = pagination
     } catch (error) {
       throw new Error(`MATERIAL LIST MUTATE ${error}`)
+    }
+  },
+  getMaterialTypes (state, materialTypes) {
+    try {
+      state.materialTypes = materialTypes
+    } catch (error) {
+      throw new Error(`MATERIAL TYPES LIST MUTATE ${error}`)
     }
   },
   getMaterialHistoryList (state, { materialHistories, pagination }) {
@@ -78,7 +86,7 @@ export const actions = {
       } : {},
       pagination: payload.pagination,
       populate: ['materialtype'],
-      sort: payload.sort || payload.sort ? [`${payload.sort.sortBy}:${payload.sort.sortDesc ? 'desc' : 'asc'}`] : []
+      sort: payload.sort || payload.sort ? [`${payload.sort.sortBy}:${payload.sort.sortDesc ? 'desc' : 'asc'}`] : ['id:desc']
     },
     {
       encodeValuesOnly: true
@@ -103,6 +111,27 @@ export const actions = {
         })
     } catch (error) {
       throw new Error(`MATERIALS ACTION ${error}`)
+    }
+  },
+  async getMaterialTypes ({ commit }, payload) {
+    try {
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}materialtypes`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${payload.token}`
+        }
+      })
+        .then(res => res.json())
+        .then((res) => {
+          const materialTypes = res.data.map((materialtype) => {
+            materialtype.attributes.id = materialtype.id
+            return materialtype.attributes
+          })
+          commit('getMaterialTypes', materialTypes)
+        })
+    } catch (error) {
+      throw new Error(`MATERIAL TYPES ACTION ${error}`)
     }
   },
   async getMaterialHistoryList ({ commit }, payload) {
@@ -217,6 +246,7 @@ export const actions = {
         body: JSON.stringify({
           data: {
             name: payload.data.name,
+            materialtype: payload.data.materialtype,
             quantity: payload.data.quantity,
             city: payload.city.id
           }

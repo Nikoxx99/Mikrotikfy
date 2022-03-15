@@ -7,7 +7,7 @@
         </v-card-title>
         <v-card-text>
           <v-row>
-            <v-col cols="8">
+            <v-col cols="4">
               <v-autocomplete
                 v-model="add.material"
                 :disabled="!(!$isAdmin() || !$isBiller())"
@@ -25,6 +25,18 @@
               <v-text-field
                 v-model.number="add.quantity"
                 label="Cantidad"
+                type="number"
+                outlined
+                dense
+              />
+            </v-col>
+            <v-col cols="4">
+              <v-select
+                v-model.number="add.materialtype"
+                label="Tipo"
+                :items="materialTypes"
+                item-text="name"
+                item-value="id"
                 type="number"
                 outlined
                 dense
@@ -55,7 +67,7 @@
         </v-card-title>
         <v-card-text>
           <v-row>
-            <v-col cols="8">
+            <v-col cols="4">
               <v-text-field
                 v-model="item.name"
                 label="Item"
@@ -67,6 +79,18 @@
               <v-text-field
                 v-model.number="item.quantity"
                 label="Cantidad"
+                type="number"
+                outlined
+                dense
+              />
+            </v-col>
+            <v-col cols="4">
+              <v-select
+                v-model.number="item.materialtype"
+                label="Tipo"
+                item-text="name"
+                item-value="id"
+                :items="materialTypes"
                 type="number"
                 outlined
                 dense
@@ -99,10 +123,12 @@ export default {
     return {
       add: {
         material: null,
+        materialtype: null,
         quantity: 0
       },
       item: {
         name: null,
+        materialtype: null,
         quantity: 0
       },
       loading: false
@@ -112,16 +138,23 @@ export default {
     materialList () {
       return this.$store.state.inventory.materialList
     },
+    materialTypes () {
+      return this.$store.state.inventory.materialTypes
+    },
     currentCity () {
       return this.$store.state.cities.find(city => city.name === this.$route.query.city)
     }
   },
   mounted () {
     this.getMaterialList()
+    this.getMaterialTypes()
   },
   methods: {
     getMaterialList () {
       this.$store.dispatch('inventory/getMaterialList', { token: this.$store.state.auth.token, city: this.$route.query.city, pagination: { page: 1, pageSize: 1000 } })
+    },
+    getMaterialTypes () {
+      this.$store.dispatch('inventory/getMaterialTypes', { token: this.$store.state.auth.token, city: this.$route.query.city, pagination: { page: 1, pageSize: 1000 } })
     },
     async addMaterial () {
       this.loading = !this.loading

@@ -57,8 +57,8 @@ export default {
     return {
       search: null,
       sort: {
-        sortBy: 'name',
-        sortDesc: false
+        sortBy: 'id',
+        sortDesc: true
       },
       pagination: {
         page: 1,
@@ -97,7 +97,6 @@ export default {
   },
   methods: {
     getMaterialList (haveSearch = false) {
-      console.log('exec')
       if (haveSearch) {
         this.pagination.page = 1
       }
