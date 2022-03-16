@@ -60,8 +60,8 @@ export default {
     return {
       search: null,
       sort: {
-        sortBy: 'material.name',
-        sortDesc: false
+        sortBy: 'createdAt',
+        sortDesc: true
       },
       pagination: {
         page: 1,
@@ -69,13 +69,13 @@ export default {
         pageSize: 10
       },
       headers: [
-        { text: '#', value: 'id', sortable: true },
-        { text: 'Material', value: 'material.name', sortable: true },
+        { text: '#', value: 'id', sortable: false },
+        { text: 'Material', value: 'material.name', sortable: false },
         { text: 'Tipo Operacion', value: 'materialhistorytype.name', sortable: false },
         { text: 'Cantidad', value: 'quantity', sortable: false },
-        { text: 'Entrego', value: 'operator.username', sortable: true },
-        { text: 'Operario', value: 'technician.username', sortable: true },
-        { text: 'Fecha', value: 'createdAt', sortable: true }
+        { text: 'Entrego', value: 'operator.username', sortable: false },
+        { text: 'Operario', value: 'technician.username', sortable: false },
+        { text: 'Fecha', value: 'createdAt', sortable: false }
       ]
     }
   },
