@@ -434,6 +434,7 @@ export default {
         })
       }
       await this.$store.dispatch('client/updateClient', { client, index, operator, token: this.$store.state.auth.token })
+      await this.$store.dispatch('client/updateClientCommentOnMikrotik', { client, token: this.$store.state.auth.token })
       this.$emit('updateSuccess')
       this.$simpleTelegramUpdate({ client: this.client, operator: this.$store.state.auth.username, telegramBots: this.telegramBots })
       this.dialogEdit = false

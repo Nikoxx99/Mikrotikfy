@@ -163,7 +163,11 @@ export default {
             name: this.$route.query.city
           }
         },
-        populate: ['plan', 'technology']
+        populate: ['plan', 'technology'],
+        pagination: {
+          page: 1,
+          pageSize: 2000
+        }
       },
       {
         encodeValuesOnly: true
@@ -178,10 +182,18 @@ export default {
         .then(res => res.json())
         .then((clients) => {
           clients = clients.data.map((client) => {
-            client.attributes.plan.data.attributes.id = client.attributes.plan.data.id
-            client.attributes.plan = client.attributes.plan.data.attributes
-            client.attributes.technology.data.attributes.id = client.attributes.technology.data.id
-            client.attributes.technology = client.attributes.technology.data.attributes
+            client.attributes.plan
+              ? client.attributes.plan.data.attributes.id = client.attributes.plan.data.id
+              : client.attributes.plan = {}
+            client.attributes.plan
+              ? client.attributes.plan = client.attributes.plan.data.attributes
+              : client.attributes.plan = {}
+            client.attributes.technology
+              ? client.attributes.technology.data.attributes.id = client.attributes.technology.data.id
+              : client.attributes.technology = {}
+            client.attributes.technology
+              ? client.attributes.technology = client.attributes.technology.data.attributes
+              : client.attributes.technology = {}
             return client.attributes
           })
           this.dataTable = clients

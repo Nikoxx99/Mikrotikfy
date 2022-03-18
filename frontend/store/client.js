@@ -249,6 +249,26 @@ export const actions = {
       throw new Error(`UPDATE USER ACTION ${error}`)
     })
   },
+  async updateClientCommentOnMikrotik (_, { client, token }) {
+    await fetch(`${this.$config.API_STRAPI_ENDPOINT}clientcomment`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        data: client
+      })
+    }).then((input) => {
+      if (input.status === 200) {
+        console.log('here')
+      }
+    }).catch((error) => {
+      // eslint-disable-next-line no-console
+      console.error(error)
+      throw new Error(`UPDATE USER COMMENT ON MIKROTIK ACTION ${error}`)
+    })
+  },
   updateClientDevices ({ commit }, { device, index }) {
     commit('updateClientDevices', { device, index })
   },

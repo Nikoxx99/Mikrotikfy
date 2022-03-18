@@ -112,17 +112,20 @@ function simpleTelegramCreateTicketAdvance ({ client, ticket, status, details, o
   } else {
     line1 = 'AVANCE DE TICKET'
   }
-  const line2 = sanitizeString(client.name)
-  const line3 = sanitizeString(ticket.tickettype.name)
-  const line4 = sanitizeString(details)
-  let line5 = ''
+  const line2 = sanitizeString(client.code)
+  const line3 = sanitizeString(client.name)
+  const line4 = sanitizeString(client.address)
+  const line5 = sanitizeString(client.phone)
+  const line6 = sanitizeString(ticket.tickettype.name)
+  const line7 = sanitizeString(details)
+  let line8 = ''
   if (status) {
-    line5 = 'CASO CERRADO'
+    line8 = 'CASO CERRADO'
   } else {
-    line5 = 'CASO ACTIVO'
+    line8 = 'CASO ACTIVO'
   }
-  const line6 = operator
-  const message = `${line1}\n${line2}\n${line3}\n${line4}\n\n${line5}\n${line6}`
+  const line9 = operator
+  const message = `${line1}\n${line2}\n${line3}\n${line4}\n${line5}\n${line6}\n${line7}\n\n${line8}\n${line9}`
   const req =
     'https://api.telegram.org/bot' +
     bot +
