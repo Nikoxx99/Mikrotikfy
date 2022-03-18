@@ -14,7 +14,6 @@ module.exports.mkDxClient = async function (input) {
         "=.proplist=.id",
         "?=name=" + input.code,
       ]);
-      console.log(com1)
       if (input.kick === 2) {
         var removeActive = await conn.write("/ppp/active/getall", [
           "=.proplist=.id",
