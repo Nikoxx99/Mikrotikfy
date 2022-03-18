@@ -1,5 +1,5 @@
 <template>
-  <v-card v-if="dataTable.length > 0">
+  <v-card>
     <v-card-title>Desconectar clientes por mora en {{ cityName }}</v-card-title>
     <v-card-text>
       <v-container>
@@ -30,7 +30,7 @@
                 <v-chip
                   color="primary darken-4"
                 >
-                  Clientes: {{ Object.keys(dataTable).length }}
+                  Clientes: {{ count }}
                 </v-chip>
               </v-col>
             </v-row>
@@ -113,6 +113,7 @@ export default {
   middleware: ['defaultCity', 'authenticated'],
   data () {
     return {
+      count: 0,
       cityName: 'default',
       title: 'DX por Mora',
       page: 1,
@@ -127,14 +128,14 @@ export default {
       successfulCuts: [],
       input: '',
       headers: [
-        { text: 'Codigo', sortable: true, value: 'code' },
-        { text: 'Nombre', sortable: true, value: 'name' },
-        { text: 'Plan', sortable: true, value: 'plan.name' },
-        { text: 'Aciones', value: 'actions', sortable: false }
+        { text: 'Codigo', sortable: true, value: 'attributes.code' },
+        { text: 'Nombre', sortable: true, value: 'attributes.name' },
+        { text: 'Plan', sortable: true, value: 'attributes.plan.data.attributes.name' },
+        { text: 'Acciones', value: 'actions', sortable: false }
       ],
       successfulCutsHeaders: [
-        { text: 'Codigo', sortable: true, value: 'code' },
-        { text: 'Nombre', sortable: true, value: 'name' },
+        { text: 'Codigo', sortable: true, value: 'attributes.code' },
+        { text: 'Nombre', sortable: true, value: 'attributes.name' },
         { text: 'Exitoso', sortable: true, value: 'success' }
       ],
       kickStat: { id: 1, name: 'No patear' },
@@ -162,11 +163,6 @@ export default {
           city: {
             name: this.$route.query.city
           }
-        },
-        populate: ['plan', 'technology'],
-        pagination: {
-          page: 1,
-          pageSize: 2000
         }
       },
       {
@@ -181,67 +177,48 @@ export default {
       })
         .then(res => res.json())
         .then((clients) => {
-          clients = clients.data.map((client) => {
-            client.attributes.plan
-              ? client.attributes.plan.data.attributes.id = client.attributes.plan.data.id
-              : client.attributes.plan = {}
-            client.attributes.plan
-              ? client.attributes.plan = client.attributes.plan.data.attributes
-              : client.attributes.plan = {}
-            client.attributes.technology
-              ? client.attributes.technology.data.attributes.id = client.attributes.technology.data.id
-              : client.attributes.technology = {}
-            client.attributes.technology
-              ? client.attributes.technology = client.attributes.technology.data.attributes
-              : client.attributes.technology = {}
-            return client.attributes
-          })
-          this.dataTable = clients
-          this.cityName = this.$route.query.city
-          this.initialLoading = false
+          this.count = clients.meta.pagination.total
         })
     },
-    prepare () {
-      const input = this.input.split('\n')
+    async prepare () {
+      this.pendingCuts = []
+      const input = this.input.trim().split('\n')
       for (let i = 0; i < input.length; i++) {
-        // eslint-disable-next-line eqeqeq
-        const search = this.dataTable.filter(c => c.code == input[i])
-        if (search.length > 0) {
-          const inputObject = {
-            code: 0,
-            name: '',
-            plan: {
-              id: 0,
-              name: ''
+        const qs = require('qs')
+        const query = qs.stringify({
+          filters: {
+            code: input[i],
+            city: {
+              name: this.$route.query.city
+            },
+            clienttype: {
+              name: this.$route.query.clienttype
             }
+          },
+          populate: ['plan', 'technology']
+        },
+        {
+          encodeValuesOnly: true
+        })
+        await fetch(`${this.$config.API_STRAPI_ENDPOINT}clients?${query}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${this.$store.state.auth.token}`
           }
-          inputObject.code = search[0].code
-          inputObject.name = search[0].name
-          inputObject.plan.id = search[0].plan.id
-          inputObject.plan.name = search[0].plan.name
-          // eslint-disable-next-line eqeqeq
-          const clientExist = this.pendingCuts.filter(c => c.code == input[i])
-          if (clientExist.length < 1) {
-            this.pendingCuts.push(inputObject)
-          }
-        } else {
-          const inputObject = {
-            code: 0,
-            name: '',
-            plan: {
-              id: 0,
-              name: ''
+        })
+          .then(res => res.json())
+          .then((client) => {
+            if (client.data.length > 0) {
+              this.pendingCuts.push(client.data[0])
+            } else {
+              this.errorCount++
             }
-          }
-          inputObject.code = input[i].code
-          inputObject.name = 'NO ENCONTRADO EN LA DB'
-          inputObject.plan.id = 0
-          inputObject.plan.name = 'NO ENCONTRADO'
-          this.pendingCuts.push(inputObject)
-        }
+          })
       }
     },
     async exec () {
+      this.successfulCuts = []
       this.loading = true
       const city = this.$route.query.city
       const pendingDx = this.pendingCuts

@@ -10,7 +10,7 @@ module.exports = {
     const input = ctx.request.body.input
     const search = await strapi.service('api::client.client').find({
       filters: {
-        code: input.dx.code,
+        code: input.dx.attributes.code,
         city: {
           name: {
             $eq: input.dxCity
@@ -43,7 +43,7 @@ module.exports = {
       return process
     } else {
       const cityIp = searchCity.mikrotiks[0].ip
-      const res = await strapi.service('api::client.client').update(clientObj.id, { data: {plan: planDx.id }})
+      const res = await strapi.service('api::client.client').update(clientObj.id, { data: {plan: input.dxPlan.id }})
       const resMk = await mkDxClient({ dni, code, cityIp, model, planDxMk, kick })
       if (res && resMk) {
         process.push({ code: code, name: clientObj.name, success: true })

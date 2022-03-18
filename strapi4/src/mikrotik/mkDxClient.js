@@ -1,6 +1,5 @@
 const RouterOSAPI = require("node-routeros").RouterOSAPI;
 module.exports.mkDxClient = async function (input) {
-  console.log(input)
   const conn = new RouterOSAPI({
     host: input.cityIp,
     user: "API_ARNOP",
