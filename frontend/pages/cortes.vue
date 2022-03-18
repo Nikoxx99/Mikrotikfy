@@ -187,7 +187,13 @@ export default {
         const qs = require('qs')
         const query = qs.stringify({
           filters: {
-            code: input[i]
+            code: input[i],
+            city: {
+              name: this.$route.query.city
+            },
+            clienttype: {
+              name: this.$route.query.clienttype
+            }
           },
           populate: ['plan', 'technology']
         },
