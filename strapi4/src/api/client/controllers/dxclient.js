@@ -10,7 +10,7 @@ module.exports = {
     const input = ctx.request.body.input
     const search = await strapi.service('api::client.client').find({
       filters: {
-        code: input.dx.code,
+        code: input.dx.attributes.code,
         city: {
           name: {
             $eq: input.dxCity

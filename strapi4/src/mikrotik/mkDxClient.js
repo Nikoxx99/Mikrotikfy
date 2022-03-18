@@ -1,6 +1,5 @@
 const RouterOSAPI = require("node-routeros").RouterOSAPI;
 module.exports.mkDxClient = async function (input) {
-  console.log(input)
   const conn = new RouterOSAPI({
     host: input.cityIp,
     user: "API_ARNOP",
@@ -15,6 +14,7 @@ module.exports.mkDxClient = async function (input) {
         "=.proplist=.id",
         "?=name=" + input.code,
       ]);
+      console.log(com1)
       if (input.kick === 2) {
         var removeActive = await conn.write("/ppp/active/getall", [
           "=.proplist=.id",
