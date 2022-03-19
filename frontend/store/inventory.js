@@ -16,9 +16,15 @@ export const mutations = {
       throw new Error(`OPERATOR LIST MUTATE ${error}`)
     }
   },
-  getMaterialList (state, { materials, pagination }) {
+  getMaterialList (state, { materials, materialType, pagination }) {
+    console.log(materials.length, materialType)
     try {
-      state.materialList = materials
+      if (materialType) {
+        console.log(materialType.id)
+        state[`materialList${materialType.id}`] = materials
+      } else {
+        state.materialList = materials
+      }
       state.paginationMaterialList = pagination
     } catch (error) {
       throw new Error(`MATERIAL LIST MUTATE ${error}`)
@@ -79,11 +85,17 @@ export const actions = {
   async getMaterialList ({ commit }, payload) {
     const qs = require('qs')
     const query = qs.stringify({
-      filters: payload.search ? {
-        name: {
-          $contains: payload.search
+      filters: payload.search
+        ? {
+          name: {
+            $contains: payload.search
+          }
         }
-      } : {},
+        : payload.materialType
+          ? {
+            materialtype: payload.materialType.id
+          }
+          : {},
       pagination: payload.pagination,
       populate: ['materialtype'],
       sort: payload.sort || payload.sort ? [`${payload.sort.sortBy}:${payload.sort.sortDesc ? 'desc' : 'asc'}`] : ['id:desc']
@@ -107,7 +119,7 @@ export const actions = {
             material.attributes.id = material.id
             return material.attributes
           })
-          commit('getMaterialList', { materials, pagination: res.meta.pagination })
+          commit('getMaterialList', { materials, materialType: payload.materialType, pagination: res.meta.pagination })
         })
     } catch (error) {
       throw new Error(`MATERIALS ACTION ${error}`)

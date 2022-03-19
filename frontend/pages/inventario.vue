@@ -26,9 +26,6 @@
             <InventoryDaily />
           </v-tab-item>
           <v-tab-item>
-            <InventoryAdd />
-          </v-tab-item>
-          <v-tab-item>
             <InventoryList />
           </v-tab-item>
           <v-tab-item>
@@ -45,9 +42,8 @@ export default {
     return {
       tab: null,
       items: [
-        'Diario', 'Ingresar', 'Inventario', 'Historial'
-      ],
-      text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
+        'Diario', 'Inventario', 'Historial'
+      ]
     }
   },
   methods: {

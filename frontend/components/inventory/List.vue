@@ -19,6 +19,11 @@
             <template v-slot:top>
               <div class="d-flex">
                 <h3>Inventario General</h3>
+                <InventoryAdd
+                  v-for="type in materialTypes"
+                  :key="type.id"
+                  :type="type"
+                />
                 <v-spacer />
                 <v-text-field
                   v-model="search"
@@ -76,6 +81,9 @@ export default {
   computed: {
     materialList () {
       return this.$store.state.inventory.materialList
+    },
+    materialTypes () {
+      return this.$store.state.inventory.materialTypes
     }
   },
   watch: {
@@ -94,8 +102,12 @@ export default {
   },
   mounted () {
     this.getMaterialList()
+    this.getMaterialTypes()
   },
   methods: {
+    getMaterialTypes () {
+      this.$store.dispatch('inventory/getMaterialTypes', { token: this.$store.state.auth.token, city: this.$route.query.city, pagination: { page: 1, pageSize: 1000 } })
+    },
     getMaterialList (haveSearch = false) {
       if (haveSearch) {
         this.pagination.page = 1
