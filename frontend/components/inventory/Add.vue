@@ -128,7 +128,7 @@ export default {
         this.loading = !this.loading
         return
       }
-      if (this.add.material.materialquantities.data.length > 0) {
+      if (this.add.material.materialquantities.data.find(materialquantity => materialquantity.materialtype.id === this.add.materialtype).length > 0) {
         this.$toast.success('Cantidad actualizada... ', { duration: 1000, position: 'top-center' })
         await this.$store.dispatch('inventory/updateCurrentMaterialQuantity', { token: this.$store.state.auth.token, city: this.$route.query.city, data: this.add, action: 'return' })
       } else {
