@@ -18,12 +18,8 @@
           >
             <template v-slot:top>
               <div class="d-flex">
-                <h3>Inventario General</h3>
-                <InventoryAdd
-                  v-for="type in materialTypes"
-                  :key="type.id"
-                  :type="type"
-                />
+                <InventoryAddItem />
+                <InventoryAdd />
                 <v-spacer />
                 <v-text-field
                   v-model="search"
@@ -36,14 +32,25 @@
                 />
               </div>
             </template>
+            <template v-slot:[`item.materialquantities`]="{ item }">
+              <v-chip
+                small
+                class="blue darken-4 white--text mr-4"
+              >
+                Total: {{ item.materialquantities.data.reduce((total, materialquantity) => total + materialquantity.attributes.quantity, 0) }}
+              </v-chip>
+              <v-chip
+                v-for="(materialquantity, index) in item.materialquantities.data"
+                :key="index"
+                small
+                class="white black--text mr-4"
+              >
+                {{ materialquantity.attributes.materialtype.data.attributes.name }}: {{ materialquantity.attributes.quantity }}
+              </v-chip>
+            </template>
             <template v-slot:[`item.createdAt`]="{ item }">
               <span>
                 {{ getDate(item.createdAt) }}
-              </span>
-            </template>
-            <template v-slot:[`item.updatedAt`]="{ item }">
-              <span>
-                {{ getDate(item.updatedAt) }}
               </span>
             </template>
           </v-data-table>
@@ -73,8 +80,7 @@ export default {
       headers: [
         { text: '#', value: 'id', sortable: true },
         { text: 'Material', value: 'name', sortable: true },
-        { text: 'Tipo de Material', value: 'materialtype.name', sortable: true },
-        { text: 'Cantidad Disponible', value: 'quantity', sortable: true }
+        { text: 'Inventario Disponible', value: 'materialquantities', sortable: true }
       ]
     }
   },

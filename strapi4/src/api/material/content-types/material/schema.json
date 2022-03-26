@@ -15,9 +15,6 @@
     "name": {
       "type": "string"
     },
-    "quantity": {
-      "type": "integer"
-    },
     "materialhistories": {
       "type": "relation",
       "relation": "oneToMany",
@@ -30,11 +27,11 @@
       "target": "api::city.city",
       "inversedBy": "material"
     },
-    "materialtype": {
+    "materialquantities": {
       "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::materialtype.materialtype",
-      "inversedBy": "materials"
+      "relation": "oneToMany",
+      "target": "api::materialquantity.materialquantity",
+      "mappedBy": "material"
     }
   }
 }

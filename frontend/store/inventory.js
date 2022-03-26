@@ -16,15 +16,9 @@ export const mutations = {
       throw new Error(`OPERATOR LIST MUTATE ${error}`)
     }
   },
-  getMaterialList (state, { materials, materialType, pagination }) {
-    console.log(materials.length, materialType)
+  getMaterialList (state, { materials, pagination }) {
     try {
-      if (materialType) {
-        console.log(materialType.id)
-        state[`materialList${materialType.id}`] = materials
-      } else {
-        state.materialList = materials
-      }
+      state.materialList = materials
       state.paginationMaterialList = pagination
     } catch (error) {
       throw new Error(`MATERIAL LIST MUTATE ${error}`)
@@ -91,13 +85,9 @@ export const actions = {
             $contains: payload.search
           }
         }
-        : payload.materialType
-          ? {
-            materialtype: payload.materialType.id
-          }
-          : {},
+        : {},
       pagination: payload.pagination,
-      populate: ['materialtype'],
+      populate: ['materialquantities', 'materialquantities.materialtype'],
       sort: payload.sort || payload.sort ? [`${payload.sort.sortBy}:${payload.sort.sortDesc ? 'desc' : 'asc'}`] : ['id:desc']
     },
     {
@@ -114,12 +104,10 @@ export const actions = {
         .then(res => res.json())
         .then((res) => {
           const materials = res.data.map((material) => {
-            material.attributes.materialtype.data.attributes.id = material.attributes.materialtype.data.id
-            material.attributes.materialtype = material.attributes.materialtype.data.attributes
             material.attributes.id = material.id
             return material.attributes
           })
-          commit('getMaterialList', { materials, materialType: payload.materialType, pagination: res.meta.pagination })
+          commit('getMaterialList', { materials, pagination: res.meta.pagination })
         })
     } catch (error) {
       throw new Error(`MATERIALS ACTION ${error}`)
@@ -258,8 +246,6 @@ export const actions = {
         body: JSON.stringify({
           data: {
             name: payload.data.name,
-            materialtype: payload.data.materialtype,
-            quantity: payload.data.quantity,
             city: payload.city.id
           }
         })
@@ -293,6 +279,31 @@ export const actions = {
         .then(res => res.json())
         .then((_) => {
           this.$toast.success('OPERACION DE INVENTARIO EXITOSA, AHORA HAY ' + finalQuantity, { duration: 5000, position: 'top-center' })
+        })
+    } catch (error) {
+      this.$toast.error(error, { position: 'top-center' })
+      throw new Error(`MATERIALS ACTION ${error}`)
+    }
+  },
+  async createMaterialQuantity (_, payload) {
+    try {
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}materialquantities`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${payload.token}`
+        },
+        body: JSON.stringify({
+          data: {
+            quantity: payload.data.quantity,
+            material: payload.data.material.id,
+            materialtype: payload.data.materialtype.id
+          }
+        })
+      })
+        .then(res => res.json())
+        .then((_) => {
+          this.$toast.success('OPERACION DE INVENTARIO EXITOSA, AHORA HAY ' + payload.data.quantity, { duration: 5000, position: 'top-center' })
         })
     } catch (error) {
       this.$toast.error(error, { position: 'top-center' })

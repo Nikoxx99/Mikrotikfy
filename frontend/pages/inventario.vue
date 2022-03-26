@@ -7,10 +7,10 @@
       <v-card-text class="d-flex justify-center">
         <v-tabs
           v-model="tab"
-          fixed-tabs
+          grow
           align-with-title
         >
-          <v-tabs-slider color="yellow"></v-tabs-slider>
+          <v-tabs-slider />
 
           <v-tab
             v-for="item in items"

@@ -1,62 +1,55 @@
 <template>
-  <v-row>
-    <v-col>
-      <v-card class="elevation-0">
-        <v-card-title>
-          Agregar Item
-        </v-card-title>
-        <v-card-text>
-          <v-row>
-            <v-col cols="8">
-              <v-text-field
-                v-model="item.name"
-                label="Item"
-                outlined
-                dense
-              />
-            </v-col>
-            <v-col cols="4">
-              <v-text-field
-                v-model.number="item.quantity"
-                label="Cantidad"
-                type="number"
-                outlined
-                dense
-              />
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols="12">
-              <v-select
-                v-model.number="item.materialtype"
-                label="Tipo"
-                item-text="name"
-                item-value="id"
-                :items="materialTypes"
-                type="number"
-                outlined
-                dense
-              />
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col>
-              <v-btn
-                color="success darken-4"
-                class="elevation-0"
-                rounded
-                :loading="loading"
-                :disabled="loading"
-                @click="addItem()"
-              >
-                Agregar
-              </v-btn>
-            </v-col>
-          </v-row>
-        </v-card-text>
-      </v-card>
-    </v-col>
-  </v-row>
+  <div>
+    <v-btn
+      rounded
+      class="ml-2 elevation-0"
+      color="green darken-4"
+      @click="modal = true"
+    >
+      <v-icon>mdi-plus</v-icon>
+      <span>Añadir Nuevo</span>
+    </v-btn>
+    <v-dialog
+      v-model="modal"
+      max-width="590"
+    >
+      <v-row>
+        <v-col>
+          <v-card class="elevation-0">
+            <v-card-title>
+              Agregar Item
+            </v-card-title>
+            <v-card-text>
+              <v-row>
+                <v-col cols>
+                  <v-text-field
+                    v-model="item.name"
+                    label="Item"
+                    outlined
+                    dense
+                  />
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col>
+                  <v-btn
+                    color="success darken-4"
+                    class="elevation-0"
+                    rounded
+                    :loading="loading"
+                    :disabled="loading"
+                    @click="addItem()"
+                  >
+                    Agregar
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-dialog>
+  </div>
 </template>
 
 <script>
@@ -64,19 +57,15 @@ export default {
   data () {
     return {
       item: {
-        name: null,
-        materialtype: null,
-        quantity: 0
+        name: null
       },
-      loading: false
+      loading: false,
+      modal: false
     }
   },
   computed: {
     materialList () {
       return this.$store.state.inventory.materialList
-    },
-    materialTypes () {
-      return this.$store.state.inventory.materialTypes
     },
     currentCity () {
       return this.$store.state.cities.find(city => city.name === this.$route.query.city)
@@ -84,14 +73,10 @@ export default {
   },
   mounted () {
     this.getMaterialList()
-    this.getMaterialTypes()
   },
   methods: {
     getMaterialList () {
       this.$store.dispatch('inventory/getMaterialList', { token: this.$store.state.auth.token, city: this.$route.query.city, pagination: { page: 1, pageSize: 1000 } })
-    },
-    getMaterialTypes () {
-      this.$store.dispatch('inventory/getMaterialTypes', { token: this.$store.state.auth.token, city: this.$route.query.city, pagination: { page: 1, pageSize: 1000 } })
     },
     async addItem () {
       this.loading = !this.loading

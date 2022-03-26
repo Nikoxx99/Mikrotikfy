@@ -1,13 +1,13 @@
 <template>
   <div>
     <v-btn
-      small
-      class="ml-2"
+      rounded
+      class="ml-2 elevation-0"
       color="primary"
       @click="modal = true"
     >
-      <v-icon>{{ type.icon }}</v-icon>
-      <span>{{ type.name }}</span>
+      <v-icon>mdi-export-variant</v-icon>
+      <span>Ingresar</span>
     </v-btn>
     <v-dialog
       v-model="modal"
@@ -17,17 +17,16 @@
         <v-col>
           <v-card class="elevation-0">
             <v-card-title>
-              Agregar Material {{ type.name }}
+              Agregar Material
             </v-card-title>
             <v-card-text>
               <v-row>
                 <v-col cols="8">
                   <v-autocomplete
                     v-model="add.material"
-                    :disabled="!(!$isAdmin() || !$isBiller())"
                     item-text="name"
                     item-value="id"
-                    :items="`materialList${type.id}`"
+                    :items="materialList"
                     return-object
                     label="Material a agregar"
                     outlined
@@ -39,6 +38,21 @@
                   <v-text-field
                     v-model.number="add.quantity"
                     label="Cantidad"
+                    type="number"
+                    outlined
+                    dense
+                  />
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12">
+                  <v-select
+                    v-model.number="add.materialtype"
+                    label="Tipo"
+                    item-text="name"
+                    item-value="id"
+                    return-object
+                    :items="materialTypes"
                     type="number"
                     outlined
                     dense
@@ -90,6 +104,9 @@ export default {
     materialList () {
       return this.$store.state.inventory.materialList
     },
+    materialTypes () {
+      return this.$store.state.inventory.materialTypes
+    },
     currentCity () {
       return this.$store.state.cities.find(city => city.name === this.$route.query.city)
     }
@@ -98,6 +115,9 @@ export default {
     this.getMaterialList()
   },
   methods: {
+    getMaterialTypes () {
+      this.$store.dispatch('inventory/getMaterialTypes', { token: this.$store.state.auth.token, city: this.$route.query.city, pagination: { page: 1, pageSize: 1000 } })
+    },
     getMaterialList () {
       this.$store.dispatch('inventory/getMaterialList', { token: this.$store.state.auth.token, city: this.$route.query.city, materialType: this.type, pagination: { page: 1, pageSize: 1000 } })
     },
@@ -108,13 +128,21 @@ export default {
         this.loading = !this.loading
         return
       }
-      await this.$store.dispatch('inventory/updateCurrentMaterialQuantity', { token: this.$store.state.auth.token, city: this.$route.query.city, data: this.add, action: 'return' })
+      if (this.add.material.materialquantities.data.length > 0) {
+        this.$toast.success('Cantidad actualizada... ', { duration: 1000, position: 'top-center' })
+        await this.$store.dispatch('inventory/updateCurrentMaterialQuantity', { token: this.$store.state.auth.token, city: this.$route.query.city, data: this.add, action: 'return' })
+      } else {
+        this.$toast.info('Cantidad creada... ', { duration: 1000, position: 'top-center' })
+        await this.$store.dispatch('inventory/createMaterialQuantity', { token: this.$store.state.auth.token, city: this.$route.query.city, data: this.add, action: 'return' })
+        this.modal = false
+      }
       this.getMaterialList()
       this.resetFields()
       this.loading = !this.loading
     },
     resetFields () {
       this.add.material = null
+      this.add.materialtype = null
       this.add.quantity = 0
     }
   }
