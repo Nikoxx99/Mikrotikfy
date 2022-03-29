@@ -20,6 +20,7 @@
               <div class="d-flex">
                 <InventoryAddItem />
                 <InventoryAdd />
+                <InventoryDaily />
                 <v-spacer />
                 <v-text-field
                   v-model="search"
@@ -43,9 +44,9 @@
                 v-for="(materialquantity, index) in item.materialquantities.data"
                 :key="index"
                 small
-                class="white black--text mr-4"
+                :class="materialquantity.attributes.quantity < 1 ? 'red darken-4 white--text mr-4' : 'white black--text mr-4'"
               >
-                {{ materialquantity.attributes.materialtype.data.attributes.name }}: {{ materialquantity.attributes.quantity }}
+                {{ materialquantity.attributes.materialtype.data.attributes.name + ' ' }}: <strong>{{ materialquantity.attributes.quantity }}</strong>
               </v-chip>
             </template>
             <template v-slot:[`item.createdAt`]="{ item }">

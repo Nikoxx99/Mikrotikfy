@@ -261,7 +261,7 @@ export const actions = {
       })
     }).then((input) => {
       if (input.status === 200) {
-        console.log('here')
+        this.$toast.success('Comentario actualizado', { duration: 2000 })
       }
     }).catch((error) => {
       // eslint-disable-next-line no-console

@@ -13,41 +13,37 @@
       v-model="modal"
       max-width="590"
     >
-      <v-row>
-        <v-col>
-          <v-card class="elevation-0">
-            <v-card-title>
-              Agregar Item
-            </v-card-title>
-            <v-card-text>
-              <v-row>
-                <v-col cols>
-                  <v-text-field
-                    v-model="item.name"
-                    label="Item"
-                    outlined
-                    dense
-                  />
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col>
-                  <v-btn
-                    color="success darken-4"
-                    class="elevation-0"
-                    rounded
-                    :loading="loading"
-                    :disabled="loading"
-                    @click="addItem()"
-                  >
-                    Agregar
-                  </v-btn>
-                </v-col>
-              </v-row>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
+      <v-card class="elevation-0">
+        <v-card-title>
+          Agregar Item
+        </v-card-title>
+        <v-card-text>
+          <v-row>
+            <v-col cols>
+              <v-text-field
+                v-model="item.name"
+                label="Item"
+                outlined
+                dense
+              />
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+              <v-btn
+                color="success darken-4"
+                class="elevation-0"
+                rounded
+                :loading="loading"
+                :disabled="loading"
+                @click="addItem()"
+              >
+                Agregar
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
     </v-dialog>
   </div>
 </template>
@@ -80,7 +76,7 @@ export default {
     },
     async addItem () {
       this.loading = !this.loading
-      if (!this.item.name || !this.item.quantity || !this.item.materialtype) {
+      if (!this.item.name) {
         this.$toast.error('Rellena todos los campos antes de continuar', { position: 'top-center' })
         this.loading = !this.loading
         return

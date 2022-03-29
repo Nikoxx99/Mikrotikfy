@@ -41,6 +41,11 @@
     },
     "description": {
       "type": "text"
+    },
+    "materialtype": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::materialtype.materialtype"
     }
   }
 }

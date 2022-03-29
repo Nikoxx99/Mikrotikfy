@@ -156,7 +156,7 @@ export const actions = {
         ]
       } : {},
       pagination: payload.pagination,
-      populate: ['material', 'materialhistorytype', 'operator', 'technician'],
+      populate: ['material', 'material.materialquantities', 'materialhistorytype', 'operator', 'technician'],
       sort: payload.sort || payload.sort ? [`${payload.sort.sortBy}:${payload.sort.sortDesc ? 'desc' : 'asc'}`] : []
     },
     {
@@ -262,9 +262,10 @@ export const actions = {
     }
   },
   async updateCurrentMaterialQuantity (_, payload) {
-    const finalQuantity = payload.action === 'add' ? payload.data.material.quantity - payload.data.quantity : payload.data.material.quantity + payload.data.quantity
+    console.log(payload)
+    const finalQuantity = payload.action === 'add' ? payload.quantity[0].attributes.quantity - payload.data.quantity : payload.quantity[0].attributes.quantity + payload.data.quantity
     try {
-      await fetch(`${this.$config.API_STRAPI_ENDPOINT}materials/${payload.data.material.id}`, {
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}materialquantities/${payload.quantity[0].id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

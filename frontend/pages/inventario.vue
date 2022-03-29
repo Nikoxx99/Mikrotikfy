@@ -23,9 +23,6 @@
       <v-card-text>
         <v-tabs-items v-model="tab">
           <v-tab-item>
-            <InventoryDaily />
-          </v-tab-item>
-          <v-tab-item>
             <InventoryList />
           </v-tab-item>
           <v-tab-item>
@@ -42,7 +39,7 @@ export default {
     return {
       tab: null,
       items: [
-        'Diario', 'Inventario', 'Historial'
+        'Inventario', 'Historial'
       ]
     }
   },

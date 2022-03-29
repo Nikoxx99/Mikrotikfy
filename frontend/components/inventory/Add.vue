@@ -6,77 +6,73 @@
       color="primary"
       @click="modal = true"
     >
-      <v-icon>mdi-export-variant</v-icon>
+      <v-icon>mdi-import</v-icon>
       <span>Ingresar</span>
     </v-btn>
     <v-dialog
       v-model="modal"
       max-width="590"
     >
-      <v-row>
-        <v-col>
-          <v-card class="elevation-0">
-            <v-card-title>
-              Agregar Material
-            </v-card-title>
-            <v-card-text>
-              <v-row>
-                <v-col cols="8">
-                  <v-autocomplete
-                    v-model="add.material"
-                    item-text="name"
-                    item-value="id"
-                    :items="materialList"
-                    return-object
-                    label="Material a agregar"
-                    outlined
-                    dense
-                    hide-details
-                  />
-                </v-col>
-                <v-col cols="4">
-                  <v-text-field
-                    v-model.number="add.quantity"
-                    label="Cantidad"
-                    type="number"
-                    outlined
-                    dense
-                  />
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col cols="12">
-                  <v-select
-                    v-model.number="add.materialtype"
-                    label="Tipo"
-                    item-text="name"
-                    item-value="id"
-                    return-object
-                    :items="materialTypes"
-                    type="number"
-                    outlined
-                    dense
-                  />
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col>
-                  <v-btn
-                    color="blue darken-4"
-                    class="elevation-0"
-                    rounded
-                    :loading="loading"
-                    :disabled="loading"
-                    @click="addMaterial()"
-                  >
-                    Agregar
-                  </v-btn>
-                </v-col>
-              </v-row>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
+      <v-card class="elevation-0">
+        <v-card-title>
+          Agregar Material
+        </v-card-title>
+        <v-card-text>
+          <v-row>
+            <v-col cols="8">
+              <v-autocomplete
+                v-model="add.material"
+                item-text="name"
+                item-value="id"
+                :items="materialList"
+                return-object
+                label="Material a agregar"
+                outlined
+                dense
+                hide-details
+              />
+            </v-col>
+            <v-col cols="4">
+              <v-text-field
+                v-model.number="add.quantity"
+                label="Cantidad"
+                type="number"
+                outlined
+                dense
+              />
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12">
+              <v-select
+                v-model.number="add.materialtype"
+                label="Tipo"
+                item-text="name"
+                item-value="id"
+                return-object
+                :items="materialTypes"
+                type="number"
+                outlined
+                dense
+              />
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+              <v-btn
+                color="blue darken-4"
+                class="elevation-0"
+                rounded
+                :loading="loading"
+                :disabled="loading"
+                @click="addMaterial()"
+              >
+                Agregar
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
     </v-dialog>
   </div>
 </template>
@@ -113,6 +109,7 @@ export default {
   },
   mounted () {
     this.getMaterialList()
+    this.getMaterialTypes()
   },
   methods: {
     getMaterialTypes () {
@@ -128,9 +125,18 @@ export default {
         this.loading = !this.loading
         return
       }
-      if (this.add.material.materialquantities.data.find(materialquantity => materialquantity.materialtype.id === this.add.materialtype).length > 0) {
+      const hasQuantities = this.add.material.materialquantities.data.length > 0
+      const quantity = this.add.material.materialquantities.data.filter(q => q.attributes.materialtype.data.attributes.name === this.add.materialtype.name)
+      if (hasQuantities && quantity.length > 0) {
         this.$toast.success('Cantidad actualizada... ', { duration: 1000, position: 'top-center' })
-        await this.$store.dispatch('inventory/updateCurrentMaterialQuantity', { token: this.$store.state.auth.token, city: this.$route.query.city, data: this.add, action: 'return' })
+        await this.$store.dispatch('inventory/updateCurrentMaterialQuantity', {
+          quantity,
+          token: this.$store.state.auth.token,
+          city: this.$route.query.city,
+          data: this.add,
+          action: 'return'
+        })
+        this.modal = false
       } else {
         this.$toast.info('Cantidad creada... ', { duration: 1000, position: 'top-center' })
         await this.$store.dispatch('inventory/createMaterialQuantity', { token: this.$store.state.auth.token, city: this.$route.query.city, data: this.add, action: 'return' })

@@ -145,7 +145,7 @@ export default {
       return this.$store.state.cities ? this.$store.state.cities.find(c => c.name == this.$route.query.city) : ''
     },
     role () {
-      return this.$store.state.role.name
+      return this.$store.state.auth.role.name
     },
     setCityTitle () {
       return this.currentCity ? `${this.$route.name.toUpperCase()} ${this.currentCity.name}` : this.title

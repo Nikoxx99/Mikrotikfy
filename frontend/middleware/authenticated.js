@@ -1,5 +1,4 @@
 export default function ({ store, route, redirect }) {
-  console.log(route.path)
   if (!store.state.auth) {
     return redirect('/login')
   }

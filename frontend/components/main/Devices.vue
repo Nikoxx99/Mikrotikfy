@@ -109,7 +109,6 @@ export default {
   }),
   methods: {
     updateDeviceList (device) {
-      console.log(device)
       this.devices.push({
         mac_address: device.device.data.attributes.mac_address,
         devicebrand: device.devicebrand,

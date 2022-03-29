@@ -1,6 +1,18 @@
 <template>
-  <v-row>
-    <v-col cols="6">
+  <div>
+    <v-btn
+      rounded
+      class="ml-2 elevation-0"
+      color="red darken-4"
+      @click="modal = true"
+    >
+      <v-icon>mdi-export-variant</v-icon>
+      <span>Entregar</span>
+    </v-btn>
+    <v-dialog
+      v-model="modal"
+      max-width="890"
+    >
       <v-card class="elevation-0">
         <v-card-title>
           Entregar
@@ -10,7 +22,6 @@
             <v-col>
               <v-autocomplete
                 v-model="dispense.technician"
-                :disabled="!(!$isAdmin() || !$isBiller())"
                 item-text="username"
                 item-value="id"
                 :items="operatorList"
@@ -23,7 +34,6 @@
             <v-col>
               <v-select
                 v-model="dispense.materialhistorytype"
-                :disabled="!(!$isAdmin() || !$isBiller())"
                 item-text="name"
                 item-value="id"
                 :items="materialHistoryTypeList"
@@ -36,10 +46,9 @@
             </v-col>
           </v-row>
           <v-row>
-            <v-col cols="8">
+            <v-col cols="4">
               <v-autocomplete
                 v-model="dispense.material"
-                :disabled="!(!$isAdmin() || !$isBiller())"
                 item-text="name"
                 item-value="id"
                 :items="materialList"
@@ -54,6 +63,19 @@
               <v-text-field
                 v-model.number="dispense.quantity"
                 label="Cantidad"
+                type="number"
+                outlined
+                dense
+              />
+            </v-col>
+            <v-col cols="4">
+              <v-select
+                v-model.number="dispense.materialtype"
+                label="Sale de"
+                item-text="name"
+                item-value="id"
+                return-object
+                :items="materialTypes"
                 type="number"
                 outlined
                 dense
@@ -87,85 +109,8 @@
           </v-row>
         </v-card-text>
       </v-card>
-    </v-col>
-    <v-col cols="6">
-      <v-card class="elevation-0">
-        <v-card-title>
-          Devolver
-        </v-card-title>
-        <v-card-text>
-          <v-row>
-            <v-col>
-              <v-autocomplete
-                v-model="returned.technician"
-                :disabled="!(!$isAdmin() || !$isBiller())"
-                item-text="username"
-                item-value="id"
-                :items="operatorList"
-                label="Devolvio"
-                outlined
-                dense
-                hide-details
-              />
-            </v-col>
-            <v-col>
-              <v-select
-                v-model="returned.materialhistorytype"
-                :disabled="!(!$isAdmin() || !$isBiller())"
-                item-text="name"
-                item-value="id"
-                :items="materialHistoryTypeListReturn"
-                return-object
-                label="Tipo de Operacion"
-                outlined
-                dense
-                hide-details
-              />
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols="8">
-              <v-autocomplete
-                v-model="returned.material"
-                :disabled="!(!$isAdmin() || !$isBiller())"
-                item-text="name"
-                item-value="id"
-                :items="materialList"
-                return-object
-                label="Material"
-                outlined
-                dense
-                hide-details
-              />
-            </v-col>
-            <v-col cols="4">
-              <v-text-field
-                v-model.number="returned.quantity"
-                label="Cantidad"
-                type="number"
-                outlined
-                dense
-              />
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col>
-              <v-btn
-                color="blue darken-4"
-                class="elevation-0"
-                rounded
-                :loading="loading"
-                :disabled="loading"
-                @click="returnMaterial()"
-              >
-                Devolver
-              </v-btn>
-            </v-col>
-          </v-row>
-        </v-card-text>
-      </v-card>
-    </v-col>
-  </v-row>
+    </v-dialog>
+  </div>
 </template>
 
 <script>
@@ -174,19 +119,14 @@ export default {
     return {
       dispense: {
         material: null,
+        materialtype: null,
         quantity: 0,
         materialhistorytype: null,
         operator: this.$store.state.auth.id,
         technician: null
       },
-      returned: {
-        material: null,
-        quantity: 0,
-        materialhistorytype: null,
-        operator: this.$store.state.auth.id,
-        technician: null
-      },
-      loading: false
+      loading: false,
+      modal: false
     }
   },
   computed: {
@@ -195,6 +135,9 @@ export default {
     },
     materialList () {
       return this.$store.state.inventory.materialList
+    },
+    materialTypes () {
+      return this.$store.state.inventory.materialTypes
     },
     materialHistoryTypeList () {
       return this.$store.state.inventory.materialHistoryTypeList
@@ -215,23 +158,34 @@ export default {
     getMaterialList () {
       this.$store.dispatch('inventory/getMaterialList', { token: this.$store.state.auth.token, city: this.$route.query.city, pagination: { page: 1, pageSize: 1000 } })
     },
+    getMaterialTypes () {
+      this.$store.dispatch('inventory/getMaterialTypes', { token: this.$store.state.auth.token, city: this.$route.query.city, pagination: { page: 1, pageSize: 1000 } })
+    },
     getMaterialHistoryTypeList () {
       this.$store.dispatch('inventory/getMaterialHistoryTypeList', { token: this.$store.state.auth.token, city: this.$route.query.city })
     },
     async dispenseMaterial () {
       this.loading = !this.loading
-      if (!this.dispense.material || !this.dispense.materialhistorytype || !this.dispense.quantity || !this.dispense.technician) {
+      if (!this.dispense.material || !this.dispense.materialtype || !this.dispense.materialhistorytype || !this.dispense.quantity || !this.dispense.technician) {
         this.$toast.error('Rellena todos los campos antes de continuar', { position: 'top-center' })
         this.loading = !this.loading
         return
       }
-      if (this.dispense.material.quantity < this.dispense.quantity) {
+      const currentQuantityOfSelected = this.dispense.material.materialquantities.data.filter(item => item.attributes.materialtype.data.attributes.name === this.dispense.materialtype.name)[0].attributes?.quantity
+      if (currentQuantityOfSelected < this.dispense.quantity) {
         this.$toast.error('No hay suficiente material para dispensar', { position: 'top-center' })
         this.loading = !this.loading
         return
       }
+      const quantity = this.dispense.material.materialquantities.data.filter(q => q.attributes.materialtype.data.attributes.name === this.dispense.materialtype.name)
       await this.$store.dispatch('inventory/createOperationHistory', { token: this.$store.state.auth.token, city: this.$route.query.city, data: this.dispense })
-      await this.$store.dispatch('inventory/updateCurrentMaterialQuantity', { token: this.$store.state.auth.token, city: this.$route.query.city, data: this.dispense, action: 'add' })
+      await this.$store.dispatch('inventory/updateCurrentMaterialQuantity', {
+        quantity,
+        token: this.$store.state.auth.token,
+        city: this.$route.query.city,
+        data: this.dispense,
+        action: 'add'
+      })
       await this.$store.dispatch('inventory/getMaterialHistoryList', { token: this.$store.state.auth.token, city: this.$route.query.city, pagination: { page: 1, pageCount: 1, pageSize: 10 } })
       await this.$store.dispatch('inventory/getMaterialList', { token: this.$store.state.auth.token, city: this.$route.query.city, pagination: { page: 1, pageCount: 1, pageSize: 24 } })
       this.getMaterialList()
@@ -256,12 +210,6 @@ export default {
     resetFields () {
       this.dispense.material = null
       this.dispense.quantity = null
-      this.dispense.materialhistorytype = null
-      this.dispense.technician = null
-      this.returned.material = null
-      this.returned.quantity = null
-      this.returned.materialhistorytype = null
-      this.returned.technician = null
     }
   }
 }

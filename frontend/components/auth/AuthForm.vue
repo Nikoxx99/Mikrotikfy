@@ -202,8 +202,7 @@ export default {
               this.$store.dispatch('client/getClientTypesFromDatabase', response.jwt),
               this.$store.dispatch('neighborhood/getNeighborhoodsFromDatabase'),
               this.$store.dispatch('count/activeClients', { token: response.jwt, city: userCities[0].id }),
-              this.$store.dispatch('telegram/getTelegramBotsFromDatabase', { token: response.jwt, city: userCities[0].name }),
-              this.$store.dispatch('role/getRoleFromUserData', { token: response.jwt })
+              this.$store.dispatch('telegram/getTelegramBotsFromDatabase', { token: response.jwt, city: userCities[0].name })
             ]).then(() => {
               window.location.href = '/clients'
             }).catch((e) => {

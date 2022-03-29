@@ -15,7 +15,7 @@ export default {
   },
   computed: {
     role () {
-      return this.$store.state.role.role.name
+      return this.$store.state.auth.role.name
     },
     currentCity () {
       // eslint-disable-next-line eqeqeq
