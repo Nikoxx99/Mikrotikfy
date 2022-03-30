@@ -254,7 +254,8 @@ export default {
         const qs = require('qs')
         const query = qs.stringify({
           filters: {
-            dni: this.user_dni
+            dni: this.user_dni,
+            active: true
           }
         },
         {
@@ -330,7 +331,6 @@ export default {
     },
     async sendRequest () {
       if (this.valid) {
-        const date = Date.now()
         await fetch(`${this.$config.API_STRAPI_ENDPOINT}passwordchanges`, {
           method: 'POST',
           headers: {
@@ -338,16 +338,12 @@ export default {
           },
           body: JSON.stringify({
             data: {
+              active: true,
               dni: this.user_dni,
               client: this.clientid,
               old_password: this.user_old_password,
               new_password: this.user_new_password,
-              address: this.user_address,
-              closed: {
-                name: 'Cerrado',
-                value: false
-              },
-              createdAt: String(date)
+              address: this.user_address
             }
           })
         }).then((input) => {

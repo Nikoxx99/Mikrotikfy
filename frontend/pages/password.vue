@@ -24,14 +24,14 @@
               mobile-breakpoint="100"
               @page-count="pageCount = $event"
             >
-              <template v-slot:[`item.closed`]="props">
+              <template v-slot:[`item.active`]="props">
                 <v-chip
                   small
-                  :color="getColor(props.item.closed)"
+                  :color="getColor(props.item.active)"
                   class="white--text"
-                  @click="save(props.item.id, props.item.closed, props.item.client ? props.item.client.id : null, props.item.new_password, props.index)"
+                  @click="save(props.item.id, props.item.active, props.item.client ? props.item.client.id : null, props.item.new_password, passwordchanges.indexOf(props.item))"
                 >
-                  {{ getState(props.item.closed) }}
+                  {{ getState(props.item.active) }}
                 </v-chip>
               </template>
               <template v-slot:[`item.created_at`]="{ item }">
@@ -82,12 +82,12 @@ export default {
         { text: 'Clave Anterior', sortable: false, value: 'old_password' },
         { text: 'Clave Nueva', sortable: true, value: 'new_password' },
         { text: 'Ciudad', sortable: true, value: 'client.city.name' },
-        { text: 'Estado', sortable: true, value: 'closed' },
+        { text: 'Estado', sortable: true, value: 'active' },
         { text: 'Fecha', sortable: false, value: 'created_at' },
         { text: 'Acciones', sortable: false, value: 'actions' }
       ],
       title: 'Cambios de Clave',
-      States: [{ name: 'Abierto', value: false }, { name: 'Cerrado', value: true }],
+      States: [{ id: 1, name: 'Abierto' }, { id: 2, name: 'Cerrado' }],
       passwordchanges: []
     }
   },
@@ -101,17 +101,17 @@ export default {
       return humanDateFormat
     },
     getColor (state) {
-      if (state.value) {
-        return 'red'
-      } else {
+      if (state) {
         return 'blue'
+      } else {
+        return 'red'
       }
     },
     getState (state) {
-      if (state.value) {
-        return 'Cerrado'
-      } else {
+      if (state) {
         return 'Abierto'
+      } else {
+        return 'Cerrado'
       }
     },
     async getPasswordChanges () {
@@ -142,14 +142,13 @@ export default {
               passwordchange.attributes.client.city = passwordchange.attributes.client.city.data.attributes
             }
             passwordchange.attributes.id = passwordchange.id
-            passwordchange = passwordchange.attributes
-            return passwordchange
+            return passwordchange.attributes
           })
           this.passwordchanges = passwordchanges
         })
     },
-    async save (id, status, clientid, password, index) {
-      this.passwordchanges[index].closed.value = !this.passwordchanges[index].closed.value
+    async save (id, active, clientid, password, index) {
+      this.passwordchanges[index].active = !this.passwordchanges[index].active
       await fetch(`${this.$config.API_STRAPI_ENDPOINT}passwordchanges/${id}`, {
         method: 'PUT',
         headers: {
@@ -159,10 +158,7 @@ export default {
         body: JSON.stringify({
           data: {
             id,
-            closed: {
-              name: status.name,
-              value: status.value
-            },
+            active: !active,
             clientid,
             password
           }

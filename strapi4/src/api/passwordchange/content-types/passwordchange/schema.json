@@ -4,7 +4,8 @@
   "info": {
     "singularName": "passwordchange",
     "pluralName": "passwordchanges",
-    "displayName": "passwordchange"
+    "displayName": "passwordchange",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -17,9 +18,6 @@
     "new_password": {
       "type": "string"
     },
-    "closed": {
-      "type": "json"
-    },
     "dni": {
       "type": "string"
     },
@@ -31,6 +29,9 @@
       "relation": "manyToOne",
       "target": "api::client.client",
       "inversedBy": "passwordchanges"
+    },
+    "active": {
+      "type": "boolean"
     }
   }
 }
