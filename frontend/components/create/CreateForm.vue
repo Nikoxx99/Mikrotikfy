@@ -55,7 +55,7 @@
             outlined
             dense
             hide-details
-            @keyup="clienttype.name === 'INTERNET' ? calculateSsid : null"
+            @keyup="clienttype.name === 'INTERNET' ? calculateSsid() : null"
             @input="Client.name = $event.toUpperCase()"
           />
         </v-col>
