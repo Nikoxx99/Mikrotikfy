@@ -62,6 +62,7 @@
             <v-col cols="4">
               <v-text-field
                 v-model.number="dispense.quantity"
+                min="1"
                 label="Cantidad"
                 type="number"
                 outlined
@@ -120,7 +121,7 @@ export default {
       dispense: {
         material: null,
         materialtype: null,
-        quantity: 0,
+        quantity: 1,
         materialhistorytype: null,
         operator: this.$store.state.auth.id,
         technician: null

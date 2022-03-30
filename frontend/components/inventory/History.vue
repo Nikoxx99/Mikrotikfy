@@ -34,6 +34,21 @@
                 />
               </div>
             </template>
+            <template v-slot:[`item.material.name`]="{ item }">
+              <span>
+                {{ item.material.name }}
+                <v-tooltip v-if="item.description" right>
+                  <template v-slot:activator="{ on, attrs }">
+                    <span
+                      v-bind="attrs"
+                      class="red--text darken-4"
+                      v-on="on"
+                    >*</span>
+                  </template>
+                  <span>{{ item.description }}</span>
+                </v-tooltip>
+              </span>
+            </template>
             <template v-slot:[`item.createdAt`]="{ item }">
               <span>
                 {{ getDate(item.createdAt) }}
@@ -71,6 +86,7 @@ export default {
       headers: [
         { text: '#', value: 'id', sortable: false },
         { text: 'Material', value: 'material.name', sortable: false },
+        { text: 'Salio de', value: 'materialtype.name', sortable: false },
         { text: 'Tipo Operacion', value: 'materialhistorytype.name', sortable: false },
         { text: 'Cantidad', value: 'quantity', sortable: false },
         { text: 'Entrego', value: 'operator.username', sortable: false },

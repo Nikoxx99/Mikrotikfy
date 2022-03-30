@@ -156,7 +156,7 @@ export const actions = {
         ]
       } : {},
       pagination: payload.pagination,
-      populate: ['material', 'material.materialquantities', 'materialhistorytype', 'operator', 'technician'],
+      populate: ['material', 'materialtype', 'material.materialquantities', 'materialhistorytype', 'operator', 'technician'],
       sort: payload.sort || payload.sort ? [`${payload.sort.sortBy}:${payload.sort.sortDesc ? 'desc' : 'asc'}`] : []
     },
     {
@@ -175,6 +175,8 @@ export const actions = {
           const materialHistories = res.data.map((material) => {
             material.attributes.material.data.attributes.id = material.attributes.material.data.id
             material.attributes.material = material.attributes.material.data.attributes
+            material.attributes.materialtype.data.attributes.id = material.attributes.materialtype.data.id
+            material.attributes.materialtype = material.attributes.materialtype.data.attributes
             material.attributes.materialhistorytype.data.attributes.id = material.attributes.materialhistorytype.data.id
             material.attributes.materialhistorytype = material.attributes.materialhistorytype.data.attributes
             material.attributes.operator.data.attributes.id = material.attributes.operator.data.id
@@ -224,6 +226,7 @@ export const actions = {
             quantity: payload.data.quantity,
             description: payload.data.description,
             material: payload.data.material.id,
+            materialtype: payload.data.materialtype.id,
             materialhistorytype: payload.data.materialhistorytype.id,
             operator: payload.data.operator,
             technician: payload.data.technician

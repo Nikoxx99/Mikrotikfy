@@ -35,6 +35,7 @@
             <v-col cols="4">
               <v-text-field
                 v-model.number="add.quantity"
+                min="1"
                 label="Cantidad"
                 type="number"
                 outlined
@@ -91,7 +92,7 @@ export default {
       add: {
         material: null,
         materialtype: null,
-        quantity: 0
+        quantity: 1
       },
       loading: false
     }
@@ -136,11 +137,9 @@ export default {
           data: this.add,
           action: 'return'
         })
-        this.modal = false
       } else {
         this.$toast.info('Cantidad creada... ', { duration: 1000, position: 'top-center' })
         await this.$store.dispatch('inventory/createMaterialQuantity', { token: this.$store.state.auth.token, city: this.$route.query.city, data: this.add, action: 'return' })
-        this.modal = false
       }
       this.getMaterialList()
       this.resetFields()
@@ -148,7 +147,6 @@ export default {
     },
     resetFields () {
       this.add.material = null
-      this.add.materialtype = null
       this.add.quantity = 0
     }
   }
