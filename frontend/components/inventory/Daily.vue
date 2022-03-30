@@ -172,8 +172,8 @@ export default {
         this.loading = !this.loading
         return
       }
-      const currentQuantityOfSelected = this.dispense.material.materialquantities.data.filter(item => item.attributes.materialtype.data.attributes.name === this.dispense.materialtype.name)[0].attributes?.quantity
-      if (currentQuantityOfSelected < this.dispense.quantity) {
+      const currentQuantityOfSelected = this.dispense.material.materialquantities.data.filter(item => item.attributes.materialtype.data.attributes.name === this.dispense.materialtype.name)[0]?.attributes?.quantity
+      if (currentQuantityOfSelected < this.dispense.quantity || !currentQuantityOfSelected || currentQuantityOfSelected.length < 1) {
         this.$toast.error('No hay suficiente material para dispensar', { position: 'top-center' })
         this.loading = !this.loading
         return
