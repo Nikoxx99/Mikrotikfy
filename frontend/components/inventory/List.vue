@@ -38,7 +38,7 @@
                 small
                 class="blue darken-4 white--text mr-4"
               >
-                Total: {{ item.materialquantities?.data?.reduce((total, materialquantity) => total + materialquantity.attributes.quantity, 0) }}
+                Total: {{ item.materialquantities.data.reduce((total, materialquantity) => total + materialquantity.attributes.quantity, 0) }}
               </v-chip>
               <v-chip
                 v-for="(materialquantity, index) in item.materialquantities.data"
