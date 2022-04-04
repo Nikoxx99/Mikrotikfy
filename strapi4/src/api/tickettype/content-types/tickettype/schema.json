@@ -4,7 +4,8 @@
   "info": {
     "singularName": "tickettype",
     "pluralName": "tickettypes",
-    "displayName": "tickettype"
+    "displayName": "tickettype",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -19,6 +20,12 @@
       "relation": "oneToMany",
       "target": "api::ticket.ticket",
       "mappedBy": "tickettype"
+    },
+    "clienttypes": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::clienttype.clienttype",
+      "inversedBy": "tickettypes"
     }
   }
 }

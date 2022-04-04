@@ -35,6 +35,12 @@
       "relation": "manyToMany",
       "target": "plugin::users-permissions.user",
       "mappedBy": "clienttypes"
+    },
+    "tickettypes": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::tickettype.tickettype",
+      "inversedBy": "clienttypes"
     }
   }
 }

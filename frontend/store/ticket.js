@@ -1,5 +1,6 @@
 export const state = () => ({
   tickets: [],
+  tickettypes: [],
   headers: []
 })
 export const mutations = {
@@ -8,6 +9,13 @@ export const mutations = {
       state.tickets = ticketList
     } catch (error) {
       throw new Error(`TICKET MUTATE ${error}`)
+    }
+  },
+  getTickettypes (state, tickettypesList) {
+    try {
+      state.tickettypes = tickettypesList
+    } catch (error) {
+      throw new Error(`TICKETTYPE MUTATE ${error}`)
     }
   },
   getHeadersByClienttype (state, clienttype) {
@@ -178,5 +186,38 @@ export const actions = {
     } catch (error) {
       throw new Error(`TICKET ACTION ${error}`)
     }
+  },
+  async getTickettypes ({ commit }, payload) {
+    const qs = require('qs')
+    const query = qs.stringify({
+      filters: {
+        clienttypes: {
+          name: payload.clienttype
+        }
+      },
+      pagination: {
+        page: 1,
+        pageSize: 1000
+      }
+    },
+    {
+      encodeValuesOnly: true
+    })
+    await fetch(`${this.$config.API_STRAPI_ENDPOINT}tickettypes?${query}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${payload.token}`
+      }
+    })
+      .then(res => res.json())
+      .then((tickettypes) => {
+        const tt = tickettypes.data.map((tickettype) => {
+          tickettype.attributes.id = tickettype.id
+          tickettype = tickettype.attributes
+          return tickettype
+        })
+        commit('getTickettypes', tt)
+      })
   }
 }

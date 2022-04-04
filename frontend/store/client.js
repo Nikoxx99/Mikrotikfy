@@ -291,6 +291,7 @@ export const actions = {
       { text: 'Nombre', value: 'name', sortable: false },
       { text: 'Cedula', value: 'dni', sortable: false },
       { text: 'Direccion', sortable: false, value: 'address' },
+      { text: 'Estado', sortable: false, value: 'active' },
       { text: 'Barrio', value: 'neighborhood.name', sortable: false },
       { text: 'Telefono', sortable: false, value: 'phone' },
       { text: 'Acciones', value: 'actions', sortable: false }

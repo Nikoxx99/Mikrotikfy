@@ -120,7 +120,8 @@ export default {
         populate: [
           'client',
           'client.city'
-        ]
+        ],
+        sort: 'createdAt:desc'
       },
       {
         encodeValuesOnly: true

@@ -205,7 +205,6 @@ export default {
     alertBox: false,
     alertBoxColor: '',
     createdMessage: '',
-    tickettypes: [],
     errors: {
       type: false,
       details: false
@@ -257,36 +256,26 @@ export default {
     },
     telegramBots () {
       return this.$store.state.telegramBots.find(bot => bot.city.name === this.$route.query.city)
+    },
+    tickettypes () {
+      return this.$store.state.ticket.tickettypes
     }
   },
+  watch: {
+    $route () {
+      this.getTickettypes()
+    }
+  },
+  mounted () {
+    this.getTickettypes()
+  },
   methods: {
-    async getTickettypes () {
-      const qs = require('qs')
-      const query = qs.stringify({
-        pagination: {
-          page: 1,
-          pageSize: 1000
-        }
-      },
-      {
-        encodeValuesOnly: true
+    getTickettypes () {
+      this.$store.dispatch('ticket/getTickettypes', {
+        city: this.$route.query.city,
+        clienttype: this.$route.query.clienttype,
+        token: this.$store.state.auth.token
       })
-      await fetch(`${this.$config.API_STRAPI_ENDPOINT}tickettypes?${query}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.$store.state.auth.token}`
-        }
-      })
-        .then(res => res.json())
-        .then((tickettypes) => {
-          const tt = tickettypes.data.map((tickettype) => {
-            tickettype.attributes.id = tickettype.id
-            tickettype = tickettype.attributes
-            return tickettype
-          })
-          this.tickettypes = tt
-        })
     },
     isEmpty (obj) {
       return Object.keys(obj).length === 0
@@ -299,7 +288,6 @@ export default {
       this.ticketPayload.client = this.client.id
       this.ticketPayload.city = this.client.city.id
       this.ticketPayload.assignated = this.assignated
-      this.getTickettypes()
     },
     async createTicket () {
       this.loading = true

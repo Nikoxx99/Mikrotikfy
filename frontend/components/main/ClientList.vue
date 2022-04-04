@@ -130,7 +130,10 @@
                   </v-edit-dialog>
                 </template>
                 <template v-slot:[`item.code`]="{ item }">
-                  <span :class="item.status === 'green' ? 'online-text' : 'offline-text'">
+                  <span v-if="clienttype.name === 'INTERNET'" :class="item.status === 'green' ? 'online-text' : 'offline-text'">
+                    {{ item.code }}
+                  </span>
+                  <span v-else :class="item.active ? 'online-text' : 'offline-text'">
                     {{ item.code }}
                   </span>
                 </template>
@@ -144,7 +147,7 @@
                     <circle cx="10" cy="8" r="5" :fill="getModel(item.newModel)" />
                   </svg>
                 </template>
-                <template v-slot:[`item.active`]="props">
+                <template v-if="clienttype.name === 'INTERNET'" v-slot:[`item.active`]="props">
                   <div style="white-space:nowrap;display:inline-flex">
                     <v-tooltip v-if="$isAdmin()" left>
                       <template v-slot:activator="{ on, attrs }">
@@ -168,6 +171,16 @@
                       :index="clients.indexOf(props.item)"
                     />
                   </div>
+                </template>
+                <template v-else v-slot:[`item.active`]="props">
+                  <v-chip
+                    small
+                    :color="getColor(props.item.active)"
+                    class="white--text"
+                    @click="save(props.item.id, props.item.active, props.item.client ? props.item.client.id : null, props.item.new_password, passwordchanges.indexOf(props.item))"
+                  >
+                    {{ getState(props.item.active) }}
+                  </v-chip>
                 </template>
                 <template v-slot:[`item.actions`]="{ item }">
                   <div style="white-space:nowrap">
@@ -425,6 +438,20 @@ export default {
       const city = this.$route.query.city
       const clienttype = this.$route.query.clienttype
       await this.$store.dispatch('client/getHeadersByClientType', { city, clienttype, token: this.$store.state.auth.token })
+    },
+    getColor (state) {
+      if (state) {
+        return 'blue'
+      } else {
+        return 'red'
+      }
+    },
+    getState (state) {
+      if (state) {
+        return 'Activo'
+      } else {
+        return 'Desconectado'
+      }
     }
   }
 }

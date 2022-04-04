@@ -61,9 +61,39 @@
               @click:row="showTicketInfo({ item: $event, index: ticketList.indexOf($event) })"
             >
               <template v-slot:[`item.tickettype.name`]="props">
-                <v-chip small :color="getTicketTypeColor(props.item.tickettype.name)" class="white--text">
-                  {{ props.item.tickettype.name }}
-                </v-chip>
+                <v-edit-dialog
+                  ref="dialog"
+                  :return-value.sync="props.item.plan"
+                  large
+                  cancel-text="Cancelar"
+                  save-text="Guardar"
+                  @save="savePlanFromModal(props.item.id, props.item.plan, isRx, $store.state.auth.username, props.item)"
+                  @cancel="cancel()"
+                >
+                  <v-chip small :color="getTicketTypeColor(props.item.tickettype.name)" class="white--text">
+                    {{ props.item.tickettype.name }}
+                  </v-chip>
+                  <template v-slot:input>
+                    <v-checkbox
+                      v-model="isRx"
+                      label="Es reconexion?"
+                    />
+                    <v-select
+                      :value="props.item.plan"
+                      item-text="name"
+                      item-value="id"
+                      :items="plans"
+                      return-object
+                      single-line
+                      label="Plan"
+                      dense
+                      @change="updatePlanFromModal(props.item.id, $event, clients.map(function(x) {return x.id; }).indexOf(props.item.id))"
+                    />
+                  </template>
+                </v-edit-dialog>
+              </template>
+              <template v-slot:[`item.client.code`]="props">
+                <nuxt-link :to="`/clients/${props.item.client.code}`">{{props.item.client.code}}</nuxt-link>
               </template>
               <template v-if="isDesktop" v-slot:[`item.actions`]="props">
                 <div class="nowspace">
@@ -86,7 +116,9 @@
                     :name="props.item.client.name"
                     @updateTicketStatus="updateTicketStatus($event)"
                   />
-                  <MiscTvServiceStepper />
+                  <TvServiceStepper
+                    v-if="clienttype === 'TELEVISION'"
+                  />
                   <TicketAdvanceHistory
                     :ticketid="props.item.id"
                     :name="props.item.client.name"
@@ -210,6 +242,9 @@
                   :block="true"
                   :ticketid="editModalData.id"
                   :name="editModalData.client.name"
+                />
+                <TvServiceStepper
+                  v-if="clienttype === 'TELEVISION'"
                 />
                 <TicketHistory
                   :clientid="editModalData.client.id"
@@ -368,5 +403,8 @@ export default {
   .nowspace {white-space: nowrap !important;}
   .v-data-table > .v-data-table__wrapper > table > tfoot > tr > td {
     font-size: 12px;
+  }
+  a {
+    text-decoration: none;
   }
 </style>
