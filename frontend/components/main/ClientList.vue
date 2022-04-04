@@ -173,14 +173,40 @@
                   </div>
                 </template>
                 <template v-else v-slot:[`item.active`]="props">
-                  <v-chip
-                    small
-                    :color="getColor(props.item.active)"
-                    class="white--text"
-                    @click="save(props.item.id, props.item.active, props.item.client ? props.item.client.id : null, props.item.new_password, passwordchanges.indexOf(props.item))"
+                  <v-edit-dialog
+                    ref="dialog"
+                    large
+                    cancel-text="Cancelar"
+                    save-text="Guardar"
+                    @save="saveActiveFromModal(props.item.id, dxreason, props.item.active, clients.map(function(x) {return x.id; }).indexOf(props.item.id))"
+                    @cancel="cancel()"
                   >
-                    {{ getState(props.item.active) }}
-                  </v-chip>
+                    <v-chip
+                      small
+                      :color="getColor(props.item.active)"
+                      class="white--text"
+                    >
+                      {{ getState(props.item.active) }}
+                    </v-chip>
+                    <template v-slot:input>
+                      <v-checkbox
+                        :input-value="props.item.active"
+                        label="Cliente activo?"
+                        @change="updateStatusFromModal($event, clients.map(function(x) {return x.id; }).indexOf(props.item.id))"
+                      />
+                      <v-select
+                        v-if="!props.item.active"
+                        :value="dxreason"
+                        item-text="name"
+                        item-value="id"
+                        :items="dxreasons"
+                        return-object
+                        single-line
+                        label="Establecer como"
+                        dense
+                      />
+                    </template>
+                  </v-edit-dialog>
                 </template>
                 <template v-slot:[`item.actions`]="{ item }">
                   <div style="white-space:nowrap">
@@ -286,7 +312,17 @@ export default {
   },
   data () {
     return {
-      allowedcomponents: [],
+      dxreason: null,
+      dxreasons: [
+        {
+          id: 1,
+          name: 'RETIRO VOLUNTARIO'
+        },
+        {
+          id: 2,
+          name: 'DX POR MORA'
+        }
+      ],
       createDialog: false,
       isRx: true,
       itemsPerPage: 15,
@@ -401,6 +437,10 @@ export default {
       this.$store.dispatch('client/setPlanFromModal', { clientId, newPlan, isRx, operator, token: this.$store.state.auth.token })
       this.$simpleTelegramUpdatePlan({ client, operator, isRx, telegramBots: this.telegramBots })
     },
+    async saveActiveFromModal (clientid, dxreason, active, index) {
+      await this.$store.dispatch('client/setActiveFromModal', { clientid, dxreason, active, index, token: this.$store.state.auth.token })
+      this.dxreason = null
+    },
     updatePlanFromModal (clientid, newPlan, index) {
       this.$store.dispatch('client/updateFromModal', { clientid, newPlan, index })
     },
@@ -433,6 +473,9 @@ export default {
       } else {
         this.$store.dispatch('client/adminCreate', { client, index, token: this.$store.state.auth.token, operator: this.$store.state.auth.username })
       }
+    },
+    updateStatusFromModal (active, index) {
+      this.$store.commit('client/setActiveFromModal', { active, index })
     },
     async getHeadersByClientType () {
       const city = this.$route.query.city

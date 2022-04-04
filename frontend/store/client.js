@@ -4,6 +4,9 @@ export const state = () => ({
   headers: null
 })
 export const mutations = {
+  setActiveFromModal (state, payload) {
+    state.clients[payload.index].active = payload.active
+  },
   calculateClientStatus (state, newState) {
     state.clients = newState
   },
@@ -188,6 +191,25 @@ export const actions = {
     } catch (error) {
       throw new Error(`EDIT CLIENT PLAN ACTION ${error}`)
     }
+  },
+  async setActiveFromModal ({ commit }, payload) {
+    await fetch(`${this.$config.API_STRAPI_ENDPOINT}clients/${payload.clientid}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${payload.token}`
+      },
+      body: JSON.stringify({
+        data: {
+          active: payload.active
+        }
+      })
+    })
+      .then(res => res.json())
+      .then((res) => {
+        commit('setActiveFromModal', payload)
+        this.$toast.info('Cliente actualizado con exito', { duration: 4000, position: 'top-center' })
+      })
   },
   async adminCreate ({ commit }, { client, index, token, operator }) {
     await fetch(`${this.$config.API_STRAPI_ENDPOINT}admincreate`, {
