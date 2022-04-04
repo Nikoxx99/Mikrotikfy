@@ -29,7 +29,7 @@ module.exports = {
       return process
     } else {
       const mikrotikHost = searchCity.mikrotiks[0].ip
-      const resMk = await mkSetComment({ dni: client.dni, code: client.code, mikrotikHost, model: client.newModel })
+      const resMk = await mkSetComment({ dni: client.dni, code: client.code, mikrotikHost, model: client.newModel, comment: createComment(client) })
       if (resMk) {
         process.push({ code: client.code, name: client.name, success: true })
       } else {
