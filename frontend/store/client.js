@@ -177,6 +177,7 @@ export const actions = {
         })
       }).then((input) => {
         if (input.status === 200) {
+          this.$toast.info('Plan actualizado actualizado con exito', { duration: 4000, position: 'top-center' })
           return true
         }
       }).catch((error) => {

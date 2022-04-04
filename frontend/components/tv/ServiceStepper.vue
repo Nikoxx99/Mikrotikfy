@@ -76,6 +76,20 @@
 
 <script>
 export default {
+  props: {
+    clientid: {
+      type: Number,
+      default: -1
+    },
+    name: {
+      type: String,
+      default: ''
+    },
+    block: {
+      type: Boolean,
+      default: false
+    }
+  },
   data () {
     return {
       e6: 1,

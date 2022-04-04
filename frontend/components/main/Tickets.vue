@@ -63,37 +63,32 @@
               <template v-slot:[`item.tickettype.name`]="props">
                 <v-edit-dialog
                   ref="dialog"
-                  :return-value.sync="props.item.plan"
                   large
                   cancel-text="Cancelar"
                   save-text="Guardar"
-                  @save="savePlanFromModal(props.item.id, props.item.plan, isRx, $store.state.auth.username, props.item)"
+                  @save="saveTickettypeFromModal(props.item.id, props.item.tickettype.id, ticketList.map(function(x) {return x.id; }).indexOf(props.item.id))"
                   @cancel="cancel()"
                 >
                   <v-chip small :color="getTicketTypeColor(props.item.tickettype.name)" class="white--text">
                     {{ props.item.tickettype.name }}
                   </v-chip>
                   <template v-slot:input>
-                    <v-checkbox
-                      v-model="isRx"
-                      label="Es reconexion?"
-                    />
                     <v-select
-                      :value="props.item.plan"
+                      :value="props.item.tickettype"
                       item-text="name"
                       item-value="id"
-                      :items="plans"
+                      :items="tickettypes"
                       return-object
                       single-line
-                      label="Plan"
+                      label="Establecer tipo"
                       dense
-                      @change="updatePlanFromModal(props.item.id, $event, clients.map(function(x) {return x.id; }).indexOf(props.item.id))"
+                      @change="updateTickettypeFromModal(props.item.id, $event, ticketList.map(function(x) {return x.id; }).indexOf(props.item.id))"
                     />
                   </template>
                 </v-edit-dialog>
               </template>
               <template v-slot:[`item.client.code`]="props">
-                <nuxt-link :to="`/clients/${props.item.client.code}`">{{props.item.client.code}}</nuxt-link>
+                <nuxt-link :to="`/clients/${props.item.client.code}?city=${$route.query.city}&clienttype=${$route.query.clienttype}`">{{props.item.client.code}}</nuxt-link>
               </template>
               <template v-if="isDesktop" v-slot:[`item.actions`]="props">
                 <div class="nowspace">
@@ -245,6 +240,7 @@
                 />
                 <TvServiceStepper
                   v-if="clienttype === 'TELEVISION'"
+                  :block="true"
                 />
                 <TicketHistory
                   :clientid="editModalData.client.id"
@@ -309,18 +305,36 @@ export default {
     },
     clienttype () {
       return this.$route.query.clienttype
+    },
+    tickettypes () {
+      return this.$store.state.ticket.tickettypes
     }
   },
   watch: {
     $route () {
       this.refreshTickets()
+      this.getTickettypes()
     }
   },
   mounted () {
     this.getResolution()
     this.refreshTickets()
+    this.getTickettypes()
   },
   methods: {
+    updateTickettypeFromModal (id, tickettype, index) {
+      this.$store.commit('ticket/updateTickettype', { id, tickettype, index })
+    },
+    saveTickettypeFromModal (ticketid, tickettypeid, index) {
+      this.$store.dispatch('ticket/saveTickettype', { ticketid, tickettypeid, index, token: this.$store.state.auth.token })
+    },
+    getTickettypes () {
+      this.$store.dispatch('ticket/getTickettypes', {
+        city: this.$route.query.city,
+        clienttype: this.$route.query.clienttype,
+        token: this.$store.state.auth.token
+      })
+    },
     async refreshTickets () {
       this.initialLoading = true
       await this.$store.dispatch('ticket/getTicketsFromDatabase', { city: this.$route.query.city, clienttype: this.clienttype, token: this.$store.state.auth.token, active: this.showClosedValue, retired: this.showRetired })

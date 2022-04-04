@@ -4,6 +4,9 @@ export const state = () => ({
   headers: []
 })
 export const mutations = {
+  updateTickettype (state, payload) {
+    state.tickets[payload.index].tickettype = payload.tickettype
+  },
   getTicketsFromDatabase (state, ticketList) {
     try {
       state.tickets = ticketList
@@ -30,9 +33,9 @@ export const mutations = {
         { text: 'Telefono', sortable: false, value: 'client.phone', align: ' d-none d-lg-table-cell' },
         { text: 'Tec.', sortable: false, value: 'client.technology.name', align: ' d-none d-lg-table-cell' },
         { text: 'Tipo', sortable: false, value: 'tickettype.name' },
-        { text: 'Operador', sortable: false, value: 'assignated.username', align: ' d-none d-lg-table-cell' },
-        { text: 'Detalles', sortable: false, value: 'details', width: 400, align: ' d-none d-lg-table-cell' },
-        { text: 'Creado', sortable: false, value: 'createdAt', align: ' d-none d-lg-table-cell' },
+        { text: 'Creado por', sortable: false, value: 'assignated.username', align: ' d-none d-lg-table-cell' },
+        { text: 'Observaciones', sortable: false, value: 'details', width: 400, align: ' d-none d-lg-table-cell' },
+        { text: 'Creado el', sortable: false, value: 'createdAt', align: ' d-none d-lg-table-cell' },
         { text: 'Acciones', sortable: false, value: 'actions', align: ' d-none d-lg-table-cell' }
       ]
     } else {
@@ -44,9 +47,10 @@ export const mutations = {
         { text: 'Dirección', sortable: false, value: 'client.address', align: ' d-none d-lg-table-cell' },
         { text: 'Barrio', sortable: false, value: 'client.neighborhood.name' },
         { text: 'Telefono', sortable: false, value: 'client.phone', align: ' d-none d-lg-table-cell' },
+        { text: 'Creado por', sortable: false, value: 'tickettype.name' },
         { text: 'Operador', sortable: false, value: 'assignated.username', align: ' d-none d-lg-table-cell' },
-        { text: 'Detalles', sortable: false, value: 'details', width: 400, align: ' d-none d-lg-table-cell' },
-        { text: 'Creado', sortable: false, value: 'createdAt', align: ' d-none d-lg-table-cell' },
+        { text: 'Observaciones', sortable: false, value: 'details', width: 400, align: ' d-none d-lg-table-cell' },
+        { text: 'Creado el', sortable: false, value: 'createdAt', align: ' d-none d-lg-table-cell' },
         { text: 'Acciones', sortable: false, value: 'actions', align: ' d-none d-lg-table-cell' }
       ]
     }
@@ -218,6 +222,24 @@ export const actions = {
           return tickettype
         })
         commit('getTickettypes', tt)
+      })
+  },
+  async saveTickettype ({ _ }, payload) {
+    await fetch(`${this.$config.API_STRAPI_ENDPOINT}tickets/${payload.ticketid}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${payload.token}`
+      },
+      body: JSON.stringify({
+        data: {
+          tickettype: payload.tickettypeid
+        }
+      })
+    })
+      .then(res => res.json())
+      .then((_) => {
+        this.$toast.info('Tipo de Ticket actualizado con exito', { duration: 4000, position: 'top-center' })
       })
   }
 }

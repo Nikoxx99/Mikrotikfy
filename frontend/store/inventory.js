@@ -265,7 +265,6 @@ export const actions = {
     }
   },
   async updateCurrentMaterialQuantity (_, payload) {
-    console.log(payload)
     const finalQuantity = payload.action === 'add' ? payload.quantity[0].attributes.quantity - payload.data.quantity : payload.quantity[0].attributes.quantity + payload.data.quantity
     try {
       await fetch(`${this.$config.API_STRAPI_ENDPOINT}materialquantities/${payload.quantity[0].id}`, {
