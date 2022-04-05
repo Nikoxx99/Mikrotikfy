@@ -35,7 +35,7 @@
           >
             <v-icon>mdi-close</v-icon>
           </v-btn>
-          <v-toolbar-title>Settings</v-toolbar-title>
+          <v-toolbar-title>Ficha Técnica</v-toolbar-title>
         </v-toolbar>
         <v-stepper
           v-model="e6"
@@ -44,13 +44,13 @@
           <v-stepper-step
             :complete="e6 > 1"
             step="1"
+            editable
           >
             Calidad de señal
-            <small>En que condiciones quedo el servicio</small>
           </v-stepper-step>
-
           <v-stepper-content step="1">
             <v-select
+              v-model="specs.quality"
               :items="quality"
               label="Calidad de señal"
               prepend-icon="mdi-signal"
@@ -64,8 +64,79 @@
             >
               Siguiente
             </v-btn>
-            <v-btn text>
-              Cancel
+          </v-stepper-content>
+
+          <v-stepper-step
+            :complete="e6 > 2"
+            step="2"
+            editable
+          >
+            Medida DBs
+          </v-stepper-step>
+          <v-stepper-content step="2">
+            <v-text-field
+              v-model="specs.db"
+              label="Medida de DBs"
+              prepend-icon="mdi-volume-high"
+              class="mb-5"
+              outlined
+              hide-details
+            />
+            <v-btn
+              color="primary"
+              @click="e6 = 3"
+            >
+              Siguiente
+            </v-btn>
+          </v-stepper-content>
+
+          <v-stepper-step
+            :complete="e6 > 3"
+            step="3"
+            editable
+          >
+            Medida Altos
+          </v-stepper-step>
+          <v-stepper-content step="3">
+            <v-text-field
+              v-model.number="specs.high"
+              label="Altos"
+              prepend-icon="mdi-arrow-up-bold-box"
+              class="mb-5"
+              type="number"
+              outlined
+              hide-details
+            />
+            <v-btn
+              color="primary"
+              @click="e6 = 4"
+            >
+              Siguiente
+            </v-btn>
+          </v-stepper-content>
+
+          <v-stepper-step
+            :complete="e6 > 4"
+            step="4"
+            editable
+          >
+            Medida Bajos
+          </v-stepper-step>
+          <v-stepper-content step="4">
+            <v-text-field
+              v-model.number="specs.down"
+              label="Bajos"
+              prepend-icon="mdi-arrow-down-bold-box"
+              class="mb-5"
+              type="number"
+              outlined
+              hide-details
+            />
+            <v-btn
+              color="primary"
+              @click="save()"
+            >
+              Guardar
             </v-btn>
           </v-stepper-content>
         </v-stepper>
@@ -98,12 +169,21 @@ export default {
         'Excelente',
         'Regular',
         'Mala'
-      ]
+      ],
+      specs: {
+        quality: null,
+        db: -1
+      }
     }
   },
   methods: {
     initComponent () {
       this.dialog = true
+    },
+    save () {
+      this.dialog = false
+      this.$toast.info('Guardando...', { duration: 2000 })
+      this.e6 = 1
     }
   }
 }
