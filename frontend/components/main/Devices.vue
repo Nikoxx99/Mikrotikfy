@@ -145,7 +145,7 @@ export default {
         .then(res => res.json())
         .then((devices) => {
           const deviceRes = devices.data.map((device) => {
-            device.attributes.devicebrand = device.attributes.devicebrand.data.attributes
+            device.attributes.devicebrand = device.attributes.devicebrand?.data?.attributes
             device.attributes.id = device.id
             device = device.attributes
             return device
