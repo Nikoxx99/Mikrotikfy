@@ -28,14 +28,8 @@ export const actions = {
       })
         .then(res => res.json())
         .then((telegramBots) => {
-          telegramBots = telegramBots.data.map((telegramBot) => {
-            telegramBot.attributes.city.data.attributes.id = telegramBot.attributes.city.data.id
-            telegramBot.attributes.city = telegramBot.attributes.city.data.attributes
-            telegramBot.attributes.id = telegramBot.id
-            return telegramBot.attributes
-          })
-          localStorage.setItem('telegramBots', JSON.stringify(telegramBots))
-          commit('getTelegramBotsFromDatabase', telegramBots)
+          localStorage.setItem('telegramBots', JSON.stringify(telegramBots.data))
+          commit('getTelegramBotsFromDatabase', telegramBots.data)
         })
     } catch (error) {
       throw new Error(`TELEGRAM BOT ACTION ${error}`)

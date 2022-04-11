@@ -15,14 +15,9 @@ export const actions = {
     try {
       await fetch(`${this.$config.API_STRAPI_ENDPOINT}plans`)
         .then(res => res.json())
-        .then((res) => {
-          const plans = res.data.map((plan) => {
-            plan.attributes.id = plan.id
-            plan = plan.attributes
-            return plan
-          })
-          localStorage.setItem('plans', JSON.stringify(plans))
-          commit('getPlansFromDatabase', plans)
+        .then((plans) => {
+          localStorage.setItem('plans', JSON.stringify(plans.data))
+          commit('getPlansFromDatabase', plans.data)
         })
     } catch (error) {
       throw new Error(`PLAN ACTION ${error}`)

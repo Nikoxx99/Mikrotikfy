@@ -163,14 +163,7 @@ export default {
       })
         .then(res => res.json())
         .then((clients) => {
-          clients.data.attributes.id = clients.data.id
-          clients.data.attributes.technology.data.attributes.id = clients.data.attributes.technology.data.id
-          clients.data.attributes.technology = clients.data.attributes.technology.data.attributes
-          clients.data.attributes.mac_addresses = clients.data.attributes.mac_addresses.data.map((mac) => {
-            mac.attributes.id = mac.id
-            return mac.attributes
-          })
-          clients = clients.data.attributes
+          clients = clients.data
           if (clients.mac_addresses.length < 1 || Object.keys(clients.technology).length === 0 || !clients.nap_onu_address || !clients.opticalPower) {
             this.loading = false
             this.$toast.error('No puedes enviar una solicitud de activacion hasta no haber llenado los campos de NAP, Potencia Optica y haber registrado la MAC correspondiente al cliente', { position: 'top-center' })

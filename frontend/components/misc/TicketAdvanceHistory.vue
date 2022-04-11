@@ -131,20 +131,7 @@ export default {
       })
         .then(res => res.json())
         .then((ticketdetails) => {
-          const ticketdetailsRes = ticketdetails.data.map((ticketdetails) => {
-            ticketdetails.attributes.ticket.data.attributes.id = ticketdetails.attributes.ticket.data.id
-            ticketdetails.attributes.ticket = ticketdetails.attributes.ticket.data.attributes
-            ticketdetails.attributes.ticket.client.data.attributes.id = ticketdetails.attributes.ticket.client.data.id
-            ticketdetails.attributes.ticket.client = ticketdetails.attributes.ticket.client.data.attributes
-            ticketdetails.attributes.ticket.tickettype.data.attributes.id = ticketdetails.attributes.ticket.tickettype.data.id
-            ticketdetails.attributes.ticket.tickettype = ticketdetails.attributes.ticket.tickettype.data.attributes
-            ticketdetails.attributes.operator.data.attributes.id = ticketdetails.attributes.operator.data.id
-            ticketdetails.attributes.operator = ticketdetails.attributes.operator.data.attributes
-            ticketdetails.attributes.id = ticketdetails.id
-            ticketdetails = ticketdetails.attributes
-            return ticketdetails
-          })
-          this.ticketdetails = ticketdetailsRes
+          this.ticketdetails = ticketdetails.data
         })
     },
     getDate (date) {

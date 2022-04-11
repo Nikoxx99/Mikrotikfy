@@ -141,17 +141,12 @@ export default {
     async countClientData () {
       await fetch(`${this.$config.API_STRAPI_ENDPOINT}cities?filters[name][$eq]=${this.$route.query.city}`)
         .then(res => res.json())
-        .then((res) => {
-          const cities = res.data.map((city) => {
-            city.attributes.id = city.id
-            city = city.attributes
-            return city
-          })[0]
-          this.active = cities.active
-          this.count = cities.count
-          this.countActive = cities.countActive
-          this.countDisable = cities.countDisable
-          this.countRetired = cities.countRetired
+        .then((cities) => {
+          this.active = cities[0].active
+          this.count = cities[0].count
+          this.countActive = cities[0].countActive
+          this.countDisable = cities[0].countDisable
+          this.countRetired = cities[0].countRetired
         })
     },
     async getMikrotikStatus () {
@@ -164,12 +159,7 @@ export default {
         })
         .then(res => res.json())
         .then((mikrotiks) => {
-          mikrotiks = mikrotiks.data.map((mikrotik) => {
-            mikrotik.attributes.id = mikrotik.id
-            mikrotik = mikrotik.attributes
-            return mikrotik
-          })
-          this.mikrotikData = mikrotiks
+          this.mikrotikData = mikrotiks.data
         })
     }
   }

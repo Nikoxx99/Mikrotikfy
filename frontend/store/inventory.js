@@ -102,12 +102,8 @@ export const actions = {
         }
       })
         .then(res => res.json())
-        .then((res) => {
-          const materials = res.data.map((material) => {
-            material.attributes.id = material.id
-            return material.attributes
-          })
-          commit('getMaterialList', { materials, pagination: res.meta.pagination })
+        .then((materials) => {
+          commit('getMaterialList', { materials: materials.data, pagination: materials.meta.pagination })
         })
     } catch (error) {
       throw new Error(`MATERIALS ACTION ${error}`)
@@ -123,12 +119,8 @@ export const actions = {
         }
       })
         .then(res => res.json())
-        .then((res) => {
-          const materialTypes = res.data.map((materialtype) => {
-            materialtype.attributes.id = materialtype.id
-            return materialtype.attributes
-          })
-          commit('getMaterialTypes', materialTypes)
+        .then((materialTypes) => {
+          commit('getMaterialTypes', materialTypes.data)
         })
     } catch (error) {
       throw new Error(`MATERIAL TYPES ACTION ${error}`)
@@ -171,22 +163,8 @@ export const actions = {
         }
       })
         .then(res => res.json())
-        .then((res) => {
-          const materialHistories = res.data.map((material) => {
-            material.attributes.material.data.attributes.id = material.attributes.material.data.id
-            material.attributes.material = material.attributes.material.data.attributes
-            material.attributes.materialtype.data.attributes.id = material.attributes.materialtype.data.id
-            material.attributes.materialtype = material.attributes.materialtype.data.attributes
-            material.attributes.materialhistorytype.data.attributes.id = material.attributes.materialhistorytype.data.id
-            material.attributes.materialhistorytype = material.attributes.materialhistorytype.data.attributes
-            material.attributes.operator.data.attributes.id = material.attributes.operator.data.id
-            material.attributes.operator = material.attributes.operator.data.attributes
-            material.attributes.technician.data.attributes.id = material.attributes.technician.data.id
-            material.attributes.technician = material.attributes.technician.data.attributes
-            material.attributes.id = material.id
-            return material.attributes
-          })
-          commit('getMaterialHistoryList', { materialHistories, pagination: res.meta.pagination })
+        .then((materialHistories) => {
+          commit('getMaterialHistoryList', { materialHistories: materialHistories.data, pagination: materialHistories.meta.pagination })
         })
     } catch (error) {
       throw new Error(`MATERIALS HISTORY ACTION ${error}`)
@@ -202,12 +180,8 @@ export const actions = {
         }
       })
         .then(res => res.json())
-        .then((res) => {
-          const materialhistorytypes = res.data.map((materialhistorytype) => {
-            materialhistorytype.attributes.id = materialhistorytype.id
-            return materialhistorytype.attributes
-          })
-          commit('getMaterialHistoryTypeList', materialhistorytypes)
+        .then((materialhistorytypes) => {
+          commit('getMaterialHistoryTypeList', materialhistorytypes.data)
         })
     } catch (error) {
       throw new Error(`MATERIALS ACTION ${error}`)
@@ -265,7 +239,7 @@ export const actions = {
     }
   },
   async updateCurrentMaterialQuantity (_, payload) {
-    const finalQuantity = payload.action === 'add' ? payload.quantity[0].attributes.quantity - payload.data.quantity : payload.quantity[0].attributes.quantity + payload.data.quantity
+    const finalQuantity = payload.action === 'add' ? payload.quantity[0].quantity - payload.data.quantity : payload.quantity[0].quantity + payload.data.quantity
     try {
       await fetch(`${this.$config.API_STRAPI_ENDPOINT}materialquantities/${payload.quantity[0].id}`, {
         method: 'PUT',

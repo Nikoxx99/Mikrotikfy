@@ -172,13 +172,13 @@ export default {
         this.loading = !this.loading
         return
       }
-      const currentQuantityOfSelected = this.dispense.material.materialquantities.data.filter(item => item.attributes.materialtype.data.attributes.name === this.dispense.materialtype.name)[0]?.attributes?.quantity
+      const currentQuantityOfSelected = this.dispense.material.materialquantities.filter(item => item.materialtype.name === this.dispense.materialtype.name)[0]?.quantity
       if (currentQuantityOfSelected < this.dispense.quantity || !currentQuantityOfSelected || currentQuantityOfSelected.length < 1) {
         this.$toast.error('No hay suficiente material para dispensar', { position: 'top-center' })
         this.loading = !this.loading
         return
       }
-      const quantity = this.dispense.material.materialquantities.data.filter(q => q.attributes.materialtype.data.attributes.name === this.dispense.materialtype.name)
+      const quantity = this.dispense.material.materialquantities.filter(q => q.materialtype.name === this.dispense.materialtype.name)
       await this.$store.dispatch('inventory/createOperationHistory', { token: this.$store.state.auth.token, city: this.$route.query.city, data: this.dispense })
       await this.$store.dispatch('inventory/updateCurrentMaterialQuantity', {
         quantity,

@@ -110,9 +110,9 @@ export default {
   methods: {
     updateDeviceList (device) {
       this.devices.push({
-        mac_address: device.device.data.attributes.mac_address,
+        mac_address: device.device.mac_address,
         devicebrand: device.devicebrand,
-        createdAt: device.device.data.attributes.createdAt
+        createdAt: device.device.createdAt
       })
       this.$toast.success('Dispositivo creado correctamente', { duration: 4000, position: 'top-center' })
     },
@@ -144,13 +144,7 @@ export default {
       })
         .then(res => res.json())
         .then((devices) => {
-          const deviceRes = devices.data.map((device) => {
-            device.attributes.devicebrand = device.attributes.devicebrand?.data?.attributes
-            device.attributes.id = device.id
-            device = device.attributes
-            return device
-          })
-          this.devices = deviceRes
+          this.devices = devices.data
         })
     },
     getDate (date) {

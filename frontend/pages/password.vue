@@ -135,17 +135,7 @@ export default {
       })
         .then(res => res.json())
         .then((passwordchanges) => {
-          passwordchanges = passwordchanges.data.map((passwordchange) => {
-            if (passwordchange.attributes.client.data) {
-              passwordchange.attributes.client.data.attributes.id = passwordchange.attributes.client.data.id
-              passwordchange.attributes.client = passwordchange.attributes.client.data.attributes
-              passwordchange.attributes.client.city.data.attributes.id = passwordchange.attributes.client.city.data.id
-              passwordchange.attributes.client.city = passwordchange.attributes.client.city.data.attributes
-            }
-            passwordchange.attributes.id = passwordchange.id
-            return passwordchange.attributes
-          })
-          this.passwordchanges = passwordchanges
+          this.passwordchanges = passwordchanges.data
         })
     },
     async save (id, active, clientid, password, index) {

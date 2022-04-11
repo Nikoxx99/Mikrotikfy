@@ -40,19 +40,8 @@ export const actions = {
       })
         .then(res => res.json())
         .then((activationrequests) => {
-          const ar = activationrequests.data.map((activationrequest) => {
-            activationrequest.attributes.operator.data.attributes.id = activationrequest.attributes.operator.data.id
-            activationrequest.attributes.operator = activationrequest.attributes.operator.data.attributes
-            activationrequest.attributes.client.data.attributes.id = activationrequest.attributes.client.data.id
-            activationrequest.attributes.client = activationrequest.attributes.client.data.attributes
-            activationrequest.attributes.client.neighborhood.data.attributes.id = activationrequest.attributes.client.neighborhood.data.id
-            activationrequest.attributes.client.neighborhood = activationrequest.attributes.client.neighborhood.data.attributes
-            activationrequest.attributes.id = activationrequest.id
-            activationrequest = activationrequest.attributes
-            return activationrequest
-          })
-          localStorage.setItem('activationrequests', JSON.stringify(ar))
-          commit('getActivationRequestsFromDatabase', ar)
+          localStorage.setItem('activationrequests', JSON.stringify(activationrequests.data))
+          commit('getActivationRequestsFromDatabase', activationrequests.data)
         })
     } catch (error) {
       throw new Error(`ACTIVATION REQUESTS ACTION ${error}`)
@@ -95,16 +84,6 @@ export const actions = {
     })
       .then(res => res.json())
       .then(async (client) => {
-        client.data.attributes.id = client.data.id
-        client.data.attributes.neighborhood.data.attributes.id = client.data.attributes.neighborhood.data.id
-        client.data.attributes.neighborhood = client.data.attributes.neighborhood.data.attributes
-        client.data.attributes.plan.data.attributes.id = client.data.attributes.plan.data.id
-        client.data.attributes.plan = client.data.attributes.plan.data.attributes
-        client.data.attributes.technology.data.attributes.id = client.data.attributes.technology.data.id
-        client.data.attributes.technology = client.data.attributes.technology.data.attributes
-        client.data.attributes.city.data.attributes.id = client.data.attributes.city.data.id
-        client.data.attributes.city = client.data.attributes.city.data.attributes
-        client = client.data.attributes
         await fetch(`${this.$config.API_STRAPI_ENDPOINT}admincreate`, {
           method: 'POST',
           headers: {

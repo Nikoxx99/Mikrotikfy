@@ -145,13 +145,8 @@ export default {
         }
       })
         .then(res => res.json())
-        .then((naps) => {
-          const clients = naps.data.attributes.clients.data.map((client) => {
-            client.attributes.id = client.id
-            client = client.attributes
-            return client
-          })
-          this.napClientsList = clients
+        .then((clients) => {
+          this.napClientsList = clients.data
           this.loading = false
         })
     },
@@ -180,14 +175,7 @@ export default {
         })
           .then(res => res.json())
           .then((clients) => {
-            clients = clients.data.map((client) => {
-              client.attributes.neighborhood.data.attributes.id = client.attributes.neighborhood.data.id
-              client.attributes.neighborhood = client.attributes.neighborhood.data.attributes
-              client.attributes.id = client.id
-              client = client.attributes
-              return client
-            })
-            this.clientList = clients
+            this.clientList = clients.data
           })
       }
     },
