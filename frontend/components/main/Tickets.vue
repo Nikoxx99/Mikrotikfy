@@ -88,7 +88,7 @@
                 </v-edit-dialog>
               </template>
               <template v-slot:[`item.client.code`]="props">
-                <nuxt-link :to="`/clients/${props.item.client?.code}?city=${$route.query.city}&clienttype=${$route.query.clienttype}`">{{props.item.client.code}}</nuxt-link>
+                <nuxt-link :to="`/clients/${props.item.client.code}?city=${$route.query.city}&clienttype=${$route.query.clienttype}`">{{props.item.client.code}}</nuxt-link>
               </template>
               <template v-if="isDesktop" v-slot:[`item.actions`]="props">
                 <div class="nowspace">

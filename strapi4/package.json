@@ -16,6 +16,7 @@
     "mysql": "2.18.1",
     "node-fetch": "2.6.1",
     "node-routeros": "^1.6.9",
+    "strapi-plugin-entity-relationship-chart": "^4.1.0",
     "strapi-plugin-transformer": "^2.0.1"
   },
   "author": {

@@ -13,6 +13,7 @@
     hide-default-footer
     mobile-breakpoint="100"
     @page-count="pageCount = $event"
+    @click:row="showBillingInfo"
   />
 </template>
 <script>
@@ -40,10 +41,17 @@ export default {
   mounted () {
     this.loadingDataTable = true
     this.page = 1
+    this.getHeadersByClientType()
     this.getClientsBySearch()
     this.loadingDataTable = false
   },
   methods: {
+    getHeadersByClientType () {
+      this.loadingDataTable = true
+      this.$store.dispatch('billing/getHeadersByClientType', { clienttype: this.$route.query.clienttype }).then(() => {
+        this.loadingDataTable = false
+      })
+    },
     getClientsBySearch () {
       if (this.search) {
         this.$store.dispatch('billing/getClientsBySearch', {
@@ -53,6 +61,9 @@ export default {
           token: this.$store.state.auth.token
         })
       }
+    },
+    showBillingInfo (item) {
+      console.log(item.id)
     }
   }
 }

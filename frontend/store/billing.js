@@ -3,11 +3,18 @@ export const state = () => ({
   headers: []
 })
 export const mutations = {
-  getClientsBySearch (state, cityList) {
+  getClientsBySearch (state, clients) {
     try {
-      state.cities = cityList
+      state.clients = clients.data
     } catch (error) {
-      throw new Error(`CITY MUTATE ${error}`)
+      throw new Error(`BILLING CLIENTS SEARCH MUTATE ${error}`)
+    }
+  },
+  getHeadersByClientType (state, headers) {
+    try {
+      state.headers = headers
+    } catch (error) {
+      throw new Error(`GET BILLING HEADERS BY CLIENT TYPE MUTATE ${error}`)
     }
   }
 }
@@ -16,8 +23,36 @@ export const actions = {
     try {
       const qs = require('qs')
       const query = qs.stringify({
-        filters: {},
-        populate: []
+        filters: {
+          $and: [
+            {
+              city: {
+                name: payload.city
+              }
+            },
+            {
+              clienttype: {
+                name: payload.clienttype
+              }
+            },
+            {
+              $or: [
+                {
+                  name: {
+                    $contains: payload.search
+                  }
+                },
+                {
+                  code: payload.search
+                },
+                {
+                  dni: payload.search
+                }
+              ]
+            }
+          ]
+        },
+        populate: ['neighborhood', 'plan', 'technology']
       },
       {
         encodeValuesOnly: true
@@ -30,17 +65,36 @@ export const actions = {
         }
       })
         .then(res => res.json())
-        .then((res) => {
-          const cities = res.data.map((city) => {
-            city.attributes.id = city.id
-            city = city.attributes
-            return city
-          })
-          localStorage.setItem('cities', JSON.stringify(cities))
-          commit('getClientsBySearch', cities)
+        .then((clients) => {
+          commit('getClientsBySearch', clients)
         })
     } catch (error) {
-      throw new Error(`CITY ACTION ${error}`)
+      throw new Error(`BILLING CLIENTS SEARCH ACTION ${error}`)
+    }
+  },
+  getHeadersByClientType ({ commit }, { city, clienttype }) {
+    const internet = [
+      { text: 'Codigo', value: 'code', sortable: false },
+      { text: 'Nombre', value: 'name', sortable: false },
+      { text: 'Cedula', value: 'dni', sortable: false },
+      { text: 'Direccion', sortable: false, value: 'address' },
+      { text: 'Barrio', value: 'neighborhood.name', sortable: false },
+      { text: 'Telefono', sortable: false, value: 'phone' }
+    ]
+    const television = [
+      { text: 'Codigo', value: 'code', sortable: false },
+      { text: 'Nombre', value: 'name', sortable: false },
+      { text: 'Cedula', value: 'dni', sortable: false },
+      { text: 'Direccion', sortable: false, value: 'address' },
+      { text: 'Estado', sortable: false, value: 'active' },
+      { text: 'Barrio', value: 'neighborhood.name', sortable: false },
+      { text: 'Telefono', sortable: false, value: 'phone' }
+    ]
+
+    if (clienttype === 'INTERNET') {
+      commit('getHeadersByClientType', internet)
+    } else if (clienttype === 'TELEVISION') {
+      commit('getHeadersByClientType', television)
     }
   }
 }
