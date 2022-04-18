@@ -38,6 +38,10 @@
               label="Mostrar retiros"
               @change="refreshTickets()"
             />
+            <h3 v-if="!showClosedValue" class="mt-5">
+              {{ ticketList.length }}
+              {{ ticketList.length === 1 ? 'Ticket activo' : 'Tickets activos' }}
+            </h3>
             </v-row>
           </v-card-text>
           <client-only>
