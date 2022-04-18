@@ -11,11 +11,7 @@ export const state = () => {
     devicebrands: null,
     neighborhoods: null,
     activeClients: null,
-    activeClientsList: null,
-    clientCount: null,
-    clientCountActive: null,
-    clientCountDisable: null,
-    clientCountRetired: null
+    activeClientsList: null
   }
 }
 export const mutations = {
@@ -32,10 +28,6 @@ export const mutations = {
     state.activeClientsList = JSON.parse(activeClientsList)
     state.clienttypes = JSON.parse(clienttypes)
     state.telegramBots = JSON.parse(telegramBots)
-    // state.clientCount = JSON.parse(clientCount)
-    // state.clientCountActive = JSON.parse(clientCountActive)
-    // state.clientCountDisable = JSON.parse(clientCountDisable)
-    // state.clientCountRetired = JSON.parse(clientCountRetired)
   },
   setTicketsFromLocalStorage (state, tickets) {
     state.tickets = JSON.parse(tickets)
@@ -82,10 +74,6 @@ export const actions = {
     const activeClientsList = localStorage.getItem('activeClientsList')
     const telegramBots = localStorage.getItem('telegramBots')
     const clienttypes = localStorage.getItem('clienttypes')
-    // const clientCount = localStorage.getItem('clientCount')
-    // const clientCountActive = localStorage.getItem('clientCountActive')
-    // const clientCountDisable = localStorage.getItem('clientCountDisable')
-    // const clientCountRetired = localStorage.getItem('clientCountRetired')
     commit('setLocalStorage', { cities, plans, technologies, neighborhoods, deviceBrands, activeClients, activeClientsList, clienttypes, telegramBots })
   },
   getTicketsFromLocalStorage ({ commit }) {
@@ -113,15 +101,6 @@ export const actions = {
         })
     } catch (error) {
       throw new Error(`ACTIVECOUNT ACTION ${error}`)
-    }
-  },
-  async refreshTickets ({ commit }, { city, limit }) {
-    try {
-      const res = await this.$axios.$get(`/tickets?city=${city}&_limit=${limit}&_sort=createdAt:desc`)
-      localStorage.setItem('tickets', JSON.stringify(res))
-      commit('refreshTickets', res)
-    } catch (error) {
-      throw new Error(`TICKET ACTION ${error}`)
     }
   }
 }
