@@ -117,6 +117,7 @@ export const actions = {
           'client',
           'client.neighborhood',
           'client.technology',
+          'client.plan',
           'city',
           'tickettype',
           'clienttype',
@@ -166,6 +167,8 @@ export const actions = {
               ticket.attributes.client.neighborhood = ticket.attributes.client.neighborhood.data.attributes
               ticket.attributes.client.technology.data.attributes.id = ticket.attributes.client.technology.data.id
               ticket.attributes.client.technology = ticket.attributes.client.technology.data.attributes
+              ticket.attributes.client.plan.data.attributes.id = ticket.attributes.client.plan.data.id
+              ticket.attributes.client.plan = ticket.attributes.client.plan.data.attributes
               ticket.attributes.tickettype.data.attributes.id = ticket.attributes.tickettype.data.id
               ticket.attributes.tickettype = ticket.attributes.tickettype.data.attributes
               ticket.attributes.clienttype.data.attributes.id = ticket.attributes.clienttype.data.id

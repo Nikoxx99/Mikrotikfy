@@ -91,6 +91,10 @@
                   </template>
                 </v-edit-dialog>
               </template>
+              <template v-slot:[`item.client.name`]="props">
+                <span v-if="props.item.client.plan.name === 'EN MORA' || props.item.client.plan.name === 'RETIRADO'" class="red--text">EN MORA <span class="text-decoration-line-through">{{props.item.client.name}}</span></span>
+                <span v-else>{{props.item.client.name}}</span>
+              </template>
               <template v-slot:[`item.client.code`]="props">
                 <nuxt-link :to="`/clients/${props.item.client.code}?city=${$route.query.city}&clienttype=${$route.query.clienttype}`">{{props.item.client.code}}</nuxt-link>
               </template>
