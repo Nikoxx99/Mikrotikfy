@@ -73,6 +73,15 @@
                         @change="alertBox = false"
                       />
                     </v-col>
+                    <v-col>
+                      <v-text-field
+                        v-model="device.details"
+                        label="Comentario"
+                        required
+                        outlined
+                        dense
+                      />
+                    </v-col>
                   </v-row>
                 </v-col>
               </v-row>
@@ -163,7 +172,7 @@ export default {
             Authorization: `Bearer ${this.$store.state.auth.token}`
           },
           body: JSON.stringify({
-            data: { mac_address: this.device.mac_address, devicebrand: this.device.devicebrand.id, clients: [this.clientid] }
+            data: { mac_address: this.device.mac_address, details: this.device.details, devicebrand: this.device.devicebrand.id, clients: [this.clientid] }
           })
         }).then((input) => {
           if (input.status === 200) {

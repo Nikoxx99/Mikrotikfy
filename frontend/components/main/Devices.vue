@@ -102,8 +102,9 @@ export default {
     itemsPerPage: 10,
     devices: [],
     headers: [
-      { text: 'Mac', sortable: true, value: 'mac_address' },
-      { text: 'Marca', sortable: true, value: 'devicebrand.name' },
+      { text: 'Mac', sortable: false, value: 'mac_address' },
+      { text: 'Marca', sortable: false, value: 'devicebrand.name' },
+      { text: 'Comentario', sortable: false, value: 'details' },
       { text: 'Fecha de Adicion', sortable: true, value: 'createdAt' }
     ]
   }),
@@ -111,6 +112,7 @@ export default {
     updateDeviceList (device) {
       this.devices.push({
         mac_address: device.device.data.attributes.mac_address,
+        details: device.device.data.attributes.details,
         devicebrand: device.devicebrand,
         createdAt: device.device.data.attributes.createdAt
       })

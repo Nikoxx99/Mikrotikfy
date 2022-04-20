@@ -26,6 +26,9 @@
       "relation": "manyToOne",
       "target": "api::devicebrand.devicebrand",
       "inversedBy": "devices"
+    },
+    "details": {
+      "type": "string"
     }
   }
 }
