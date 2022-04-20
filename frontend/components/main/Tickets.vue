@@ -53,6 +53,7 @@
               :items-per-page="itemsPerPage"
               :page.sync="page"
               :loading="initialLoading"
+              :expanded.sync="expanded"
               sort-by="createdAt"
               calculate-widths
               sort-desc
@@ -90,6 +91,11 @@
                     />
                   </template>
                 </v-edit-dialog>
+              </template>
+              <template v-if="!isDesktop" v-slot:expanded-item="{ headers, item }">
+                <td :colspan="headers.length">
+                  <span class="grey--text">Avance:</span> {{ item.details ? item.details : 'no hay' }}
+                </td>
               </template>
               <template v-slot:[`item.client.name`]="props">
                 <span v-if="props.item.client.plan.name === 'EN MORA' || props.item.client.plan.name === 'RETIRADO'" class="red--text">EN MORA <span class="text-decoration-line-through">{{props.item.client.name}}</span></span>
@@ -297,7 +303,9 @@ export default {
       editModalData: {},
       infoModal: false,
       States: [{ name: 'Abierto', value: true }, { name: 'Cerrado', value: false }],
-      allowed_components: []
+      allowed_components: [],
+      expanded: [],
+      singleExpand: true
     }
   },
   computed: {
@@ -346,6 +354,7 @@ export default {
     async refreshTickets () {
       this.initialLoading = true
       await this.$store.dispatch('ticket/getTicketsFromDatabase', { city: this.$route.query.city, clienttype: this.clienttype, token: this.$store.state.auth.token, active: this.showClosedValue, retired: this.showRetired })
+      this.expanded = this.ticketList
       this.initialLoading = false
     },
     updateTicketStatus ({ editindex, closeTicket }) {
