@@ -107,7 +107,7 @@
                     @save="savePlanFromModal(props.item.id, props.item.plan, isRx, $store.state.auth.username, props.item)"
                     @cancel="cancel()"
                   >
-                    <v-chip small class="white black--text">
+                    <v-chip small :class=" props.item.plan.name === 'EN MORA' || props.item.plan.name === 'RETIRADO' ? 'red darken-4' : 'white black--text'">
                       {{ props.item.plan.name }}
                     </v-chip>
                     <template v-slot:input>
@@ -432,10 +432,12 @@ export default {
         await this.$store.dispatch('client/calculateClientStatus', this.activeClientsList)
       }
     },
-    savePlanFromModal (clientId, newPlan, isRx, operator, client) {
+    async savePlanFromModal (clientId, newPlan, isRx, operator, client) {
       // set plan by callback after the update
-      this.$store.dispatch('client/setPlanFromModal', { clientId, newPlan, isRx, operator, token: this.$store.state.auth.token })
+      this.loadingDataTable = true
+      await this.$store.dispatch('client/setPlanFromModal', { clientId, newPlan, isRx, operator, token: this.$store.state.auth.token })
       this.$simpleTelegramUpdatePlan({ client, operator, isRx, telegramBots: this.telegramBots })
+      this.loadingDataTable = false
     },
     async saveActiveFromModal (clientid, dxreason, active, index) {
       await this.$store.dispatch('client/setActiveFromModal', { clientid, dxreason, active, index, token: this.$store.state.auth.token })

@@ -121,7 +121,7 @@ export const actions = {
       })
         .then(res => res.json())
         .then((clienttypes) => {
-          localStorage.setItem('clienttypes', JSON.stringify(clienttypes))
+          localStorage.setItem('clienttypes', JSON.stringify(clienttypes.data))
         })
     } catch (error) {
       throw new Error(`ACTION ${error}`)

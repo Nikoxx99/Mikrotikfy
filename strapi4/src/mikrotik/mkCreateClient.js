@@ -3,6 +3,7 @@ module.exports.mkCreateClient = async function (
   mikrotikHost,
   client
 ) {
+  console.log(mikrotikHost, client)
   const conn = new RouterOSAPI({
     host: mikrotikHost,
     user: "API_ARNOP",

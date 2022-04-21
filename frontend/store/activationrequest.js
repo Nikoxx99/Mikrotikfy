@@ -22,16 +22,21 @@ export const actions = {
     try {
       const qs = require('qs')
       const query = qs.stringify({
+        filters: {
+          hasPendingRx: true,
+          active: false
+        },
         populate: [
-          'operator',
-          'client',
-          'client.neighborhood'
+          'city',
+          'plan',
+          'technology',
+          'neighborhood'
         ]
       },
       {
         encodeValuesOnly: true
       })
-      await fetch(`${this.$config.API_STRAPI_ENDPOINT}activationrequests?${query}`, {
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}clients?${query}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -49,55 +54,34 @@ export const actions = {
   },
   async updateActivationRequest ({ commit }, payload) {
     try {
-      await fetch(`${this.$config.API_STRAPI_ENDPOINT}activationrequests/${payload.activationrequest.id}`, {
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}clients/${payload.activationrequest.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${payload.token}`
         },
-        body: JSON.stringify({ data: { active: !payload.activationrequest.active } })
+        body: JSON.stringify({ data: { active: !payload.activationrequest.active, hasPendingRx: !payload.activationrequest.hasPendingRx } })
       })
       commit('updateActivationRequest', { index: payload.index, activationrequest: payload.activationrequest })
     } catch (error) {
       throw new Error(`ACTIVATION REQUESTS ACTION ${error}`)
     }
   },
-  async createClientOnMikrotikById ({ commit }, payload) {
-    const qs = require('qs')
-    const query = qs.stringify({
-      populate: [
-        'neighborhood',
-        'plan',
-        'technology',
-        'city'
-      ]
-    },
-    {
-      encodeValuesOnly: true
-    })
-    await fetch(`${this.$config.API_STRAPI_ENDPOINT}clients/${payload.clientid}?${query}`, {
-      method: 'GET',
+  async createClientOnMikrotikById (_, payload) {
+    console.log(payload)
+    await fetch(`${this.$config.API_STRAPI_ENDPOINT}admincreate`, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${payload.token}`
-      }
-    })
-      .then(res => res.json())
-      .then(async (client) => {
-        await fetch(`${this.$config.API_STRAPI_ENDPOINT}admincreate`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${payload.token}`
-          },
-          body: JSON.stringify({
-            data: { ...client, operator: payload.operator }
-          })
-        }).catch((error) => {
-          // eslint-disable-next-line no-console
-          console.error(error)
-          throw new Error(`ADMINCREATE ACTION ${error}`)
-        })
+      },
+      body: JSON.stringify({
+        data: { ...payload.client, operator: payload.operator }
       })
+    }).catch((error) => {
+      // eslint-disable-next-line no-console
+      console.error(error)
+      throw new Error(`ADMINCREATE ACTION ${error}`)
+    })
   }
 }

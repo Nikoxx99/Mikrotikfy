@@ -25,10 +25,10 @@
     >
       <v-card
         :loading="loading"
-        :class="clientData ? clientData.online ? 'teal darken-4' : '' : ''"
+        :class="clientData ? clientData.online ? clientData.address.includes('172.') ? 'blue-grey darken-4' : 'teal darken-4' : '' : ''"
       >
         <v-card-title class="headline">
-          Estatus en Mikrotik de {{ name }}
+          {{ name }}
         </v-card-title>
         <div v-if="!loading">
           <v-card-text>
@@ -36,10 +36,10 @@
               v-if="clientData && clientData.online && clientData.exists"
               dense
               text
-              type="success"
+              :type="clientData.address.includes('172.') ? 'error' : 'success'"
               class="my-4"
             >
-              El cliente esta <strong>En Linea</strong>
+              El cliente esta <strong>{{ clientData.address.includes('172.') ? 'en linea pero NO ESTA NAVEGANDO (SIGUE CORTADO) REPORTAR A NICO' : 'en Linea ' }}</strong>
             </v-alert>
             <v-alert
               v-else-if="clientData && !clientData.online && clientData.exists"

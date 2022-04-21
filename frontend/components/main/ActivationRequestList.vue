@@ -67,6 +67,9 @@
                 <span>Activar Cliente</span>
                 </v-tooltip>
               </template>
+              <template v-slot:[`item.code`]="props">
+                <nuxt-link :to="`/clients/${props.item.code}?city=${$route.query.city}&clienttype=${$route.query.clienttype}`">{{props.item.code}}</nuxt-link>
+              </template>
               <template v-slot:[`item.active`]="props">
                 <v-chip small :color="getColor(props.item.active)" class="white--text">
                   {{ getState(props.item.active) }}
@@ -75,11 +78,6 @@
               <template v-slot:[`item.createdAt`]="{ item }">
                 <span>
                   {{ getDate(item.createdAt) }}
-                </span>
-              </template>
-              <template v-slot:[`item.client.createdAt`]="{ item }">
-                <span>
-                  {{ getDate(item.client.createdAt) }}
                 </span>
               </template>
             </v-data-table>
@@ -113,14 +111,11 @@ export default {
       showClosedValue: false,
       refreshLoading: false,
       headers: [
-        { text: 'Estado', sortable: false, value: 'active', width: '5%' },
-        { text: 'Codigo', sortable: false, value: 'client.code', width: 60 },
-        { text: 'Cliente', sortable: false, value: 'client.name', width: 150 },
-        { text: 'Dirección', sortable: false, value: 'client.address', width: 200 },
-        { text: 'Barrio', sortable: false, value: 'client.neighborhood.name', width: 100 },
-        { text: 'Creado Cliente', sortable: false, value: 'client.createdAt' },
-        { text: 'Operador', sortable: false, value: 'operator.username', width: 60 },
-        { text: 'Creada Solicitud', sortable: false, value: 'createdAt' },
+        { text: 'Estado', sortable: false, value: 'active' },
+        { text: 'Codigo', sortable: false, value: 'code' },
+        { text: 'Cliente', sortable: false, value: 'name' },
+        { text: 'Dirección', sortable: false, value: 'address' },
+        { text: 'Barrio', sortable: false, value: 'neighborhood.name' },
         { text: 'Acciones', sortable: false, value: 'actions' }
       ],
       States: [{ name: 'Abierto', value: true }, { name: 'Cerrado', value: false }]
@@ -149,8 +144,8 @@ export default {
     },
     async updateStatus (index) {
       await this.$store.dispatch('activationrequest/updateActivationRequest', { token: this.$store.state.auth.token, activationrequest: this.activationRequestsList[index], index })
-      await this.$store.dispatch('activationrequest/createClientOnMikrotikById', { token: this.$store.state.auth.token, clientid: this.activationRequestsList[index].client.id, operador: this.$store.state.auth.username })
-      this.$simpleTelegramAdminCreate({ client: this.activationRequestsList[index].client, telegramBots: this.telegramBots, operator: this.$store.state.auth.username })
+      await this.$store.dispatch('activationrequest/createClientOnMikrotikById', { token: this.$store.state.auth.token, client: this.activationRequestsList[index], operador: this.$store.state.auth.username })
+      this.$simpleTelegramAdminCreate({ client: this.activationRequestsList[index], telegramBots: this.telegramBots, operator: this.$store.state.auth.username })
     },
     getDate (date) {
       const dateObject = new Date(date)
@@ -174,3 +169,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+a {
+    text-decoration: none;
+  }
+</style>

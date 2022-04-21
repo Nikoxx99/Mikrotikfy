@@ -111,10 +111,10 @@ export default {
   methods: {
     updateDeviceList (device) {
       this.devices.push({
-        mac_address: device.device.data.attributes.mac_address,
-        details: device.device.data.attributes.details,
+        mac_address: device.device.data.mac_address,
+        details: device.device.data.details,
         devicebrand: device.devicebrand,
-        createdAt: device.device.createdAt
+        createdAt: device.device.data.createdAt
       })
       this.$toast.success('Dispositivo creado correctamente', { duration: 4000, position: 'top-center' })
     },

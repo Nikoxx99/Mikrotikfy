@@ -70,10 +70,6 @@ export default {
     index: {
       type: Number,
       default: -1
-    },
-    allowedcomponents: {
-      type: Array,
-      default: () => []
     }
   },
   data () {
@@ -105,18 +101,15 @@ export default {
       await this.testDuplicates()
       try {
         if (this.flag1 && this.flag2) {
-          await fetch(`${this.$config.API_STRAPI_ENDPOINT}activationrequests`, {
-            method: 'POST',
+          await fetch(`${this.$config.API_STRAPI_ENDPOINT}clients/${this.item.id}`, {
+            method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${this.$store.state.auth.token}`
             },
             body: JSON.stringify({
               data: {
-                active: false,
-                operator: this.$store.state.auth.id,
-                client: this.item.id,
-                city: this.currentCity.id
+                hasPendingRx: true
               }
             })
           })
@@ -175,19 +168,7 @@ export default {
         })
     },
     async testDuplicates () {
-      const qs = require('qs')
-      const query = qs.stringify({
-        filters: {
-          active: true,
-          client: {
-            id: this.item.id
-          }
-        }
-      },
-      {
-        encodeValuesOnly: true
-      })
-      await fetch(`${this.$config.API_STRAPI_ENDPOINT}activationrequests?${query}`, {
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}clients/${this.item.id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -196,7 +177,7 @@ export default {
       })
         .then((res) => { return res.json() })
         .then((activationRequestExists) => {
-          if (activationRequestExists.data.length > 0) {
+          if (activationRequestExists.data.hasPendingRx) {
             this.loading = false
             this.$toast.error('Ya existe una solicitud de activación', { position: 'top-center' })
           } else {
