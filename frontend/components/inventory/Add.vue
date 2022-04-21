@@ -126,8 +126,8 @@ export default {
         this.loading = !this.loading
         return
       }
-      const hasQuantities = this.add.material.materialquantities.data.length > 0
-      const quantity = this.add.material.materialquantities.data.filter(q => q.attributes.materialtype.data.attributes.name === this.add.materialtype.name)
+      const hasQuantities = this.add.material.materialquantities.length > 0
+      const quantity = this.add.material.materialquantities.filter(q => q.materialtype.name === this.add.materialtype.name)
       if (hasQuantities && quantity.length > 0) {
         this.$toast.success('Cantidad actualizada... ', { duration: 1000, position: 'top-center' })
         await this.$store.dispatch('inventory/updateCurrentMaterialQuantity', {

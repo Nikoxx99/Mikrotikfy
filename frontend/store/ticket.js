@@ -139,51 +139,10 @@ export const actions = {
         .then(res => res.json())
         .then((tickets) => {
           const ticketList = tickets.data.map((ticket) => {
-            if (clienttype === 'TELEVISION') {
-              ticket.attributes.id = ticket.id
-              ticket.attributes.client.data.attributes.id = ticket.attributes.client.data.id
-              ticket.attributes.client = ticket.attributes.client.data.attributes
-              ticket.attributes.city.data.attributes.id = ticket.attributes.city.data.id
-              ticket.attributes.city = ticket.attributes.city.data.attributes
-              ticket.attributes.client.neighborhood.data.attributes.id = ticket.attributes.client.neighborhood.data.id
-              ticket.attributes.client.neighborhood = ticket.attributes.client.neighborhood.data.attributes
-              ticket.attributes.tickettype.data.attributes.id = ticket.attributes.tickettype.data.id
-              ticket.attributes.tickettype = ticket.attributes.tickettype.data.attributes
-              ticket.attributes.clienttype.data.attributes.id = ticket.attributes.clienttype.data.id
-              ticket.attributes.clienttype = ticket.attributes.clienttype.data.attributes
-              ticket.attributes.assignated.data.attributes.id = ticket.attributes.assignated.data.id
-              ticket.attributes.assignated = ticket.attributes.assignated.data.attributes
-              ticket.attributes.ticketdetails.data.forEach((ticketdetail) => {
-                ticketdetail.attributes.id = ticketdetail.id
-                ticketdetail = ticketdetail.attributes
-              })
-            } else {
-              ticket.attributes.id = ticket.id
-              ticket.attributes.client.data.attributes.id = ticket.attributes.client.data.id
-              ticket.attributes.client = ticket.attributes.client.data.attributes
-              ticket.attributes.city.data.attributes.id = ticket.attributes.city.data.id
-              ticket.attributes.city = ticket.attributes.city.data.attributes
-              ticket.attributes.client.neighborhood.data.attributes.id = ticket.attributes.client.neighborhood.data.id
-              ticket.attributes.client.neighborhood = ticket.attributes.client.neighborhood.data.attributes
-              ticket.attributes.client.technology.data.attributes.id = ticket.attributes.client.technology.data.id
-              ticket.attributes.client.technology = ticket.attributes.client.technology.data.attributes
-              ticket.attributes.client.plan.data.attributes.id = ticket.attributes.client.plan.data.id
-              ticket.attributes.client.plan = ticket.attributes.client.plan.data.attributes
-              ticket.attributes.tickettype.data.attributes.id = ticket.attributes.tickettype.data.id
-              ticket.attributes.tickettype = ticket.attributes.tickettype.data.attributes
-              ticket.attributes.clienttype.data.attributes.id = ticket.attributes.clienttype.data.id
-              ticket.attributes.clienttype = ticket.attributes.clienttype.data.attributes
-              ticket.attributes.assignated.data.attributes.id = ticket.attributes.assignated.data.id
-              ticket.attributes.assignated = ticket.attributes.assignated.data.attributes
-              ticket.attributes.ticketdetails.data.forEach((ticketdetail) => {
-                ticketdetail.attributes.id = ticketdetail.id
-                ticketdetail = ticketdetail.attributes
-              })
+            if (ticket.ticketdetails.length > 0) {
+              ticket.details = ticket.ticketdetails.slice(-1)[0].operator.username + ': ' + ticket.ticketdetails.slice(-1)[0].details
             }
-            if (ticket.attributes.ticketdetails.data.length > 0) {
-              ticket.attributes.details = ticket.attributes.ticketdetails.data.slice(-1)[0].attributes.operator.data.attributes.username + ': ' + ticket.attributes.ticketdetails.data.slice(-1)[0].attributes.details
-            }
-            return ticket.attributes
+            return ticket
           })
           localStorage.setItem('tickets', JSON.stringify(ticketList))
           commit('getTicketsFromDatabase', ticketList)
@@ -219,12 +178,7 @@ export const actions = {
     })
       .then(res => res.json())
       .then((tickettypes) => {
-        const tt = tickettypes.data.map((tickettype) => {
-          tickettype.attributes.id = tickettype.id
-          tickettype = tickettype.attributes
-          return tickettype
-        })
-        commit('getTickettypes', tt)
+        commit('getTickettypes', tickettypes.data)
       })
   },
   async saveTickettype ({ _ }, payload) {

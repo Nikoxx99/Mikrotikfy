@@ -15,14 +15,9 @@ export const actions = {
     try {
       await fetch(`${this.$config.API_STRAPI_ENDPOINT}technologies`)
         .then(res => res.json())
-        .then((res) => {
-          const technologies = res.data.map((technology) => {
-            technology.attributes.id = technology.id
-            technology = technology.attributes
-            return technology
-          })
-          localStorage.setItem('technologies', JSON.stringify(technologies))
-          commit('getTechnologiesFromDatabase', technologies)
+        .then((technologies) => {
+          localStorage.setItem('technologies', JSON.stringify(technologies.data))
+          commit('getTechnologiesFromDatabase', technologies.data)
         })
     } catch (error) {
       throw new Error(`TECHNOLOGY ACTION ${error}`)

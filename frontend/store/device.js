@@ -15,14 +15,9 @@ export const actions = {
     try {
       await fetch(`${this.$config.API_STRAPI_ENDPOINT}devicebrands`)
         .then(res => res.json())
-        .then((res) => {
-          const devicebrands = res.data.map((devicebrand) => {
-            devicebrand.attributes.id = devicebrand.id
-            devicebrand = devicebrand.attributes
-            return devicebrand
-          })
-          localStorage.setItem('devicebrands', JSON.stringify(devicebrands))
-          commit('getDeviceBrandsFromDatabase', devicebrands)
+        .then((devicebrands) => {
+          localStorage.setItem('devicebrands', JSON.stringify(devicebrands.data))
+          commit('getDeviceBrandsFromDatabase', devicebrands.data)
         })
     } catch (error) {
       throw new Error(`DEVICE BRANDS ACTION ${error}`)

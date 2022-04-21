@@ -26,7 +26,22 @@ export default {
       return this.$store.state.cities ? this.$store.state.cities.find(c => c.name == this.$route.query.city) : ''
     }
   },
+  watch: {
+    $route () {
+      this.getTickettypes()
+    }
+  },
+  mounted () {
+    this.getTickettypes()
+  },
   methods: {
+    getTickettypes () {
+      this.$store.dispatch('ticket/getTickettypes', {
+        city: this.$route.query.city,
+        clienttype: this.$route.query.clienttype,
+        token: this.$store.state.auth.token
+      })
+    },
     can (component) {
       // eslint-disable-next-line camelcase
       const allowed_components = this.role

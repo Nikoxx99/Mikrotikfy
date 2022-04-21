@@ -63,18 +63,7 @@ export const actions = {
       })
         .then(res => res.json())
         .then((naps) => {
-          naps = naps.data.map((nap) => {
-            nap.attributes.neighborhood.data.attributes.id = nap.attributes.neighborhood.data.id
-            nap.attributes.neighborhood = nap.attributes.neighborhood.data.attributes
-            nap.attributes.technology.data.attributes.id = nap.attributes.technology.data.id
-            nap.attributes.technology = nap.attributes.technology.data.attributes
-            nap.attributes.naptype.data.attributes.id = nap.attributes.naptype.data.id
-            nap.attributes.naptype = nap.attributes.naptype.data.attributes
-            nap.attributes.id = nap.id
-            nap = nap.attributes
-            return nap
-          })
-          commit('napList', naps)
+          commit('napList', naps.data)
         })
     } catch (error) {
       throw new Error(`NAPS GET ACTION ${error}`)
@@ -90,12 +79,7 @@ export const actions = {
       })
         .then(res => res.json())
         .then((naptypes) => {
-          naptypes = naptypes.data.map((naptype) => {
-            naptype.attributes.id = naptype.id
-            naptype = naptype.attributes
-            return naptype
-          })
-          commit('napTypes', naptypes)
+          commit('napTypes', naptypes.data)
         })
     } catch (error) {
       throw new Error(`NAPSTYPES GET ACTION ${error}`)

@@ -121,10 +121,6 @@ export const actions = {
       })
         .then(res => res.json())
         .then((clienttypes) => {
-          clienttypes = clienttypes.data.map((clienttype) => {
-            clienttype.attributes.id = clienttype.id
-            return clienttype.attributes
-          })
           localStorage.setItem('clienttypes', JSON.stringify(clienttypes))
         })
     } catch (error) {

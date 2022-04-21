@@ -261,22 +261,7 @@ export default {
       return this.$store.state.ticket.tickettypes
     }
   },
-  watch: {
-    $route () {
-      this.getTickettypes()
-    }
-  },
-  mounted () {
-    this.getTickettypes()
-  },
   methods: {
-    getTickettypes () {
-      this.$store.dispatch('ticket/getTickettypes', {
-        city: this.$route.query.city,
-        clienttype: this.$route.query.clienttype,
-        token: this.$store.state.auth.token
-      })
-    },
     isEmpty (obj) {
       return Object.keys(obj).length === 0
     },

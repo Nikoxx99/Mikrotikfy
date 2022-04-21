@@ -128,14 +128,14 @@ export default {
       successfulCuts: [],
       input: '',
       headers: [
-        { text: 'Codigo', sortable: true, value: 'attributes.code' },
-        { text: 'Nombre', sortable: true, value: 'attributes.name' },
-        { text: 'Plan', sortable: true, value: 'attributes.plan.data.attributes.name' },
+        { text: 'Codigo', sortable: true, value: 'code' },
+        { text: 'Nombre', sortable: true, value: 'name' },
+        { text: 'Plan', sortable: true, value: 'plan.name' },
         { text: 'Acciones', value: 'actions', sortable: false }
       ],
       successfulCutsHeaders: [
-        { text: 'Codigo', sortable: true, value: 'attributes.code' },
-        { text: 'Nombre', sortable: true, value: 'attributes.name' },
+        { text: 'Codigo', sortable: true, value: 'code' },
+        { text: 'Nombre', sortable: true, value: 'name' },
         { text: 'Exitoso', sortable: true, value: 'success' }
       ],
       kickStat: { id: 1, name: 'No patear' },

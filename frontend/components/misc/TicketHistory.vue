@@ -156,18 +156,7 @@ export default {
       })
         .then(res => res.json())
         .then((tickets) => {
-          const ticketRes = tickets.data.map((ticket) => {
-            ticket.attributes.client.data.attributes.id = ticket.attributes.client.data.id
-            ticket.attributes.client = ticket.attributes.client.data.attributes
-            ticket.attributes.tickettype.data.attributes.id = ticket.attributes.tickettype.data.id
-            ticket.attributes.tickettype = ticket.attributes.tickettype.data.attributes
-            ticket.attributes.assignated.data.attributes.id = ticket.attributes.assignated.data.id
-            ticket.attributes.assignated = ticket.attributes.assignated.data.attributes
-            ticket.attributes.id = ticket.id
-            ticket = ticket.attributes
-            return ticket
-          })
-          this.tickets = ticketRes
+          this.tickets = tickets.data
         })
     },
     getDate (date) {

@@ -38,15 +38,15 @@
                 small
                 class="blue darken-4 white--text mr-4"
               >
-                Total: {{ item.materialquantities.data.reduce((total, materialquantity) => total + materialquantity.attributes.quantity, 0) }}
+                Total: {{ item.materialquantities.reduce((total, materialquantity) => total + materialquantity.quantity, 0) }}
               </v-chip>
               <v-chip
-                v-for="(materialquantity, index) in item.materialquantities.data"
+                v-for="(materialquantity, index) in item.materialquantities"
                 :key="index"
                 small
-                :class="materialquantity.attributes.quantity < 1 ? 'red darken-4 white--text mr-4' : 'white black--text mr-4'"
+                :class="materialquantity.quantity < 1 ? 'red darken-4 white--text mr-4' : 'white black--text mr-4'"
               >
-                {{ materialquantity.attributes.materialtype.data.attributes.name + ' ' }}: <strong>{{ materialquantity.attributes.quantity }}</strong>
+                {{ materialquantity.materialtype.name + ' ' }}: <strong>{{ materialquantity.quantity }}</strong>
               </v-chip>
             </template>
             <template v-slot:[`item.createdAt`]="{ item }">

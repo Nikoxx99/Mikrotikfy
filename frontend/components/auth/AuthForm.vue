@@ -174,7 +174,8 @@ export default {
               id: menu.id,
               name: menu.name,
               icon: menu.icon,
-              url: menu.url
+              url: menu.url,
+              priority: menu.priority
             }
           })
           if (!userCities) {
@@ -189,7 +190,7 @@ export default {
               username: userData.username,
               cities: userCities,
               clienttypes: userClienttypes,
-              menu: userMenus,
+              menu: userMenus.sort((a, b) => a.priority - b.priority),
               role: userData.role
             }
             Cookie.set('auth', auth, { expires: 7 })

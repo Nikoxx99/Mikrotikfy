@@ -25,14 +25,9 @@ export const actions = {
     try {
       await fetch(`${this.$config.API_STRAPI_ENDPOINT}neighborhoods?${query}`)
         .then(res => res.json())
-        .then((res) => {
-          const neighborhoods = res.data.map((neighborhood) => {
-            neighborhood.attributes.id = neighborhood.id
-            neighborhood = neighborhood.attributes
-            return neighborhood
-          })
-          localStorage.setItem('neighborhoods', JSON.stringify(neighborhoods))
-          commit('getNeighborhoodsFromDatabase', neighborhoods)
+        .then((neighborhoods) => {
+          localStorage.setItem('neighborhoods', JSON.stringify(neighborhoods.data))
+          commit('getNeighborhoodsFromDatabase', neighborhoods.data)
         })
     } catch (error) {
       throw new Error(`NEIGHBORHOOD ACTION ${error}`)
