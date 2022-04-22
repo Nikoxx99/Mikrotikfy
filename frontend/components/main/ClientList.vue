@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <v-container>
     <div v-if="clients.length < 1 && !$route.params.search && clienttype">
       <v-row class="justify-center">
         <h4>Crea un cliente</h4>
@@ -39,7 +39,7 @@
     </v-row>
     <v-row v-if="clients.length > 0" class="mt-0">
       <v-col class="pt-0">
-        <v-card class="elevation-0">
+        <v-card class="elevation-0 rounded-xl">
           <v-card-text>
             <client-only>
               <v-data-table
@@ -97,7 +97,7 @@
                     /> -->
                   </div>
                 </template>
-                <template v-slot:[`item.plan.name`]="props">
+                <template v-if="clienttype.name === 'INTERNET'" v-slot:[`item.plan.name`]="props">
                   <v-edit-dialog
                     ref="dialog"
                     :return-value.sync="props.item.plan"
@@ -282,7 +282,7 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-  </div>
+  </v-container>
 </template>
 
 <script>

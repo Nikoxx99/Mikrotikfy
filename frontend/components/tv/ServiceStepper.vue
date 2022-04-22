@@ -51,7 +51,9 @@
           <v-stepper-content step="1">
             <v-select
               v-model="specs.quality"
-              :items="quality"
+              :items="tvSpecTypes"
+              item-text="name"
+              item-value="id"
               label="Calidad de señal"
               prepend-icon="mdi-signal"
               class="mb-5"
@@ -165,23 +167,59 @@ export default {
     return {
       e6: 1,
       dialog: false,
-      quality: [
-        'Excelente',
-        'Regular',
-        'Mala'
-      ],
       specs: {
         quality: null,
-        db: -1
+        db: -1,
+        high: -1,
+        down: -1
       }
     }
+  },
+  computed: {
+    tvSpecTypes () {
+      return this.$store.state.tv.spectypes
+    }
+  },
+  mounted () {
+    this.initComponent()
+    this.getTvSpecTypes()
   },
   methods: {
     initComponent () {
       this.dialog = true
     },
+    getTvSpecTypes () {
+      this.$store.dispatch('tv/getTvSpecTypes', { token: this.$store.state.auth.token })
+    },
     save () {
+      if (this.specs.quality === null) {
+        this.$toast.error('Seleccione una calidad de señal', { duration: 3000 })
+        return
+      }
+      if (this.specs.db === -1) {
+        this.$toast.error('Ingrese una medida de DBs', {
+          duration: 3000
+        })
+        return
+      }
+      if (this.specs.high === -1) {
+        this.$toast.error('Ingrese una medida de altos', {
+          duration: 3000
+        })
+        return
+      }
+      if (this.specs.down === -1) {
+        this.$toast.error('Ingrese una medida de bajos', {
+          duration: 3000
+        })
+        return
+      }
       this.dialog = false
+      this.$store.dispatch('tv/saveSpecs', {
+        clientid: this.clientid,
+        specs: this.specs,
+        token: this.$store.state.auth.token
+      })
       this.$toast.info('Guardando...', { duration: 2000 })
       this.e6 = 1
     }

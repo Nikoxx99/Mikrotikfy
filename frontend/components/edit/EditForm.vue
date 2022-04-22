@@ -285,7 +285,6 @@
                   disabled
                 />
               </div> -->
-              <v-checkbox v-if="clienttype.name === 'INTERNET'" v-model="editClient.hasRepeater" hide-details label="Tiene repetidor?" />
             </v-form>
           </v-container>
         </v-card-text>
@@ -293,6 +292,8 @@
           <v-btn
             class="mr-4"
             color="primary"
+            :loading="loading"
+            :disabled="loading"
             @click="updateClient(editClient, index)"
           >
             Confirmar
@@ -349,6 +350,7 @@ export default {
         'DIAGONAL'
       ],
       dialogEdit: false,
+      loading: false,
       alertBox: false,
       alertBoxColor: '',
       createdMessage: '',
@@ -406,6 +408,7 @@ export default {
   },
   methods: {
     async updateClient (client, index) {
+      this.loading = true
       const operator = this.$store.state.auth.id
       if (this.addDevice) {
         await fetch(`${this.$config.API_STRAPI_ENDPOINT}devices`, {
@@ -437,6 +440,7 @@ export default {
       await this.$store.dispatch('client/updateClientCommentOnMikrotik', { client, token: this.$store.state.auth.token })
       this.$emit('updateSuccess')
       this.$simpleTelegramUpdate({ client: this.client, operator: this.$store.state.auth.username, telegramBots: this.telegramBots })
+      this.loading = false
       this.dialogEdit = false
     },
     genAddress () {

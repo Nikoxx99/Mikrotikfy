@@ -303,7 +303,7 @@ export const actions = {
       { text: 'Tecnologia', value: 'technology.name', sortable: false },
       { text: 'Tipo', value: 'newModel', sortable: false },
       { text: 'Activo', value: 'active', sortable: false },
-      { text: 'Acciones', value: 'actions', sortable: false }
+      { text: '', value: 'actions', sortable: false }
     ]
     const television = [
       { text: 'Codigo', value: 'code', sortable: false },
@@ -313,7 +313,7 @@ export const actions = {
       { text: 'Estado', sortable: false, value: 'active' },
       { text: 'Barrio', value: 'neighborhood.name', sortable: false },
       { text: 'Telefono', sortable: false, value: 'phone' },
-      { text: 'Acciones', value: 'actions', sortable: false }
+      { text: '', value: 'actions', sortable: false }
     ]
 
     if (clienttype === 'INTERNET') {

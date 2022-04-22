@@ -13,7 +13,7 @@ function simpleTelegramCreate ({ client, operator, telegramBots }) {
   try {
     const bot = telegramBots.token
     const chatid = telegramBots.log
-    const message = `CREADO\n${client.code}\n${client.name}\n${client.dni}\n${client.address}\n${client.phone}\n${client.wifi_ssid}\n${client.wifi_password}\n${operator}\n${client.createdAt}`
+    const message = `CREADO\n${client.code}\n${client.name}\n${client.dni}\n${client.address}\n${client.phone}\n${client.wifi_ssid}\n${client.wifi_password}\n${operator}`
     const req =
       'https://api.telegram.org/bot' +
       bot +

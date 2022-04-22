@@ -97,8 +97,8 @@
                   <span class="grey--text">Avance:</span> {{ item.details ? item.details : 'no hay' }}
                 </td>
               </template>
-              <template v-slot:[`item.client.name`]="props">
-                <span v-if="props.item.client.plan.name === 'EN MORA' || props.item.client.plan.name === 'RETIRADO'" class="red--text">EN MORA <span class="text-decoration-line-through">{{props.item.client.name}}</span></span>
+              <template v-if="clienttype === 'INTERNET'" v-slot:[`item.client.name`]="props">
+                <span v-if="testPlanDx(props.item.client)" class="red--text">EN MORA <span class="text-decoration-line-through">{{props.item.client.name}}</span></span>
                 <span v-else>{{props.item.client.name}}</span>
               </template>
               <template v-slot:[`item.client.code`]="props">
@@ -127,6 +127,7 @@
                   />
                   <TvServiceStepper
                     v-if="clienttype === 'TELEVISION'"
+                    :clientid="props.item.client.id"
                   />
                   <TicketAdvanceHistory
                     :ticketid="props.item.id"
@@ -254,6 +255,7 @@
                 />
                 <TvServiceStepper
                   v-if="clienttype === 'TELEVISION'"
+                  :clientid="editModalData.client.id"
                   :block="true"
                 />
                 <TicketHistory
@@ -338,6 +340,9 @@ export default {
     this.getTickettypes()
   },
   methods: {
+    testPlanDx (client) {
+      return client.plan?.name === 'EN MORA' || client.plan?.name === 'RETIRADO'
+    },
     updateTickettypeFromModal (id, tickettype, index) {
       this.$store.commit('ticket/updateTickettype', { id, tickettype, index })
     },

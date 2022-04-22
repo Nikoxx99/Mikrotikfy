@@ -241,8 +241,6 @@
           />
         </v-col>
       </v-row>
-      <v-switch v-if="clienttype.name === 'INTERNET'" v-model="Client.hasRepeater" hide-details input-value="false" label="Tiene repetidor?" />
-      <v-switch v-if="clienttype.name === 'INTERNET'" v-model="Client.sendToMikrotik" input-value="true" label="Crear en Mikrotik?" />
       <v-btn
         class="mr-4 mt-4"
         :color="citycolor"
@@ -286,8 +284,6 @@ export default {
         mac_address: '',
         comment: '',
         newModel: 1,
-        hasRepeater: false,
-        sendToMikrotik: true,
         nap_onu_address: '',
         opticalPower: ''
       },

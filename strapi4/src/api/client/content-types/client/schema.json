@@ -133,6 +133,12 @@
       "relation": "manyToOne",
       "target": "api::clienttype.clienttype",
       "inversedBy": "clients"
+    },
+    "tvspecs": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::tvspec.tvspec",
+      "mappedBy": "client"
     }
   }
 }

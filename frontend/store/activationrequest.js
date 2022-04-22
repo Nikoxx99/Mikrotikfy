@@ -68,7 +68,6 @@ export const actions = {
     }
   },
   async createClientOnMikrotikById (_, payload) {
-    console.log(payload)
     await fetch(`${this.$config.API_STRAPI_ENDPOINT}admincreate`, {
       method: 'POST',
       headers: {

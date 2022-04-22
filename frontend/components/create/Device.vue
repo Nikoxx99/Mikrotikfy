@@ -31,7 +31,7 @@
         </v-card-title>
         <v-card-text>
           <v-container>
-            <MiscMacScanner @detectedmac="detectedMac($event)" />
+            <!-- <MiscMacScanner @detectedmac="detectedMac($event)" /> -->
             <v-alert
               v-if="alertBox"
               type="info"
@@ -92,6 +92,8 @@
           <v-btn
             class="mr-4"
             color="primary"
+            :loading="loading"
+            :disabled="loading"
             @click="createDeviceFn()"
           >
             Confirmar
@@ -125,6 +127,7 @@ export default {
       alertBox: false,
       alertBoxColor: '',
       createdMessage: '',
+      loading: false,
       valid_mac: [
         value => !!value || 'Debes especificar la Mac',
         (value) => {
@@ -165,6 +168,7 @@ export default {
     },
     async createDeviceFn () {
       if (this.valid) {
+        this.loading = true
         await fetch(`${this.$config.API_STRAPI_ENDPOINT}devices`, {
           method: 'POST',
           headers: {
@@ -180,11 +184,14 @@ export default {
               .then((device) => {
                 this.$emit('createDevice', { device, devicebrand: this.device.devicebrand })
                 this.dialogDevice = false
+                this.loading = false
               })
           } else {
-            throw new Error('Error creating serie')
+            this.loading = false
+            throw new Error('Error creating device')
           }
         }).catch((error) => {
+          this.loading = false
           // eslint-disable-next-line no-console
           console.error(error)
         })
@@ -192,6 +199,7 @@ export default {
         this.alertBox = true
         this.createdMessage = 'Debes completar todos los campos'
         this.alertBoxColor = 'red'
+        this.loading = false
       }
     },
     getDate (date) {
