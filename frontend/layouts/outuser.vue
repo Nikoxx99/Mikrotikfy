@@ -1,6 +1,7 @@
 <template>
   <v-app
     dark
+    :style="'background-color:rgb(20 20 20 / 58%);'"
   >
     <v-main>
       <v-container fluid>

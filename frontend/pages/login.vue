@@ -1,11 +1,11 @@
 <template>
   <v-container
     fluid
-    style="background-color:#222;height:100vh;"
+    class="transparent"
   >
     <v-row
       class="align-center"
-      style="height:100vh;"
+      style="height:97vh;"
     >
       <v-col
         cols="12"
@@ -57,5 +57,12 @@ export default {
 </script>
 
 <style>
-
+body {
+    color: rgba(255,255,255,0.65);
+    background-color: #24292e;
+    background-image: url('/star-bg.svg'),linear-gradient(#191c20, #1e1e1e 50%);
+    background-repeat: no-repeat;
+    background-position: center 0, 0 0, 0 0;
+    background-size: cover;
+}
 </style>

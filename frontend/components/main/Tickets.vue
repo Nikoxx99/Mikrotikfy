@@ -1,11 +1,14 @@
 <template>
-  <div>
+  <v-container fluid>
     <v-row>
       <v-col
         cols="12"
       >
-        <v-card flat tile>
-          <v-card-text class="py-1">
+        <v-card
+          fluid
+          class="rounded-xl"
+        >
+          <v-card-text class="py-4">
             <v-row>
               <v-tooltip top>
                 <!-- eslint-disable -->
@@ -269,7 +272,7 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-  </div>
+  </v-container>
 </template>
 
 <script>

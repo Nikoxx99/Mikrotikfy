@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container fluid>
     <div v-if="clients.length < 1 && !$route.params.search && clienttype">
       <v-row class="justify-center">
         <h4>Crea un cliente</h4>
@@ -16,18 +16,6 @@
             <v-icon>mdi-plus</v-icon>
           </v-btn>
         </v-fab-transition>
-      </v-row>
-      <v-row class="justify-center">
-        <h3 class="text-center px-3">
-          O realiza una búsqueda para mostrar la información
-        </h3>
-      </v-row>
-      <v-row class="justify-center">
-        <h1>
-          <v-icon large>
-            mdi-magnify
-          </v-icon>
-        </h1>
       </v-row>
     </div>
     <v-row v-else-if="clients.length < 1 && $route.params.search" class="justify-center">

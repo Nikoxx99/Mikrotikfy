@@ -1,7 +1,7 @@
 <template>
   <v-app
     class="text-body-2"
-    :style="this.$vuetify.theme.dark ? 'background-color:rgb(20 20 20 / 88%);' : 'background-color:rgb(255 255 255 / 86%);'"
+    :style="this.$vuetify.theme.dark ? 'background-color:rgb(20 20 20 / 68%);' : 'background-color:rgb(255 255 255 / 86%);'"
   >
     <v-navigation-drawer
       v-model="drawer"
@@ -117,8 +117,12 @@
       app
       inset
       absolute
+      style="font-size:11px;"
+      class="text-center justify-center"
     >
-      <span>&copy; 2019 - {{ new Date().getFullYear() }} Base de Datos interactiva - Desarrollada para ARNOProducciones por Nicolas Echeverry - Todos los derechos reservados.</span>
+      <span
+        class="text-center"
+      >&copy; 2019 - {{ new Date().getFullYear() }} Base de Datos interactiva - Desarrollada para ARNOProducciones por Nicolas Echeverry - Todos los derechos reservados.</span>
     </v-footer>
   </v-app>
 </template>
@@ -155,12 +159,24 @@ export default {
     }
   },
   mounted () {
+    this.testAuthToken()
     this.getLocalStorage()
     this.comprobeDateToSetChristmasTheme()
     this.loadThemeFromVuetifyThemeManager()
     this.isMobileScreen()
   },
   methods: {
+    testAuthToken () {
+      if (this.$store.state.auth.token) {
+        this.$store.dispatch('authActions/checkToken', {
+          token: this.$store.state.auth.token
+        }).then((res) => {
+          if (res.status !== 200) {
+            this.logout(true)
+          }
+        })
+      }
+    },
     async getLocalStorage () {
       await this.$store.dispatch('loadLocalStorage')
     },
@@ -215,7 +231,7 @@ export default {
       localStorage.clear()
       sessionStorage.clear()
       this.$store.commit('setAuth', null)
-      window.location.href = params ? '/login?resetSession=true' : '/login'
+      window.location.href = params ? '/login?sessionExpired=true' : '/login'
     }
   }
 }

@@ -1,85 +1,106 @@
 <template>
-  <v-card
-    flat
-    :loading="isLoading"
-    style="background-color:222;"
-  >
-    <v-alert
-      v-if="firstTime"
-      type="info"
-      class="blue darken-4"
-      tile
+  <div>
+    <v-card
+      flat
+      :loading="isLoading"
+      class="rounded-xl"
     >
-      ARNOProducciones Database
-    </v-alert>
-    <v-alert
-      v-if="loginFailed"
-      type="error"
-      tile
-    >
-      Error de inicio de sesión. <br>
-      <span class="text-subtitle-2">{{ errorMessages }}</span>
-    </v-alert>
-    <v-alert
-      v-if="$route.query.resetSession"
-      type="info"
-      tile
-    >
-      Tu sesión ha sido reiniciada manualmente por un administrador debido a una actualizacion de la API. Porfavor inicia sesion nuevamente.
-    </v-alert>
-    <v-alert
-      v-if="loginSuccessful"
-      type="info"
-      tile
-    >
-      ¡Inicio de sesión correcto! Por favor espera mientras se cachean los datos.
-    </v-alert>
-    <v-card-text
-      class="d-flex justify-center"
-    >
-      <img
-        src="logo.png"
-        alt="ARNOProducciones Logo"
-        style="max-width:50%;"
-      >
-    </v-card-text>
-    <v-card-text class="text-center">
-      <h3>Ingresa tu usuario</h3>
-    </v-card-text>
-    <v-card-text>
-      <form @keyup.enter="login">
-        <v-text-field
-          v-model="username"
-          :rules="usernameRules"
-          label="Usuario"
-          required
-        />
-        <v-text-field
-          v-model="password"
-          :rules="passwordRules"
-          :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-          :type="showPassword ? 'text' : 'password'"
-          label="Contraseña"
-          hint="Ingresa tu contraseña"
-          required
-          @click:append="showPassword = !showPassword"
-        />
-      </form>
-    </v-card-text>
-    <v-card-text>
-      <v-btn
+      <v-alert
+        v-if="firstTime"
+        type="info"
+        class="blue darken-4"
         tile
-        text
-        block
-        class="my-2 blue darken-4 white--text"
-        :loading="isLoading"
-        :disabled="isLoading"
-        @click.enter="login"
       >
-        Ingresar
-      </v-btn>
+        ARNOProducciones Database
+      </v-alert>
+      <v-alert
+        v-if="loginFailed"
+        type="error"
+        tile
+        class="rounded-t-xl"
+      >
+        Error de inicio de sesión. <br>
+        <span class="text-subtitle-2">{{ errorMessages }}</span>
+      </v-alert>
+      <v-alert
+        v-if="sessionExpired"
+        class="yellow darken-4 rounded-t-xl"
+        tile
+      >
+        Tu sesión ha expirado. Ingresa nuevamente.
+      </v-alert>
+      <v-alert
+        v-if="loginSuccessful"
+        type="info"
+        tile
+        class="rounded-t-xl"
+      >
+        ¡Inicio de sesión correcto! Por favor espera mientras se cachean los datos.
+      </v-alert>
+      <v-card-text
+        class="d-flex justify-center"
+      >
+        <img
+          src="logo.png"
+          alt="ARNOProducciones Logo"
+          style="max-width:50%;"
+        >
+      </v-card-text>
+      <v-card-text class="text-center">
+        <h3>Aplicativo de Gestión Integral</h3>
+      </v-card-text>
+      <v-card-text>
+        <form @keyup.enter="login">
+          <v-text-field
+            v-model="username"
+            :rules="usernameRules"
+            label="Usuario"
+            class="rounded-t-xl"
+            filled
+            required
+          />
+          <v-text-field
+            v-model="password"
+            :rules="passwordRules"
+            :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+            :type="showPassword ? 'text' : 'password'"
+            label="Contraseña"
+            class="rounded-t-xl"
+            filled
+            hint="Ingresa tu contraseña"
+            required
+            @click:append="showPassword = !showPassword"
+          />
+        </form>
+      </v-card-text>
+      <v-card-text>
+        <v-btn
+          tile
+          text
+          block
+          class="my-2 blue darken-4 white--text rounded-xl"
+          :loading="isLoading"
+          :disabled="isLoading"
+          @click.enter="login"
+        >
+          Continuar
+          <v-icon>
+            mdi-arrow-right
+          </v-icon>
+        </v-btn>
+      </v-card-text>
+    </v-card>
+    <v-card-text class="text-center">
+      <p class="grey--text">
+        &copy; ARNOProducciones S.A.S. | Departamento de Desarrollo de Software
+      </p>
     </v-card-text>
-  </v-card>
+    <v-card-text class="text-center pt-0">
+      <p class="grey--text">
+        Nicolas Echeverry
+      </p>
+    </v-card-text>
+  </div>
 </template>
 
 <script>
@@ -102,6 +123,7 @@ export default {
     loginFailed: false,
     loginSuccessful: false,
     isLoading: false,
+    sessionExpired: false,
     errorMessages: ''
   }),
   mounted () {
@@ -110,6 +132,9 @@ export default {
     }
     if (this.$route.query.loginFailed) {
       this.loginFailed = true
+    }
+    if (this.$route.query.sessionExpired) {
+      this.sessionExpired = true
     }
   },
   methods: {
@@ -137,6 +162,8 @@ export default {
             })
         } else {
           this.loginFailed = true
+          this.isLoading = false
+          this.sessionExpired = false
         }
       }).catch((error) => {
         // eslint-disable-next-line no-console

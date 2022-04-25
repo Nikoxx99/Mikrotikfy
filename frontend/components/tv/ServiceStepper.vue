@@ -181,7 +181,6 @@ export default {
     }
   },
   mounted () {
-    this.initComponent()
     this.getTvSpecTypes()
   },
   methods: {
@@ -194,24 +193,28 @@ export default {
     save () {
       if (this.specs.quality === null) {
         this.$toast.error('Seleccione una calidad de señal', { duration: 3000 })
+        this.e6 = 1
         return
       }
       if (this.specs.db === -1) {
         this.$toast.error('Ingrese una medida de DBs', {
           duration: 3000
         })
+        this.e6 = 2
         return
       }
       if (this.specs.high === -1) {
         this.$toast.error('Ingrese una medida de altos', {
           duration: 3000
         })
+        this.e6 = 3
         return
       }
       if (this.specs.down === -1) {
         this.$toast.error('Ingrese una medida de bajos', {
           duration: 3000
         })
+        this.e6 = 4
         return
       }
       this.dialog = false
