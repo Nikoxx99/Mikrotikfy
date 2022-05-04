@@ -35,7 +35,7 @@
         tile
         class="rounded-t-xl"
       >
-        ¡Inicio de sesión correcto! Por favor espera mientras se cachean los datos.
+        ¡Inicio de sesión correcto! Por favor espere.
       </v-alert>
       <v-card-text
         class="d-flex justify-center"
@@ -232,7 +232,7 @@ export default {
               this.$store.dispatch('count/activeClients', { token: response.jwt, city: userCities[0].id }),
               this.$store.dispatch('telegram/getTelegramBotsFromDatabase', { token: response.jwt, city: userCities[0].name })
             ]).then(() => {
-              window.location.href = '/clients'
+              window.location.href = `/clients?city=${userCities[0].name}&clienttype=INTERNET`
             }).catch((e) => {
               this.errorMessages = e
               this.loginFailed = true

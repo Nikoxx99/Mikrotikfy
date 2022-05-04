@@ -68,7 +68,7 @@ export default {
         this.loadingDataTable = false
       } else {
         this.$router.push({
-          path: '/clients'
+          path: `/clients?city=${this.$route.query.city}&clienttype=${this.$route.query.clienttype}`
         })
         this.$emit('search', '')
         this.loadingDataTable = false
