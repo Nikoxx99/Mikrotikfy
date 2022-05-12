@@ -60,7 +60,8 @@
       "type": "relation",
       "relation": "manyToOne",
       "target": "plugin::users-permissions.role",
-      "inversedBy": "users"
+      "inversedBy": "users",
+      "configurable": false
     },
     "cities": {
       "type": "relation",

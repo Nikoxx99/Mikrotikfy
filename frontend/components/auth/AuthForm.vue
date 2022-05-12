@@ -172,7 +172,14 @@ export default {
     },
     async logininfo (response) {
       this.loginSuccessful = true
-      await fetch(`${this.$config.API_STRAPI_ENDPOINT}users/me`, {
+      const qs = require('qs')
+      const query = qs.stringify({
+        populate: ['role', 'cities', 'clienttypes', 'menus']
+      },
+      {
+        encodeValuesOnly: true
+      })
+      await fetch(`${this.$config.API_STRAPI_ENDPOINT}users/${response.user.id}?${query}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

@@ -47,6 +47,16 @@
             </h3>
             </v-row>
           </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
+        <v-card
+          fluid
+          class="rounded-xl"
+        >
+        <v-card-text>
           <client-only>
             <v-data-table
               :key="key"
@@ -62,7 +72,6 @@
               sort-desc
               no-data-text="No hay Tickets abiertos aún..."
               loading-text="Cargando información de tickets..."
-              dense
               hide-default-footer
               mobile-breakpoint="100"
               @page-count="pageCount = $event"
@@ -150,10 +159,15 @@
               </template>
             </v-data-table>
           </client-only>
-          <div class="text-center pt-2">
-            <v-pagination v-model="page" :length="pageCount" />
-          </div>
+          </v-card-text>
         </v-card>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
+        <div class="text-center pt-2">
+          <v-pagination v-model="page" :length="pageCount" />
+        </div>
       </v-col>
     </v-row>
     <v-dialog
