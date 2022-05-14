@@ -7,7 +7,7 @@
       @click="modal = true"
     >
       <v-icon>mdi-export-variant</v-icon>
-      <span>Entregar</span>
+      <span>Entregar {{ template.name }}</span>
     </v-btn>
     <v-dialog
       v-model="modal"
@@ -15,7 +15,7 @@
     >
       <v-card class="elevation-0">
         <v-card-title>
-          Entregar
+          Entregar {{ template.name }}
         </v-card-title>
         <v-card-text>
           <v-row>
@@ -31,84 +31,56 @@
                 hide-details
               />
             </v-col>
-            <v-col>
-              <v-select
-                v-model="dispense.materialhistorytype"
-                item-text="name"
-                item-value="id"
-                :items="materialHistoryTypeList"
-                return-object
-                label="Tipo de Operacion"
-                outlined
-                dense
-                hide-details
-              />
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols="4">
-              <v-autocomplete
-                v-model="dispense.material"
-                item-text="name"
-                item-value="id"
-                :items="materialList"
-                return-object
-                label="Material"
-                outlined
-                dense
-                hide-details
-              />
-            </v-col>
-            <v-col cols="4">
-              <v-text-field
-                v-model.number="dispense.quantity"
-                min="1"
-                label="Cantidad"
-                type="number"
-                outlined
-                dense
-              />
-            </v-col>
-            <v-col cols="4">
-              <v-select
-                v-model.number="dispense.materialtype"
-                label="Sale de"
-                item-text="name"
-                item-value="id"
-                return-object
-                :items="materialTypes"
-                type="number"
-                outlined
-                dense
-              />
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="pt-0">
-              <v-textarea
-                v-model="dispense.description"
-                label="Detalles adicionales (OPCIONAL)"
-                rows="2"
-                outlined
-                dense
-              />
-            </v-col>
           </v-row>
           <v-row>
             <v-col>
               <v-btn
-                color="red darken-4"
-                class="elevation-0 white--text"
-                rounded
-                :loading="loading"
-                :disabled="loading"
-                @click="dispenseMaterial()"
+                class="elevation-0"
+                color="blue darken-4"
+                @click="addItem"
               >
-                Entregar
+                <v-icon>mdi-arrow-down</v-icon>
+                <span>Agregar</span>
               </v-btn>
             </v-col>
           </v-row>
         </v-card-text>
+        <v-divider class="mb-5" />
+        <v-card-text>
+          <v-row>
+            <v-col>
+              <p v-if="materials.length < 1" class="text-center">
+                Agrega un elemento para continuar
+              </p>
+              <InventoryTemplateItem
+                v-for="(material, index) in materials"
+                :key="index"
+                :index="index"
+                :material="{...material}"
+                :materials="materials"
+                :materiallist="materialList"
+                @update="updateItem"
+              />
+            </v-col>
+          </v-row>
+        </v-card-text>
+        <v-card-actions>
+          <v-btn
+            class="red darken-4"
+            text
+            :loading="loading"
+            :disabled="loading"
+            @click="dispenseMaterial"
+          >
+            Entregar
+          </v-btn>
+          <v-btn
+            text
+            @click="modal = false"
+          >
+            Cancelar
+          </v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
   </div>
@@ -116,16 +88,20 @@
 
 <script>
 export default {
+  name: 'InventoryWithdrawTemplate',
+  props: {
+    template: {
+      type: Object,
+      required: true
+    }
+  },
   data () {
     return {
       dispense: {
-        material: null,
-        materialtype: null,
-        quantity: 1,
-        materialhistorytype: null,
         operator: this.$store.state.auth.id,
         technician: null
       },
+      materials: [],
       loading: false,
       modal: false
     }
@@ -167,7 +143,7 @@ export default {
     },
     async dispenseMaterial () {
       this.loading = !this.loading
-      if (!this.dispense.material || !this.dispense.materialtype || !this.dispense.materialhistorytype || !this.dispense.quantity || !this.dispense.technician) {
+      if (this.materials.length < 1 || !this.dispense.technician) {
         this.$toast.error('Rellena todos los campos antes de continuar', { position: 'top-center' })
         this.loading = !this.loading
         return
@@ -193,24 +169,15 @@ export default {
       this.resetFields()
       this.loading = !this.loading
     },
-    async returnMaterial () {
-      this.loading = !this.loading
-      if (!this.returned.material || !this.returned.materialhistorytype || !this.returned.quantity || !this.returned.technician) {
-        this.$toast.error('Rellena todos los campos antes de continuar', { position: 'top-center' })
-        this.loading = !this.loading
-        return
-      }
-      await this.$store.dispatch('inventory/createOperationHistory', { token: this.$store.state.auth.token, city: this.$route.query.city, data: this.returned })
-      await this.$store.dispatch('inventory/updateCurrentMaterialQuantity', { token: this.$store.state.auth.token, city: this.$route.query.city, data: this.returned, action: 'return' })
-      await this.$store.dispatch('inventory/getMaterialHistoryList', { token: this.$store.state.auth.token, city: this.$route.query.city, pagination: { page: 1, pageCount: 1, pageSize: 10 } })
-      await this.$store.dispatch('inventory/getMaterialList', { token: this.$store.state.auth.token, city: this.$route.query.city, pagination: { page: 1, pageCount: 1, pageSize: 24 } })
-      this.getMaterialList()
-      this.resetFields()
-      this.loading = !this.loading
+    addItem () {
+      this.materials.push({
+        id: -1,
+        name: ''
+      })
     },
-    resetFields () {
-      this.dispense.material = null
-      this.dispense.quantity = null
+    updateItem (data) {
+      console.log(data)
+      this.materials[data.index] = data.material
     }
   }
 }

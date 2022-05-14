@@ -20,7 +20,9 @@
               <div class="d-flex">
                 <InventoryAddItem />
                 <InventoryAdd />
-                <InventoryDaily />
+                <InventoryWithdraw />
+                <InventoryWithdrawTemplate :template="{name: 'Internet'}" />
+                <InventoryWithdrawTemplate :template="{name: 'TV'}" />
                 <v-spacer />
                 <v-text-field
                   v-model="search"
