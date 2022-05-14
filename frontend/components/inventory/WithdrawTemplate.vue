@@ -11,7 +11,7 @@
     </v-btn>
     <v-dialog
       v-model="modal"
-      max-width="890"
+      max-width="990"
     >
       <v-card class="elevation-0">
         <v-card-title>
@@ -141,14 +141,14 @@ export default {
     getMaterialHistoryTypeList () {
       this.$store.dispatch('inventory/getMaterialHistoryTypeList', { token: this.$store.state.auth.token, city: this.$route.query.city })
     },
-    async dispenseMaterial () {
+    async dispenseMaterial (material) {
       this.loading = !this.loading
       if (this.materials.length < 1 || !this.dispense.technician) {
         this.$toast.error('Rellena todos los campos antes de continuar', { position: 'top-center' })
         this.loading = !this.loading
         return
       }
-      const currentQuantityOfSelected = this.dispense.material.materialquantities.filter(item => item.materialtype.name === this.dispense.materialtype.name)[0]?.quantity
+      const currentQuantityOfSelected = material.materialquantities.filter(item => item.materialtype.name === this.dispense.materialtype.name)[0]?.quantity
       if (currentQuantityOfSelected < this.dispense.quantity || !currentQuantityOfSelected || currentQuantityOfSelected.length < 1) {
         this.$toast.error('No hay suficiente material para dispensar', { position: 'top-center' })
         this.loading = !this.loading
@@ -172,7 +172,11 @@ export default {
     addItem () {
       this.materials.push({
         id: -1,
-        name: ''
+        name: '',
+        materialtype: {
+          id: 1,
+          name: 'GENERAL'
+        }
       })
     },
     updateItem (data) {

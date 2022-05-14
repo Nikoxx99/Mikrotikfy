@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-row>
-      <v-col cols="8" class="py-1">
+      <v-col cols="6" class="py-1">
         <v-select
           v-model="materialComputed"
           label="Material"
@@ -20,6 +20,18 @@
           min="1"
           label="Cantidad"
           type="number"
+          outlined
+          dense
+        />
+      </v-col>
+      <v-col cols="2" class="py-1">
+        <v-select
+          v-model.number="material.materialtype"
+          label="Tipo"
+          item-text="name"
+          item-value="id"
+          return-object
+          :items="materialTypes"
           outlined
           dense
         />
@@ -53,6 +65,9 @@ export default {
     return {}
   },
   computed: {
+    materialTypes () {
+      return this.$store.state.inventory.materialTypes
+    },
     materialComputed: {
       get () {
         return this.material
