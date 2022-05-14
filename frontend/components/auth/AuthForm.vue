@@ -247,6 +247,11 @@ export default {
               this.isLoading = false
             })
           }
+        }).catch((_) => {
+          this.errorMessages = 'Usuario o contraseña incorrectos. Intente nuevamente.'
+          this.loginFailed = true
+          this.loginSuccessful = false
+          this.isLoading = false
         })
     }
   }
